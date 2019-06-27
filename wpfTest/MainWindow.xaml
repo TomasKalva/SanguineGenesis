@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:wpfTest"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" WindowState="Maximized" WindowStyle="None"
+        Closing="Window_Closing" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
     <Grid>
-        
+        <Grid Name="mapPanel">
+            <Canvas Name="tiles"></Canvas>
+        </Grid>
     </Grid>
 </Window>

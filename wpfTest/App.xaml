@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:wpfTest"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <BitmapImage x:Key="vanilaMap" UriSource="vanilaMap.png"/>
     </Application.Resources>
 </Application>
