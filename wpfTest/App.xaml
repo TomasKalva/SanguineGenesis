@@ -5,5 +5,8 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <BitmapImage x:Key="vanilaMap" UriSource="vanilaMap.png"/>
+        <BitmapImage x:Key="hugeMap" UriSource="hugeMap.png"/>
+        <BitmapImage x:Key="grass" UriSource="Water.png"/>
+        <BitmapImage x:Key="water" UriSource="Water.png"/>
     </Application.Resources>
 </Application>
