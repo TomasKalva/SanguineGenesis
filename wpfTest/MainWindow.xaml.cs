@@ -1,12 +1,16 @@
-﻿using SharpGL;
+﻿using GlmNet;
+using SharpGL;
 using SharpGL.Enumerations;
 using SharpGL.SceneGraph.Assets;
+using SharpGL.Shaders;
 using SharpGL.VertexBuffers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +44,6 @@ namespace wpfTest
             //mapImage.Source = game.Map.MapImage;
             mapView = new MapView(0, 0, 60, game.Map);
             mapMovementInput = new MapMovementInput();
-            OpenGlInitialize();
 
             Thread t = new Thread(() => {
                 Dispatcher.Invoke(DispatcherPriority.Render, new Action(() =>
@@ -383,368 +386,48 @@ namespace wpfTest
 
         private void OpenGLControl_OpenGLDraw(object sender, SharpGL.SceneGraph.OpenGLEventArgs args)
         {
-
             //  Get the OpenGL object, for quick access.
             OpenGL gl = args.OpenGL;
 
             if (openGlNotInitialized)
             {
-                OpenGlInitialize();
-                openGlNotInitialized=false;
+                //OpenGlInitialize();
+                openGlNotInitialized = false;
+                //OpenGLColorBufferDrawer.Initialise(gl, (float)ActualWidth, (float)ActualHeight);
+                OpenGLAtlasDrawer.Initialise(gl, (float)ActualWidth, (float)ActualHeight);
             }
-
-            //  Clear the color and depth buffers.
-            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
-            
-
-
-            //DrawSquareOGL(gl, 0, 0);
-            TextureVsColorMeasuring(gl);
-
-            //  Flush OpenGL.
-            gl.Flush();
-
-            //  Rotate the geometry a bit.
-            rotatePyramid += 3.0f;
-            rquad -= 3.0f;
-        }
-
-        private void TextureVsColorMeasuring(OpenGL gl)
-        {
-            //Orthographic(gl);
-            int width = 20;
-            int height = 10;
-
-            float squareSide = 20f;
-
-            CreateVerticesForSquare(gl);
-            DrawBuffered(gl);
-
-            /*Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new Stopwatch();
             sw.Start();
-
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                    //DrawSquareColorOrographic(gl, i, j, squareSide, squareSide);
-                    DrawSquareOGL(gl,i,j, squareSide, squareSide);
+            //OpenGLColorBufferDrawer.Draw(gl);
+            OpenGLAtlasDrawer.Draw(gl);
             sw.Stop();
-            Console.WriteLine("Drawing shapes took: " + sw.Elapsed.Milliseconds);
-
-            sw.Reset();
-            sw.Start();
-
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                    //DrawSquareTextureOrographic(gl, i, j, squareSide, squareSide);
-                    DrawTextureSquareOGL(gl, i, j, squareSide, squareSide);
-            sw.Stop();
-            Console.WriteLine("Drawing textures took: " + sw.Elapsed.Milliseconds);*/
+            Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
         }
+    }
 
-        private void OpenGlInitialize()
-        {
-            //  Get the OpenGL object, for quick access.
-            OpenGL gl = openGLControl1.OpenGL;
-            this.openGLControl1.FrameRate = 30;
-
-            //  A bit of extra initialisation here, we have to enable textures.
-            gl.Enable(OpenGL.GL_TEXTURE_2D);
-
-            //  Create our texture object from a file. This creates the texture for OpenGL.
-            texture.Create(gl, "Grass.png");
-        }
-
-        Texture texture = new Texture();
-        float rotatePyramid = 0;
-        float rquad = 0;
-
-        private void DrawCubeOGL(OpenGL gl, float x , float y)
-        {
-            //  Reset the modelview matrix.
-            gl.LoadIdentity();
-
-            //  Move into a more central position.
-            gl.Translate(x, y, -70.0f);
-
-            //  Rotate the cube.
-            gl.Rotate(rquad, 1.0f, 1.0f, 1.0f);
-
-            //  Provide the cube colors and geometry.
-            gl.Begin(OpenGL.GL_QUADS);
-
-            gl.Color(0.0f, 1.0f, 0.0f);
-            gl.Vertex(1.0f, 1.0f, -1.0f);
-            gl.Vertex(-1.0f, 1.0f, -1.0f);
-            gl.Vertex(-1.0f, 1.0f, 1.0f);
-            gl.Vertex(1.0f, 1.0f, 1.0f);
-
-            gl.Color(1.0f, 0.5f, 0.0f);
-            gl.Vertex(1.0f, -1.0f, 1.0f);
-            gl.Vertex(-1.0f, -1.0f, 1.0f);
-            gl.Vertex(-1.0f, -1.0f, -1.0f);
-            gl.Vertex(1.0f, -1.0f, -1.0f);
-
-            gl.Color(1.0f, 0.0f, 0.0f);
-            gl.Vertex(1.0f, 1.0f, 1.0f);
-            gl.Vertex(-1.0f, 1.0f, 1.0f);
-            gl.Vertex(-1.0f, -1.0f, 1.0f);
-            gl.Vertex(1.0f, -1.0f, 1.0f);
-
-            gl.Color(1.0f, 1.0f, 0.0f);
-            gl.Vertex(1.0f, -1.0f, -1.0f);
-            gl.Vertex(-1.0f, -1.0f, -1.0f);
-            gl.Vertex(-1.0f, 1.0f, -1.0f);
-            gl.Vertex(1.0f, 1.0f, -1.0f);
-
-            gl.Color(0.0f, 0.0f, 1.0f);
-            gl.Vertex(-1.0f, 1.0f, 1.0f);
-            gl.Vertex(-1.0f, 1.0f, -1.0f);
-            gl.Vertex(-1.0f, -1.0f, -1.0f);
-            gl.Vertex(-1.0f, -1.0f, 1.0f);
-
-            gl.Color(1.0f, 0.0f, 1.0f);
-            gl.Vertex(1.0f, 1.0f, -1.0f);
-            gl.Vertex(1.0f, 1.0f, 1.0f);
-            gl.Vertex(1.0f, -1.0f, 1.0f);
-            gl.Vertex(1.0f, -1.0f, -1.0f);
-
-            gl.End();
-
-        }
-
-        float Distance;
-
-        private void DrawSquareOGL(OpenGL gl, float x, float y, float width, float height)
-        {
-            Distance = 5f;
-
-            //  Reset the modelview matrix.
-            gl.LoadIdentity();
-
-            //  Move into a more central position.
-            gl.Translate(x* width, y* height, -Distance);
-
-            //  Rotate the cube.
-            gl.Rotate(0, 1.0f, 1.0f, 1.0f);
-            gl.Scale(width, height, 1f);
-
-            //  Provide the cube colors and geometry.
-            gl.Begin(OpenGL.GL_QUADS);
-
-            gl.Color(0.0f, 1.0f, 0.0f);
-            gl.Vertex(0f, 0f, 0);
-            gl.Vertex(0f, 1f, 0);
-            gl.Vertex(1f, 1f, 0);
-            gl.Vertex(1f, 0f, 0);
-
-            gl.End();
-        }
-
-        private void DrawTextureSquareOGL(OpenGL gl, float x, float y, float width, float height)
-        {
-            Distance = 5f;
-
-            //  Reset the modelview matrix.
-            gl.LoadIdentity();
-
-            //  Move into a more central position.
-            gl.Translate(x* width, y * height, -Distance);
-
-            //  Rotate the cube.
-            gl.Rotate(0, 1.0f, 1.0f, 1.0f);
-            gl.Scale(width, height, 1f);
-
-            texture.Bind(gl);
-            //  Provide the cube colors and geometry.
-            gl.Begin(OpenGL.GL_QUADS);
-            
-            gl.TexCoord(0.0f, 1.0f); gl.Vertex(0f, 0f, 0);
-            gl.TexCoord(0.0f, 0.0f); gl.Vertex(0f, 1f, 0);
-            gl.TexCoord(1.0f, 0.0f); gl.Vertex(1f, 1f, 0);
-            gl.TexCoord(1.0f, 1.0f); gl.Vertex(1f, 0f, 0);
-
-            gl.End();
-        }
-
-        public void Orthographic(OpenGL gl)
-        {
-            gl.MatrixMode(MatrixMode.Projection);
-            gl.LoadIdentity();
-
-            // NOTE: Basically no matter what I do, the only points I see are those at
-            // the "near" surface (with z = -zNear)--in this case, I only see green points
-            gl.Ortho(0, openGLControl1.ActualWidth, openGLControl1.ActualHeight, 0, 1, 10);
-
-            //  Back to the modelview.
-            gl.MatrixMode(MatrixMode.Modelview);
-            
-        }
-
-        private void DrawSquareColorOrographic(OpenGL gl, float x, float y, float width, float height)
-        {
-            Distance = 5f;
-
-            //  Reset the modelview matrix.
-            gl.LoadIdentity();
-
-            //  Move into a more central position.
-            gl.Translate(x*width, y*height, -Distance);
-
-            //  Rotate the cube.
-            gl.Rotate(0, 1.0f, 1.0f, 1.0f);
-            gl.Scale(width, height, 1f);
-
-            //  Provide the cube colors and geometry.
-            gl.Begin(OpenGL.GL_QUADS);
-
-            gl.Color(0.0f, 1.0f, 0.0f);
-            gl.Vertex(0f, 0f, 0);
-            gl.Vertex(0f, 1f, 0);
-            gl.Vertex(1f, 1f, 0);
-            gl.Vertex(1f, 0f, 0);
-
-            gl.End();
-        }
-
-        private void DrawSquareTextureOrographic(OpenGL gl, float x, float y, float width, float height)
-        {
-            Distance = 5f;
-
-            //  Reset the modelview matrix.
-            gl.LoadIdentity();
-
-            //  Move into a more central position.
-            gl.Translate(x*width, y*height, -Distance);
-
-            //  Rotate the cube.
-            gl.Rotate(0, 1.0f, 1.0f, 1.0f);
-            gl.Scale(width, height, 1f);
-
-            texture.Bind(gl);
-            //  Provide the cube colors and geometry.
-            gl.Begin(OpenGL.GL_QUADS);
-
-            gl.TexCoord(0.0f, 1.0f); gl.Vertex(0f, 0f, 0);
-            gl.TexCoord(0.0f, 0.0f); gl.Vertex(0f, 1f, 0);
-            gl.TexCoord(1.0f, 0.0f); gl.Vertex(1f, 1f, 0);
-            gl.TexCoord(1.0f, 1.0f); gl.Vertex(1f, 0f, 0);
-
-            gl.End();
-        }
-
-        private void DrawBuffered(OpenGL gl)
-        {
-            //  Bind the out vertex array.
-            vertexBufferArray.Bind(gl);
-
-            //  Draw the square.
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 6);
-
-            //  Unbind our vertex array and shader.
-            vertexBufferArray.Unbind(gl);
-        }
-
+    /// <summary>
+    /// A small helper class to load manifest resource files.
+    /// </summary>
+    public static class ManifestResourceLoader
+    {
         /// <summary>
-        /// Creates the geometry for the square, also creating the vertex buffer array.
+        /// Loads the named manifest resource as a text string.
         /// </summary>
-        /// <param name="gl">The OpenGL instance.</param>
-        private void CreateVerticesForSquare(OpenGL gl)
+        /// <param name="textFileName">Name of the text file.</param>
+        /// <returns>The contents of the manifest resource.</returns>
+        public static string LoadTextFile(string textFileName)
         {
-            var vertices = new float[18];
-            var colors = new float[18]; // Colors for our vertices  
-            vertices[0] = -0.5f; vertices[1] = -0.5f; vertices[2] = 0.0f; // Bottom left corner  
-            colors[0] = 1.0f; colors[1] = 1.0f; colors[2] = 1.0f; // Bottom left corner  
-            vertices[3] = -0.5f; vertices[4] = 0.5f; vertices[5] = 0.0f; // Top left corner  
-            colors[3] = 1.0f; colors[4] = 0.0f; colors[5] = 0.0f; // Top left corner  
-            vertices[6] = 0.5f; vertices[7] = 0.5f; vertices[8] = 0.0f; // Top Right corner  
-            colors[6] = 0.0f; colors[7] = 1.0f; colors[8] = 0.0f; // Top Right corner  
-            vertices[9] = 0.5f; vertices[10] = -0.5f; vertices[11] = 0.0f; // Bottom right corner  
-            colors[9] = 0.0f; colors[10] = 0.0f; colors[11] = 1.0f; // Bottom right corner  
-            vertices[12] = -0.5f; vertices[13] = -0.5f; vertices[14] = 0.0f; // Bottom left corner  
-            colors[12] = 1.0f; colors[13] = 1.0f; colors[14] = 1.0f; // Bottom left corner  
-            vertices[15] = 0.5f; vertices[16] = 0.5f; vertices[17] = 0.0f; // Top Right corner  
-            colors[15] = 0.0f; colors[16] = 1.0f; colors[17] = 0.0f; // Top Right corner  
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            var pathToDots = textFileName.Replace("\\", ".");
+            var location = string.Format("{0}.{1}", executingAssembly.GetName().Name, pathToDots);
 
-            //  Create the vertex array object.
-            vertexBufferArray = new VertexBufferArray();
-            vertexBufferArray.Create(gl);
-            vertexBufferArray.Bind(gl);
-
-            //  Create a vertex buffer for the vertex data.
-            var vertexDataBuffer = new VertexBuffer();
-            vertexDataBuffer.Create(gl);
-            vertexDataBuffer.Bind(gl);
-            vertexDataBuffer.SetData(gl, 0, vertices, false, 3);
-
-            //  Now do the same for the colour data.
-            var colourDataBuffer = new VertexBuffer();
-            colourDataBuffer.Create(gl);
-            colourDataBuffer.Bind(gl);
-            colourDataBuffer.SetData(gl, 1, colors, false, 3);
-
-            //  Unbind the vertex array, we've finished specifying data for it.
-            vertexBufferArray.Unbind(gl);
+            using (var stream = executingAssembly.GetManifestResourceStream(location))
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
         }
-
-        //  The vertex buffer array which contains the vertex and colour buffers.
-        VertexBufferArray vertexBufferArray;
-
-
-        private void DrawTextureOGL(OpenGL gl)
-        {
-
-
-            gl.LoadIdentity();
-            gl.Translate(0.0f, 0.0f, -6.0f);
-
-            gl.Rotate(rtri, 0.0f, 1.0f, 0.0f);
-
-            //  Bind the texture.
-            texture.Bind(gl);
-
-            gl.Begin(OpenGL.GL_QUADS);
-
-            // Front Face
-            gl.TexCoord(0.0f, 0.0f); gl.Vertex(-1.0f, -1.0f, 1.0f); // Bottom Left Of The Texture and Quad
-            gl.TexCoord(1.0f, 0.0f); gl.Vertex(1.0f, -1.0f, 1.0f);  // Bottom Right Of The Texture and Quad
-            gl.TexCoord(1.0f, 1.0f); gl.Vertex(1.0f, 1.0f, 1.0f);   // Top Right Of The Texture and Quad
-            gl.TexCoord(0.0f, 1.0f); gl.Vertex(-1.0f, 1.0f, 1.0f);  // Top Left Of The Texture and Quad
-
-            // Back Face
-            gl.TexCoord(1.0f, 0.0f); gl.Vertex(-1.0f, -1.0f, -1.0f);    // Bottom Right Of The Texture and Quad
-            gl.TexCoord(1.0f, 1.0f); gl.Vertex(-1.0f, 1.0f, -1.0f); // Top Right Of The Texture and Quad
-            gl.TexCoord(0.0f, 1.0f); gl.Vertex(1.0f, 1.0f, -1.0f);  // Top Left Of The Texture and Quad
-            gl.TexCoord(0.0f, 0.0f); gl.Vertex(1.0f, -1.0f, -1.0f); // Bottom Left Of The Texture and Quad
-
-            // Top Face
-            gl.TexCoord(0.0f, 1.0f); gl.Vertex(-1.0f, 1.0f, -1.0f); // Top Left Of The Texture and Quad
-            gl.TexCoord(0.0f, 0.0f); gl.Vertex(-1.0f, 1.0f, 1.0f);  // Bottom Left Of The Texture and Quad
-            gl.TexCoord(1.0f, 0.0f); gl.Vertex(1.0f, 1.0f, 1.0f);   // Bottom Right Of The Texture and Quad
-            gl.TexCoord(1.0f, 1.0f); gl.Vertex(1.0f, 1.0f, -1.0f);  // Top Right Of The Texture and Quad
-
-            // Bottom Face
-            gl.TexCoord(1.0f, 1.0f); gl.Vertex(-1.0f, -1.0f, -1.0f);    // Top Right Of The Texture and Quad
-            gl.TexCoord(0.0f, 1.0f); gl.Vertex(1.0f, -1.0f, -1.0f); // Top Left Of The Texture and Quad
-            gl.TexCoord(0.0f, 0.0f); gl.Vertex(1.0f, -1.0f, 1.0f);  // Bottom Left Of The Texture and Quad
-            gl.TexCoord(1.0f, 0.0f); gl.Vertex(-1.0f, -1.0f, 1.0f); // Bottom Right Of The Texture and Quad
-
-            // Right face
-            gl.TexCoord(1.0f, 0.0f); gl.Vertex(1.0f, -1.0f, -1.0f); // Bottom Right Of The Texture and Quad
-            gl.TexCoord(1.0f, 1.0f); gl.Vertex(1.0f, 1.0f, -1.0f);  // Top Right Of The Texture and Quad
-            gl.TexCoord(0.0f, 1.0f); gl.Vertex(1.0f, 1.0f, 1.0f);   // Top Left Of The Texture and Quad
-            gl.TexCoord(0.0f, 0.0f); gl.Vertex(1.0f, -1.0f, 1.0f);  // Bottom Left Of The Texture and Quad
-
-            // Left Face
-            gl.TexCoord(0.0f, 0.0f); gl.Vertex(-1.0f, -1.0f, -1.0f);    // Bottom Left Of The Texture and Quad
-            gl.TexCoord(1.0f, 0.0f); gl.Vertex(-1.0f, -1.0f, 1.0f); // Bottom Right Of The Texture and Quad
-            gl.TexCoord(1.0f, 1.0f); gl.Vertex(-1.0f, 1.0f, 1.0f);  // Top Right Of The Texture and Quad
-            gl.TexCoord(0.0f, 1.0f); gl.Vertex(-1.0f, 1.0f, -1.0f);	// Top Left Of The Texture and Quad
-            gl.End();
-
-
-            rtri += 1.0f;// 0.2f;
-        }
-
-        float rtri = 0;
     }
 }

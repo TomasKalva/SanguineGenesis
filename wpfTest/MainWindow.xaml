@@ -11,7 +11,7 @@
         >
     <Grid>
         <Grid>
-            <sharpGL:OpenGLControl Name="openGLControl1" OpenGLDraw="OpenGLControl_OpenGLDraw"/>
+            <sharpGL:OpenGLControl Name="openGLControl1" OpenGLDraw="OpenGLControl_OpenGLDraw" RenderContextType="FBO" />
         </Grid>
         <Grid Name="mapPanel">
             <Canvas Name="tiles">
