@@ -29,7 +29,7 @@ namespace wpfTest
             gl.Flush();
         }
 
-        private static void TextureVsColorMeasuring(OpenGL gl)
+        public static void TextureVsColorMeasuring(OpenGL gl)
         {
             //Orthographic(gl);
             int width = 20;
@@ -58,7 +58,7 @@ namespace wpfTest
             Console.WriteLine("Drawing textures took: " + sw.Elapsed.Milliseconds);
         }
 
-        private static void OpenGlInitialize(OpenGLControl openGLControl1)
+        public static void OpenGlInitialize(OpenGLControl openGLControl1)
         {
             //  Get the OpenGL object, for quick access.
             OpenGL gl = openGLControl1.OpenGL;

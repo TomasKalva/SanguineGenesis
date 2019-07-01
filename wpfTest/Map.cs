@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 namespace wpfTest
 {
-    class Map
+    public class Map
     {
         public Node[,] Nodes { get; private set; }
         public int Width => Nodes.GetLength(0);

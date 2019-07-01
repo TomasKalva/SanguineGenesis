@@ -44,6 +44,7 @@ namespace wpfTest
             //mapImage.Source = game.Map.MapImage;
             mapView = new MapView(0, 0, 60, game.Map);
             mapMovementInput = new MapMovementInput();
+            //openGLControl1.FrameRate = 80;
 
             Thread t = new Thread(() => {
                 Dispatcher.Invoke(DispatcherPriority.Render, new Action(() =>
@@ -62,7 +63,8 @@ namespace wpfTest
         {
             //update position of mapView
             foreach (Direction d in mapMovementInput.MapDirection)
-                mapView.Move(d);
+                lock(mapView)
+                    mapView.Move(d);
 
             //draw map
             //DrawMap();
@@ -74,7 +76,7 @@ namespace wpfTest
 
         public void DrawMap2()
         {
-            mapView.SetActualExtents(tiles.ActualWidth, tiles.ActualHeight);
+            mapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
             Canvas.SetLeft(mapImage, -mapView.Left * game.Map.NodeSize);
             Canvas.SetTop(mapImage, -mapView.Top * game.Map.NodeSize);
             mapImage.Clip = mapView.GetViewGeometry();
@@ -86,9 +88,9 @@ namespace wpfTest
 
             mapView.SetActualExtents(tiles.ActualWidth, tiles.ActualHeight);
 
-            double nodeSize = mapView.NodeSize;
-            double viewLeft = mapView.Left;
-            double viewTop = mapView.Top;
+            float nodeSize = mapView.NodeSize;
+            float viewLeft = mapView.Left;
+            float viewTop = mapView.Top;
             IEnumerator tileGrid = tiles.Children.GetEnumerator();
             foreach (Node node in mapView)
             {
@@ -98,8 +100,8 @@ namespace wpfTest
                 square.Visibility = Visibility.Visible;
                 Rectangle r=(Rectangle)square.Children[0];
                 r.Fill = Brushes.Blue;
-                double x = node.X - viewLeft;
-                double y = node.Y - viewTop;
+                float x = node.X - viewLeft;
+                float y = node.Y - viewTop;
                 Canvas.SetLeft(square, x * (nodeSize));
                 Canvas.SetTop(square, y * (nodeSize));
                 Label l = (Label)square.Children[1];
@@ -114,7 +116,7 @@ namespace wpfTest
 
         public void ResizeView()
         {
-            mapView.SetActualExtents(tiles.ActualWidth, tiles.ActualHeight);
+            mapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
             mapImageScaler.ScaleX = 1;
             mapImageScaler.ScaleY = 1;
             //InitializeTiles();
@@ -124,7 +126,7 @@ namespace wpfTest
         {
             tiles.Children.Clear();
             mapView.SetActualExtents(tiles.ActualWidth, tiles.ActualHeight);
-            double nodeSize = mapView.NodeSize;
+            float nodeSize = mapView.NodeSize;
             for (int i=0;i<mapView.MaxEnumeratedElements;i++)
             {
                 Grid square = new Grid();
@@ -159,28 +161,28 @@ namespace wpfTest
         /// The class describes player's view of the map.
         /// Enumerator returns the nodes inside current players view from left top to right bottom.
         /// </summary>
-        private class MapView:IEnumerable<Node>
+        public class MapView:IEnumerable<Node>
         {
             private Map map;
-            private double actualWidth;
-            private double actualHeight;
-            private double scrollSpeed;
-            private double zoomSpeed;
-            private double minNodeSize;
-            private double maxNodeSize;
+            private float actualWidth;
+            private float actualHeight;
+            private float scrollSpeed;
+            private float zoomSpeed;
+            private float minNodeSize;
+            private float maxNodeSize;
 
-            public double NodeSize { get; set; }
+            public float NodeSize { get; set; }
             //These values are relative to size of one node.
-            public double Top { get; set; }
-            public double Left { get; set; }
-            public double Width => actualWidth / map.NodeSize;
-            public double Height => actualHeight / map.NodeSize;
-            public double Right => Left + Width;
-            public double Bottom => Top + Height;
+            public float Top { get; set; }
+            public float Left { get; set; }
+            public float Width => actualWidth / NodeSize;
+            public float Height => actualHeight / NodeSize;
+            public float Right => Left + Width;
+            public float Bottom => Top + Height;
 
 
-            public MapView(double top,double left, double nodeSize, Map map,
-                double minNodeSize = 50, double maxNodeSize=90,double scrollSpeed=0.1,double zoomSpeed=20)
+            public MapView(float top,float left, float nodeSize, Map map,
+                float minNodeSize = 30, float maxNodeSize=70,float scrollSpeed=0.05f,float zoomSpeed=20)
             {
                 Top = top;
                 Left = left;
@@ -217,13 +219,49 @@ namespace wpfTest
                 afterLoop:;
             }
 
+            public Node[,] GetVisibleNodes()
+            {
+                if (actualHeight == 0 || actualWidth == 0)
+                    throw new InvalidOperationException("Actual extents have to be specified before getting enumerator!");
+
+
+                int width = Math.Min((int)(Math.Ceiling(Width) + 1),
+                    map.Width-(int)Left);
+                int height = Math.Min((int)(Math.Ceiling(Height) + 1),
+                    map.Height-(int)Right);
+
+
+                Node[,] visible = new Node[width + 1,height + 1];
+
+                for (int i = 0; i <= width; i++)
+                    for (int j = 0; j <= height; j++)
+                    {
+                        int mapI = i + (int)Left;
+                        int mapJ = j + (int)Top;
+                        //check if coordinates are valid
+                        if (mapI >= map.Nodes.GetLength(0))
+                            goto afterLoop;
+                        if (mapI < 0)
+                            break;
+                        if (mapJ >= map.Nodes.GetLength(1))
+                            break;
+                        if (mapJ < 0)
+                            continue;
+
+                        visible[i, j] = map.Nodes[mapI,mapJ];
+                        //yield return map.Nodes[i, j];
+                    }
+                afterLoop:;
+                return visible;
+            }
+
             public RectangleGeometry GetViewGeometry()
             {
                 return new RectangleGeometry(new Rect(Left * map.NodeSize, Top * map.NodeSize,
                     actualWidth, actualHeight));
             }
 
-            public void SetActualExtents(double width, double height)
+            public void SetActualExtents(float width, float height)
             {
                 this.actualWidth = width;
                 this.actualHeight = height;
@@ -258,7 +296,7 @@ namespace wpfTest
             /// </summary>
             public bool ZoomIn()
             {
-                double newNodeSize= Math.Min(maxNodeSize,Math.Max(NodeSize + zoomSpeed,minNodeSize));
+                float newNodeSize= Math.Min(maxNodeSize,Math.Max(NodeSize + zoomSpeed,minNodeSize));
                 if(newNodeSize != NodeSize)
                 {
                     NodeSize = newNodeSize;
@@ -273,7 +311,7 @@ namespace wpfTest
             /// </summary>
             public bool ZoomOut()
             {
-                double newNodeSize = Math.Min(maxNodeSize, Math.Max(NodeSize - zoomSpeed, minNodeSize));
+                float newNodeSize = Math.Min(maxNodeSize, Math.Max(NodeSize - zoomSpeed, minNodeSize));
                 if (newNodeSize != NodeSize)
                 {
                     NodeSize = newNodeSize;
@@ -299,7 +337,7 @@ namespace wpfTest
             }
         }
 
-        private enum Direction
+        public enum Direction
         {
             LEFT,
             UP,
@@ -307,7 +345,7 @@ namespace wpfTest
             DOWN
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        public void Window_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -395,11 +433,16 @@ namespace wpfTest
                 openGlNotInitialized = false;
                 //OpenGLColorBufferDrawer.Initialise(gl, (float)ActualWidth, (float)ActualHeight);
                 OpenGLAtlasDrawer.Initialise(gl, (float)ActualWidth, (float)ActualHeight);
+                OpenGLAtlasDrawer.CreateMap(gl, mapView);
+                //OpenGLImmediateDrawer.OpenGlInitialize(openGLControl1);
             }
             Stopwatch sw = new Stopwatch();
             sw.Start();
             //OpenGLColorBufferDrawer.Draw(gl);
+            OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, mapView);
             OpenGLAtlasDrawer.Draw(gl);
+            //OpenGLImmediateDrawer.TextureVsColorMeasuring(gl);
+            //gl.Flush();
             sw.Stop();
             Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace wpfTest
 {
-    class Node
+    public class Node
     {
         public Terrain Terrain { get; set; }
         public int X { get; }

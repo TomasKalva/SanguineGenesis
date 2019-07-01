@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace wpfTest
 {
-    enum Terrain
+    public enum Terrain
     {
         GRASS,
         WATER
