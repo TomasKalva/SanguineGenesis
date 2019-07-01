@@ -22,10 +22,10 @@ namespace wpfTest
 
         //  Constants that specify the attribute indexes.
         const uint attributeIndexPosition = 0;
-        const uint attributeIndexColour = 1;
+        const uint attributeIndexcolor = 1;
         const uint attributeIndexTexCoord = 2;
 
-        //  The vertex buffer array which contains the vertex and colour buffers.
+        //  The vertex buffer array which contains the vertex and color buffers.
         static VertexBufferArray vertexBufferArray;
 
         //  The shader program for our vertex and fragment shader.
@@ -40,7 +40,7 @@ namespace wpfTest
         public static void Initialise(OpenGL gl, float width, float height)
         {
 
-            //  Set a blue clear colour.
+            //  Set a blue clear color.
             gl.ClearColor(0.4f, 0.6f, 0.9f, 0.0f);
 
             //  Create the shader program.
@@ -49,7 +49,7 @@ namespace wpfTest
             shaderProgram = new ShaderProgram();
             shaderProgram.Create(gl, vertexShaderSource, fragmentShaderSource, null);
             shaderProgram.BindAttributeLocation(gl, attributeIndexPosition, "in_Position");
-            shaderProgram.BindAttributeLocation(gl, attributeIndexColour, "in_Color");
+            shaderProgram.BindAttributeLocation(gl, attributeIndexcolor, "in_Color");
             shaderProgram.BindAttributeLocation(gl, attributeIndexTexCoord, "in_TexCoord");
             shaderProgram.AssertValid(gl);
 
@@ -218,13 +218,13 @@ namespace wpfTest
             vertexDataBuffer.Bind(gl);
             vertexDataBuffer.SetData(gl, 0, vertices, false, 3);
 
-            //  Now do the same for the colour data.
-            var colourDataBuffer = new VertexBuffer();
-            colourDataBuffer.Create(gl);
-            colourDataBuffer.Bind(gl);
-            colourDataBuffer.SetData(gl, 1, colors, false, 3);
+            //  Now do the same for the color data.
+            var colorDataBuffer = new VertexBuffer();
+            colorDataBuffer.Create(gl);
+            colorDataBuffer.Bind(gl);
+            colorDataBuffer.SetData(gl, 1, colors, false, 3);
 
-            //  Now do the same for the colour data.
+            //  Now do the same for the color data.
             var textureDataBuffer = new VertexBuffer();
             textureDataBuffer.Create(gl);
             textureDataBuffer.Bind(gl);
@@ -354,13 +354,13 @@ namespace wpfTest
             vertexDataBuffer.Bind(gl);
             vertexDataBuffer.SetData(gl, 0, vertices, false, 3);
 
-            //  Now do the same for the colour data.
-            var colourDataBuffer = new VertexBuffer();
-            colourDataBuffer.Create(gl);
-            colourDataBuffer.Bind(gl);
-            colourDataBuffer.SetData(gl, 1, colors, false, 3);
+            //  Now do the same for the color data.
+            var colorDataBuffer = new VertexBuffer();
+            colorDataBuffer.Create(gl);
+            colorDataBuffer.Bind(gl);
+            colorDataBuffer.SetData(gl, 1, colors, false, 3);
 
-            //  Now do the same for the colour data.
+            //  Now do the same for the color data.
             var textureDataBuffer = new VertexBuffer();
             textureDataBuffer.Create(gl);
             textureDataBuffer.Bind(gl);

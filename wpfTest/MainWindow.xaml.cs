@@ -41,16 +41,16 @@ namespace wpfTest
             InitializeComponent();
 
             game = new Game("hugeMap", this);
-            //mapImage.Source = game.Map.MapImage;
             mapView = new MapView(0, 0, 60, game.Map);
             mapMovementInput = new MapMovementInput();
-            //openGLControl1.FrameRate = 80;
+            openGLControl1.FrameRate = 80;
 
             Thread t = new Thread(() => {
                 Dispatcher.Invoke(DispatcherPriority.Render, new Action(() =>
                 {
                     //wait for window layout initialization
                 }));
+                Dispatcher.Invoke(InitializeOpenGL);
                 Dispatcher.Invoke(ResizeView);
                 game.MainLoop();
             });
@@ -62,95 +62,16 @@ namespace wpfTest
         public void Draw()
         {
             //update position of mapView
-            foreach (Direction d in mapMovementInput.MapDirection)
-                lock(mapView)
+            lock (mapView)
+                foreach (Direction d in mapMovementInput.MapDirection)
                     mapView.Move(d);
-
-            //draw map
-            //DrawMap();
-            /*Canvas.SetLeft(testImage, -100);
-            Canvas.SetTop(testImage, -100);*/
-            //mapImage.Clip = new RectangleGeometry(new Rect(100,100,100,100));
-            //DrawMap2();
+            
         }
-
-        public void DrawMap2()
-        {
-            mapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
-            Canvas.SetLeft(mapImage, -mapView.Left * game.Map.NodeSize);
-            Canvas.SetTop(mapImage, -mapView.Top * game.Map.NodeSize);
-            mapImage.Clip = mapView.GetViewGeometry();
-        }
-
-        /*private void DrawMap()
-        {
-            Node[,] map = game.Map.Nodes;
-
-            mapView.SetActualExtents(tiles.ActualWidth, tiles.ActualHeight);
-
-            float nodeSize = mapView.NodeSize;
-            float viewLeft = mapView.Left;
-            float viewTop = mapView.Top;
-            IEnumerator tileGrid = tiles.Children.GetEnumerator();
-            foreach (Node node in mapView)
-            {
-                if (!tileGrid.MoveNext())
-                    break;
-                Grid square = (Grid)tileGrid.Current;
-                square.Visibility = Visibility.Visible;
-                Rectangle r=(Rectangle)square.Children[0];
-                r.Fill = Brushes.Blue;
-                float x = node.X - viewLeft;
-                float y = node.Y - viewTop;
-                Canvas.SetLeft(square, x * (nodeSize));
-                Canvas.SetTop(square, y * (nodeSize));
-                Label l = (Label)square.Children[1];
-                l.Content=node.X+" ; "+node.Y;
-            }
-            while (tileGrid.MoveNext())
-            {
-                ((Grid)tileGrid.Current).Visibility = Visibility.Hidden;
-            }
-        }*/
-        
 
         public void ResizeView()
         {
             mapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
-            mapImageScaler.ScaleX = 1;
-            mapImageScaler.ScaleY = 1;
-            //InitializeTiles();
         }
-
-        /*private void InitializeTiles()
-        {
-            tiles.Children.Clear();
-            mapView.SetActualExtents(tiles.ActualWidth, tiles.ActualHeight);
-            float nodeSize = mapView.NodeSize;
-            for (int i=0;i<mapView.MaxEnumeratedElements;i++)
-            {
-                Grid square = new Grid();
-                //tile
-                Rectangle r = new Rectangle
-                {
-                    Width = nodeSize+0.5,
-                    Height = nodeSize+0.5
-                };
-                square.Children.Add(r);
-                //text
-                Label l = new Label
-                {
-                    Width = nodeSize,
-                    Height = nodeSize,
-                    Content = "h",
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Foreground = Brushes.Red
-                };
-                square.Children.Add(l);
-                tiles.Children.Add(square);
-            }
-        }*/
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -182,7 +103,7 @@ namespace wpfTest
 
 
             public MapView(float top,float left, float nodeSize, Map map,
-                float minNodeSize = 30, float maxNodeSize=70,float scrollSpeed=0.05f,float zoomSpeed=20)
+                float minNodeSize = 30, float maxNodeSize=70,float scrollSpeed=0.5f,float zoomSpeed=20)
             {
                 Top = top;
                 Left = left;
@@ -224,12 +145,11 @@ namespace wpfTest
                 if (actualHeight == 0 || actualWidth == 0)
                     throw new InvalidOperationException("Actual extents have to be specified before getting enumerator!");
 
-
+                //todo: set more optimal array extents - so that it doesnt contain nulls
                 int width = Math.Min((int)(Math.Ceiling(Width) + 1),
-                    map.Width-(int)Left);
+                    (int)(map.Width-Left));
                 int height = Math.Min((int)(Math.Ceiling(Height) + 1),
-                    map.Height-(int)Right);
-
+                    (int)(map.Height-Top));
 
                 Node[,] visible = new Node[width + 1,height + 1];
 
@@ -249,16 +169,9 @@ namespace wpfTest
                             continue;
 
                         visible[i, j] = map.Nodes[mapI,mapJ];
-                        //yield return map.Nodes[i, j];
                     }
                 afterLoop:;
                 return visible;
-            }
-
-            public RectangleGeometry GetViewGeometry()
-            {
-                return new RectangleGeometry(new Rect(Left * map.NodeSize, Top * map.NodeSize,
-                    actualWidth, actualHeight));
             }
 
             public void SetActualExtents(float width, float height)
@@ -271,13 +184,11 @@ namespace wpfTest
             {
                 return GetEnumerator();
             }
-
-            public int MaxEnumeratedElements => (int)(Math.Ceiling(Width) + 2) * (int)(Math.Ceiling(Height) + 2);
-
+            
             /// <summary>
             /// Moves the view in given direction so that it doesn't leave the map.
             /// </summary>
-            /// <param name="dir"></param>
+            /// <param name="dir">The direction.</param>
             public void Move(Direction dir)
             {
                 switch (dir)
@@ -422,29 +333,31 @@ namespace wpfTest
 
         private bool openGlNotInitialized = true;
 
+        private void InitializeOpenGL()
+        {
+            OpenGL gl = openGLControl1.OpenGL;
+            OpenGLAtlasDrawer.Initialize(gl, (float)ActualWidth, (float)ActualHeight);
+            OpenGLAtlasDrawer.CreateMap(gl);
+        }
+
         private void OpenGLControl_OpenGLDraw(object sender, SharpGL.SceneGraph.OpenGLEventArgs args)
         {
             //  Get the OpenGL object, for quick access.
             OpenGL gl = args.OpenGL;
 
-            if (openGlNotInitialized)
+            /*if (openGlNotInitialized)
             {
-                //OpenGlInitialize();
                 openGlNotInitialized = false;
-                //OpenGLColorBufferDrawer.Initialise(gl, (float)ActualWidth, (float)ActualHeight);
-                OpenGLAtlasDrawer.Initialise(gl, (float)ActualWidth, (float)ActualHeight);
-                OpenGLAtlasDrawer.CreateMap(gl, mapView);
-                //OpenGLImmediateDrawer.OpenGlInitialize(openGLControl1);
-            }
+                OpenGLAtlasDrawer.Initialize(gl, (float)ActualWidth, (float)ActualHeight);
+                OpenGLAtlasDrawer.CreateMap(gl);
+            }*/
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            //OpenGLColorBufferDrawer.Draw(gl);
+            mapView.SetActualExtents((float)ActualWidth, (float)ActualHeight);
             OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, mapView);
             OpenGLAtlasDrawer.Draw(gl);
-            //OpenGLImmediateDrawer.TextureVsColorMeasuring(gl);
-            //gl.Flush();
             sw.Stop();
-            Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
+            //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
         }
     }
 
