@@ -48,7 +48,6 @@ namespace wpfTest
             shaderProgram.AssertValid(gl);
 
             //  Create a perspective projection matrix.
-            const float rads = (60.0f / 360.0f) * (float)Math.PI * 2.0f;
             projectionMatrix = glm.ortho(0f, width, height, 0f, 0f, 100f); //glm.perspective(rads, width / height, 0.1f, 100.0f);
 
             //  Create a view matrix to move us back a bit.

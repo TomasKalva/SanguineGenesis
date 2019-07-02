@@ -28,16 +28,7 @@ namespace wpfTest
         const uint attributeIndexcolor = 1;
         const uint attributeIndexTexCoord = 2;
         const uint attributeIndexTexBL = 3;
-
-        //the vertex buffer array which contains the buffers for vertex, 
-        //color, texture and bottom left coordinates of textures
-        static VertexBufferArray vertexBufferArray;
-        public static VertexBuffer vertexDataBuffer;
-        public static VertexBuffer colorDataBuffer;
-        public static VertexBuffer textureDataBuffer;
-        public static VertexBuffer texBLDataBuffer;
-
-
+        
         //the shader program for the vertex and fragment shader
         static private ShaderProgram shaderProgram;
 
@@ -65,7 +56,7 @@ namespace wpfTest
             shaderProgram.AssertValid(gl);
 
             //create projection matrix that maps points directly to screen coordinates
-            projectionMatrix = glm.ortho(0f, width, height, 0f, 0f, 100f);
+            projectionMatrix = glm.ortho(0f, width, 0f, height, 0f, 100f);
 
             //create view matrix that translates graphical objects to visible range
             viewMatrix = glm.translate(new mat4(1.0f), new vec3(0.0f, 0.0f, -1.0f));
@@ -94,11 +85,20 @@ namespace wpfTest
             shaderProgram.SetUniformMatrix4(gl, "modelMatrix", modelMatrix.to_array());
             shaderProgram.SetUniform3(gl, "atlasExtents", 640, 640, 0);
             shaderProgram.SetUniform3(gl, "texExtents", 62, 62, 0);
-            
-            vertexBufferArray.Bind(gl);
 
             //draw vertex array buffers
+            map.VertexBufferArray.Bind(gl);
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+
+
+            flowMap.VertexBufferArray.Bind(gl);
+            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+
+            if (!unitsEmpty)
+            {
+                units.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+            }
 
             shaderProgram.Unbind(gl);
 
@@ -144,34 +144,55 @@ namespace wpfTest
                 ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb).Scan0);
         }
 
+
+        private class BufferArray
+        {
+            public VertexBufferArray VertexBufferArray { get; set; }
+            public VertexBuffer VertexDataBuffer { get; set; }
+            public VertexBuffer ColorDataBuffer { get; set; }
+            public VertexBuffer TextureDataBuffer { get; set; }
+            public VertexBuffer TexBLDataBuffer { get; set; }
+        }
+
+        //vertex buffer arrays which contain the buffers for vertex, 
+        //color, texture and bottom left coordinates of textures
+        private static BufferArray map;
+        private static BufferArray flowMap;
+        private static BufferArray units;
+
+        //true if there are no units to draw
+        private static bool unitsEmpty;
+
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateMap(OpenGL gl)
         {
-            //initialize vertexBufferArray and link it to its VertexBuffers
-            vertexBufferArray = new VertexBufferArray();
-            vertexBufferArray.Create(gl);
-            vertexBufferArray.Bind(gl);
+            map = new BufferArray();
 
-            //initialize empty vertexDataBuffer
-            vertexDataBuffer = new VertexBuffer();
-            vertexDataBuffer.Create(gl);
+            //initialize map.VertexBufferArray and link it to its VertexBuffers
+            map.VertexBufferArray = new VertexBufferArray();
+            map.VertexBufferArray.Create(gl);
+            map.VertexBufferArray.Bind(gl);
 
-            //initialize empty colorDataBuffer
-            colorDataBuffer = new VertexBuffer();
-            colorDataBuffer.Create(gl);
+            //initialize empty map.VertexDataBuffer
+            map.VertexDataBuffer = new VertexBuffer();
+            map.VertexDataBuffer.Create(gl);
 
-            //initialize empty textureDataBuffer
-            textureDataBuffer = new VertexBuffer();
-            textureDataBuffer.Create(gl);
+            //initialize empty map.ColorDataBuffer
+            map.ColorDataBuffer = new VertexBuffer();
+            map.ColorDataBuffer.Create(gl);
 
-            //initialize empty texBLDataBuffer
-            texBLDataBuffer = new VertexBuffer();
-            texBLDataBuffer.Create(gl);
+            //initialize empty map.TextureDataBuffer
+            map.TextureDataBuffer = new VertexBuffer();
+            map.TextureDataBuffer.Create(gl);
+
+            //initialize empty map.TexBLDataBuffer
+            map.TexBLDataBuffer = new VertexBuffer();
+            map.TexBLDataBuffer.Create(gl);
             
-            vertexBufferArray.Unbind(gl);
+            map.VertexBufferArray.Unbind(gl);
         }
 
         /// <summary>
@@ -193,8 +214,8 @@ namespace wpfTest
             {
                 nodeSize = mapView.NodeSize;
                 viewLeft = mapView.Left;
-                viewTop = mapView.Top;
-                viewBottom = mapView.Bottom;
+                viewTop = mapView.Bottom;
+                viewBottom = mapView.Top;
                 viewRight = mapView.Right;
                 visible = mapView.GetVisibleNodes();
             }
@@ -219,9 +240,7 @@ namespace wpfTest
                 {
                     //buffer indices
                     int coord = (i + j * width) * 6 * 3;
-                    int offset = 0;
                     int texCoord = (i + j * width) * 6 * 2;
-                    int texOffset = 0;
 
                     Node current = visible[i, j];
                     if (current == null)
@@ -239,132 +258,501 @@ namespace wpfTest
                     }
 
                     //tile position
-                    float bottom = (visible[i, j].Y - viewTop + 1) * sqH;
-                    float top = (visible[i, j].Y - viewTop) * sqH;
-                    float left = (visible[i, j].X - viewLeft) * sqW;
-                    float right = (visible[i, j].X - viewLeft + 1) * sqW;
+                    float bottom = (current.Y - viewTop) * sqH;
+                    float top = (current.Y - viewTop + 1) * sqH;
+                    float left = (current.X - viewLeft) * sqW;
+                    float right = (current.X - viewLeft + 1) * sqW;
 
-                    //bottom left
-                    vertices[coord + offset + 0] = left;
-                    vertices[coord + offset + 1] = bottom;
-                    vertices[coord + offset + 2] = -1;
-
-                    colors[coord + offset + 0] = i;
-                    colors[coord + offset + 1] = 1;
-                    colors[coord + offset + 2] = 0;
-
-                    texturCoords[texCoord + texOffset + 0] = 0;
-                    texturCoords[texCoord + texOffset + 1] = 0;
-
-                    texBottomLeft[texCoord + texOffset + 0] = blX;
-                    texBottomLeft[texCoord + texOffset + 1] = blY;
-
-                    offset += 3;
-                    texOffset += 2;
-
-                    //top left
-                    vertices[coord + offset + 0] = left;
-                    vertices[coord + offset + 1] = top;
-                    vertices[coord + offset + 2] = -1;
-
-                    colors[coord + offset + 0] = i;
-                    colors[coord + offset + 1] = 1;
-                    colors[coord + offset + 2] = 0;
-
-                    texturCoords[texCoord + texOffset + 0] = 0;
-                    texturCoords[texCoord + texOffset + 1] = 1;
-
-                    texBottomLeft[texCoord + texOffset + 0] = blX;
-                    texBottomLeft[texCoord + texOffset + 1] = blY;
-
-                    offset += 3;
-                    texOffset += 2;
-
-                    //top right
-                    vertices[coord + offset + 0] = right;
-                    vertices[coord + offset + 1] = top;
-                    vertices[coord + offset + 2] = -1;
-
-                    colors[coord + offset + 0] = i;
-                    colors[coord + offset + 1] = 1;
-                    colors[coord + offset + 2] = 0;
-
-                    texturCoords[texCoord + texOffset + 0] = 1;
-                    texturCoords[texCoord + texOffset + 1] = 1;
-
-                    texBottomLeft[texCoord + texOffset + 0] = blX;
-                    texBottomLeft[texCoord + texOffset + 1] = blY;
-
-                    offset += 3;
-                    texOffset += 2;
-
-                    //bottom right
-                    vertices[coord + offset + 0] = right;
-                    vertices[coord + offset + 1] = bottom;
-                    vertices[coord + offset + 2] = -1;
-
-                    colors[coord + offset + 0] = i;
-                    colors[coord + offset + 1] = 1;
-                    colors[coord + offset + 2] = 0;
-
-                    texturCoords[texCoord + texOffset + 0] = 1;
-                    texturCoords[texCoord + texOffset + 1] = 0;
-
-                    texBottomLeft[texCoord + texOffset + 0] = blX;
-                    texBottomLeft[texCoord + texOffset + 1] = blY;
-
-                    offset += 3;
-                    texOffset += 2;
-
-                    //bottom left
-                    vertices[coord + offset + 0] = left;
-                    vertices[coord + offset + 1] = bottom;
-                    vertices[coord + offset + 2] = -1;
-
-                    colors[coord + offset + 0] = i;
-                    colors[coord + offset + 1] = 1;
-                    colors[coord + offset + 2] = 0;
-
-                    texturCoords[texCoord + texOffset + 0] = 0;
-                    texturCoords[texCoord + texOffset + 1] = 0;
-
-                    texBottomLeft[texCoord + texOffset + 0] = blX;
-                    texBottomLeft[texCoord + texOffset + 1] = blY;
-
-                    offset += 3;
-                    texOffset += 2;
-
-                    //top right
-                    vertices[coord + offset + 0] = right;
-                    vertices[coord + offset + 1] = top;
-                    vertices[coord + offset + 2] = -1;
-
-                    colors[coord + offset + 0] = i;
-                    colors[coord + offset + 1] = 1;
-                    colors[coord + offset + 2] = 0;
-
-                    texturCoords[texCoord + texOffset + 0] = 1;
-                    texturCoords[texCoord + texOffset + 1] = 1;
-
-                    texBottomLeft[texCoord + texOffset + 0] = blX;
-                    texBottomLeft[texCoord + texOffset + 1] = blY;
+                    SetSquareVertices(vertices, bottom, top, left, right, -1, coord);
+                    SetColor(colors, 1f, 1f, 1f, coord,6);
+                    SetSquareTextureCoordinates(texturCoords, texCoord);
+                    SetTexBottomLeft(texBottomLeft, blX,blY,texCoord,6);
                 }
             }
 
-            //bind vertexBufferArray and set data of its buffers
-            vertexBufferArray.Bind(gl);
+            //bind map.VertexBufferArray and set data of its buffers
+            map.VertexBufferArray.Bind(gl);
             
-            vertexDataBuffer.Bind(gl);
-            vertexDataBuffer.SetData(gl, attributeIndexPosition, vertices, false, 3);
+            map.VertexDataBuffer.Bind(gl);
+            map.VertexDataBuffer.SetData(gl, attributeIndexPosition, vertices, false, 3);
             
-            colorDataBuffer.Bind(gl);
-            colorDataBuffer.SetData(gl, attributeIndexcolor, colors, false, 3);
+            map.ColorDataBuffer.Bind(gl);
+            map.ColorDataBuffer.SetData(gl, attributeIndexcolor, colors, false, 3);
             
-            textureDataBuffer.Bind(gl);
-            textureDataBuffer.SetData(gl, attributeIndexTexCoord, texturCoords, false, 2);
+            map.TextureDataBuffer.Bind(gl);
+            map.TextureDataBuffer.SetData(gl, attributeIndexTexCoord, texturCoords, false, 2);
             
-            texBLDataBuffer.Bind(gl);
-            texBLDataBuffer.SetData(gl, attributeIndexTexBL, texBottomLeft, false, 2);
+            map.TexBLDataBuffer.Bind(gl);
+            map.TexBLDataBuffer.SetData(gl, attributeIndexTexBL, texBottomLeft, false, 2);
+        }
+
+        private static void SetSquareVertices(float[] vertices, float bottom, float top,
+                                                float left, float right, float dist, int coord)
+        {
+            int offset = 0;
+
+            //bottom left
+            vertices[coord + offset + 0] = left;
+            vertices[coord + offset + 1] = bottom;
+            vertices[coord + offset + 2] = -1;
+
+            offset += 3;
+
+            //top left
+            vertices[coord + offset + 0] = left;
+            vertices[coord + offset + 1] = top;
+            vertices[coord + offset + 2] = -1;
+
+            offset += 3;
+
+            //top right
+            vertices[coord + offset + 0] = right;
+            vertices[coord + offset + 1] = top;
+            vertices[coord + offset + 2] = -1;
+
+            offset += 3;
+
+            //bottom right
+            vertices[coord + offset + 0] = right;
+            vertices[coord + offset + 1] = bottom;
+            vertices[coord + offset + 2] = -1;
+
+            offset += 3;
+
+            //bottom left
+            vertices[coord + offset + 0] = left;
+            vertices[coord + offset + 1] = bottom;
+            vertices[coord + offset + 2] = -1;
+
+            offset += 3;
+
+            //top right
+            vertices[coord + offset + 0] = right;
+            vertices[coord + offset + 1] = top;
+            vertices[coord + offset + 2] = -1;
+        }
+
+        private static void SetColor(float[] colors, float red, float green, float blue , int coord,
+            int vertCount)
+        {
+            int offset = 0;
+
+            for(int i = 0; i < vertCount; i++)
+            {
+                colors[coord + offset + 0] = red;
+                colors[coord + offset + 1] = green;
+                colors[coord + offset + 2] = blue;
+
+                offset += 3;
+
+            }
+            /*//bottom left
+            colors[coord + offset + 0] = red;
+            colors[coord + offset + 1] = green;
+            colors[coord + offset + 2] = blue;
+
+            offset += 3;
+
+            //top left
+            colors[coord + offset + 0] = red;
+            colors[coord + offset + 1] = green;
+            colors[coord + offset + 2] = blue;
+
+            offset += 3;
+
+            //top right
+            colors[coord + offset + 0] = red;
+            colors[coord + offset + 1] = green;
+            colors[coord + offset + 2] = blue;
+
+            offset += 3;
+
+            //bottom right
+            colors[coord + offset + 0] = red;
+            colors[coord + offset + 1] = green;
+            colors[coord + offset + 2] = blue;
+
+            offset += 3;
+
+            //bottom left
+            colors[coord + offset + 0] = red;
+            colors[coord + offset + 1] = green;
+            colors[coord + offset + 2] = blue;
+
+            offset += 3;
+
+            //top right
+            colors[coord + offset + 0] = red;
+            colors[coord + offset + 1] = green;
+            colors[coord + offset + 2] = blue;*/
+        }
+
+        private static void SetSquareTextureCoordinates(float[] textureCoords, int coord)
+        {
+            int offset = 0;
+
+            //bottom left
+
+            textureCoords[coord + offset + 0] = 0;
+            textureCoords[coord + offset + 1] = 0;
+            
+            offset += 2;
+
+            //top left
+            textureCoords[coord + offset + 0] = 0;
+            textureCoords[coord + offset + 1] = 1;
+            
+            offset += 2;
+
+            //top right
+            textureCoords[coord + offset + 0] = 1;
+            textureCoords[coord + offset + 1] = 1;
+            
+            offset += 2;
+
+            //bottom right
+            textureCoords[coord + offset + 0] = 1;
+            textureCoords[coord + offset + 1] = 0;
+
+            offset += 2;
+
+            //bottom left
+            textureCoords[coord + offset + 0] = 0;
+            textureCoords[coord + offset + 1] = 0;
+            
+            offset += 2;
+
+            //top right
+            textureCoords[coord + offset + 0] = 1;
+            textureCoords[coord + offset + 1] = 1;
+        }
+
+        private static void SetTexBottomLeft(float[] texBottomLeft, float texBottomLeftX, float texBottomLeftY , int coord,
+            int vertCount)
+        {
+            int offset = 0;
+
+            for(int i = 0; i < vertCount; i++)
+            {
+                texBottomLeft[coord + offset + 0] = texBottomLeftX;
+                texBottomLeft[coord + offset + 1] = texBottomLeftY;
+
+                offset += 2;
+            }
+            /*
+            //bottom left
+            texBottomLeft[coord + offset + 0] = texBottomLeftX;
+            texBottomLeft[coord + offset + 1] = texBottomLeftY;
+            
+            offset += 2;
+
+            //top left
+            texBottomLeft[coord + offset + 0] = texBottomLeftX;
+            texBottomLeft[coord + offset + 1] = texBottomLeftY;
+            
+            offset += 2;
+
+            //top right
+            texBottomLeft[coord + offset + 0] = texBottomLeftX;
+            texBottomLeft[coord + offset + 1] = texBottomLeftY;
+            
+            offset += 2;
+
+            //bottom right
+            texBottomLeft[coord + offset + 0] = texBottomLeftX;
+            texBottomLeft[coord + offset + 1] = texBottomLeftY;
+            
+            offset += 2;
+
+            //bottom left
+            texBottomLeft[coord + offset + 0] = texBottomLeftX;
+            texBottomLeft[coord + offset + 1] = texBottomLeftY;
+            
+            offset += 2;
+
+            //top right
+            texBottomLeft[coord + offset + 0] = texBottomLeftX;
+            texBottomLeft[coord + offset + 1] = texBottomLeftY;*/
+        }
+
+
+        /// <summary>
+        /// Creates vertex buffer array and its buffers for gl.
+        /// </summary>
+        /// <param name="gl">The instance of OpenGL.</param>
+        public static void CreateUnits(OpenGL gl)
+        {
+            units = new BufferArray();
+
+            //initialize map.VertexBufferArray and link it to its VertexBuffers
+            units.VertexBufferArray = new VertexBufferArray();
+            units.VertexBufferArray.Create(gl);
+            units.VertexBufferArray.Bind(gl);
+
+            //initialize empty map.VertexDataBuffer
+            units.VertexDataBuffer = new VertexBuffer();
+            units.VertexDataBuffer.Create(gl);
+
+            //initialize empty map.ColorDataBuffer
+            units.ColorDataBuffer = new VertexBuffer();
+            units.ColorDataBuffer.Create(gl);
+
+            //initialize empty map.TextureDataBuffer
+            units.TextureDataBuffer = new VertexBuffer();
+            units.TextureDataBuffer.Create(gl);
+
+            //initialize empty map.TexBLDataBuffer
+            units.TexBLDataBuffer = new VertexBuffer();
+            units.TexBLDataBuffer.Create(gl);
+
+            units.VertexBufferArray.Unbind(gl);
+        }
+
+        /// <summary>
+        /// Updates buffers of vertexArrayBuffer with the information about the map
+        /// from mapView.
+        /// </summary>
+        /// <param name="gl">Instance of OpenGL.</param>
+        /// <param name="mapView">Map view describing the map.</param>
+        public static void UpdateUnitsDataBuffers(OpenGL gl, MapView mapView)
+        {
+            float nodeSize;
+            float viewLeft;
+            float viewTop;
+            float viewBottom;
+            float viewRight;
+            List<Unit> visUnits;
+            //mapView has to be locked because it can also be accessed from the main game loop
+            lock (mapView)
+            {
+                nodeSize = mapView.NodeSize;
+                viewLeft = mapView.Left;
+                viewTop = mapView.Bottom;
+                viewBottom = mapView.Top;
+                viewRight = mapView.Right;
+                visUnits = mapView.GetVisibleUnits();
+            }
+            
+            float blX = 129;
+            float blY = 1;
+
+
+            int size = visUnits.Count;
+            if (size == 0)
+            {
+                unitsEmpty = true;
+                return;
+            }
+            else
+            {
+                unitsEmpty = false;
+            }
+
+            float[] vertices = new float[size * 6 * 3];
+            float[] colors = new float[size * 6 * 3];
+            float[] texturCoords = new float[size * 6 * 2];
+            float[] texBottomLeft = new float[size * 6 * 2];
+
+
+            for(int i=0;i<visUnits.Count;i++)
+            {
+                Unit current = visUnits[i];
+                //buffer indices
+                int coord = i * 6 * 3;
+                int texCoord = i * 6 * 2;
+
+                if (current == null)
+                    continue;
+
+                float unitSize = current.Size*nodeSize;
+
+                //tile position
+                float bottom = (current.Y - viewTop) * unitSize;
+                float top = (current.Y - viewTop + 1) * unitSize;
+                float left = (current.X - viewLeft) * unitSize;
+                float right = (current.X - viewLeft + 1) * unitSize;
+
+                SetSquareVertices(vertices, bottom, top, left, right, -1, coord);
+                SetColor(colors, 1f, 1f, 1f, coord,6);
+                SetSquareTextureCoordinates(texturCoords, texCoord);
+                SetTexBottomLeft(texBottomLeft, blX, blY, texCoord,6);
+            }
+
+            //bind map.VertexBufferArray and set data of its buffers
+            units.VertexBufferArray.Bind(gl);
+
+            units.VertexDataBuffer.Bind(gl);
+            units.VertexDataBuffer.SetData(gl, attributeIndexPosition, vertices, false, 3);
+
+            units.ColorDataBuffer.Bind(gl);
+            units.ColorDataBuffer.SetData(gl, attributeIndexcolor, colors, false, 3);
+
+            units.TextureDataBuffer.Bind(gl);
+            units.TextureDataBuffer.SetData(gl, attributeIndexTexCoord, texturCoords, false, 2);
+
+            units.TexBLDataBuffer.Bind(gl);
+            units.TexBLDataBuffer.SetData(gl, attributeIndexTexBL, texBottomLeft, false, 2);
+        }
+
+        /// <summary>
+        /// Creates vertex buffer array and its buffers for gl.
+        /// </summary>
+        /// <param name="gl">The instance of OpenGL.</param>
+        public static void CreateFlowMap(OpenGL gl)
+        {
+            flowMap = new BufferArray();
+
+            //initialize map.VertexBufferArray and link it to its VertexBuffers
+            flowMap.VertexBufferArray = new VertexBufferArray();
+            flowMap.VertexBufferArray.Create(gl);
+            flowMap.VertexBufferArray.Bind(gl);
+
+            //initialize empty map.VertexDataBuffer
+            flowMap.VertexDataBuffer = new VertexBuffer();
+            flowMap.VertexDataBuffer.Create(gl);
+
+            //initialize empty map.ColorDataBuffer
+            flowMap.ColorDataBuffer = new VertexBuffer();
+            flowMap.ColorDataBuffer.Create(gl);
+
+            //initialize empty map.TextureDataBuffer
+            flowMap.TextureDataBuffer = new VertexBuffer();
+            flowMap.TextureDataBuffer.Create(gl);
+
+            //initialize empty map.TexBLDataBuffer
+            flowMap.TexBLDataBuffer = new VertexBuffer();
+            flowMap.TexBLDataBuffer.Create(gl);
+
+            flowMap.VertexBufferArray.Unbind(gl);
+        }
+        
+        /// <summary>
+        /// Updates buffers of vertexArrayBuffer with the information about the flow map
+        /// from mapView.
+        /// </summary>
+        /// <param name="gl">Instance of OpenGL.</param>
+        /// <param name="mapView">Map view describing the map.</param>
+        public static void UpdateFlowMapDataBuffers(OpenGL gl, MapView mapView)
+        {
+            float nodeSize;
+            float viewLeft;
+            float viewTop;
+            float viewBottom;
+            float viewRight;
+            float[,] flowM;
+            //mapView has to be locked because it can also be accessed from the main game loop
+            lock (mapView)
+            {
+                nodeSize = mapView.NodeSize;
+                viewLeft = mapView.Left;
+                viewTop = mapView.Bottom;
+                viewBottom = mapView.Top;
+                viewRight = mapView.Right;
+                flowM = mapView.GetVisibleFlowMap();
+            }
+
+            int width = flowM.GetLength(0);
+            int height = flowM.GetLength(1);
+            float blX = 1;
+            float blY = 1;
+
+            //extents of one rectangle
+            float sqW = nodeSize;
+            float sqH = nodeSize;
+
+            float[] vertices = new float[width * height * 3 * 3];
+            float[] colors = new float[width * height * 3 * 3];
+            float[] textureCoords = new float[width * height * 3 * 2];
+            float[] texBottomLeft = new float[width * height * 3 * 2];
+
+            vec2 triLB = new vec2(-0.25f, -0.15f);
+            vec2 triLT = new vec2(-0.25f, 0.15f);
+            vec2 triRM = new vec2(0.25f, 0f);
+            vec2 triOffset = new vec2(0.5f, 0.5f);
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    //buffer indices
+                    int coord = (i + j * width) * 3 * 3;
+                    int texCoord = (i + j * width) * 3 * 2;
+
+                    float angle = flowM[i, j];
+
+                    vec2 leftBottom =new vec2((i - (viewLeft % 1)), (j - (viewTop % 1)));
+                    vec2 squareExt = new vec2(sqW, sqH);
+
+                    vec2 rotTriLB = (Rotate(triLB,angle) + triOffset + leftBottom) * squareExt;
+                    vec2 rotTriLT = (Rotate(triLT, angle) + triOffset + leftBottom) * squareExt;
+                    vec2 rotTriRM = (Rotate(triRM, angle) + triOffset + leftBottom) * squareExt;
+
+                    int offset = 0;
+                    int texOffset = 0;
+
+                    //bottom left
+                    vertices[coord + offset + 0] = rotTriLB.x;
+                    vertices[coord + offset + 1] = rotTriLB.y;
+                    vertices[coord + offset + 2] = -1;
+
+                    offset += 3;
+
+                    //top left
+                    vertices[coord + offset + 0] = rotTriLT.x;
+                    vertices[coord + offset + 1] = rotTriLT.y;
+                    vertices[coord + offset + 2] = -1;
+
+                    offset += 3;
+
+                    //top right
+                    vertices[coord + offset + 0] = rotTriRM.x;
+                    vertices[coord + offset + 1] = rotTriRM.y;
+                    vertices[coord + offset + 2] = -1;
+
+                    //bottom left
+
+                    textureCoords[texCoord + texOffset + 0] = 0;
+                    textureCoords[texCoord + texOffset + 1] = 0;
+
+                    texOffset += 2;
+
+                    //top left
+                    textureCoords[texCoord + texOffset + 0] = 0;
+                    textureCoords[texCoord + texOffset + 1] = 1;
+
+                    texOffset += 2;
+
+                    //top right
+                    textureCoords[texCoord + texOffset + 0] = 1;
+                    textureCoords[texCoord + texOffset + 1] = 0.5f;
+
+                    SetColor(colors, 0f, 0f, 0f, coord,3);
+                    SetTexBottomLeft(texBottomLeft, blX, blY, texCoord,3);
+                }
+            }
+
+            //bind map.VertexBufferArray and set data of its buffers
+            flowMap.VertexBufferArray.Bind(gl);
+
+            flowMap.VertexDataBuffer.Bind(gl);
+            flowMap.VertexDataBuffer.SetData(gl, attributeIndexPosition, vertices, false, 3);
+
+            flowMap.ColorDataBuffer.Bind(gl);
+            flowMap.ColorDataBuffer.SetData(gl, attributeIndexcolor, colors, false, 3);
+
+            flowMap.TextureDataBuffer.Bind(gl);
+            flowMap.TextureDataBuffer.SetData(gl, attributeIndexTexCoord, textureCoords, false, 2);
+
+            flowMap.TexBLDataBuffer.Bind(gl);
+            flowMap.TexBLDataBuffer.SetData(gl, attributeIndexTexBL, texBottomLeft, false, 2);
+        }
+
+        private static vec2 Rotate(vec2 vec, float angle)
+        {
+            float cosA = (float)Math.Cos(angle);
+            float sinA = (float)Math.Sin(angle);
+            return new vec2(cosA * vec.x - sinA * vec.y,
+                            sinA * vec.x + cosA * vec.y);
         }
     }
 }

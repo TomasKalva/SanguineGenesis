@@ -17,7 +17,7 @@ void main(void) {
 	out_Color = texture(ourTexture,vec2(pass_TexBottomLeft[0]/atlasExtents[0] //left coordinate
 									+pass_TexCoord[0]*texExtents[0]/atlasExtents[0],
 									pass_TexBottomLeft[1]/atlasExtents[1]//bottom coordinate
-									+pass_TexCoord[1]*texExtents[1]/atlasExtents[1]));
+									+pass_TexCoord[1]*texExtents[1]/atlasExtents[1]))*vec4(pass_Color,1.0);
 	/*out_Color = texture(ourTexture,vec2(pass_TexBottomLeft[0]/atlasExtents[0] //left coordinate
 									+pass_TexCoord[0]/texExtents[0],
 									pass_TexBottomLeft[1]/atlasExtents[1]//bottom coordinate

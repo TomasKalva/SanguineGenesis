@@ -72,7 +72,6 @@ namespace wpfTest
         }
 
         static Texture texture = new Texture();
-        static float rotatePyramid = 0;
         static float rquad = 0;
 
         private static void DrawCubeOGL(OpenGL gl, float x, float y)

@@ -8,11 +8,11 @@ namespace wpfTest
 {
     public class Node
     {
-        public Terrain Terrain { get; set; }
         public int X { get; }
         public int Y { get; }
+        public Terrain Terrain { get; set; }
 
-        public Node(Terrain t,int x, int y)
+        public Node(int x, int y, Terrain t)
         {
             this.Terrain = t;
             X = x;

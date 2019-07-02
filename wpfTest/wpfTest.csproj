@@ -68,11 +68,15 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BitmapImageExtensions.cs" />
+    <Compile Include="FlowMap.cs" />
+    <Compile Include="IMap.cs" />
     <Compile Include="OpenGLColorBufferDrawer.cs" />
     <Compile Include="OpenGLImmediateDrawer.cs" />
     <Compile Include="OpenGLAtlasDrawer.cs" />
     <Compile Include="OpenGLTextureBufferDrawer.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Terrain.cs" />
+    <Compile Include="Unit.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
