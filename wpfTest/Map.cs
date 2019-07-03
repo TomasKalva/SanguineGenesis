@@ -43,5 +43,21 @@ namespace wpfTest
                 }
             }
         }
+
+        public ObstacleMap GetObstacleMap()
+        {
+            ObstacleMap om = new ObstacleMap(Width,Height);
+            for (int i = 0; i < Width; i++)
+                for (int j = 0; j < Height; j++)
+                    om[i, j] = this[i, j].Terrain == Terrain.WATER;
+            return om;
+        }
+
+        public float Distance(Unit u1, Unit u2)
+        {
+            float dx = u1.Pos.X - u2.Pos.X;
+            float dy = u1.Pos.Y - u2.Pos.Y;
+            return (float)Math.Sqrt(dx * dx + dy * dy);
+        }
     }
 }

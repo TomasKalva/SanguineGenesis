@@ -39,12 +39,13 @@ namespace wpfTest
         public MainWindow()
         {
             InitializeComponent();
-
-            BitmapImage mapBitmap = (BitmapImage)FindResource("hugeMap");
+            
+            BitmapImage mapBitmap = (BitmapImage)FindResource("frameMap");
             game = new Game(mapBitmap);
             mapView = new MapView(0, 0, 60, game.Map, game);
             mapMovementInput = new MapMovementInput();
-            openGLControl1.FrameRate = 80;
+            openGLControl1.FrameRate = 30;
+            
 
             Thread t = new Thread(() => {
                 Dispatcher.Invoke(DispatcherPriority.Render, new Action(() =>
@@ -59,7 +60,7 @@ namespace wpfTest
             t.Start();
         }
 
-        private int wantedGameFps=60;
+        private int wantedGameFps=100;
         private int StepLength => 1000 / wantedGameFps;
 
         private Stopwatch stepStopwatch = new Stopwatch();
@@ -67,7 +68,6 @@ namespace wpfTest
 
         public void MainLoop()
         {
-            int i = 0;
             while (true)
             {
                 if (game.GameEnded)
@@ -76,7 +76,7 @@ namespace wpfTest
                 stepStopwatch.Start();
 
                 //logic
-                i++;
+                game.Update();
 
                 //draw
                 Dispatcher.Invoke(() =>
@@ -111,7 +111,7 @@ namespace wpfTest
             //update position of mapView
             lock (mapView)
             {
-                game.FlowMap.Update();
+                //game.FlowMap.Update();
                 foreach (Direction d in mapMovementInput.MapDirection)
                     mapView.Move(d);
             }
@@ -120,7 +120,7 @@ namespace wpfTest
 
         public void ResizeView()
         {
-            mapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
+            //mapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -424,6 +424,7 @@ namespace wpfTest
             //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
         }
     }
+
 
     /// <summary>
     /// A small helper class to load manifest resource files.

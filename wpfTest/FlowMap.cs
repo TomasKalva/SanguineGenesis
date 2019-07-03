@@ -8,6 +8,8 @@ namespace wpfTest
 {
     public class FlowMap:IMap<float>
     {
+        public const float MIN_VALID_VALUE= -0.01f;
+
         //values are oriented angles in radians relative to the positive x axis
         private float[,] directions;
 
@@ -25,7 +27,7 @@ namespace wpfTest
 
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
-                    this[i, j] = .57f;
+                    this[i, j] = -10.57f;
         }
 
         /// <summary>
@@ -38,7 +40,8 @@ namespace wpfTest
         public Vector2 GetVelocity(float x, float y, float speed)
         {
             int i = (int)x; int j = (int)y;
-            if (i < 0 || i >= Width || j < 0 || j >= Height)
+            if (i < 0 || i >= Width || j < 0 || j >= Height ||
+                !IsValidValue(directions[i,j]))
                 return new Vector2(0f, 0f);
 
             float angle = directions[(int)x, (int)y];
@@ -54,17 +57,35 @@ namespace wpfTest
                 for (int j = 0; j < Height; j++)
                     this[i, j] += .01f;
         }
+
+        public static bool IsValidValue(float val) => val >= MIN_VALID_VALUE;
     }
 
     public struct Vector2
     {
-        float X { get; set; }
-        float Y { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
 
         internal Vector2(float x, float y)
         {
             X = x;
             Y = y;
+        }
+
+        public static Vector2 operator +(Vector2 u, Vector2 v)=>
+            new Vector2(u.X + v.X, u.Y + v.Y);
+        public static Vector2 operator -(Vector2 u, Vector2 v) =>
+            new Vector2(u.X - v.X, u.Y - v.Y);
+        public static Vector2 operator /(Vector2 v, float a) =>
+            new Vector2(v.X/a,v.Y/a);
+        public static Vector2 operator *(float a, Vector2 v) =>
+            new Vector2(v.X * a, v.Y * a);
+
+        public Vector2 UnitDirectionTo(Vector2 vec)
+        {
+            Vector2 dir = vec - this;
+            float length = (float)Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y);
+            return dir / length;
         }
     }
 }

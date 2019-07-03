@@ -19,16 +19,19 @@ namespace wpfTest
         public FlowMap FlowMap { get; }
         public bool GameEnded { get; set; }
         Player[] Players { get; }
+        Physics Physics;
 
         public Game(BitmapImage mapBitmap)
         {
             PixelColor[,] mapPC = mapBitmap.GetPixels();
             Map=new Map(mapPC);
             FlowMap = new FlowMap(Map.Width, Map.Height);
+            FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap());
             GameEnded = false;
             Players = new Player[2];
             Players[0] = new Player();
             Players[1] = new Player();
+            Physics = Physics.GetPhysics();
         }
 
         public List<Unit> GetUnits()
@@ -41,5 +44,12 @@ namespace wpfTest
             return units;
         }
 
+        public void Update()
+        {
+            List<Unit> units = GetUnits();
+            Physics.PushOutsideOfObstacles(Map, units);
+            Physics.Repulse(Map,units);
+            Physics.Step(Map,units);
+        }
     }
 }

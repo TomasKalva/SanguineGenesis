@@ -70,11 +70,14 @@
     <Compile Include="BitmapImageExtensions.cs" />
     <Compile Include="FlowMap.cs" />
     <Compile Include="IMap.cs" />
+    <Compile Include="ObstacleMap.cs" />
     <Compile Include="OpenGLColorBufferDrawer.cs" />
     <Compile Include="OpenGLImmediateDrawer.cs" />
     <Compile Include="OpenGLAtlasDrawer.cs" />
     <Compile Include="OpenGLTextureBufferDrawer.cs" />
+    <Compile Include="Physics.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PushingMapGenerator.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="Unit.cs" />
     <Page Include="MainWindow.xaml">
@@ -178,6 +181,9 @@
     <None Include="tileMap.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="frameMap.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

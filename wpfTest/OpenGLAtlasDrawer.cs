@@ -66,9 +66,16 @@ namespace wpfTest
 
             //load image used as atlas and pass it to the shader program
             InitializeAtlas(gl);
+            
+            //bind the shader program and set its parameters
+            shaderProgram.Bind(gl);
+            shaderProgram.SetUniformMatrix4(gl, "projectionMatrix", projectionMatrix.to_array());
+            shaderProgram.SetUniformMatrix4(gl, "viewMatrix", viewMatrix.to_array());
+            shaderProgram.SetUniformMatrix4(gl, "modelMatrix", modelMatrix.to_array());
+            shaderProgram.SetUniform3(gl, "atlasExtents", 640, 640, 0);
+            shaderProgram.SetUniform3(gl, "texExtents", 62, 62, 0);
         }
         
-
         /// <summary>
         /// Draws the scene.
         /// </summary>
@@ -78,18 +85,9 @@ namespace wpfTest
             //clear the scene
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
             
-            //bind the shader program and set its parameters
-            shaderProgram.Bind(gl);
-            shaderProgram.SetUniformMatrix4(gl, "projectionMatrix", projectionMatrix.to_array());
-            shaderProgram.SetUniformMatrix4(gl, "viewMatrix", viewMatrix.to_array());
-            shaderProgram.SetUniformMatrix4(gl, "modelMatrix", modelMatrix.to_array());
-            shaderProgram.SetUniform3(gl, "atlasExtents", 640, 640, 0);
-            shaderProgram.SetUniform3(gl, "texExtents", 62, 62, 0);
-
             //draw vertex array buffers
             map.VertexBufferArray.Bind(gl);
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-
 
             flowMap.VertexBufferArray.Bind(gl);
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
@@ -99,9 +97,6 @@ namespace wpfTest
                 units.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
             }
-
-            shaderProgram.Unbind(gl);
-
         }
 
         /// <summary>
@@ -229,10 +224,46 @@ namespace wpfTest
             float sqW = nodeSize;
             float sqH = nodeSize;
 
-            float[] vertices = new float[width * height * 6 * 3];
-            float[] colors = new float[width * height * 6 * 3];
-            float[] texturCoords = new float[width * height * 6 * 2];
+            float[] vertices= new float[width * height * 6 * 3];
+            float[] colors= new float[width * height * 6 * 3];
+            float[] textureCoords = new float[width * height * 6 * 2];
             float[] texBottomLeft = new float[width * height * 6 * 2];
+
+            /*if (map.Vertices == null || map.Vertices.Length < width * height * 6 * 3)
+                vertices = map.Vertices = new float[width * height * 6 * 3];
+            else
+            {
+                vertices = map.Vertices;
+                for (int i = 0; i < vertices.Length; i++)
+                    vertices[i] = 0;
+            }
+
+            if (map.Colors == null || map.Colors.Length < width * height * 6 * 3)
+                colors = map.Vertices = new float[width * height * 6 * 3];
+            else
+            {
+                colors = map.Colors;
+                for (int i = 0; i < colors.Length; i++)
+                    colors[i] = 0;
+            }
+
+            if (map.TextureCoords == null || map.TextureCoords.Length < width * height * 6 * 2)
+                textureCoords = map.Vertices = new float[width * height * 6 * 2];
+            else
+            {
+                textureCoords = map.TextureCoords;
+                for (int i = 0; i < textureCoords.Length; i++)
+                    textureCoords[i] = 0;
+            }
+
+            if (map.TexBottomLeft == null || map.TexBottomLeft.Length < width * height * 6 * 2)
+                texBottomLeft = map.TexBottomLeft = new float[width * height * 6 * 2];
+            else
+            {
+                texBottomLeft = map.TexBottomLeft;
+                for (int i = 0; i < texBottomLeft.Length; i++)
+                    texBottomLeft[i] = 0;
+            }*/
 
             for (int i = 0; i < width; i++)
             {
@@ -265,7 +296,7 @@ namespace wpfTest
 
                     SetSquareVertices(vertices, bottom, top, left, right, -1, coord);
                     SetColor(colors, 1f, 1f, 1f, coord,6);
-                    SetSquareTextureCoordinates(texturCoords, texCoord);
+                    SetSquareTextureCoordinates(textureCoords, texCoord);
                     SetTexBottomLeft(texBottomLeft, blX,blY,texCoord,6);
                 }
             }
@@ -280,7 +311,7 @@ namespace wpfTest
             map.ColorDataBuffer.SetData(gl, attributeIndexcolor, colors, false, 3);
             
             map.TextureDataBuffer.Bind(gl);
-            map.TextureDataBuffer.SetData(gl, attributeIndexTexCoord, texturCoords, false, 2);
+            map.TextureDataBuffer.SetData(gl, attributeIndexTexCoord, textureCoords, false, 2);
             
             map.TexBLDataBuffer.Bind(gl);
             map.TexBLDataBuffer.SetData(gl, attributeIndexTexBL, texBottomLeft, false, 2);
@@ -564,13 +595,13 @@ namespace wpfTest
                 if (current == null)
                     continue;
 
-                float unitSize = current.Size*nodeSize;
+                float unitSize = current.Range*2*nodeSize;
 
                 //tile position
-                float bottom = (current.Y - viewTop) * unitSize;
-                float top = (current.Y - viewTop + 1) * unitSize;
-                float left = (current.X - viewLeft) * unitSize;
-                float right = (current.X - viewLeft + 1) * unitSize;
+                float bottom = (current.Pos.Y - viewTop - 0.5f) * unitSize;
+                float top = (current.Pos.Y - viewTop + 1 - 0.5f) * unitSize;
+                float left = (current.Pos.X - viewLeft - 0.5f) * unitSize;
+                float right = (current.Pos.X - viewLeft + 1 - 0.5f) * unitSize;
 
                 SetSquareVertices(vertices, bottom, top, left, right, -1, coord);
                 SetColor(colors, 1f, 1f, 1f, coord,6);
@@ -689,28 +720,35 @@ namespace wpfTest
 
                     int offset = 0;
                     int texOffset = 0;
+                    if (!FlowMap.IsValidValue(angle))
+                    {
+                        vertices[coord + 0] = vertices[coord + 1] = vertices[coord + 2]
+                            = vertices[coord + 3] = vertices[coord + 4] = vertices[coord + 5] = 0;
+                    }
+                    else
+                    {
+                        //bottom left
+                        vertices[coord + offset + 0] = rotTriLB.x;
+                        vertices[coord + offset + 1] = rotTriLB.y;
+                        vertices[coord + offset + 2] = -1;
+
+                        offset += 3;
+
+                        //top left
+                        vertices[coord + offset + 0] = rotTriLT.x;
+                        vertices[coord + offset + 1] = rotTriLT.y;
+                        vertices[coord + offset + 2] = -1;
+
+                        offset += 3;
+
+                        //top right
+                        vertices[coord + offset + 0] = rotTriRM.x;
+                        vertices[coord + offset + 1] = rotTriRM.y;
+                        vertices[coord + offset + 2] = -1;
+
+                    }
 
                     //bottom left
-                    vertices[coord + offset + 0] = rotTriLB.x;
-                    vertices[coord + offset + 1] = rotTriLB.y;
-                    vertices[coord + offset + 2] = -1;
-
-                    offset += 3;
-
-                    //top left
-                    vertices[coord + offset + 0] = rotTriLT.x;
-                    vertices[coord + offset + 1] = rotTriLT.y;
-                    vertices[coord + offset + 2] = -1;
-
-                    offset += 3;
-
-                    //top right
-                    vertices[coord + offset + 0] = rotTriRM.x;
-                    vertices[coord + offset + 1] = rotTriRM.y;
-                    vertices[coord + offset + 2] = -1;
-
-                    //bottom left
-
                     textureCoords[texCoord + texOffset + 0] = 0;
                     textureCoords[texCoord + texOffset + 1] = 0;
 
