@@ -63,20 +63,29 @@ namespace wpfTest
         private int wantedGameFps=100;
         private int StepLength => 1000 / wantedGameFps;
 
+        private Stopwatch totalStopwatch = new Stopwatch();
+        private double totalTime;
+
         private Stopwatch stepStopwatch = new Stopwatch();
         private double totalStepTime;
 
+
         public void MainLoop()
         {
+            totalTime = 0;
+            totalStopwatch.Start();
             while (true)
             {
                 if (game.GameEnded)
                     break;
-
+                
                 stepStopwatch.Start();
 
                 //logic
-                game.Update();
+                long totalEl = totalStopwatch.ElapsedMilliseconds;
+                float deltaT = (totalEl - (float)totalTime)/1000f;
+                totalTime = totalEl;
+                game.Update(deltaT);
 
                 //draw
                 Dispatcher.Invoke(() =>
@@ -194,7 +203,7 @@ namespace wpfTest
 
             /// <summary>
             /// Returns true if the point is inside this map view. Coordinates are
-            /// relative to size of node.
+            /// relative to the size of a node.
             /// </summary>
             /// <param name="x">X component.</param>
             /// <param name="y">Y component.</param>

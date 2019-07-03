@@ -39,5 +39,17 @@ namespace wpfTest
             for (int j = -1; j < Height+1; j++)
                 this[Width, j] = true;
         }
+
+        /// <summary>
+        /// Returns true if the point is inside an obstacle.
+        /// </summary>
+        public bool CollidingWithObstacle(Vector2 point)
+        {
+            int i = (int)point.X; int j = (int)point.Y;
+            if (i < 0 || i >= Width || j < 0 || j >= Height)
+                return true;
+
+            return this[i, j];
+        }
     }
 }

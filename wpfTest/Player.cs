@@ -18,11 +18,11 @@ namespace wpfTest
         public void InitUnits()
         {
             Units = new List<Unit>();
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < 5; j++)
+                for (int j = 0; j < 10; j++)
                 {
-                    Units.Add(new Unit(20 + i, j));
+                    Units.Add(new Unit(20 + i*.25f,10+ j*.25f));
                 }
             }
             Units.Add(new Unit(5f, 6f));

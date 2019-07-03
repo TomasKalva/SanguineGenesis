@@ -44,12 +44,13 @@ namespace wpfTest
             return units;
         }
 
-        public void Update()
+        public void Update(float deltaT)
         {
             List<Unit> units = GetUnits();
-            Physics.PushOutsideOfObstacles(Map, units);
-            Physics.Repulse(Map,units);
-            Physics.Step(Map,units);
+            Physics.PushOutsideOfObstacles(Map, units,deltaT);
+            Physics.Repulse(Map,units,deltaT);
+            Physics.Step(Map,units,deltaT);
+            Physics.ResetCollision(units);
         }
     }
 }

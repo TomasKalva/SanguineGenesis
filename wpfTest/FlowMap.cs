@@ -44,7 +44,7 @@ namespace wpfTest
                 !IsValidValue(directions[i,j]))
                 return new Vector2(0f, 0f);
 
-            float angle = directions[(int)x, (int)y];
+            float angle = directions[i, j];
             return new Vector2(
                 (float)Math.Cos(angle) * speed,
                 (float)Math.Sin(angle) * speed
@@ -84,8 +84,9 @@ namespace wpfTest
         public Vector2 UnitDirectionTo(Vector2 vec)
         {
             Vector2 dir = vec - this;
-            float length = (float)Math.Sqrt(dir.X * dir.X + dir.Y * dir.Y);
-            return dir / length;
+            return dir / dir.Length;
         }
+
+        public float Length =>(float)Math.Sqrt(X * X + Y * Y);
     }
 }
