@@ -19,7 +19,8 @@ namespace wpfTest
         public FlowMap FlowMap { get; }
         public bool GameEnded { get; set; }
         Player[] Players { get; }
-        Physics Physics;
+        public GameQuerying GameQuerying { get; }
+        Physics physics;
 
         public Game(BitmapImage mapBitmap)
         {
@@ -31,7 +32,8 @@ namespace wpfTest
             Players = new Player[2];
             Players[0] = new Player();
             Players[1] = new Player();
-            Physics = Physics.GetPhysics();
+            GameQuerying = GameQuerying.GetGameQuerying();
+            physics = Physics.GetPhysics();
         }
 
         public List<Unit> GetUnits()
@@ -47,10 +49,10 @@ namespace wpfTest
         public void Update(float deltaT)
         {
             List<Unit> units = GetUnits();
-            Physics.PushOutsideOfObstacles(Map, units,deltaT);
-            Physics.Repulse(Map,units,deltaT);
-            Physics.Step(Map,units,deltaT);
-            Physics.ResetCollision(units);
+            physics.PushOutsideOfObstacles(Map, units,deltaT);
+            physics.Repulse(Map,units,deltaT);
+            physics.Step(Map,units,deltaT);
+            physics.ResetCollision(units);
         }
     }
 }

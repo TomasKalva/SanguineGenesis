@@ -11,7 +11,9 @@
         >
     <Grid>
         <Grid>
-            <sharpGL:OpenGLControl Name="openGLControl1" OpenGLDraw="OpenGLControl_OpenGLDraw" RenderContextType="FBO" />
+            <sharpGL:OpenGLControl Name="openGLControl1" OpenGLDraw="OpenGLControl_OpenGLDraw" RenderContextType="FBO"
+                                   MouseLeftButtonDown="openGLControl1_MouseLeftButtonDown" MouseLeftButtonUp="openGLControl1_MouseLeftButtonUp"
+                                   MouseMove="openGLControl1_MouseMove"/>
         </Grid>
         <!--<Grid Name="mapPanel">
             <Canvas Name="tiles">

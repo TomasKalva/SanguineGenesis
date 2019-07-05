@@ -32,9 +32,12 @@ namespace wpfTest
     /// </summary>
     public partial class MainWindow : Window
     {
-        Game game;
-        MapView mapView;
-        MapMovementInput mapMovementInput;
+        private Game game;
+        /// <summary>
+        /// Can only be used synchronously from this window. Using this variable or
+        /// its contents from other threads requires invocation.
+        /// </summary>
+        private GameControls gameControls;
 
         public MainWindow()
         {
@@ -42,8 +45,9 @@ namespace wpfTest
             
             BitmapImage mapBitmap = (BitmapImage)FindResource("frameMap");
             game = new Game(mapBitmap);
-            mapView = new MapView(0, 0, 60, game.Map, game);
-            mapMovementInput = new MapMovementInput();
+            var MapView = new MapView(0, 0, 60, game.Map, game);
+            var MapMovementInput = new MapMovementInput();
+            gameControls = new GameControls(MapView, MapMovementInput);
             openGLControl1.FrameRate = 30;
             
 
@@ -76,22 +80,26 @@ namespace wpfTest
             totalStopwatch.Start();
             while (true)
             {
-                if (game.GameEnded)
-                    break;
-                
                 stepStopwatch.Start();
 
-                //logic
-                long totalEl = totalStopwatch.ElapsedMilliseconds;
-                float deltaT = (totalEl - (float)totalTime)/1000f;
-                totalTime = totalEl;
-                game.Update(deltaT);
-
-                //draw
-                Dispatcher.Invoke(() =>
+                lock (game)
                 {
-                    Draw();
-                });
+                    if (game.GameEnded)
+                        break;
+
+                    //process players input
+                    //Invoke could cause deadlock because drawing also locks game
+                    Dispatcher.BeginInvoke(
+                        (Action)(() =>
+                        gameControls.ProcessInput(game)));
+
+
+                    //update the state of the game
+                    long totalEl = totalStopwatch.ElapsedMilliseconds;
+                    float deltaT = (totalEl - (float)totalTime) / 1000f;
+                    totalTime = totalEl;
+                    game.Update(deltaT);
+                }
 
                 stepStopwatch.Stop();
 
@@ -115,217 +123,16 @@ namespace wpfTest
             }
         }
 
-        public void Draw()
-        {
-            //update position of mapView
-            lock (mapView)
-            {
-                //game.FlowMap.Update();
-                foreach (Direction d in mapMovementInput.MapDirection)
-                    mapView.Move(d);
-            }
-            
-        }
-
         public void ResizeView()
         {
-            //mapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
+            //gameControls.MapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             game.GameEnded = true;
         }
-
-        /// <summary>
-        /// The class describes player's view of the map.
-        /// Enumerator returns the nodes inside current players view from left top to right bottom.
-        /// </summary>
-        public class MapView
-        {
-            private Map map;
-            private Game game;
-            private float actualWidth;
-            private float actualHeight;
-            private float scrollSpeed;
-            private float zoomSpeed;
-            private float minNodeSize;
-            private float maxNodeSize;
-
-            public float NodeSize { get; set; }
-            //These values are relative to size of one node.
-            public float Bottom { get; set; }
-            public float Left { get; set; }
-            public float Width => actualWidth / NodeSize;
-            public float Height => actualHeight / NodeSize;
-            public float Right => Left + Width;
-            public float Top => Bottom + Height;
-
-
-            public MapView(float top, float left, float nodeSize, Map map, Game game,
-                float minNodeSize = 30, float maxNodeSize=70,float scrollSpeed=0.5f,float zoomSpeed=20)
-            {
-                Bottom = top;
-                Left = left;
-                NodeSize = nodeSize;
-                this.map = map;
-                this.game = game;
-                this.scrollSpeed = scrollSpeed;
-                this.zoomSpeed = zoomSpeed;
-                this.minNodeSize = minNodeSize;
-                this.maxNodeSize = maxNodeSize;
-            }
-            
-            public List<Unit> GetVisibleUnits()
-            {
-                if (actualHeight == 0 || actualWidth == 0)
-                    throw new InvalidOperationException("Actual extents have to be specified before calling this method!");
-                
-                List<Unit> visible = new List<Unit>();
-                foreach(Unit unit in game.GetUnits())
-                {
-                    //todo: add querying for unit extents
-                    float bottom = unit.GetActualBottom(0);
-                    float top = unit.GetActualTop(0, 0);
-                    float left = unit.GetActualLeft(0);
-                    float right = unit.GetActualRight(0, 0);
-                    if(PointInside(left,bottom) ||
-                        PointInside(right,bottom) ||
-                        PointInside(left, top) ||
-                        PointInside(right, top))
-                    {
-                        visible.Add(unit);
-                    }
-                }
-                return visible;
-                
-            }
-
-            /// <summary>
-            /// Returns true if the point is inside this map view. Coordinates are
-            /// relative to the size of a node.
-            /// </summary>
-            /// <param name="x">X component.</param>
-            /// <param name="y">Y component.</param>
-            /// <returns></returns>
-            public bool PointInside(float x, float y)
-            {
-                return x>=Left && x<=Right && y>=Bottom && y<=Top;
-            }
-
-            public Node[,] GetVisibleNodes()
-            {
-                return GetVisiblePart(map);
-            }
-
-            public float[,] GetVisibleFlowMap()
-            {
-                return GetVisiblePart(game.FlowMap);
-            }
-
-            public T[,] GetVisiblePart<T>(IMap<T> map)
-            {
-                if (actualHeight == 0 || actualWidth == 0)
-                    throw new InvalidOperationException("Actual extents have to be specified before calling this method!");
-
-                //todo: set more optimal array extents - so that it doesnt contain nulls
-                int width = Math.Min((int)(Math.Ceiling(Width) + 1),
-                    (int)(map.Width-Left));
-                int height = Math.Min((int)(Math.Ceiling(Height) + 1),
-                    (int)(map.Height-Bottom));
-
-                T[,] visible = new T[width + 1,height + 1];
-
-                for (int i = 0; i <= width; i++)
-                    for (int j = 0; j <= height; j++)
-                    {
-                        int mapI = i + (int)Left;
-                        int mapJ = j + (int)Bottom;
-                        //check if coordinates are valid
-                        if (mapI >= map.Width)
-                            goto afterLoop;
-                        if (mapI < 0)
-                            break;
-                        if (mapJ >= map.Height)
-                            break;
-                        if (mapJ < 0)
-                            continue;
-
-                        visible[i, j] = map[mapI,mapJ];
-                    }
-                afterLoop:;
-                return visible;
-            }
-
-            public void SetActualExtents(float width, float height)
-            {
-                this.actualWidth = width;
-                this.actualHeight = height;
-            }
-            
-            /// <summary>
-            /// Moves the view in given direction so that it doesn't leave the map.
-            /// </summary>
-            /// <param name="dir">The direction.</param>
-            public void Move(Direction dir)
-            {
-                switch (dir)
-                {
-
-                    case Direction.DOWN: Bottom -= scrollSpeed; break;
-                    case Direction.UP: Bottom += scrollSpeed; break;
-                    case Direction.LEFT: Left -= scrollSpeed; break;
-                    case Direction.RIGHT:Left += scrollSpeed;break;
-                }
-                CorrectPosition();
-            }
-
-            /// <summary>
-            /// Decreases size of viewed area.
-            /// </summary>
-            public bool ZoomIn()
-            {
-                float newNodeSize= Math.Min(maxNodeSize,Math.Max(NodeSize + zoomSpeed,minNodeSize));
-                if(newNodeSize != NodeSize)
-                {
-                    NodeSize = newNodeSize;
-                    CorrectPosition();
-                    return true;
-                }
-                return false;
-            }
-            
-            /// <summary>
-            /// Increases size of viewed area.
-            /// </summary>
-            public bool ZoomOut()
-            {
-                float newNodeSize = Math.Min(maxNodeSize, Math.Max(NodeSize - zoomSpeed, minNodeSize));
-                if (newNodeSize != NodeSize)
-                {
-                    NodeSize = newNodeSize;
-                    CorrectPosition();
-                    return true;
-                }
-                return false;
-            }
-
-            /// <summary>
-            /// Sets view position into the map.
-            /// </summary>
-            public void CorrectPosition()
-            {
-                if (Right > map.Width)
-                    Left = map.Width - Width;
-                if (Left < 0)
-                    Left = 0;
-                if (Top > map.Height)
-                    Bottom = map.Height-Height;
-                if (Bottom < 0)
-                    Bottom = 0;
-            }
-        }
-
+        
         public enum Direction
         {
             LEFT,
@@ -338,49 +145,10 @@ namespace wpfTest
         {
             switch (e.Key)
             {
-                case Key.Down: mapMovementInput.AddDirection(Direction.DOWN); break;
-                case Key.Up: mapMovementInput.AddDirection(Direction.UP); break;
-                case Key.Left: mapMovementInput.AddDirection(Direction.LEFT); break;
-                case Key.Right: mapMovementInput.AddDirection(Direction.RIGHT); break;
-            }
-        }
-
-
-        private class MapMovementInput
-        {
-            public List<Direction> MapDirection { get; private set; }
-
-            public MapMovementInput()
-            {
-                MapDirection = new List<Direction>();
-            }
-
-            public void AddDirection(Direction dir)
-            {
-                if (MapDirection.Contains(dir))
-                    return;
-
-                if (MapDirection.Contains(Opposite(dir)))
-                {
-                    MapDirection.Remove(Opposite(dir));
-                }
-                MapDirection.Add(dir);
-            }
-
-            public void RemoveDirection(Direction dir)
-            {
-                MapDirection.Remove(dir);
-            }
-
-            private Direction Opposite(Direction dir)
-            {
-                switch (dir)
-                {
-                    case Direction.DOWN: return Direction.UP;
-                    case Direction.UP: return Direction.DOWN;
-                    case Direction.LEFT: return Direction.RIGHT;
-                    default: return Direction.LEFT;
-                }
+                case Key.Down: gameControls.MapMovementInput.AddDirection(Direction.DOWN); break;
+                case Key.Up: gameControls.MapMovementInput.AddDirection(Direction.UP); break;
+                case Key.Left: gameControls.MapMovementInput.AddDirection(Direction.LEFT); break;
+                case Key.Right: gameControls.MapMovementInput.AddDirection(Direction.RIGHT); break;
             }
         }
 
@@ -388,10 +156,10 @@ namespace wpfTest
         {
             switch (e.Key)
             {
-                case Key.Down: mapMovementInput.RemoveDirection(Direction.DOWN); break;
-                case Key.Up: mapMovementInput.RemoveDirection(Direction.UP); break;
-                case Key.Left: mapMovementInput.RemoveDirection(Direction.LEFT); break;
-                case Key.Right: mapMovementInput.RemoveDirection(Direction.RIGHT); break;
+                case Key.Down: gameControls.MapMovementInput.RemoveDirection(Direction.DOWN); break;
+                case Key.Up:  gameControls.MapMovementInput.RemoveDirection(Direction.UP); break;
+                case Key.Left:  gameControls.MapMovementInput.RemoveDirection(Direction.LEFT); break;
+                case Key.Right:  gameControls.MapMovementInput.RemoveDirection(Direction.RIGHT); break;
             }
         }
 
@@ -399,23 +167,25 @@ namespace wpfTest
         {
             if (e.Delta > 0)
             {
-                if (mapView.ZoomIn())
+                if (gameControls.MapView.ZoomIn(game.Map))
                     ResizeView();
             }
             else
             {
-                if (mapView.ZoomOut())
+                if (gameControls.MapView.ZoomOut(game.Map))
                     ResizeView();
             }
+                
         }
 
         private void InitializeOpenGL()
         {
             OpenGL gl = openGLControl1.OpenGL;
-            OpenGLAtlasDrawer.Initialize(gl, (float)ActualWidth, (float)ActualHeight);
+            OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
             OpenGLAtlasDrawer.CreateMap(gl);
             OpenGLAtlasDrawer.CreateUnits(gl);
             OpenGLAtlasDrawer.CreateFlowMap(gl);
+            OpenGLAtlasDrawer.CreateSelectionFrame(gl);
         }
 
         private void OpenGLControl_OpenGLDraw(object sender, SharpGL.SceneGraph.OpenGLEventArgs args)
@@ -424,13 +194,47 @@ namespace wpfTest
             
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            mapView.SetActualExtents((float)ActualWidth, (float)ActualHeight);
-            OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, mapView);
-            OpenGLAtlasDrawer.UpdateUnitsDataBuffers(gl, mapView);
-            OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, mapView);
-            OpenGLAtlasDrawer.Draw(gl);
+            lock (game)
+            {
+                gameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
+                OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateUnitsDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, gameControls.MapView, gameControls.MapSelectorFrame);
+                OpenGLAtlasDrawer.Draw(gl);
+            }
             sw.Stop();
             //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
+        }
+
+        private void openGLControl1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Point clickPos = e.GetPosition(openGLControl1);
+            Vector2 mapCoordinates = gameControls.MapView
+                .ScreenToMap(new Vector2((float)clickPos.X,(float)clickPos.Y));
+            gameControls.SelectorFrameInput.NewPoint(mapCoordinates);
+            //Console.WriteLine(mapCoordinates.X+" ; "+mapCoordinates.Y);
+            Console.WriteLine(clickPos);
+        }
+
+        private void openGLControl1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Point clickPos = e.GetPosition(openGLControl1);
+            Vector2 mapCoordinates = gameControls.MapView
+                .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
+            gameControls.SelectorFrameInput.EndSelection(mapCoordinates);
+            //Console.WriteLine(mapCoordinates.X + " ; " + mapCoordinates.Y);
+        }
+
+        private void openGLControl1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (gameControls.SelectorFrameInput.Selecting)
+            {
+                Point clickPos = e.GetPosition(openGLControl1);
+                Vector2 mapCoordinates = gameControls.MapView
+                    .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
+                gameControls.SelectorFrameInput.NewPoint(mapCoordinates);
+            }
         }
     }
 

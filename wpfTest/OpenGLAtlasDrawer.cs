@@ -97,6 +97,12 @@ namespace wpfTest
                 units.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
             }
+
+            //if (!unitsEmpty)
+            {
+                selectionFrame.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+            }
         }
 
         /// <summary>
@@ -154,6 +160,7 @@ namespace wpfTest
         private static BufferArray map;
         private static BufferArray flowMap;
         private static BufferArray units;
+        private static BufferArray selectionFrame;
 
         //true if there are no units to draw
         private static bool unitsEmpty;
@@ -196,7 +203,7 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateMapDataBuffers(OpenGL gl, MapView mapView)
+        public static void UpdateMapDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
             float nodeSize;
             float viewLeft;
@@ -209,10 +216,10 @@ namespace wpfTest
             {
                 nodeSize = mapView.NodeSize;
                 viewLeft = mapView.Left;
-                viewTop = mapView.Bottom;
-                viewBottom = mapView.Top;
+                viewTop = mapView.Top;
+                viewBottom = mapView.Bottom;
                 viewRight = mapView.Right;
-                visible = mapView.GetVisibleNodes();
+                visible = mapView.GetVisibleNodes(game);
             }
 
             int width = visible.GetLength(0);
@@ -289,8 +296,8 @@ namespace wpfTest
                     }
 
                     //tile position
-                    float bottom = (current.Y - viewTop) * sqH;
-                    float top = (current.Y - viewTop + 1) * sqH;
+                    float bottom = (current.Y - viewBottom) * sqH;
+                    float top = (current.Y - viewBottom + 1) * sqH;
                     float left = (current.X - viewLeft) * sqW;
                     float right = (current.X - viewLeft + 1) * sqW;
 
@@ -545,7 +552,7 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateUnitsDataBuffers(OpenGL gl, MapView mapView)
+        public static void UpdateUnitsDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
             float nodeSize;
             float viewLeft;
@@ -561,7 +568,7 @@ namespace wpfTest
                 viewTop = mapView.Bottom;
                 viewBottom = mapView.Top;
                 viewRight = mapView.Right;
-                visUnits = mapView.GetVisibleUnits();
+                visUnits = mapView.GetVisibleUnits(game);
             }
             
             float blX = 129;
@@ -586,7 +593,7 @@ namespace wpfTest
 
 
             for(int i=0;i<visUnits.Count;i++)
-            {
+            {                
                 Unit current = visUnits[i];
                 //buffer indices
                 int coord = i * 6 * 3;
@@ -604,7 +611,10 @@ namespace wpfTest
                 float right = (current.Pos.X - viewLeft + 1 - 0.5f) * unitSize;
 
                 SetSquareVertices(vertices, bottom, top, left, right, -1, coord);
-                SetColor(colors, 1f, 1f, 1f, coord,6);
+                if(current.Group==null)
+                    SetColor(colors, 1f, 1f, 1f, coord,6);
+                else
+                    SetColor(colors, 1f, 0f, 0f, coord, 6);
                 SetSquareTextureCoordinates(texturCoords, texCoord);
                 SetTexBottomLeft(texBottomLeft, blX, blY, texCoord,6);
             }
@@ -663,7 +673,7 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateFlowMapDataBuffers(OpenGL gl, MapView mapView)
+        public static void UpdateFlowMapDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
             float nodeSize;
             float viewLeft;
@@ -676,10 +686,10 @@ namespace wpfTest
             {
                 nodeSize = mapView.NodeSize;
                 viewLeft = mapView.Left;
-                viewTop = mapView.Bottom;
-                viewBottom = mapView.Top;
+                viewTop = mapView.Top;
+                viewBottom = mapView.Bottom;
                 viewRight = mapView.Right;
-                flowM = mapView.GetVisibleFlowMap();
+                flowM = mapView.GetVisibleFlowMap(game);
             }
 
             int width = flowM.GetLength(0);
@@ -711,7 +721,7 @@ namespace wpfTest
 
                     float angle = flowM[i, j];
 
-                    vec2 leftBottom =new vec2((i - (viewLeft % 1)), (j - (viewTop % 1)));
+                    vec2 leftBottom =new vec2((i - (viewLeft % 1)), (j - (viewBottom % 1)));
                     vec2 squareExt = new vec2(sqW, sqH);
 
                     vec2 rotTriLB = (Rotate(triLB,angle) + triOffset + leftBottom) * squareExt;
@@ -783,6 +793,98 @@ namespace wpfTest
 
             flowMap.TexBLDataBuffer.Bind(gl);
             flowMap.TexBLDataBuffer.SetData(gl, attributeIndexTexBL, texBottomLeft, false, 2);
+        }
+
+        /// <summary>
+        /// Creates vertex buffer array and its buffers for gl.
+        /// </summary>
+        /// <param name="gl">The instance of OpenGL.</param>
+        public static void CreateSelectionFrame(OpenGL gl)
+        {
+            selectionFrame = new BufferArray();
+
+            //initialize map.VertexBufferArray and link it to its VertexBuffers
+            selectionFrame.VertexBufferArray = new VertexBufferArray();
+            selectionFrame.VertexBufferArray.Create(gl);
+            selectionFrame.VertexBufferArray.Bind(gl);
+
+            //initialize empty map.VertexDataBuffer
+            selectionFrame.VertexDataBuffer = new VertexBuffer();
+            selectionFrame.VertexDataBuffer.Create(gl);
+
+            //initialize empty map.ColorDataBuffer
+            selectionFrame.ColorDataBuffer = new VertexBuffer();
+            selectionFrame.ColorDataBuffer.Create(gl);
+
+            //initialize empty map.TextureDataBuffer
+            selectionFrame.TextureDataBuffer = new VertexBuffer();
+            selectionFrame.TextureDataBuffer.Create(gl);
+
+            //initialize empty map.TexBLDataBuffer
+            selectionFrame.TexBLDataBuffer = new VertexBuffer();
+            selectionFrame.TexBLDataBuffer.Create(gl);
+
+            selectionFrame.VertexBufferArray.Unbind(gl);
+        }
+
+        /// <summary>
+        /// Updates buffers of vertexArrayBuffer with the information about the flow map
+        /// from mapView.
+        /// </summary>
+        /// <param name="gl">Instance of OpenGL.</param>
+        /// <param name="mapView">Map view describing the map.</param>
+        public static void UpdateSelectionFrameDataBuffers(OpenGL gl, MapView mapView, MapSelectorFrame selectorFrame)
+        {
+            float nodeSize;
+            float viewLeft;
+            float viewTop;
+            float viewBottom;
+            float viewRight;
+                nodeSize = mapView.NodeSize;
+                viewLeft = mapView.Left;
+                viewTop = mapView.Top;
+                viewBottom = mapView.Bottom;
+                viewRight = mapView.Right;
+            
+            float blX = 193;
+            float blY = 1;
+
+            //extents of one rectangle
+            float sqW = nodeSize;
+            float sqH = nodeSize;
+
+            float[] vertices = new float[6 * 3];
+            float[] colors = new float[6 * 3];
+            float[] textureCoords = new float[6 * 2];
+            float[] texBottomLeft = new float[6 * 2];
+            
+            if (selectorFrame != null)
+            {
+                float bottom = selectorFrame.Bottom - viewBottom;
+                float top = selectorFrame.Top - viewBottom;
+                float left = selectorFrame.Left - viewLeft;
+                float right = selectorFrame.Right - viewLeft;
+                SetSquareVertices(vertices, bottom * nodeSize, top * nodeSize,
+                    left * nodeSize, right * nodeSize, -1f, 0);
+                SetSquareTextureCoordinates(textureCoords, 0);
+                SetColor(colors, 1f, 1f, 1f, 0, 6);
+                SetTexBottomLeft(texBottomLeft, blX, blY, 0, 6);
+            }
+
+            //bind map.VertexBufferArray and set data of its buffers
+            selectionFrame.VertexBufferArray.Bind(gl);
+
+            selectionFrame.VertexDataBuffer.Bind(gl);
+            selectionFrame.VertexDataBuffer.SetData(gl, attributeIndexPosition, vertices, false, 3);
+
+            selectionFrame.ColorDataBuffer.Bind(gl);
+            selectionFrame.ColorDataBuffer.SetData(gl, attributeIndexcolor, colors, false, 3);
+
+            selectionFrame.TextureDataBuffer.Bind(gl);
+            selectionFrame.TextureDataBuffer.SetData(gl, attributeIndexTexCoord, textureCoords, false, 2);
+
+            selectionFrame.TexBLDataBuffer.Bind(gl);
+            selectionFrame.TexBLDataBuffer.SetData(gl, attributeIndexTexBL, texBottomLeft, false, 2);
         }
 
         private static vec2 Rotate(vec2 vec, float angle)

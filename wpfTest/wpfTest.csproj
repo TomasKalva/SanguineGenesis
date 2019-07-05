@@ -69,7 +69,15 @@
     </ApplicationDefinition>
     <Compile Include="BitmapImageExtensions.cs" />
     <Compile Include="FlowMap.cs" />
+    <Compile Include="GameControls.cs" />
+    <Compile Include="GameQuerying.cs" />
+    <Compile Include="CommandsGroup.cs" />
+    <Compile Include="IEntity.cs" />
     <Compile Include="IMap.cs" />
+    <Compile Include="MapMovementInput.cs" />
+    <Compile Include="MapSelector.cs" />
+    <Compile Include="MapSelectorFrame.cs" />
+    <Compile Include="MapView.cs" />
     <Compile Include="ObstacleMap.cs" />
     <Compile Include="OpenGLColorBufferDrawer.cs" />
     <Compile Include="OpenGLImmediateDrawer.cs" />
@@ -78,6 +86,8 @@
     <Compile Include="Physics.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PushingMapGenerator.cs" />
+    <Compile Include="Rect.cs" />
+    <Compile Include="SelectorFrameInput.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="Unit.cs" />
     <Page Include="MainWindow.xaml">
@@ -184,6 +194,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="frameMap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="transparentSquare.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

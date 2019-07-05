@@ -14,6 +14,7 @@ namespace wpfTest
         public bool WantsToMove => false;//true if the unit has a target destination
         public bool IsInCollision { get; set; }//true if the unit is colliding with obstacles or other units
         public float MaxSpeed { get; }
+        public CommandsGroup Group { get; set; }
 
         public Unit(float x, float y, float size=0.5f)
         {
@@ -21,6 +22,7 @@ namespace wpfTest
             Range = size;
             IsInCollision = false;
             MaxSpeed = 2f;
+            Group = null;
         }
 
         public void Move(Map map, float deltaT)
