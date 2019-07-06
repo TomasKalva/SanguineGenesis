@@ -67,31 +67,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BitmapImageExtensions.cs" />
-    <Compile Include="FlowMap.cs" />
-    <Compile Include="GameControls.cs" />
-    <Compile Include="GameQuerying.cs" />
-    <Compile Include="CommandsGroup.cs" />
-    <Compile Include="ICommand.cs" />
-    <Compile Include="IEntity.cs" />
-    <Compile Include="IMap.cs" />
-    <Compile Include="MapMovementInput.cs" />
-    <Compile Include="MapSelector.cs" />
-    <Compile Include="MapSelectorFrame.cs" />
-    <Compile Include="MapView.cs" />
-    <Compile Include="ObstacleMap.cs" />
-    <Compile Include="OpenGLColorBufferDrawer.cs" />
-    <Compile Include="OpenGLImmediateDrawer.cs" />
-    <Compile Include="OpenGLAtlasDrawer.cs" />
-    <Compile Include="OpenGLTextureBufferDrawer.cs" />
-    <Compile Include="Physics.cs" />
-    <Compile Include="Player.cs" />
-    <Compile Include="PushingMapGenerator.cs" />
-    <Compile Include="Rect.cs" />
-    <Compile Include="SelectorFrameInput.cs" />
-    <Compile Include="Terrain.cs" />
-    <Compile Include="Unit.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="GUI\BitmapImageExtensions.cs" />
+    <Compile Include="Game\Maps\FlowMap.cs" />
+    <Compile Include="GameControls\GameControls.cs" />
+    <Compile Include="Game\GameQuerying.cs" />
+    <Compile Include="Game\CommandsGroup.cs" />
+    <Compile Include="Game\ICommand.cs" />
+    <Compile Include="GUI\IEntity.cs" />
+    <Compile Include="Game\Maps\IMap.cs" />
+    <Compile Include="GameControls\MapMovementInput.cs" />
+    <Compile Include="GameControls\MapSelectorFrame.cs" />
+    <Compile Include="GameControls\MapView.cs" />
+    <Compile Include="Game\Maps\ObstacleMap.cs" />
+    <Compile Include="GUI\OpenGLColorBufferDrawer.cs" />
+    <Compile Include="GUI\OpenGLImmediateDrawer.cs" />
+    <Compile Include="GUI\OpenGLAtlasDrawer.cs" />
+    <Compile Include="GUI\OpenGLTextureBufferDrawer.cs" />
+    <Compile Include="Game\Physics.cs" />
+    <Compile Include="Game\Player.cs" />
+    <Compile Include="Game\Maps\PushingMapGenerator.cs" />
+    <Compile Include="Game\Rect.cs" />
+    <Compile Include="GameControls\SelectorFrameInput.cs" />
+    <Compile Include="Game\Terrain.cs" />
+    <Compile Include="Game\Unit.cs" />
+    <Page Include="GUI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -99,15 +98,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Game.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Game\Game.cs" />
+    <Compile Include="GUI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Map.cs" />
-    <Compile Include="Node.cs" />
+    <Compile Include="Game\Maps\Map.cs" />
+    <Compile Include="Game\Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -130,22 +129,22 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <EmbeddedResource Include="Shader.frag">
+    <EmbeddedResource Include="GUI\Shaders\Shader.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Shader.vert">
+    <EmbeddedResource Include="GUI\Shaders\Shader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="TexShader.frag">
+    <EmbeddedResource Include="GUI\Shaders\TexShader.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="TexShader.vert">
+    <EmbeddedResource Include="GUI\Shaders\TexShader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="AtlasTexShader.frag">
+    <EmbeddedResource Include="GUI\Shaders\AtlasTexShader.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="AtlasTexShader.vert">
+    <EmbeddedResource Include="GUI\Shaders\AtlasTexShader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -153,51 +152,20 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="vanilaMap.png">
+    <Resource Include="Images\vanilaMap.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="shrek5.png" />
+    <Resource Include="Images\hugeMap.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Water.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Grass.png">
+    <None Include="Images\tileMap.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Red.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="hugeMap.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Grass.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Crate.bmp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="tileMap.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="frameMap.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="transparentSquare.png" />
+    <Resource Include="Images\frameMap.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
