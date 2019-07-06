@@ -87,12 +87,13 @@ namespace wpfTest
                     if (game.GameEnded)
                         break;
 
-                    //process players input
+                    //process player's input
                     //Invoke could cause deadlock because drawing also locks game
                     Dispatcher.BeginInvoke(
                         (Action)(() =>
                         gameControls.ProcessInput(game)));
 
+                    gameControls.UpdateUnitsByInput(game);
 
                     //update the state of the game
                     long totalEl = totalStopwatch.ElapsedMilliseconds;
@@ -212,7 +213,7 @@ namespace wpfTest
             Point clickPos = e.GetPosition(openGLControl1);
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X,(float)clickPos.Y));
-            gameControls.SelectorFrameInput.NewPoint(mapCoordinates);
+            gameControls.UnitCommandsInput.NewPoint(mapCoordinates);
             //Console.WriteLine(mapCoordinates.X+" ; "+mapCoordinates.Y);
             Console.WriteLine(clickPos);
         }
@@ -222,19 +223,27 @@ namespace wpfTest
             Point clickPos = e.GetPosition(openGLControl1);
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
-            gameControls.SelectorFrameInput.EndSelection(mapCoordinates);
+            gameControls.UnitCommandsInput.EndSelection(mapCoordinates);
             //Console.WriteLine(mapCoordinates.X + " ; " + mapCoordinates.Y);
         }
 
         private void openGLControl1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (gameControls.SelectorFrameInput.Selecting)
+            if (gameControls.UnitCommandsInput.State== UnitsCommandInputState.SELECTING)
             {
                 Point clickPos = e.GetPosition(openGLControl1);
                 Vector2 mapCoordinates = gameControls.MapView
                     .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
-                gameControls.SelectorFrameInput.NewPoint(mapCoordinates);
+                gameControls.UnitCommandsInput.NewPoint(mapCoordinates);
             }
+        }
+
+        private void openGLControl1_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Point clickPos = e.GetPosition(openGLControl1);
+            Vector2 mapCoordinates = gameControls.MapView
+                .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
+            gameControls.UnitCommandsInput.SetTarget(mapCoordinates);
         }
     }
 

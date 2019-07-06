@@ -6,27 +6,48 @@ using System.Threading.Tasks;
 
 namespace wpfTest
 {
-    class SelectorFrameInput
+    class UnitCommandsInput
     {
-        public bool Selecting { get; private set; }
+        //public bool Selecting { get; private set; }
+        public UnitsCommandInputState State { get; set; }
         public Vector2 MapCoordinates { get; private set; }
 
-        public SelectorFrameInput()
+        public UnitCommandsInput()
         {
-            Selecting = false;
+            //Selecting = false;
+            State = UnitsCommandInputState.IDLE;
             MapCoordinates = new Vector2();
         }
 
         public void NewPoint(Vector2 mousePos)
         {
-            Selecting = true;
+            //Selecting = true;
+            State = UnitsCommandInputState.SELECTING;
             MapCoordinates = mousePos;
         }
 
         public void EndSelection(Vector2 mousePos)
         {
-            Selecting = false;
+            //Selecting = false;
+            State = UnitsCommandInputState.SELECTED;
             MapCoordinates = mousePos;
         }
+
+        public void SetTarget(Vector2 mousePos)
+        {
+            if(State==UnitsCommandInputState.SELECTED)
+            {
+                MapCoordinates = mousePos;
+                State = UnitsCommandInputState.ABILITY;
+            }
+        }
+    }
+
+    public enum UnitsCommandInputState
+    {
+        IDLE,
+        SELECTING,
+        SELECTED,
+        ABILITY
     }
 }

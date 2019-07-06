@@ -43,5 +43,25 @@ namespace wpfTest
                 u.Group = null;
             Units.RemoveAll((unit) => units.Contains(unit));
         }
+
+        /// <summary>
+        /// Adds a new command created by the factory to every entity in the group.
+        /// </summary>
+        /// <param name="commandFactory">Determines command type.</param>
+        public void AddCommand(ICommandFactory commandFactory)
+        {
+            foreach (Unit u in Units)
+                u.AddCommand(commandFactory.NewInstance(u));
+        }
+
+        /// <summary>
+        /// Sets a new command created by the factory to every entity in the group.
+        /// </summary>
+        /// <param name="commandFactory">Determines command type.</param>
+        public void SetCommand(ICommandFactory commandFactory)
+        {
+            foreach (Unit u in Units)
+                u.SetCommand(commandFactory.NewInstance(u));
+        }
     }
 }

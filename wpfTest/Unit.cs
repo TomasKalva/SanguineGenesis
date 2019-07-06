@@ -14,7 +14,9 @@ namespace wpfTest
         public bool WantsToMove => false;//true if the unit has a target destination
         public bool IsInCollision { get; set; }//true if the unit is colliding with obstacles or other units
         public float MaxSpeed { get; }
+        public float Acceleration { get; }
         public CommandsGroup Group { get; set; }
+        public Queue<Command> CommandQueue { get; }
 
         public Unit(float x, float y, float size=0.5f)
         {
@@ -22,7 +24,21 @@ namespace wpfTest
             Range = size;
             IsInCollision = false;
             MaxSpeed = 2f;
+            Acceleration = 1f;
             Group = null;
+            CommandQueue = new Queue<Command>();
+            CommandQueue.Enqueue(new MoveTowardsCommand(this,new Vector2(10f, 10f)));
+        }
+
+        public void PerformCommand()
+        {
+            if(CommandQueue.Any())
+            {
+                Command command = CommandQueue.Peek();
+                if (command.PerformCommand())
+                    //if command is finished, remove it from the queue
+                    CommandQueue.Dequeue();
+            }
         }
 
         public void Move(Map map, float deltaT)
@@ -52,6 +68,17 @@ namespace wpfTest
             float l;
             if ((l=Vel.Length)>MaxSpeed)
                 Vel = (MaxSpeed / l)*Vel;
+        }
+
+        public void AddCommand(Command command)
+        {
+            CommandQueue.Enqueue(command);
+        }
+
+        public void SetCommand(Command command)
+        {
+            CommandQueue.Clear();
+            CommandQueue.Enqueue(command);
         }
     }
 }

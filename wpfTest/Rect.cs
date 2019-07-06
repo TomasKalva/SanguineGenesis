@@ -54,6 +54,8 @@ namespace wpfTest
 
         public bool IntersectsWith(Rect rect)
         {
+            //todo: resolve the case when rectangles form a cross
+            //THE FOLLOWING STATEMENT IS WRONG:
             //two rectangles intersect if and only if at least one
             //of them contains at least one vertex of the other one
             return 

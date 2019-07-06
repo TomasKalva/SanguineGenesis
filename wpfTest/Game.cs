@@ -49,6 +49,8 @@ namespace wpfTest
         public void Update(float deltaT)
         {
             List<Unit> units = GetUnits();
+            foreach (Unit u in units)
+                u.PerformCommand();
             physics.PushOutsideOfObstacles(Map, units,deltaT);
             physics.Repulse(Map,units,deltaT);
             physics.Step(Map,units,deltaT);
