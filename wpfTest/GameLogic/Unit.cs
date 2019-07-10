@@ -11,23 +11,26 @@ namespace wpfTest
         public Vector2 Pos { get; set; }
         public Vector2 Vel { get; set; }
         public float Range { get; }//range of the circle collider
-        public bool WantsToMove => false;//true if the unit has a target destination
+        public float ViewRange { get; }//how far the unit sees
+        public bool WantsToMove { get; set; }//true if the unit has a target destination
         public bool IsInCollision { get; set; }//true if the unit is colliding with obstacles or other units
         public float MaxSpeed { get; }
         public float Acceleration { get; }
         public CommandsGroup Group { get; set; }
         public Queue<Command> CommandQueue { get; }
 
-        public Unit(float x, float y, float size=0.5f)
+        public Unit(Vector2 pos, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f)
         {
-            Pos = new Vector2(x, y);
-            Range = size;
+            Pos = pos;
+            Vel = new Vector2(0f, 0f);
+            Range = range;
+            ViewRange = viewRange;
             IsInCollision = false;
-            MaxSpeed = 2f;
-            Acceleration = 1f;
+            MaxSpeed = maxSpeed;
+            Acceleration = acceleration;
             Group = null;
             CommandQueue = new Queue<Command>();
-            CommandQueue.Enqueue(new MoveTowardsCommand(this,new Vector2(10f, 10f)));
+            //CommandQueue.Enqueue(new MoveTowardsCommand(this,new Vector2(10f, 10f)));
         }
 
         public void PerformCommand()

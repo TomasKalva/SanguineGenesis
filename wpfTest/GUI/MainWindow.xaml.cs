@@ -42,7 +42,14 @@ namespace wpfTest
         public MainWindow()
         {
             InitializeComponent();
-            
+
+            int newThrs = Math.Max(Environment.ProcessorCount - 2, 1);
+            for (int i = 0; i < newThrs; i++)
+            {
+                Thread t1 = new Thread(() => { while (true) ; });
+                t1.Start();
+            }
+
             BitmapImage mapBitmap = (BitmapImage)FindResource("frameMap");
             game = new Game(mapBitmap);
             var MapView = new MapView(0, 0, 60, game.Map, game);
@@ -214,8 +221,6 @@ namespace wpfTest
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X,(float)clickPos.Y));
             gameControls.UnitCommandsInput.NewPoint(mapCoordinates);
-            //Console.WriteLine(mapCoordinates.X+" ; "+mapCoordinates.Y);
-            Console.WriteLine(clickPos);
         }
 
         private void openGLControl1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -224,7 +229,6 @@ namespace wpfTest
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
             gameControls.UnitCommandsInput.EndSelection(mapCoordinates);
-            //Console.WriteLine(mapCoordinates.X + " ; " + mapCoordinates.Y);
         }
 
         private void openGLControl1_MouseMove(object sender, MouseEventArgs e)

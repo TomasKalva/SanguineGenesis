@@ -30,8 +30,8 @@ namespace wpfTest
             FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap());
             GameEnded = false;
             Players = new Player[2];
-            Players[0] = new Player();
-            Players[1] = new Player();
+            Players[0] = new Player(Map.Width,Map.Height);
+            Players[1] = new Player(Map.Width,Map.Height);
             GameQuerying = GameQuerying.GetGameQuerying();
             physics = Physics.GetPhysics();
         }
@@ -48,6 +48,7 @@ namespace wpfTest
 
         public void Update(float deltaT)
         {
+            //physics
             List<Unit> units = GetUnits();
             foreach (Unit u in units)
                 u.PerformCommand();
@@ -55,6 +56,14 @@ namespace wpfTest
             physics.Repulse(Map,units,deltaT);
             physics.Step(Map,units,deltaT);
             physics.ResetCollision(units);
+
+
+            //players view of map
+            if(++deletable%1000==0)
+                foreach (Player pl in Players)
+                    pl.UpdateVisibilityMap(Map.GetObstacleMap());
         }
+
+        int deletable=0;
     }
 }

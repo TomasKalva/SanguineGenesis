@@ -53,7 +53,7 @@ namespace wpfTest
         {
             Vector2 direction = CommandedEntity.Pos.UnitDirectionTo(TargetPoint);
             CommandedEntity.Accelerate(CommandedEntity.Acceleration*direction);
-            return (TargetPoint - CommandedEntity.Pos).Length < 2f;
+            return (TargetPoint - CommandedEntity.Pos).Length < 0.1f;
         }
     }
 }

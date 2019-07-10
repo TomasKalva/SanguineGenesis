@@ -66,7 +66,7 @@ namespace wpfTest
         public float X { get; set; }
         public float Y { get; set; }
 
-        internal Vector2(float x, float y)
+        public Vector2(float x, float y)
         {
             X = x;
             Y = y;

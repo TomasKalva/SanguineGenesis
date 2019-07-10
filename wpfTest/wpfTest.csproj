@@ -67,29 +67,33 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GameLogic\Maps\Pathfinding.cs" />
+    <Compile Include="GameLogic\Maps\Ray.cs" />
+    <Compile Include="GameLogic\Maps\VisibilityMap.cs" />
+    <Compile Include="GameLogic\UnitFactory.cs" />
     <Compile Include="GUI\BitmapImageExtensions.cs" />
-    <Compile Include="Game\Maps\FlowMap.cs" />
+    <Compile Include="GameLogic\Maps\FlowMap.cs" />
     <Compile Include="GameControls\GameControls.cs" />
-    <Compile Include="Game\GameQuerying.cs" />
-    <Compile Include="Game\CommandsGroup.cs" />
-    <Compile Include="Game\ICommand.cs" />
+    <Compile Include="GameLogic\GameQuerying.cs" />
+    <Compile Include="GameLogic\CommandsGroup.cs" />
+    <Compile Include="GameLogic\ICommand.cs" />
     <Compile Include="GUI\IEntity.cs" />
-    <Compile Include="Game\Maps\IMap.cs" />
+    <Compile Include="GameLogic\Maps\IMap.cs" />
     <Compile Include="GameControls\MapMovementInput.cs" />
     <Compile Include="GameControls\MapSelectorFrame.cs" />
     <Compile Include="GameControls\MapView.cs" />
-    <Compile Include="Game\Maps\ObstacleMap.cs" />
+    <Compile Include="GameLogic\Maps\ObstacleMap.cs" />
     <Compile Include="GUI\OpenGLColorBufferDrawer.cs" />
     <Compile Include="GUI\OpenGLImmediateDrawer.cs" />
     <Compile Include="GUI\OpenGLAtlasDrawer.cs" />
     <Compile Include="GUI\OpenGLTextureBufferDrawer.cs" />
-    <Compile Include="Game\Physics.cs" />
-    <Compile Include="Game\Player.cs" />
-    <Compile Include="Game\Maps\PushingMapGenerator.cs" />
-    <Compile Include="Game\Rect.cs" />
+    <Compile Include="GameLogic\Physics.cs" />
+    <Compile Include="GameLogic\Player.cs" />
+    <Compile Include="GameLogic\Maps\PushingMapGenerator.cs" />
+    <Compile Include="GameLogic\Rect.cs" />
     <Compile Include="GameControls\SelectorFrameInput.cs" />
-    <Compile Include="Game\Terrain.cs" />
-    <Compile Include="Game\Unit.cs" />
+    <Compile Include="GameLogic\Terrain.cs" />
+    <Compile Include="GameLogic\Unit.cs" />
     <Page Include="GUI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -98,15 +102,15 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Game\Game.cs" />
+    <Compile Include="GameLogic\Game.cs" />
     <Compile Include="GUI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game\Maps\Map.cs" />
-    <Compile Include="Game\Node.cs" />
+    <Compile Include="GameLogic\Maps\Map.cs" />
+    <Compile Include="GameLogic\Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

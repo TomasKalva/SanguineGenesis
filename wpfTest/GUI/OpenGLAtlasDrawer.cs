@@ -602,13 +602,13 @@ namespace wpfTest
                 if (current == null)
                     continue;
 
-                float unitSize = current.Range*2*nodeSize;
+                float unitSize = /*current.Range*2**/nodeSize;
 
                 //tile position
-                float bottom = (current.Pos.Y - viewTop - 0.5f) * unitSize;
-                float top = (current.Pos.Y - viewTop + 1 - 0.5f) * unitSize;
-                float left = (current.Pos.X - viewLeft - 0.5f) * unitSize;
-                float right = (current.Pos.X - viewLeft + 1 - 0.5f) * unitSize;
+                float bottom = (current.Bottom - viewTop/* - 0.5f*/) * unitSize;
+                float top = (current.Top - viewTop /*+ 1 - 0.5f*/) * unitSize;
+                float left = (current.Left - viewLeft/* - 0.5f*/) * unitSize;
+                float right = (current.Right - viewLeft /*+ 1 - 0.5f*/) * unitSize;
 
                 SetSquareVertices(vertices, bottom, top, left, right, -1, coord);
                 if(current.Group==null)
