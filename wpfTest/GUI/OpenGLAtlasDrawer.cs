@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using wpfTest.GameLogic.Maps;
 using static wpfTest.MainWindow;
 
 namespace wpfTest
@@ -211,6 +212,7 @@ namespace wpfTest
             float viewBottom;
             float viewRight;
             Node[,] visible;
+            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game);
             //mapView has to be locked because it can also be accessed from the main game loop
             lock (mapView)
             {
@@ -284,6 +286,10 @@ namespace wpfTest
                     if (current == null)
                         continue;
 
+                    bool isVisible = true;
+                    if (visibleVisibility != null)
+                        isVisible = visibleVisibility[i, j];
+
                     if (current.Terrain == Terrain.GRASS)
                     {
                         blX = 1;
@@ -302,7 +308,10 @@ namespace wpfTest
                     float right = (current.X - viewLeft + 1) * sqW;
 
                     SetSquareVertices(vertices, bottom, top, left, right, -1, coord);
-                    SetColor(colors, 1f, 1f, 1f, coord,6);
+                    if(isVisible)
+                        SetColor(colors, 1f, 1f, 1f, coord,6);
+                    else
+                        SetColor(colors, .8f, .8f, .8f, coord, 6);
                     SetSquareTextureCoordinates(textureCoords, texCoord);
                     SetTexBottomLeft(texBottomLeft, blX,blY,texCoord,6);
                 }
@@ -602,19 +611,30 @@ namespace wpfTest
                 if (current == null)
                     continue;
 
-                float unitSize = /*current.Range*2**/nodeSize;
+                float unitSize = nodeSize;
 
                 //tile position
-                float bottom = (current.Bottom - viewTop/* - 0.5f*/) * unitSize;
-                float top = (current.Top - viewTop /*+ 1 - 0.5f*/) * unitSize;
-                float left = (current.Left - viewLeft/* - 0.5f*/) * unitSize;
-                float right = (current.Right - viewLeft /*+ 1 - 0.5f*/) * unitSize;
+                float bottom = (current.Bottom - viewTop) * unitSize;
+                float top = (current.Top - viewTop) * unitSize;
+                float left = (current.Left - viewLeft) * unitSize;
+                float right = (current.Right - viewLeft) * unitSize;
 
                 SetSquareVertices(vertices, bottom, top, left, right, -1, coord);
-                if(current.Group==null)
-                    SetColor(colors, 1f, 1f, 1f, coord,6);
+                if (current.Group == null)
+                {
+                    //fill the circle with color of the corresponding player
+                    switch (current.Owner)
+                    {
+                        case Players.PLAYER0:
+                            SetColor(colors, 0f, 0f, 1f, coord, 6);
+                            break;
+                        case Players.PLAYER1:
+                            SetColor(colors, 1f, 0f, 0f, coord, 6);
+                            break;
+                    }
+                }
                 else
-                    SetColor(colors, 1f, 0f, 0f, coord, 6);
+                    SetColor(colors, 1f, 1f, 0f, coord, 6);
                 SetSquareTextureCoordinates(texturCoords, texCoord);
                 SetTexBottomLeft(texBottomLeft, blX, blY, texCoord,6);
             }

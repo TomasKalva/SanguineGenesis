@@ -60,13 +60,27 @@ namespace wpfTest
             return game.GameQuerying.SelectPartOfMap(game.FlowMap, ((IEntity)this).GetRect());
         }
 
+        /// <summary>
+        /// Returns null if the map doesn't exist.
+        /// </summary>
+        public bool[,] GetVisibleVisibilityMap(Game game)
+        {
+            if (actualHeight == 0 || actualWidth == 0)
+                throw new InvalidOperationException(
+                    "The actual extents have to be specified before calling this method");
+            if (game.CurrentPlayer.VisibilityMap == null)
+                return null;
+
+            return game.GameQuerying.SelectPartOfMap(game.CurrentPlayer.VisibilityMap, ((IEntity)this).GetRect());
+        }
+
         public List<Unit> GetVisibleUnits(Game game)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
 
-            return game.GameQuerying.SelectUnits(game, ((IEntity)this).GetRect());
+            return game.GameQuerying.SelectUnits(game, ((IEntity)this).GetRect(), (unit) => true);
         }
 
         public void SetActualExtents(float width, float height)

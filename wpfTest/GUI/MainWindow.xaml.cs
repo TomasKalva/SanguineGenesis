@@ -43,12 +43,12 @@ namespace wpfTest
         {
             InitializeComponent();
 
-            int newThrs = Math.Max(Environment.ProcessorCount - 2, 1);
+            /*int newThrs = Math.Max(Environment.ProcessorCount - 2, 1);
             for (int i = 0; i < newThrs; i++)
             {
                 Thread t1 = new Thread(() => { while (true) ; });
                 t1.Start();
-            }
+            }*/
 
             BitmapImage mapBitmap = (BitmapImage)FindResource("frameMap");
             game = new Game(mapBitmap);

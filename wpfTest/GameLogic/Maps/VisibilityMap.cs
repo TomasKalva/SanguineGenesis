@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Maps
 {
-    class VisibilityMap : IMap<bool>
+    public class VisibilityMap : IMap<bool>
     {
         private bool[,] visible;
 
@@ -20,62 +20,61 @@ namespace wpfTest.GameLogic.Maps
             visible = new bool[width, height];
         }
 
-        public void UpdateVisibility(List<Unit> units, ObstacleMap obstMap)
+        public void FindVisibility(List<UnitView> units, ObstacleMap obstMap)
         {
-            Clear();
-            foreach(Unit u in units)
+            foreach(UnitView v in units)
             {
-                AddVisibility(u, obstMap);
+                AddVisibility(v, obstMap);
             }
         }
 
         /// <summary>
         /// Set true to all squares visible by the unit.
         /// </summary>
-        public void AddVisibility(Unit u, ObstacleMap obstMap)
+        public void AddVisibility(UnitView v, ObstacleMap obstMap)
         {
-            float viewRange = u.ViewRange;
-            int left = (int)(u.Pos.X - viewRange);
-            int right = (int)(u.Pos.X + viewRange);
-            int bottom = (int)(u.Pos.Y - viewRange);
-            int top = (int)(u.Pos.Y + viewRange);
+            float viewRange = v.Range;
+            int left = (int)(v.Pos.X - viewRange);
+            int right = (int)(v.Pos.X + viewRange) + 1;
+            int bottom = (int)(v.Pos.Y - viewRange);
+            int top = (int)(v.Pos.Y + viewRange) + 1;
+            //cast rays to the lines on bottom and top of the square around v
             for (int i = left; i <= right; i++)
             {
-                Ray rTop = new Ray(new Vector2(u.Pos.X, u.Pos.Y),
+                Ray rTop = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
                     new Vector2(i, top),
                     viewRange,
                     obstMap);
                 while (rTop.Next(out int x, out int y))
                     visible[x, y] = true;
-                Ray rBottom = new Ray(new Vector2(u.Pos.X, u.Pos.Y),
+                Ray rBottom = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
                     new Vector2(i, bottom),
                     viewRange,
                     obstMap);
                 while (rBottom.Next(out int x, out int y))
                     visible[x, y] = true;
             }
+            //cast rays to the lines on left and right of the square around v
             for (int j = bottom; j <= top; j++)
             {
-                Ray rLeft = new Ray(new Vector2(u.Pos.X, u.Pos.Y),
+                Ray rLeft = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
                     new Vector2(left, j),
                     viewRange,
                     obstMap);
                 while (rLeft.Next(out int x, out int y))
                     visible[x, y] = true;
-                Ray rRight = new Ray(new Vector2(u.Pos.X, u.Pos.Y),
+                Ray rRight = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
                     new Vector2(right, j),
                     viewRange,
                     obstMap);
                 while (rRight.Next(out int x, out int y))
                     visible[x, y] = true;
             }
-        }
-
-        public void Clear()
-        {
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                    visible[i, j] = false;
+            //add the square which contains v
+            int vX = (int)v.Pos.X;
+            int vY = (int)v.Pos.Y;
+            if(vX >= 0 && vX < Width && vY >= 0 && vY < Height)
+                visible[vX, vY] = true;
         }
     }
 }

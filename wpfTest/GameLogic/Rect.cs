@@ -54,20 +54,11 @@ namespace wpfTest
 
         public bool IntersectsWith(Rect rect)
         {
-            //todo: resolve the case when rectangles form a cross
-            //THE FOLLOWING STATEMENT IS WRONG:
-            //two rectangles intersect if and only if at least one
-            //of them contains at least one vertex of the other one
-            return 
-                (PointInside(rect.Left, rect.Bottom) ||
-                PointInside(rect.Right, rect.Bottom) ||
-                PointInside(rect.Left, rect.Top) ||
-                PointInside(rect.Right, rect.Top))
-                ||
-                (rect.PointInside(Left, Bottom) ||
-                rect.PointInside(Right, Bottom) ||
-                rect.PointInside(Left, Top) ||
-                rect.PointInside(Right, Top));
+            //two rectangles don't overlap if the left edge of one of them is
+            //to the right from the other or if one of them is above the other
+            //in all other cases the rectangles overlap
+            return !(rect.Left > Right || rect.Right < Left ||
+                    rect.Bottom > Top || rect.Top < Bottom);
         }
     }
 }

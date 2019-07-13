@@ -12,9 +12,9 @@ namespace wpfTest
         public float MaxSpeed { get; }
         public float Acceleration { get; }
 
-        public Unit NewInstance(Vector2 pos)
+        public Unit NewInstance(Players playerID, Vector2 pos)
         {
-            return new Unit(pos, Range, MaxSpeed, Acceleration);
+            return new Unit(playerID, pos, range:Range, maxSpeed:MaxSpeed, acceleration:Acceleration);
         }
 
         public UnitFactory(float range, float maxSpeed, float acceleration)

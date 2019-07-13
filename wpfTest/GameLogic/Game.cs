@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using wpfTest.GameLogic;
 
 namespace wpfTest
 {
@@ -20,7 +21,9 @@ namespace wpfTest
         public bool GameEnded { get; set; }
         Player[] Players { get; }
         public GameQuerying GameQuerying { get; }
+        public Player CurrentPlayer { get; private set; }
         Physics physics;
+        VisibilityGenerator visibilityGenerator;
 
         public Game(BitmapImage mapBitmap)
         {
@@ -30,10 +33,12 @@ namespace wpfTest
             FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap());
             GameEnded = false;
             Players = new Player[2];
-            Players[0] = new Player(Map.Width,Map.Height);
-            Players[1] = new Player(Map.Width,Map.Height);
+            Players[0] = new Player(wpfTest.Players.PLAYER0);
+            Players[1] = new Player(wpfTest.Players.PLAYER1);
+            CurrentPlayer = Players[0];
             GameQuerying = GameQuerying.GetGameQuerying();
             physics = Physics.GetPhysics();
+            visibilityGenerator = new VisibilityGenerator();
         }
 
         public List<Unit> GetUnits()
@@ -59,11 +64,13 @@ namespace wpfTest
 
 
             //players view of map
-            if(++deletable%1000==0)
-                foreach (Player pl in Players)
-                    pl.UpdateVisibilityMap(Map.GetObstacleMap());
-        }
+            if (visibilityGenerator.Done)
+            {
+                Players[0].VisibilityMap = visibilityGenerator.VisibilityMap;
 
-        int deletable=0;
+                visibilityGenerator.SetNewTask(Map.GetObstacleMap(),
+                    Players[0].Units.Select((unit) => unit.UnitView).ToList());
+            }
+        }
     }
 }

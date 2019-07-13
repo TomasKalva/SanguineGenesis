@@ -11,11 +11,10 @@ namespace wpfTest
         public static GameQuerying GetGameQuerying()=>new GameQuerying(); 
         private GameQuerying() { }
 
-        public List<Unit> SelectUnits(Game game, Rect area)
+        public List<Unit> SelectUnits(Game game, Rect area, Func<Unit,bool> unitProperty)
         {
-
             List<Unit> selected = new List<Unit>();
-            foreach (Unit unit in game.GetUnits())
+            foreach (Unit unit in game.GetUnits().Where(unitProperty))
             {
                 //todo: add querying for unit extents
                 float bottom = unit.GetActualBottom(0);
@@ -24,7 +23,6 @@ namespace wpfTest
                 float right = unit.GetActualRight(0, 0);
                 Rect unitRect = new Rect(left, bottom, right, top);
                 if(area.IntersectsWith(unitRect))
-                //if(area.CollidesWith(new Rect(left,bottom,right,top)))
                 {
                     selected.Add(unit);
                 }

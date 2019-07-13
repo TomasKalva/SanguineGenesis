@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic;
 
 namespace wpfTest
 {
@@ -18,9 +19,12 @@ namespace wpfTest
         public float Acceleration { get; }
         public CommandsGroup Group { get; set; }
         public Queue<Command> CommandQueue { get; }
+        public UnitView UnitView => new UnitView(Pos, ViewRange);
+        public Players Owner { get; }
 
-        public Unit(Vector2 pos, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f)
+        public Unit(Players owner, Vector2 pos, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f)
         {
+            Owner = owner;
             Pos = pos;
             Vel = new Vector2(0f, 0f);
             Range = range;
@@ -30,7 +34,6 @@ namespace wpfTest
             Acceleration = acceleration;
             Group = null;
             CommandQueue = new Queue<Command>();
-            //CommandQueue.Enqueue(new MoveTowardsCommand(this,new Vector2(10f, 10f)));
         }
 
         public void PerformCommand()
