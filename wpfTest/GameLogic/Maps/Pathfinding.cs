@@ -14,9 +14,9 @@ namespace wpfTest.GameLogic.Maps
         private enum SquareState
         {
             BLOCKED,
-            FOUND,
-            FOUND_IN_CURRENT,
-            NOT_FOUND
+            DISCOVERED,
+            DISCOVERED_IN_CURRENT,
+            NOT_DISCOVERED
         }
 
         static Pathfinding()
@@ -26,57 +26,61 @@ namespace wpfTest.GameLogic.Maps
 
         private Pathfinding() { }
 
-        public FlowMap GenerateFlowMap(ObstacleMap obst, List<Unit> units, Vector2 targetLocation)
+        public FlowMap GenerateFlowMap(ObstacleMap obst, Vector2 targetLocation)
         {
             FlowMap flMap = new FlowMap(obst.Width, obst.Height);
             //distance from the target
             float[,] distance = new float[obst.Width, obst.Height];
             //squares that need to be explored
-            SquareState[,] needsExploring = new SquareState[obst.Width, obst.Height];
+            SquareState[,] state = new SquareState[obst.Width, obst.Height];
+            //starting distance of squares - no square on the map can be further than this number
             float maxDist = obst.Width * obst.Height;
             for (int i = 0; i < obst.Width; i++)
                 for (int j = 0; j < obst.Height; j++)
                 {
                     distance[i, j] = maxDist;
-                    needsExploring[i, j] = obst[i, j] ? SquareState.BLOCKED 
-                        : SquareState.NOT_FOUND;//only non obstacles need to be explored
+                    state[i, j] = obst[i, j] ? SquareState.BLOCKED 
+                        : SquareState.NOT_DISCOVERED;//only non obstacles need to be discovered
                 }
             int targX = (int)targetLocation.X;
             int targY = (int)targetLocation.Y;
             distance[targX, targY] = 0;
-            needsExploring[targX, targY] = SquareState.FOUND;
+            state[targX, targY] = SquareState.DISCOVERED;
 
-            RelaxDistances(new Vector2(targetLocation.X, targetLocation.Y), obst, distance, needsExploring, flMap);
-            NextIteration(needsExploring);
-            while (FindClosest(targetLocation,needsExploring,distance, out int x, out int y))
+            //first iteration
+            RelaxDistances(new Vector2(targetLocation.X, targetLocation.Y), obst, distance, state, flMap);
+            NextIteration(state);
+            //iterate until all unblocked squares are discovered
+            while (FindClosest(targetLocation,state,distance, out int x, out int y))
             {
-                RelaxDistances(new Vector2(x + 0.5f, y + 0.5f), obst, distance, needsExploring, flMap);
-                NextIteration(needsExploring);
+                RelaxDistances(new Vector2(x + 0.5f, y + 0.5f), obst, distance, state, flMap);
+                NextIteration(state);
             }
+            //remove vectors pointing to blocked squares
+            RepairEdges(flMap, obst);
 
             return flMap;
         }
 
         /// <summary>
         /// Finds the square that is closest to the point, was already found and
-        /// has a not found adjacent neighbour. Returns true if the square exists.
+        /// has a not discovered adjacent neighbour. Returns true if the square exists.
         /// </summary>
         /// <returns></returns>
-        private bool FindClosest(Vector2 point, SquareState[,] needsExploring, float[,] distance, out int x, out int y)
+        private bool FindClosest(Vector2 point, SquareState[,] state, float[,] distance, out int x, out int y)
         {
             //the coordinates have to be initialized even if the algorithm returns false
             x = -1;
             y = -1;
-            float minDist = needsExploring.GetLength(0) * needsExploring.GetLength(1);
-            for(int i=0;i<needsExploring.GetLength(0);i++)
-                for (int j = 0; j < needsExploring.GetLength(1); j++)
+            float minDist = state.GetLength(0) * state.GetLength(1);
+            for(int i=0;i<state.GetLength(0);i++)
+                for (int j = 0; j < state.GetLength(1); j++)
                 {
-                    float dist = 0;//will be assigned value in the condition
-                    if(needsExploring[i,j]==SquareState.FOUND
-                        && minDist > (dist = distance[i,j]/*new Vector2(i+0.5f-point.X, j+0.5f-point.Y).Length*/)
-                        && NeighborNotFound(i,j,needsExploring))
+                    if(state[i,j]==SquareState.DISCOVERED
+                        && minDist > distance[i,j]
+                        && NeighborNotFound(i,j,state))
                     {
-                        minDist = dist;
+                        minDist = distance[i,j];
                         x = i; y = j;
                     }
                 }
@@ -86,17 +90,17 @@ namespace wpfTest.GameLogic.Maps
         }
 
         /// <summary>
-        /// Returns true if at least one adjacent neighbor wasn't found yet.
+        /// Returns true if at least one adjacent neighbor wasn't discovered yet.
         /// </summary>
-        private bool NeighborNotFound(int x, int y, SquareState[,] needsExploring)
+        private bool NeighborNotFound(int x, int y, SquareState[,] state)
         {
-            return ((x - 1 >= 0 && needsExploring[x - 1, y]==SquareState.NOT_FOUND) ||
-                (x + 1 < needsExploring.GetLength(0) && needsExploring[x + 1, y] == SquareState.NOT_FOUND) ||
-                (y - 1 >= 0 && needsExploring[x, y - 1] == SquareState.NOT_FOUND) ||
-                (y + 1 < needsExploring.GetLength(1) && needsExploring[x, y + 1] == SquareState.NOT_FOUND)) ;
+            return ((x - 1 >= 0 && state[x - 1, y]==SquareState.NOT_DISCOVERED) ||
+                (x + 1 < state.GetLength(0) && state[x + 1, y] == SquareState.NOT_DISCOVERED) ||
+                (y - 1 >= 0 && state[x, y - 1] == SquareState.NOT_DISCOVERED) ||
+                (y + 1 < state.GetLength(1) && state[x, y + 1] == SquareState.NOT_DISCOVERED)) ;
         }
         
-        private void RelaxDistances(Vector2 center, ObstacleMap obst, float[,] distance, SquareState[,] needsExploring, FlowMap flMap)
+        private void RelaxDistances(Vector2 center, ObstacleMap obst, float[,] distance, SquareState[,] state, FlowMap flMap)
         {
             //ray has no length limit
             float rayLength = obst.Width * obst.Height;
@@ -104,44 +108,56 @@ namespace wpfTest.GameLogic.Maps
             //cast rays to the lines on bottom and top of the map
             for (int i = 0; i <= obst.Width; i++)
             {
+                //top
                 Ray rTop = new Ray(center,
                     new Vector2(i + 0.5f, obst.Height - 0.5f),
                     rayLength,
                     obst);
                 float angle = rTop.OppositeAngle;
                 while (rTop.Next(out int x, out int y) &&
-                    RayStep(x, y, angle,(float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f), centerDist + (new Vector2(x + 0.5f, y + 0.5f) -center).Length, distance, flMap, needsExploring))
-                    needsExploring[x, y] = SquareState.FOUND_IN_CURRENT;
+                    RayStep(x, y, angle,(float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f),
+                            centerDist + (new Vector2(x + 0.5f, y + 0.5f) -center).Length,
+                            distance, flMap, state))
+                    state[x, y] = SquareState.DISCOVERED_IN_CURRENT;
 
+                //bottom
                 Ray rBottom = new Ray(center,
                     new Vector2(i + 0.5f, 0.5f),
                     rayLength,
                     obst);
                 angle = rBottom.OppositeAngle;
                 while (rBottom.Next(out int x, out int y) &&
-                    RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f), centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length, distance, flMap, needsExploring))
-                    needsExploring[x, y] = SquareState.FOUND_IN_CURRENT;
+                    RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f),
+                            centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length,
+                            distance, flMap, state))
+                    state[x, y] = SquareState.DISCOVERED_IN_CURRENT;
             }
             //cast rays to the lines on left and right of the map
             for (int j = 0; j <= obst.Height; j++)
             {
+                //left
                 Ray rLeft = new Ray(center,
                     new Vector2(0.5f, j + 0.5f),
                     rayLength,
                     obst);
                 float angle = rLeft.OppositeAngle;
                 while (rLeft.Next(out int x, out int y) &&
-                    RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f), centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length, distance, flMap, needsExploring))
-                    needsExploring[x, y] = SquareState.FOUND_IN_CURRENT;
+                    RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f), 
+                            centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length, 
+                            distance, flMap, state))
+                    state[x, y] = SquareState.DISCOVERED_IN_CURRENT;
 
+                //right
                 Ray rRight = new Ray(center,
                     new Vector2(obst.Width - 0.5f, j + 0.5f),
                     rayLength,
                     obst);
                 angle = rRight.OppositeAngle;
                 while (rRight.Next(out int x, out int y) &&
-                    RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f), centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length, distance, flMap,needsExploring))
-                    needsExploring[x, y] = SquareState.FOUND_IN_CURRENT;
+                    RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f),
+                            centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length, 
+                            distance, flMap,state))
+                    state[x, y] = SquareState.DISCOVERED_IN_CURRENT;
             }
         }
 
@@ -150,16 +166,18 @@ namespace wpfTest.GameLogic.Maps
         /// </summary>
         /// <returns></returns>
         private bool RayStep(int x, int y, float rayAngle, float squaresAngle, float newDistance,
-                            float[,] distance, FlowMap flMap, SquareState[,] needsExploring)
+                            float[,] distance, FlowMap flMap, SquareState[,] state)
         {
             if (newDistance < distance[x, y])
             {
+                //found shorter path to the square
                 flMap[x, y] = rayAngle;
                 distance[x, y] = newDistance;
                 return true;
             }
-            else if (needsExploring[x,y] == SquareState.FOUND_IN_CURRENT)
+            else if (state[x,y] == SquareState.DISCOVERED_IN_CURRENT)
             {
+                //check if the path along this ray is more optimal
                 float sqRayAngle = NormaliseAngle(squaresAngle - rayAngle);
                 float sqFlMapAngle = NormaliseAngle(squaresAngle - flMap[x, y]);
                 if (sqRayAngle<sqFlMapAngle)
@@ -167,7 +185,6 @@ namespace wpfTest.GameLogic.Maps
                     //ray angle is closer to the angles between the two squares,
                     //than the original angle
                     flMap[x, y] = rayAngle;
-                    //distance[x, y] = newDistance;
                 }
                 return true;
             }
@@ -189,12 +206,54 @@ namespace wpfTest.GameLogic.Maps
             return angle;
         }
 
-        private void NextIteration(SquareState[,] needsExploring)
+        /// <summary>
+        /// Replaces SquareState.FOUND_IN_CURRENT by SquareState.FOUND.
+        /// </summary>
+        /// <param name="state"></param>
+        private void NextIteration(SquareState[,] state)
         {
-            for (int i = 0; i < needsExploring.GetLength(0); i++)
-                for (int j = 0; j < needsExploring.GetLength(1); j++)
-                    if (needsExploring[i, j] == SquareState.FOUND_IN_CURRENT)
-                        needsExploring[i, j] = SquareState.FOUND;
+            for (int i = 0; i < state.GetLength(0); i++)
+                for (int j = 0; j < state.GetLength(1); j++)
+                    if (state[i, j] == SquareState.DISCOVERED_IN_CURRENT)
+                        state[i, j] = SquareState.DISCOVERED;
+        }
+
+        /// <summary>
+        /// When a component of a vector is pointing towards a blocked square, remove the component of
+        /// the vecotr.
+        /// </summary>
+        private void RepairEdges(FlowMap flowMap, ObstacleMap obstMap)
+        {
+            for(int i=0;i<flowMap.Width;i++)
+                for(int j=0;j<flowMap.Height;j++)
+                {
+                    //update only squares that are not blocked
+                    if (obstMap[i, j])
+                        continue;
+
+                    float angle = flowMap[i, j];
+                    //directions of the components
+                    int dirX = Math.Sign(Math.Cos(angle));
+                    int dirY = Math.Sign(Math.Sin(angle));
+                    //coordinate of vertical and horizontal neighbor
+                    int neibX = i + dirX;
+                    int neibY = j + dirY;
+
+                    //check if the vector is pointing to a blocked square
+                    if ((neibX >= flowMap.Width || neibX < 0) ||
+                        obstMap[neibX, j])
+                        //set new angle in the normal direction
+                        flowMap[i, j] = dirY > 0 ? (float)Math.PI * 1 / 2f //up
+                                                 : (float)Math.PI * 3 / 2f;//down
+
+
+                    //check if the vector is pointing to a blocked square
+                    if ((neibY >= flowMap.Height || neibY < 0) ||
+                        obstMap[i, neibY])
+                        //set new angle in the normal direction
+                        flowMap[i, j] = dirX > 0 ? 0f               //right
+                                                : (float)Math.PI;   //left
+                }
         }
     }
 }

@@ -37,9 +37,9 @@ namespace wpfTest
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <param name="speed">Length of the velocity vector.</param>
-        public Vector2 GetVelocity(float x, float y, float speed)
+        public Vector2 GetIntensity(Vector2 position, float speed)
         {
-            int i = (int)x; int j = (int)y;
+            int i = (int)position.X; int j = (int)position.Y;
             if (i < 0 || i >= Width || j < 0 || j >= Height ||
                 !IsValidValue(directions[i,j]))
                 return new Vector2(0f, 0f);

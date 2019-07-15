@@ -61,7 +61,8 @@ namespace wpfTest
                     MapSelectorFrame = null;
                     break;
                 case UnitsCommandInputState.ABILITY:
-                    SelectedUnits.SetCommand(new MoveTowardsCommandFactory(UnitCommandsInput.MapCoordinates));
+                    //SelectedUnits.SetCommand(new MoveTowardsCommandFactory(UnitCommandsInput.MapCoordinates));
+                    SelectedUnits.SetCommand(new MoveToCommandFactory(UnitCommandsInput.MapCoordinates,game));
                     //setting state from this thread can cause inconsistency of State
                     //todo: maybe encode states into byte - operations should be atomic => no inconsistent state
                     UnitCommandsInput.State = UnitsCommandInputState.SELECTED;

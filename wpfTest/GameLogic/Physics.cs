@@ -56,7 +56,7 @@ namespace wpfTest
             foreach (Unit u in units)
             {
                 u.Accelerate(
-                    deltaT * pMap.GetVelocity(u.Pos.X, u.Pos.Y, terrainAcc)
+                    deltaT * pMap.GetIntensity(u.Pos, terrainAcc)
                     );
                 if (obstacleMap.CollidingWithObstacle(u.Pos))
                     u.IsInCollision = true;
