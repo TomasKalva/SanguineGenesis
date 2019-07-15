@@ -17,7 +17,7 @@ namespace wpfTest
     public class Game
     {
         public Map Map { get; }
-        public FlowMap FlowMap { get; }
+        public FlowMap FlowMap { get; set; }
         public bool GameEnded { get; set; }
         Player[] Players { get; }
         public GameQuerying GameQuerying { get; }

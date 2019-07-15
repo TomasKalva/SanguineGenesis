@@ -12,7 +12,9 @@ namespace wpfTest.GameLogic.Maps
         private Vector2 End { get; }
         private Vector2 Current { get; set; }
         private ObstacleMap ObstMap { get; }
-        public float Angle => throw new NotImplementedException();
+        public float Angle { get; }
+        public float OppositeAngle => Angle + (float)Math.PI;
+        public float TraveledDist => (Current - Start).Length;
 
         public Ray(Vector2 start, Vector2 end, ObstacleMap obstacleMap)
         {
@@ -20,6 +22,7 @@ namespace wpfTest.GameLogic.Maps
             this.End = end;
             this.Current = start;
             this.ObstMap = obstacleMap;
+            Angle= (float)(Math.Atan2(End.Y - Start.Y, End.X - Start.X) + 2 * Math.PI);
         }
 
         /// <summary>
@@ -31,6 +34,7 @@ namespace wpfTest.GameLogic.Maps
             this.End = start + length * start.UnitDirectionTo(end);
             this.Current = start;
             this.ObstMap = obstacleMap;
+            Angle = (float)(Math.Atan2(End.Y - Start.Y, End.X - Start.X) + 2*Math.PI);
         }
 
         /// <summary>

@@ -24,6 +24,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
 {
@@ -85,6 +86,7 @@ namespace wpfTest
         {
             totalTime = 0;
             totalStopwatch.Start();
+            game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(), null, new Vector2(10, 2));
             while (true)
             {
                 stepStopwatch.Start();
@@ -248,6 +250,7 @@ namespace wpfTest
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
             gameControls.UnitCommandsInput.SetTarget(mapCoordinates);
+            game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(), null, mapCoordinates);
         }
     }
 

@@ -78,7 +78,7 @@
     <Compile Include="GameControls\GameControls.cs" />
     <Compile Include="GameLogic\GameQuerying.cs" />
     <Compile Include="GameLogic\CommandsGroup.cs" />
-    <Compile Include="GameLogic\ICommand.cs" />
+    <Compile Include="GameLogic\Command.cs" />
     <Compile Include="GUI\IEntity.cs" />
     <Compile Include="GameLogic\Maps\IMap.cs" />
     <Compile Include="GameControls\MapMovementInput.cs" />
