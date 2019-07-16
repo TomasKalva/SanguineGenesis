@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GUI;
 
 namespace wpfTest
 {
@@ -21,8 +22,17 @@ namespace wpfTest
         public Queue<Command> CommandQueue { get; }
         public UnitView UnitView => new UnitView(Pos, ViewRange);
         public Players Owner { get; }
+        public UnitType UnitType { get; }
+        public AnimationState AnimationState { get; set; }
+        public float MaxHealth { get; set; }
+        public float Health { get; set; }
+        public bool HasEnergy { get; }//true if the unit uses energy
+        public float MaxEnergy { get; set; }
+        public float Energy { get; set; }
+        public Vector2 Direction { get; set; }//direction the unit is facing
+        public bool FacingLeft => Direction.X <= 0;
 
-        public Unit(Players owner, Vector2 pos, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f)
+        public Unit(Players owner, UnitType unitType, float maxHealth, float maxEnergy, Vector2 pos, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f)
         {
             Owner = owner;
             Pos = pos;
@@ -34,6 +44,15 @@ namespace wpfTest
             Acceleration = acceleration;
             Group = null;
             CommandQueue = new Queue<Command>();
+            UnitType = unitType;
+            MaxHealth = maxHealth;
+            Health = maxHealth;
+            if (maxEnergy > 0)
+                HasEnergy = true;
+            MaxEnergy = maxEnergy;
+            Energy = maxEnergy;
+            AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(unitType));
+            Direction = new Vector2(1f, 0f);
         }
 
         public void PerformCommand()
@@ -52,16 +71,26 @@ namespace wpfTest
             Pos = new Vector2( 
                 Math.Max(Range, Math.Min(Pos.X + deltaT * Vel.X,map.Width-Range)),
                 Math.Max(Range, Math.Min(Pos.Y + deltaT * Vel.Y, map.Height-Range)));
+            Direction = Vel;
         }
         
         public float GetActualBottom(float imageBottom)
-            => Math.Min(Pos.Y - Range, Pos.Y + imageBottom);
+            => Math.Min(Pos.Y - Range, Pos.Y - imageBottom);
         public float GetActualTop(float imageHeight, float imageBottom)
-            => Math.Max(Pos.Y + Range, Pos.Y + imageBottom+imageHeight);
+            => Math.Max(Pos.Y + Range, Pos.Y - imageBottom+imageHeight);
         public float GetActualLeft(float imageLeft)
-            => Math.Min(Pos.X - Range, Pos.X + imageLeft);
+            => Math.Min(Pos.X - Range, Pos.X - imageLeft);
         public float GetActualRight(float imageWidth, float imageLeft)
-            => Math.Max(Pos.X + Range, Pos.X + imageLeft + imageWidth);
+            => Math.Max(Pos.X + Range, Pos.X - imageLeft + imageWidth);
+        public Rect GetActualRect(ImageAtlas atlas)
+        {
+            Animation anim = atlas.GetAnimation(UnitType);
+            return new Rect(
+                Math.Min(Pos.X - Range, Pos.X - anim.LeftBottom.X),
+                Math.Min(Pos.Y - Range, Pos.Y - anim.LeftBottom.Y),
+                Math.Max(Pos.X + Range, Pos.X - anim.LeftBottom.X + anim.Width),
+                Math.Max(Pos.Y + Range, Pos.Y - anim.LeftBottom.Y + anim.Height));
+        }
 
         public float Left => Pos.X - Range;
         public float Right => Pos.X + Range;
@@ -86,5 +115,15 @@ namespace wpfTest
             CommandQueue.Clear();
             CommandQueue.Enqueue(command);
         }
+
+        public void AnimationStep(float deltaT)
+        {
+            AnimationState.Step(deltaT);
+        }
+    }
+
+    public enum UnitType
+    {
+        TIGER
     }
 }

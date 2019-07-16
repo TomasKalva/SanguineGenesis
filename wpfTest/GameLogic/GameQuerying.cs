@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GUI;
 
 namespace wpfTest
 {
@@ -16,13 +17,8 @@ namespace wpfTest
             List<Unit> selected = new List<Unit>();
             foreach (Unit unit in game.GetUnits().Where(unitProperty))
             {
-                //todo: add querying for unit extents
-                float bottom = unit.GetActualBottom(0);
-                float top = unit.GetActualTop(0, 0);
-                float left = unit.GetActualLeft(0);
-                float right = unit.GetActualRight(0, 0);
-                Rect unitRect = new Rect(left, bottom, right, top);
-                if(area.IntersectsWith(unitRect))
+                Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
+                if (area.IntersectsWith(unitRect))
                 {
                     selected.Add(unit);
                 }

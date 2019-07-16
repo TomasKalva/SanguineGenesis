@@ -193,7 +193,9 @@ namespace wpfTest
             OpenGL gl = openGLControl1.OpenGL;
             OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
             OpenGLAtlasDrawer.CreateMap(gl);
+            OpenGLAtlasDrawer.CreateUnitCircles(gl);
             OpenGLAtlasDrawer.CreateUnits(gl);
+            OpenGLAtlasDrawer.CreateUnitIndicators(gl);
             OpenGLAtlasDrawer.CreateFlowMap(gl);
             OpenGLAtlasDrawer.CreateSelectionFrame(gl);
         }
@@ -208,7 +210,9 @@ namespace wpfTest
             {
                 gameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
                 OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateUnitCirclesDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitsDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateUnitIndicatorsDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, gameControls.MapView, gameControls.MapSelectorFrame);
                 OpenGLAtlasDrawer.Draw(gl);

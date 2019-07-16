@@ -56,11 +56,15 @@ namespace wpfTest
             //physics
             List<Unit> units = GetUnits();
             foreach (Unit u in units)
+            {
                 u.PerformCommand();
+                u.AnimationStep(deltaT);
+            }
             physics.PushOutsideOfObstacles(Map, units,deltaT);
             physics.Repulse(Map,units,deltaT);
             physics.Step(Map,units,deltaT);
             physics.ResetCollision(units);
+
 
 
             //players view of map

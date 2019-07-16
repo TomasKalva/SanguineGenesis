@@ -22,9 +22,9 @@ namespace wpfTest
         public void InitUnits()
         {
             Units = new List<Unit>();
-            UnitFactory normalUnits = new UnitFactory(0.5f,2f,2f);
-            UnitFactory smallFastUnits = new UnitFactory(0.25f, 3f, 3f);
-            UnitFactory bigUnits = new UnitFactory(1f, 2f, 4f);
+            UnitFactory normalUnits = new UnitFactory(UnitType.TIGER, 0.5f,2f,2f,10,10);
+            UnitFactory smallFastUnits = new UnitFactory(UnitType.TIGER, 0.25f, 3f, 3f,10,0);
+            UnitFactory bigUnits = new UnitFactory(UnitType.TIGER, 1f, 2f, 4f,10,0);
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
@@ -33,10 +33,10 @@ namespace wpfTest
                 }
             }
             Units.Add(bigUnits.NewInstance(PlayerID, new Vector2(5f, 6f)));
-            Units.Add(new Unit(PlayerID, new Vector2(5f, 6f)));
-            Units.Add(new Unit(PlayerID, new Vector2(7f, 6f)));
-            Units.Add(new Unit(PlayerID, new Vector2(6.5f, 6f)));
-            Units.Add(new Unit(PlayerID, new Vector2(4f, 9f)));
+            Units.Add(new Unit(PlayerID, UnitType.TIGER, 10, 10, new Vector2(5f, 6f)));
+            Units.Add(new Unit(PlayerID, UnitType.TIGER, 10, 10, new Vector2(7f, 6f)));
+            Units.Add(new Unit(PlayerID, UnitType.TIGER, 10, 10, new Vector2(6.5f, 6f)));
+            Units.Add(new Unit(PlayerID, UnitType.TIGER, 10, 10, new Vector2(4f, 9f)));
         }
 
         public void UpdateVisibilityMap(ObstacleMap obstMap)

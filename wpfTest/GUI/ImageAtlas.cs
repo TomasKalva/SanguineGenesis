@@ -17,9 +17,12 @@ namespace wpfTest.GUI
         private const int ATLAS_WIDTH = 640;
         private const int ATLAS_HEIGHT = 640;
         private Dictionary<Terrain, Rect> terrainImages;
+        private Dictionary<UnitType, Animation> unitsAnimations;
 
         public Rect UnitCircle { get; }
         public Rect UnitsSelector { get; }
+        public Rect BlankWhite { get; }
+        public Rect Tiger { get; }
 
         public static ImageAtlas GetImageAtlas => imageAtlas;
 
@@ -30,6 +33,18 @@ namespace wpfTest.GUI
 
         private ImageAtlas()
         {
+            InitializeTerrainImages();
+            InitializeUnitsAnimations();
+
+            UnitCircle = ToRelative(GridToCoordinates(2, 0, 1, 1));
+            UnitsSelector = ToRelative(GridToCoordinates(3, 0, 1, 1));
+            BlankWhite = ToRelative(GridToCoordinates(0, 1, 1, 1));
+            Tiger = ToRelative(GridToCoordinates(0, 2, 1.5f, 1));
+
+        }
+
+        private void InitializeTerrainImages()
+        {
             terrainImages = new Dictionary<Terrain, Rect>();
             AddTerrainImage(Terrain.LOW_GRASS, 0, 0, 1, 1);
             AddTerrainImage(Terrain.DEEP_WATER, 1, 0, 1, 1);
@@ -39,20 +54,33 @@ namespace wpfTest.GUI
             AddTerrainImage(Terrain.ENTANGLING_ROOTS, 7, 0, 1, 1);
             AddTerrainImage(Terrain.SAVANA_DIRT, 8, 0, 1, 1);
             AddTerrainImage(Terrain.SAVANA_GRASS, 9, 0, 1, 1);
-
-            UnitCircle = ToRelative(GridToCoordinates(2, 0, 1, 1));
-            UnitsSelector = ToRelative(GridToCoordinates(3, 0, 1, 1));
         }
 
-        private void AddTerrainImage(Terrain terrain, int left, int bottom, int width, int height)
+        private void InitializeUnitsAnimations()
+        {
+            unitsAnimations = new Dictionary<UnitType, Animation>();
+            AddUnitsAnimation(UnitType.TIGER,
+                new Vector2(0.75f, 0.2f),
+                1.5f, 1f, 0.5f,
+                new List<Rect>()
+                { ToRelative(GridToCoordinates(0,2,1.5f,1)),
+                  ToRelative(GridToCoordinates(1.5f,2,1.5f,1))});
+        }
+
+        private void AddTerrainImage(Terrain terrain, float left, float bottom, float width, float height)
         {
             terrainImages.Add(terrain, ToRelative(GridToCoordinates(left, bottom,width,height)));
+        }
+
+        private void AddUnitsAnimation(UnitType unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
+        {
+            unitsAnimations.Add(unit, new Animation(leftBottom,width, height, animChangeTimeS, images));
         }
 
         /// <summary>
         /// Transforms coordinates of a rectangle in the grid to the coordinates in the atlas.
         /// </summary>
-        private Rect GridToCoordinates(int left, int bottom, int width, int height)
+        private Rect GridToCoordinates(float left, float bottom, float width, float height)
         {
             float l = left * TILE_SIZE + 1;
             float b = bottom * TILE_SIZE + 1;
@@ -79,6 +107,33 @@ namespace wpfTest.GUI
         public Rect GetTerrainCoords(Terrain terrain)
         {
             return terrainImages[terrain];
+        }
+
+        /// <summary>
+        /// Get animation for the unit.
+        /// </summary>
+        public Animation GetAnimation(UnitType unitType)
+        {
+            return unitsAnimations[unitType];
+        }
+    }
+
+    public class Animation
+    {
+        public Vector2 LeftBottom { get; }
+        public List<Rect> Images { get; }
+        public float Width { get; }
+        public float Height { get; }
+        public float ChangeTimeS { get; }
+        public int Length => Images.Count;
+
+        public Animation(Vector2 leftBottom, float width, float height, float animChangeTimeS, List<Rect> images)
+        {
+            LeftBottom = leftBottom;
+            Images = images;
+            Width = width;
+            Height = height;
+            ChangeTimeS = animChangeTimeS;
         }
     }
 }

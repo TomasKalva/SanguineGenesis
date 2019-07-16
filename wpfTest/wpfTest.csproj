@@ -67,6 +67,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GameLogic\AnimationState.cs" />
     <Compile Include="GameLogic\UnitView.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />
     <Compile Include="GameLogic\Maps\Pathfinding.cs" />
