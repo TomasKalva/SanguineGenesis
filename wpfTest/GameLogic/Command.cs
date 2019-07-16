@@ -111,7 +111,8 @@ namespace wpfTest
         public MoveToCommandFactory(Vector2 target, Game game)
         {
             this.targetPos = target;
-            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(),  target);
+            //todo: separete units to different groups by their movement
+            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(Movement.GROUND),  target);
         }
 
         public void CheckInvalidation()

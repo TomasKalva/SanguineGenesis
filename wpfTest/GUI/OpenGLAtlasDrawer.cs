@@ -120,7 +120,7 @@ namespace wpfTest
             //enable alpha channel for textures
             gl.Enable(OpenGL.GL_BLEND);
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
-            LoadTexture("Images/tileMap.png", gl);
+            LoadTexture("Images/bigTileMap.png", gl);
 
             //set linear filtering
             gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR);

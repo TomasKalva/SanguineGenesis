@@ -175,5 +175,13 @@
   <ItemGroup>
     <Resource Include="Images\frameMap.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\bigTileMap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\riverMap.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

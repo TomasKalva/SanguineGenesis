@@ -24,7 +24,7 @@ namespace wpfTest
             Units = new List<Unit>();
             UnitFactory normalUnits = new UnitFactory(UnitType.TIGER, 0.5f,2f,2f,10,10);
             UnitFactory smallFastUnits = new UnitFactory(UnitType.TIGER, 0.25f, 3f, 3f,10,0);
-            UnitFactory bigUnits = new UnitFactory(UnitType.TIGER, 1f, 2f, 4f,10,0);
+            UnitFactory bigUnits = new UnitFactory(UnitType.BAOBAB, 1f, 2f, 4f,10,0);
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)

@@ -11,9 +11,37 @@ namespace wpfTest
         private float terrainAcc=5000000f;
         private float unitAcc = 20f;
 
-        public static Physics GetPhysics() => new Physics();
+        /// <summary>
+        /// Pushing maps for the current map. If the map changes they are updated by the method UpdatePushingMaps.
+        /// </summary>
+        public Dictionary<Movement, FlowMap> PushingMaps { get; }
 
-        private Physics() { }
+        public static Physics GetPhysics() => new Physics();
+        private Physics()
+        {
+            PushingMaps = new Dictionary<Movement, FlowMap>();
+            PushingMaps.Add(Movement.GROUND, null);
+            PushingMaps.Add(Movement.WATER, null);
+            PushingMaps.Add(Movement.GROUND_WATER, null);
+        }
+
+        /// <summary>
+        /// Updates PushingMaps. Should be called only when the map changes.
+        /// </summary>
+        /// <param name="map"></param>
+        public void UpdatePushingMaps(Map map)
+        {
+            
+            ObstacleMap groundObst = map.ObstacleMaps[Movement.GROUND];
+            ObstacleMap waterObst = map.ObstacleMaps[Movement.WATER];
+            ObstacleMap bothObst = map.ObstacleMaps[Movement.GROUND_WATER];
+            FlowMap gPMap = PushingMapGenerator.GeneratePushingMap(groundObst);
+            FlowMap wPMap = PushingMapGenerator.GeneratePushingMap(waterObst);
+            FlowMap gwPMap = PushingMapGenerator.GeneratePushingMap(bothObst);
+            PushingMaps[Movement.GROUND] = gPMap;
+            PushingMaps[Movement.WATER] = wPMap;
+            PushingMaps[Movement.GROUND_WATER]= gwPMap;
+        }
 
         public void Repulse(Map map, List<Unit> units, float deltaT)
         {
@@ -51,15 +79,44 @@ namespace wpfTest
 
         public void PushOutsideOfObstacles(Map map, List<Unit> units, float deltaT)
         {
-            ObstacleMap obstacleMap = map.GetObstacleMap();
-            FlowMap pMap=PushingMapGenerator.GeneratePushingMap(obstacleMap);
+
+            ObstacleMap gOMap = map.ObstacleMaps[Movement.GROUND];
+            ObstacleMap wOMap = map.ObstacleMaps[Movement.WATER];
+            ObstacleMap gwOMap = map.ObstacleMaps[Movement.GROUND_WATER];
+            if (map.MapWasChanged
+                || PushingMaps[Movement.GROUND] == null
+                || PushingMaps[Movement.WATER] == null
+                || PushingMaps[Movement.GROUND_WATER] == null)
+                UpdatePushingMaps(map);
+            FlowMap gPMap = PushingMaps[Movement.GROUND];
+            FlowMap wPMap = PushingMaps[Movement.WATER];
+            FlowMap gwPMap = PushingMaps[Movement.GROUND_WATER];
             foreach (Unit u in units)
             {
-                u.Accelerate(
-                    deltaT * pMap.GetIntensity(u.Pos, terrainAcc)
-                    );
-                if (obstacleMap.CollidingWithObstacle(u.Pos))
-                    u.IsInCollision = true;
+                switch (u.Movement)
+                {
+                    case Movement.GROUND:
+                        u.Accelerate(
+                            deltaT * gPMap.GetIntensity(u.Pos, terrainAcc)
+                            );
+                        if (gOMap.CollidingWithObstacle(u.Pos))
+                            u.IsInCollision = true;
+                        break;
+                    case Movement.WATER:
+                        u.Accelerate(
+                            deltaT * wPMap.GetIntensity(u.Pos, terrainAcc)
+                            );
+                        if (wOMap.CollidingWithObstacle(u.Pos))
+                            u.IsInCollision = true;
+                        break;
+                    case Movement.GROUND_WATER:
+                        u.Accelerate(
+                            deltaT * gwPMap.GetIntensity(u.Pos, terrainAcc)
+                            );
+                        if (gwOMap.CollidingWithObstacle(u.Pos))
+                            u.IsInCollision = true;
+                        break;
+                }
             }
         }
 

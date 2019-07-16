@@ -51,7 +51,7 @@ namespace wpfTest
                 t1.Start();
             }*/
 
-            BitmapImage mapBitmap = (BitmapImage)FindResource("frameMap");
+            BitmapImage mapBitmap = (BitmapImage)FindResource("riverMap");
             game = new Game(mapBitmap);
             var MapView = new MapView(0, 0, 60, game.Map, game);
             var MapMovementInput = new MapMovementInput();
@@ -86,7 +86,7 @@ namespace wpfTest
         {
             totalTime = 0;
             totalStopwatch.Start();
-            game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(), new Vector2(10, 2));
+            //game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(), new Vector2(10, 2));
             while (true)
             {
                 stepStopwatch.Start();
@@ -254,7 +254,7 @@ namespace wpfTest
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
             gameControls.UnitCommandsInput.SetTarget(mapCoordinates);
-            game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(),  mapCoordinates);
+           // game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(),  mapCoordinates);
         }
     }
 

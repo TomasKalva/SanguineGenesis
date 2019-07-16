@@ -14,15 +14,14 @@ namespace wpfTest.GUI
         private static ImageAtlas imageAtlas;
 
         private const int TILE_SIZE = 64;
-        private const int ATLAS_WIDTH = 640;
-        private const int ATLAS_HEIGHT = 640;
+        private const int ATLAS_WIDTH = 2048;
+        private const int ATLAS_HEIGHT = 2048;
         private Dictionary<Terrain, Rect> terrainImages;
         private Dictionary<UnitType, Animation> unitsAnimations;
 
         public Rect UnitCircle { get; }
         public Rect UnitsSelector { get; }
         public Rect BlankWhite { get; }
-        public Rect Tiger { get; }
 
         public static ImageAtlas GetImageAtlas => imageAtlas;
 
@@ -39,7 +38,6 @@ namespace wpfTest.GUI
             UnitCircle = ToRelative(GridToCoordinates(2, 0, 1, 1));
             UnitsSelector = ToRelative(GridToCoordinates(3, 0, 1, 1));
             BlankWhite = ToRelative(GridToCoordinates(0, 1, 1, 1));
-            Tiger = ToRelative(GridToCoordinates(0, 2, 1.5f, 1));
 
         }
 
@@ -65,6 +63,14 @@ namespace wpfTest.GUI
                 new List<Rect>()
                 { ToRelative(GridToCoordinates(0,2,1.5f,1)),
                   ToRelative(GridToCoordinates(1.5f,2,1.5f,1))});
+            AddUnitsAnimation(UnitType.BAOBAB,
+                new Vector2(2.5f, 1.5f),
+                5, 6, 0.8f,
+                new List<Rect>()
+                { ToRelative(GridToCoordinates(10,0,5,6)),
+                  ToRelative(GridToCoordinates(15,0,5,6)),
+                  ToRelative(GridToCoordinates(10,0,5,6)),
+                  ToRelative(GridToCoordinates(20,0,5,6)),});
         }
 
         private void AddTerrainImage(Terrain terrain, float left, float bottom, float width, float height)

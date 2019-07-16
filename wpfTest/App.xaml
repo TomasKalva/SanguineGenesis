@@ -7,5 +7,6 @@
         <BitmapImage x:Key="vanilaMap" UriSource="Images/vanilaMap.png"/>
         <BitmapImage x:Key="hugeMap" UriSource="Images/hugeMap.png"/>
         <BitmapImage x:Key="frameMap" UriSource="Images/frameMap.png"/>
+        <BitmapImage x:Key="riverMap" UriSource="Images/riverMap.png"/>
     </Application.Resources>
 </Application>

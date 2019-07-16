@@ -22,7 +22,7 @@ namespace wpfTest
             PixelColor[,] pixels = new PixelColor[width, height];
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
-                    pixels[x + x0, y + y0] = new PixelColor
+                    pixels[x + x0, height - 1 - y + y0] = new PixelColor
                     {
                         Blue = pixelBytes[(y * width + x) * 4 + 0],
                         Green = pixelBytes[(y * width + x) * 4 + 1],
@@ -40,5 +40,16 @@ namespace wpfTest
         public byte Green;
         public byte Red;
         public byte Alpha;
+
+        public int RGB => ((int)Red << 16) | ((int)Green << 8) | (int)Blue;
+
+        public PixelColor(byte red, byte green, byte blue)
+        {
+            Red = red;
+            Green = green;
+            Blue = blue;
+            Alpha = 0;
+        }
+
     }
 }

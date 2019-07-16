@@ -31,8 +31,9 @@ namespace wpfTest
         public float Energy { get; set; }
         public Vector2 Direction { get; set; }//direction the unit is facing
         public bool FacingLeft => Direction.X <= 0;
+        public Movement Movement { get; }//where can the unit walk
 
-        public Unit(Players owner, UnitType unitType, float maxHealth, float maxEnergy, Vector2 pos, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f)
+        public Unit(Players owner, UnitType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement=Movement.GROUND, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f)
         {
             Owner = owner;
             Pos = pos;
@@ -53,6 +54,7 @@ namespace wpfTest
             Energy = maxEnergy;
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(unitType));
             Direction = new Vector2(1f, 0f);
+            Movement = movement;
         }
 
         public void PerformCommand()
@@ -71,7 +73,8 @@ namespace wpfTest
             Pos = new Vector2( 
                 Math.Max(Range, Math.Min(Pos.X + deltaT * Vel.X,map.Width-Range)),
                 Math.Max(Range, Math.Min(Pos.Y + deltaT * Vel.Y, map.Height-Range)));
-            Direction = Vel;
+            if(Vel.Length!=0)
+                Direction = Vel;
         }
         
         public float GetActualBottom(float imageBottom)
@@ -124,6 +127,14 @@ namespace wpfTest
 
     public enum UnitType
     {
-        TIGER
+        TIGER,
+        BAOBAB
+    }
+
+    public enum Movement
+    {
+        GROUND,
+        WATER,
+        GROUND_WATER
     }
 }
