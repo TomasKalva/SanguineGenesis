@@ -34,11 +34,11 @@ namespace wpfTest
                         pc.Red ==0 &&
                         pc.Green == 0)
                     {
-                        nodes[i, j] = new Node(i, j,Terrain.WATER);
+                        nodes[i, j] = new Node(i, j,Terrain.DEEP_WATER);
                     }
                     else
                     {
-                        nodes[i, j] = new Node(i, j, Terrain.GRASS);
+                        nodes[i, j] = new Node(i, j, Terrain.LOW_GRASS);
                     }
                 }
             }
@@ -49,7 +49,7 @@ namespace wpfTest
             ObstacleMap om = new ObstacleMap(Width,Height);
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
-                    om[i, j] = this[i, j].Terrain == Terrain.WATER;
+                    om[i, j] = this[i, j].Terrain == Terrain.DEEP_WATER;
             return om;
         }
 

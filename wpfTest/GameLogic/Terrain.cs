@@ -8,7 +8,13 @@ namespace wpfTest
 {
     public enum Terrain
     {
-        GRASS,
-        WATER
+        LOW_GRASS,
+        DEEP_WATER,
+        SAVANA_GRASS,
+        SHALLOW_WATER,
+        HIGH_GRASS,
+        DIRT,
+        SAVANA_DIRT,
+        ENTANGLING_ROOTS
     }
 }

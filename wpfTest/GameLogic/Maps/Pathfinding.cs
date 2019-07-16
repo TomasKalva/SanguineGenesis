@@ -227,8 +227,8 @@ namespace wpfTest.GameLogic.Maps
             for(int i=0;i<flowMap.Width;i++)
                 for(int j=0;j<flowMap.Height;j++)
                 {
-                    //update only squares that are not blocked
-                    if (obstMap[i, j])
+                    //update only squares that are not blocked and have valid value of flowMap
+                    if (obstMap[i, j] || !FlowMap.IsValidValue(flowMap[i,j]))
                         continue;
 
                     float angle = flowMap[i, j];

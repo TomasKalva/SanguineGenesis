@@ -85,6 +85,7 @@
     <Compile Include="GameControls\MapSelectorFrame.cs" />
     <Compile Include="GameControls\MapView.cs" />
     <Compile Include="GameLogic\Maps\ObstacleMap.cs" />
+    <Compile Include="GUI\ImageAtlas.cs" />
     <Compile Include="GUI\OpenGLColorBufferDrawer.cs" />
     <Compile Include="GUI\OpenGLImmediateDrawer.cs" />
     <Compile Include="GUI\OpenGLAtlasDrawer.cs" />
