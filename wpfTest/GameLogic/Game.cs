@@ -68,7 +68,8 @@ namespace wpfTest
                 u.AnimationStep(deltaT);
             }
             physics.PushOutsideOfObstacles(Map, units,deltaT);
-            physics.Repulse(Map,units,deltaT);
+            //physics.Repulse(Map,units,deltaT);
+            physics.PushAway(Map, units, deltaT);
             physics.Step(Map,units,deltaT);
             physics.ResetCollision(units);
 

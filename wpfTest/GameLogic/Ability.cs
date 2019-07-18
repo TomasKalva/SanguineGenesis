@@ -41,11 +41,11 @@ namespace wpfTest.GameLogic
                 case AbilityType.MOVE_TO:
                     {
                         //first use flowmap to navigate close to the point
-                        MoveToCommandAssignment mto = new MoveToCommandAssignment(units, target);
+                        MoveToCommandAssignment mto = new MoveToCommandAssignment(units.ToList(), target);
                         mto.Process(game);
                         mto.AssignCommands();
                         //then move straight towards the point
-                        MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units, target);
+                        MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units.ToList(), target);
                         mtow.Process(game);
                         mtow.AssignCommands();
                         return;
@@ -53,7 +53,7 @@ namespace wpfTest.GameLogic
                 case AbilityType.MOVE_TOWARDS:
                     {
                         //move straight towards the point
-                        MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units, target);
+                        MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units.ToList(), target);
                         mtow.Process(game);
                         mtow.AssignCommands();
                         return;
@@ -70,10 +70,10 @@ namespace wpfTest.GameLogic
         /// <param name="endDistance">Distance to the target when the unit stops moving.</param>
         private void AssignMovementTo(List<Unit> units, Vector2 target, float endDistance, Game game)
         {
-            MoveToCommandAssignment mto=new MoveToCommandAssignment(units, target, endDistance);
+            MoveToCommandAssignment mto=new MoveToCommandAssignment(units.ToList(), target, endDistance);
             mto.Process(game);
             mto.AssignCommands();
-            MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units, target, endDistance);
+            MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units.ToList(), target, endDistance);
             mtow.Process(game);
             mtow.AssignCommands();
         }
@@ -101,7 +101,7 @@ namespace wpfTest.GameLogic
             switch (AbilityType)
             {
                 case AbilityType.ATTACK:
-                    AttackCommandAssignment mto = new AttackCommandAssignment(units, target);
+                    AttackCommandAssignment mto = new AttackCommandAssignment(units.ToList(), target);
                     mto.Process(game);
                     mto.AssignCommands();
                     return;
@@ -117,10 +117,10 @@ namespace wpfTest.GameLogic
         /// <param name="endDistance">Distance to the target when the unit stops moving.</param>
         private void AssignMovementTo(List<Unit> units, Vector2 target, float endDistance, Game game)
         {
-            MoveToCommandAssignment mto = new MoveToCommandAssignment(units, target, endDistance);
+            MoveToCommandAssignment mto = new MoveToCommandAssignment(units.ToList(), target, endDistance);
             mto.Process(game);
             mto.AssignCommands();
-            MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units, target, endDistance);
+            MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units.ToList(), target, endDistance);
             mtow.Process(game);
             mtow.AssignCommands();
         }

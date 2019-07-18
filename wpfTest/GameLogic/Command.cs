@@ -25,7 +25,52 @@ namespace wpfTest
         }
     }
 
-    public class MoveTowardsCommand : Command
+    public abstract class MovementCommand:Command
+    {
+        private static Vector2 INVALID { get; }
+        public override abstract bool PerformCommand(Game game, float deltaT);
+        static MovementCommand()
+        {
+            INVALID = new Vector2(-1, -1);
+        }
+        public MovementCommand(Unit commandedEntity)
+            :base(commandedEntity)
+        {
+            last4positions = new Vector2[4];
+            last4positions[0] = INVALID;
+            last4positions[1] = INVALID;
+            last4positions[2] = INVALID;
+            last4positions[3] = INVALID;
+        }
+        protected Vector2[] last4positions;
+
+        protected void AddToLast4(Vector2 v)
+        {
+            last4positions[3] = last4positions[2];
+            last4positions[2] = last4positions[1];
+            last4positions[1] = last4positions[0];
+            last4positions[0] = v;
+        }
+
+        protected bool Last4TooClose(float deltaT)
+        {
+            if (last4positions[0] != INVALID &&
+                last4positions[1] != INVALID &&
+                last4positions[2] != INVALID &&
+                last4positions[3] != INVALID)
+            {
+                float d1 = (last4positions[0] - last4positions[1]).Length;
+                float d2 = (last4positions[1] - last4positions[2]).Length;
+                float d3 = (last4positions[2] - last4positions[3]).Length;
+
+                if (d1 + d2 + d3 < CommandedEntity.MaxSpeed*deltaT)
+                    return true;
+            }
+            return false;
+        }
+    }
+
+    public class MoveTowardsCommand : MovementCommand
     {
         public Vector2 TargetPoint;
         private float endDistance;//distance where the unit stops moving
@@ -41,15 +86,27 @@ namespace wpfTest
         {
             Vector2 direction = CommandedEntity.Pos.UnitDirectionTo(TargetPoint);
             CommandedEntity.Accelerate(CommandedEntity.Acceleration*direction);
-            return (TargetPoint - CommandedEntity.Pos).Length < endDistance;
+            AddToLast4(CommandedEntity.Pos);
+            //return (TargetPoint - CommandedEntity.Pos).Length < endDistance; 
+
+            CommandedEntity.WantsToMove = true;
+
+            bool finished = (CommandedEntity.Pos - TargetPoint).Length <= endDistance;
+            if (finished || Last4TooClose(deltaT))
+            {
+                CommandedEntity.WantsToMove = false;
+                return true;
+            }
+            return false;
         }
     }
     
-    public class MoveToCommand : Command
+    public class MoveToCommand : MovementCommand
     {
         private FlowMap flowMap;
         private Vector2 targetPos;
         private float endDistance;//distance where the unit stops moving
+
 
         public MoveToCommand(Unit commandedEntity, Vector2 targetPos, FlowMap flowMap, float endDistance=1.42f) 
             : base(commandedEntity)
@@ -62,7 +119,17 @@ namespace wpfTest
         public override bool PerformCommand(Game game, float deltaT)
         {
             CommandedEntity.Accelerate(flowMap.GetIntensity(CommandedEntity.Pos, CommandedEntity.Acceleration));
-            return (CommandedEntity.Pos - targetPos).Length<=endDistance;
+            AddToLast4(CommandedEntity.Pos);
+            CommandedEntity.WantsToMove = true;
+
+            bool finished = (CommandedEntity.Pos - targetPos).Length <= endDistance;
+            
+            if (finished || Last4TooClose(deltaT))
+            {
+                CommandedEntity.WantsToMove = false;
+                return true;
+            }
+            return false;
         }
     }
 

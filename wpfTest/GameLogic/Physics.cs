@@ -9,7 +9,6 @@ namespace wpfTest
     class Physics
     {
         private float terrainAcc=5000000f;
-        private float unitAcc = 20f;
 
         /// <summary>
         /// Pushing maps for the current map. If the map changes they are updated by the method UpdatePushingMaps.
@@ -43,17 +42,17 @@ namespace wpfTest
             PushingMaps[Movement.GROUND_WATER]= gwPMap;
         }
 
-        public void Repulse(Map map, List<Unit> units, float deltaT)
+        public void PushAway(Map map, List<Unit> units, float deltaT)
         {
             foreach (Unit u1 in units)
-                foreach(Unit u2 in units)
+                foreach (Unit u2 in units)
                 {
                     //accelerate only distinct units and calculate acceleration for each
                     //pair of units only once
                     if (u1.GetHashCode() < u2.GetHashCode())
                     {
 
-                        float dist = (u1.Pos- u2.Pos).Length;
+                        float dist = (u1.Pos - u2.Pos).Length;
                         //if two units get stuck on top of each other, move them apart
                         if (dist == 0)
                         {
@@ -67,14 +66,38 @@ namespace wpfTest
                         {
                             //push centres of the units from each other
                             Vector2 dir12 = u1.Pos.UnitDirectionTo(u2.Pos);
-                            u1.Accelerate((-unitAcc * deltaT) * dir12);
-                            u2.Accelerate((unitAcc * deltaT) * dir12);
-                            u1.IsInCollision = true;
-                            u2.IsInCollision = true;
+                            Vector2 pushVec = (totalR - dist) / 2 * dir12;
+                            if (u1.Owner != u2.Owner)
+                            {
+                                if (u1.WantsToMove && !u2.WantsToMove)
+                                {
+                                    u1.Pos = u1.Pos - 2 * pushVec;
+
+                                }
+                                else if (u2.WantsToMove && !u1.WantsToMove)
+                                {
+                                    u2.Pos = u2.Pos + 2 * pushVec;
+
+                                }
+                                else
+                                {
+                                    u1.Pos = u1.Pos - pushVec;
+                                    u2.Pos = u2.Pos + pushVec;
+
+                                }
+                            }
+                            else
+                            {
+                                //u1.Accelerate((-unitAcc * deltaT) * dir12);
+                                //u2.Accelerate((unitAcc * deltaT) * dir12);
+                                u1.Pos = u1.Pos - pushVec;
+                                u2.Pos = u2.Pos + pushVec;
+                                //u1.IsInCollision = true;
+                                //u2.IsInCollision = true;}
+                            }
                         }
                     }
                 }
-
         }
 
         public void PushOutsideOfObstacles(Map map, List<Unit> units, float deltaT)

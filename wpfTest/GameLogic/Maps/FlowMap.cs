@@ -80,6 +80,21 @@ namespace wpfTest
             new Vector2(v.X/a,v.Y/a);
         public static Vector2 operator *(float a, Vector2 v) =>
             new Vector2(v.X * a, v.Y * a);
+        public static bool operator ==(Vector2 u, Vector2 v) =>
+             u.X == v.X && u.Y == v.Y;
+        public static bool operator !=(Vector2 u, Vector2 v) =>
+             u.X != v.X || u.Y != v.Y;
+        public override bool Equals(object o)
+        {
+            if (!(o is Vector2))
+                return false;
+
+            return this == (Vector2)o;
+        }
+        public override int GetHashCode()
+        {
+            return (X * 7 + Y * 13).GetHashCode();
+        }
 
         public Vector2 UnitDirectionTo(Vector2 vec)
         {

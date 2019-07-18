@@ -71,8 +71,11 @@ namespace wpfTest
             {
                 Command command = CommandQueue.Peek();
                 if (command.PerformCommand(game, deltaT))
+                {
                     //if command is finished, remove it from the queue
+                    command.Creator.Units.Remove(this);
                     CommandQueue.Dequeue();
+                }
             }
         }
 
