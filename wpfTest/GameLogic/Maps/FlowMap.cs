@@ -84,7 +84,10 @@ namespace wpfTest
         public Vector2 UnitDirectionTo(Vector2 vec)
         {
             Vector2 dir = vec - this;
-            return dir / dir.Length;
+            if (dir.Length != 0)
+                return dir / dir.Length;
+            else
+                return new Vector2(0, 0);
         }
 
         public float Length =>(float)Math.Sqrt(X * X + Y * Y);

@@ -32,8 +32,13 @@ namespace wpfTest
         public Vector2 Direction { get; set; }//direction the unit is facing
         public bool FacingLeft => Direction.X <= 0;
         public Movement Movement { get; }//where can the unit walk
+        public float AttackDamage { get; }
+        public float AttackPeriod { get; }
+        public float AttackDistance { get; }
+        public bool IsDead => Health <= 0;
 
-        public Unit(Players owner, UnitType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement=Movement.GROUND, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f)
+        public Unit(Players owner, UnitType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement=Movement.GROUND, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f,
+            float attackDamage=10f, float attackPeriod=0.9f, float attackDistance=0.2f)
         {
             Owner = owner;
             Pos = pos;
@@ -55,14 +60,17 @@ namespace wpfTest
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(unitType));
             Direction = new Vector2(1f, 0f);
             Movement = movement;
+            AttackDamage = attackDamage;
+            AttackPeriod = attackPeriod;
+            AttackDistance = attackDistance;
         }
 
-        public void PerformCommand()
+        public void PerformCommand(Game game, float deltaT)
         {
             if(CommandQueue.Any())
             {
                 Command command = CommandQueue.Peek();
-                if (command.PerformCommand())
+                if (command.PerformCommand(game, deltaT))
                     //if command is finished, remove it from the queue
                     CommandQueue.Dequeue();
             }
@@ -103,8 +111,8 @@ namespace wpfTest
         public void Accelerate(Vector2 acc)
         {
             Vel += acc;
-            float l;
-            if ((l=Vel.Length)>MaxSpeed)
+            float l= Vel.Length;
+            if (l>MaxSpeed && l!=0)
                 Vel = (MaxSpeed / l)*Vel;
         }
 
@@ -122,6 +130,19 @@ namespace wpfTest
         public void AnimationStep(float deltaT)
         {
             AnimationState.Step(deltaT);
+        }
+
+        /// <summary>
+        /// Removes referece to this unit from all CommandsAssignments.
+        /// </summary>
+        public void RemoveFromAllCommandsAssignments()
+        {
+            foreach(Command c in CommandQueue)
+            {
+                //it is enough to remove unit from CommandAssignment because
+                //there is no other reference to the Command other than this queue
+                c.Creator.Units.Remove(this);
+            }
         }
     }
 

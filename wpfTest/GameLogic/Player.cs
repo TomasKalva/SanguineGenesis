@@ -22,9 +22,9 @@ namespace wpfTest
         public void InitUnits()
         {
             Units = new List<Unit>();
-            UnitFactory normalUnits = new UnitFactory(UnitType.TIGER, 0.5f,2f,2f,10,10);
-            UnitFactory smallFastUnits = new UnitFactory(UnitType.TIGER, 0.25f, 3f, 3f,10,0);
-            UnitFactory bigUnits = new UnitFactory(UnitType.BAOBAB, 1f, 2f, 4f,10,0);
+            UnitFactory normalUnits = new UnitFactory(UnitType.TIGER, 0.5f,2f,2f,100,10);
+            UnitFactory smallFastUnits = new UnitFactory(UnitType.TIGER, 0.25f, 3f, 3f,50,0);
+            UnitFactory bigUnits = new UnitFactory(UnitType.BAOBAB, 1f, 2f, 4f,150,0);
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 10; j++)
@@ -42,6 +42,25 @@ namespace wpfTest
         public void UpdateVisibilityMap(ObstacleMap obstMap)
         {
             VisibilityMap.FindVisibility(Units.Select((unit) => unit.UnitView).ToList(), obstMap);
+        }
+
+        /// <summary>
+        /// Removes dead units and references to them from their commands. The references
+        /// from other commands stay - other commands need to check for the death of the unit.
+        /// </summary>
+        public void RemoveDeadUnits()
+        {
+            List<Unit> toBeRemoved = new List<Unit>();
+            foreach(Unit u in Units)
+            {
+                if(u.IsDead)
+                {
+                    toBeRemoved.Add(u);
+                    //CommandsAssignments still have reference to the unit
+                    u.RemoveFromAllCommandsAssignments();
+                }
+            }
+            Units.RemoveAll((unit) => toBeRemoved.Contains(unit));
         }
     }
 

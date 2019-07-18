@@ -109,11 +109,14 @@ namespace wpfTest
             return om;
         }
 
+        /// <summary>
+        /// Returns the distance between the closest points of the circles of the units.
+        /// </summary>
         public float Distance(Unit u1, Unit u2)
         {
             float dx = u1.Pos.X - u2.Pos.X;
             float dy = u1.Pos.Y - u2.Pos.Y;
-            return (float)Math.Sqrt(dx * dx + dy * dy);
+            return (float)Math.Sqrt(dx * dx + dy * dy) - u1.Range - u2.Range;
         }
     }
 }

@@ -114,7 +114,7 @@ namespace wpfTest
             float newNodeSize = Math.Min(maxNodeSize, Math.Max(NodeSize + zoomSpeed, minNodeSize));
             if (newNodeSize != NodeSize)
             {
-                NodeSize = newNodeSize;
+                ChangeNodeSizeAndCenterView(newNodeSize);
                 CorrectPosition(map);
                 return true;
             }
@@ -129,11 +129,21 @@ namespace wpfTest
             float newNodeSize = Math.Min(maxNodeSize, Math.Max(NodeSize - zoomSpeed, minNodeSize));
             if (newNodeSize != NodeSize)
             {
-                NodeSize = newNodeSize;
+                ChangeNodeSizeAndCenterView(newNodeSize);
                 CorrectPosition(map);
                 return true;
             }
             return false;
+        }
+
+        private void ChangeNodeSizeAndCenterView(float newNodeSize)
+        {
+            float oldWidth = Width;
+            float oldHeight = Height;
+            NodeSize = newNodeSize;
+            //center the view
+            Left = Left + (oldWidth - Width) / 2;
+            Bottom = Bottom + (oldHeight - Height) / 2;
         }
 
         /// <summary>

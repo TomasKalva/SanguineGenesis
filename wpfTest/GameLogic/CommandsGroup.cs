@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic;
 
 namespace wpfTest
 {
@@ -48,7 +49,7 @@ namespace wpfTest
         /// Adds a new command created by the factory to every entity in the group.
         /// </summary>
         /// <param name="commandFactory">Determines command type.</param>
-        public void AddCommand(ICommandFactory commandFactory)
+        public void AddCommand(CommandAssignment commandFactory)
         {
             foreach (Unit u in Units)
                 u.AddCommand(commandFactory.NewInstance(u));
@@ -58,7 +59,7 @@ namespace wpfTest
         /// Sets a new command created by the factory to every entity in the group.
         /// </summary>
         /// <param name="commandFactory">Determines command type.</param>
-        public void SetCommand(ICommandFactory commandFactory)
+        public void SetCommand(CommandAssignment commandFactory)
         {
             foreach (Unit u in Units)
                 u.SetCommand(commandFactory.NewInstance(u));

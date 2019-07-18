@@ -18,6 +18,7 @@ namespace wpfTest
             foreach (Unit unit in game.GetUnits().Where(unitProperty))
             {
                 Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
+                //todo: select units by circles on the ground
                 if (area.IntersectsWith(unitRect))
                 {
                     selected.Add(unit);

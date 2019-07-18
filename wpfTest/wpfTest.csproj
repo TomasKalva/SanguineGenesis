@@ -67,7 +67,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GameLogic\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
+    <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\UnitView.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />
     <Compile Include="GameLogic\Maps\Pathfinding.cs" />
@@ -95,7 +97,7 @@
     <Compile Include="GameLogic\Player.cs" />
     <Compile Include="GameLogic\Maps\PushingMapGenerator.cs" />
     <Compile Include="GameLogic\Rect.cs" />
-    <Compile Include="GameControls\SelectorFrameInput.cs" />
+    <Compile Include="GameControls\UnitCommandsInput.cs" />
     <Compile Include="GameLogic\Terrain.cs" />
     <Compile Include="GameLogic\Unit.cs" />
     <Page Include="GUI\MainWindow.xaml">

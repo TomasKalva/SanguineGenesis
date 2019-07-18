@@ -614,8 +614,8 @@ namespace wpfTest
                     float left = (current.Pos.X - anim.LeftBottom.X - viewLeft) * unitSize;
                     float right = (current.Pos.X - anim.LeftBottom.X - viewLeft + anim.Width) * unitSize;
 
-                    //depth is from [2,3]
-                    float depth = 2f + current.Pos.Y / game.Map.Height;
+                    //depth is from [4,5]
+                    float depth = 4f + current.Pos.Y / game.Map.Height;
                     //vertices
                     SetSquareVertices(vertices, bottom, top, left, right, -depth, index);
 
@@ -718,7 +718,7 @@ namespace wpfTest
                         index += 6 * 3;
                         texIndex += 6 * 2;
                         atlasInd += 6 * 4;
-                        float energyRight = left + (right - left) * current.Energy / current.MaxEnergy;
+                        float energyRight = Math.Max(left, left + (right - left) * current.Energy / current.MaxEnergy);
                         AddRectangle(left, bottom, energyRight, top, indicatorImage, depth, index, vertices,
                             index, colors, texIndex, textureCoords, atlasInd, texAtlas, 0f, 0f, 1f);
                         index += 6 * 3;
@@ -734,7 +734,7 @@ namespace wpfTest
                     index += 6 * 3;
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
-                    float healthRight = left + (right - left) * current.Health/current.MaxHealth;
+                    float healthRight =Math.Max(left, left + (right - left) * current.Health/current.MaxHealth);
                     AddRectangle(left, bottom, healthRight, top, indicatorImage, depth, index, vertices,
                         index, colors, texIndex, textureCoords, atlasInd, texAtlas, 1f, 0f, 0f);
                 }

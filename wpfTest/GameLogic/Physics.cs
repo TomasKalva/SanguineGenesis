@@ -53,7 +53,7 @@ namespace wpfTest
                     if (u1.GetHashCode() < u2.GetHashCode())
                     {
 
-                        float dist = map.Distance(u1, u2);
+                        float dist = (u1.Pos- u2.Pos).Length;
                         //if two units get stuck on top of each other, move them apart
                         if (dist == 0)
                         {

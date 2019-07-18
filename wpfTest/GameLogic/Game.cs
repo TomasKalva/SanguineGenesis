@@ -64,13 +64,17 @@ namespace wpfTest
             List<Unit> units = GetUnits();
             foreach (Unit u in units)
             {
-                u.PerformCommand();
+                u.PerformCommand(this, deltaT);
                 u.AnimationStep(deltaT);
             }
             physics.PushOutsideOfObstacles(Map, units,deltaT);
             physics.Repulse(Map,units,deltaT);
             physics.Step(Map,units,deltaT);
             physics.ResetCollision(units);
+
+            //remove dead units
+            Players[0].RemoveDeadUnits();
+            Players[1].RemoveDeadUnits();
 
             //update player's view of the map
             if (visibilityGenerator.Done)

@@ -8,6 +8,9 @@ using wpfTest.GameLogic.Maps;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Used for asynchronous creating of visibility maps.
+    /// </summary>
     public class VisibilityGenerator
     {
         //inputs
@@ -34,14 +37,22 @@ namespace wpfTest.GameLogic
             }
         }
 
+        /// <summary>
+        /// Starts a new thread for creating visibility maps.
+        /// </summary>
         public VisibilityGenerator()
         {
             Done = true;
             newTask = false;
             Thread t = new Thread(() => Generate());
+            t.IsBackground = true;
             t.Start();
         }
 
+        /// <summary>
+        /// Set parameters for creating the visibility map. Does nothing if the current
+        /// task is not done yet.
+        /// </summary>
         public void SetNewTask(ObstacleMap obstMap, List<UnitView> unitViews)
         {
             if (newTask) return;
@@ -55,6 +66,9 @@ namespace wpfTest.GameLogic
             }
         }
 
+        /// <summary>
+        /// Infinite loop for generating visibility maps.
+        /// </summary>
         public void Generate()
         {
             while (true)
