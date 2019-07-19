@@ -14,6 +14,8 @@ namespace wpfTest
         public Vector2 Vel { get; set; }
         public float Range { get; }//range of the circle collider
         public float ViewRange { get; }//how far the unit sees
+        public bool CanBeMoved { get; set; }//false if the unit has to stand still
+        public bool StopMoving { get; set; }//set to true to set WantsToMove to false after Move
         public bool WantsToMove { get; set; }//true if the unit has a target destination
         public bool IsInCollision { get; set; }//true if the unit is colliding with obstacles or other units
         public float MaxSpeed { get; }
@@ -45,6 +47,7 @@ namespace wpfTest
             Vel = new Vector2(0f, 0f);
             Range = range;
             ViewRange = viewRange;
+            CanBeMoved = true;
             IsInCollision = false;
             MaxSpeed = maxSpeed;
             Acceleration = acceleration;
@@ -73,7 +76,8 @@ namespace wpfTest
                 if (command.PerformCommand(game, deltaT))
                 {
                     //if command is finished, remove it from the queue
-                    command.Creator.Units.Remove(this);
+                    if(command.Creator!=null)
+                        command.Creator.Units.Remove(this);
                     CommandQueue.Dequeue();
                 }
             }
@@ -84,8 +88,13 @@ namespace wpfTest
             Pos = new Vector2( 
                 Math.Max(Range, Math.Min(Pos.X + deltaT * Vel.X,map.Width-Range)),
                 Math.Max(Range, Math.Min(Pos.Y + deltaT * Vel.Y, map.Height-Range)));
-            if(Vel.Length!=0)
+            if(WantsToMove && Vel.Length!=0)
                 Direction = Vel;
+            if(StopMoving)
+            {
+                StopMoving = false;
+                WantsToMove = false;
+            }
         }
         
         public float GetActualBottom(float imageBottom)
@@ -144,7 +153,8 @@ namespace wpfTest
             {
                 //it is enough to remove unit from CommandAssignment because
                 //there is no other reference to the Command other than this queue
-                c.Creator.Units.Remove(this);
+                if(c.Creator!=null)
+                    c.Creator.Units.Remove(this);
             }
         }
     }

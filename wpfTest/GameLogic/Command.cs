@@ -28,14 +28,16 @@ namespace wpfTest
     public abstract class MovementCommand:Command
     {
         private static Vector2 INVALID { get; }
+        protected float minStoppingDistance;
         public override abstract bool PerformCommand(Game game, float deltaT);
         static MovementCommand()
         {
             INVALID = new Vector2(-1, -1);
         }
-        public MovementCommand(Unit commandedEntity)
+        public MovementCommand(Unit commandedEntity, float minStoppingDistance)
             :base(commandedEntity)
         {
+            this.minStoppingDistance = minStoppingDistance;
             last4positions = new Vector2[4];
             last4positions[0] = INVALID;
             last4positions[1] = INVALID;
@@ -63,11 +65,12 @@ namespace wpfTest
                 float d2 = (last4positions[1] - last4positions[2]).Length;
                 float d3 = (last4positions[2] - last4positions[3]).Length;
 
-                if (d1 + d2 + d3 < CommandedEntity.MaxSpeed*deltaT)
+                if (d1 + d2 + d3 < CommandedEntity.MaxSpeed*deltaT/2)
                     return true;
             }
             return false;
         }
+
     }
 
     public class MoveTowardsCommand : MovementCommand
@@ -75,8 +78,8 @@ namespace wpfTest
         public Vector2 TargetPoint;
         private float endDistance;//distance where the unit stops moving
 
-        public MoveTowardsCommand(Unit commandedEntity, Vector2 targetPoint, float endDistance = 0.1f) 
-            : base(commandedEntity)
+        public MoveTowardsCommand(Unit commandedEntity, Vector2 targetPoint, float minStoppingDistance, float endDistance = 0.1f) 
+            : base(commandedEntity,minStoppingDistance)
         {
             TargetPoint = targetPoint;
             this.endDistance = endDistance;
@@ -92,12 +95,17 @@ namespace wpfTest
             CommandedEntity.WantsToMove = true;
 
             bool finished = (CommandedEntity.Pos - TargetPoint).Length <= endDistance;
-            if (finished || Last4TooClose(deltaT))
+            if (finished || (Last4TooClose(deltaT) && CanStop()))
             {
-                CommandedEntity.WantsToMove = false;
+                CommandedEntity.StopMoving = true;
                 return true;
             }
             return false;
+        }
+
+        private bool CanStop()
+        {
+            return (TargetPoint-CommandedEntity.Pos).Length < minStoppingDistance;
         }
     }
     
@@ -108,8 +116,8 @@ namespace wpfTest
         private float endDistance;//distance where the unit stops moving
 
 
-        public MoveToCommand(Unit commandedEntity, Vector2 targetPos, FlowMap flowMap, float endDistance=1.42f) 
-            : base(commandedEntity)
+        public MoveToCommand(Unit commandedEntity, Vector2 targetPos, FlowMap flowMap, float minStoppingDistance, float endDistance=1.42f) 
+            : base(commandedEntity, minStoppingDistance)
         {
             this.flowMap = flowMap;
             this.targetPos = targetPos;
@@ -124,12 +132,17 @@ namespace wpfTest
 
             bool finished = (CommandedEntity.Pos - targetPos).Length <= endDistance;
             
-            if (finished || Last4TooClose(deltaT))
+            if (finished || (Last4TooClose(deltaT) && CanStop()))
             {
-                CommandedEntity.WantsToMove = false;
+                CommandedEntity.StopMoving = true;
                 return true;
             }
             return false;
+        }
+
+        private bool CanStop()
+        {
+            return (targetPos - CommandedEntity.Pos).Length < minStoppingDistance;
         }
     }
 
@@ -149,15 +162,27 @@ namespace wpfTest
         {
             //dead target cannont be attacked
             if (target.IsDead)
+            {
+                CommandedEntity.CanBeMoved = true;
                 return true;
+            }
+            CommandedEntity.Direction = target.Pos - CommandedEntity.Pos;
 
+            CommandedEntity.CanBeMoved = false;
             timeUntilAttack += deltaT;
             if (timeUntilAttack >= CommandedEntity.AttackPeriod)
             {
                 timeUntilAttack -= CommandedEntity.AttackPeriod;
                 target.Health -= CommandedEntity.AttackDamage;
             }
-            return game.Map.Distance(CommandedEntity, target) >= CommandedEntity.AttackDistance;
+
+            bool finished= game.Map.Distance(CommandedEntity, target) >= CommandedEntity.AttackDistance;
+            if (finished)
+            {
+                CommandedEntity.CanBeMoved = true;
+                return true;
+            }
+            return false;
         }
     }
 }

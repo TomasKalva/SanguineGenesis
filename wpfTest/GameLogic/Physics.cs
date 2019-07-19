@@ -88,10 +88,22 @@ namespace wpfTest
                             }
                             else
                             {
+                                if(u1.CanBeMoved && !u2.CanBeMoved)
+                                {
+                                    u1.Pos = u1.Pos - 2 * pushVec;
+
+                                }
+                                else if (u2.CanBeMoved && !u1.CanBeMoved)
+                                {
+                                    u2.Pos = u2.Pos + 2 * pushVec;
+                                }
+                                else
+                                {
+                                    u1.Pos = u1.Pos - pushVec;
+                                    u2.Pos = u2.Pos + pushVec;
+                                }
                                 //u1.Accelerate((-unitAcc * deltaT) * dir12);
                                 //u2.Accelerate((unitAcc * deltaT) * dir12);
-                                u1.Pos = u1.Pos - pushVec;
-                                u2.Pos = u2.Pos + pushVec;
                                 //u1.IsInCollision = true;
                                 //u2.IsInCollision = true;}
                             }

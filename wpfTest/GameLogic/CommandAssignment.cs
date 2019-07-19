@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -55,7 +56,23 @@ namespace wpfTest.GameLogic
         public abstract Command NewInstance(Unit commandedEntity);
     }
 
-    public class MoveTowardsCommandAssignment : CommandAssignment
+    public abstract class MovementCommandAssignment:CommandAssignment
+    {
+        protected float minStoppingDistance;
+
+        public MovementCommandAssignment(List<Unit> units)
+            : base(units)
+        {
+            float volume = 0f;
+            foreach(Unit u in units)
+            {
+                volume += u.Range * u.Range;
+            }
+            minStoppingDistance = (float)Math.Sqrt(volume)*1.3f;
+        }
+    }
+
+    public class MoveTowardsCommandAssignment : MovementCommandAssignment
     {
         private Vector2 TargetPoint { get; }
         private float endDistance;//distance where the unit stops moving
@@ -69,7 +86,7 @@ namespace wpfTest.GameLogic
 
         public override Command NewInstance(Unit commandedEntity)
         {
-            return new MoveTowardsCommand(commandedEntity, TargetPoint, endDistance);
+            return new MoveTowardsCommand(commandedEntity, TargetPoint, minStoppingDistance, endDistance);
         }
 
         public override void CheckInvalidation()
@@ -83,7 +100,7 @@ namespace wpfTest.GameLogic
         }
     }
 
-    public class MoveToCommandAssignment : CommandAssignment
+    public class MoveToCommandAssignment : MovementCommandAssignment
     {
         private Vector2 target;
         private float endDistance;//distance where the unit stops moving
@@ -103,13 +120,17 @@ namespace wpfTest.GameLogic
 
         public override Command NewInstance(Unit commandedEntity)
         {
-            return new MoveToCommand(commandedEntity, target, flowMap, endDistance);
+            return new MoveToCommand(commandedEntity, target, flowMap, minStoppingDistance, endDistance);
         }
 
         public override void Process(Game game)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             //todo: separete units to different groups by their movement
             flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(Movement.GROUND), target);
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedMilliseconds);
         }
     }
 

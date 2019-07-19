@@ -50,12 +50,17 @@ namespace wpfTest.GameLogic.Maps
             //first iteration
             RelaxDistances(new Vector2(targetLocation.X, targetLocation.Y), obst, distance, state, flMap);
             NextIteration(state);
+            int iterations = 0;
+
             //iterate until all unblocked squares are discovered
             while (FindClosest(targetLocation,state,distance, out int x, out int y))
             {
                 RelaxDistances(new Vector2(x + 0.5f, y + 0.5f), obst, distance, state, flMap);
                 NextIteration(state);
+                InferSmoothly(distance, state, flMap);
+                iterations++;
             }
+            Console.WriteLine("Number of iterations: " + iterations);
             //remove vectors pointing to blocked squares
             RepairEdges(flMap, obst);
 
@@ -216,6 +221,50 @@ namespace wpfTest.GameLogic.Maps
                 for (int j = 0; j < state.GetLength(1); j++)
                     if (state[i, j] == SquareState.DISCOVERED_IN_CURRENT)
                         state[i, j] = SquareState.DISCOVERED;
+        }
+
+        private void InferSmoothly(float[,] distance, SquareState[,] state, FlowMap flMap)
+        {
+            for(int i=1;i<flMap.Width-1;i++)
+                for(int j = 1; j < flMap.Height - 1; j++)
+                {
+                    if (state[i, j] != SquareState.NOT_DISCOVERED)
+                        continue;
+
+                    float dist = flMap.Width * flMap.Height;
+                    float angle = 0;
+                    int neigbCount = 0;
+                    if (state[i - 1, j] == SquareState.DISCOVERED)
+                    {
+                        neigbCount++;
+                        angle += flMap[i - 1, j];
+                        dist = Math.Min(dist, distance[i - 1, j]);
+                    }
+                    if (state[i + 1, j] == SquareState.DISCOVERED)
+                    {
+                        neigbCount++;
+                        angle += flMap[i + 1, j];
+                        dist = Math.Min(dist, distance[i + 1, j]);
+                    }
+                    if (state[i, j - 1] == SquareState.DISCOVERED)
+                    {
+                        neigbCount++;
+                        angle += flMap[i, j - 1];
+                        dist = Math.Min(dist, distance[i, j - 1]);
+                    }
+                    if (state[i, j + 1] == SquareState.DISCOVERED)
+                    {
+                        neigbCount++;
+                        angle += flMap[i, j + 1];
+                        dist = Math.Min(dist, distance[i, j + 1]);
+                    }
+                    if (neigbCount >= 3)
+                    {
+                        distance[i, j] = dist+1;
+                        state[i, j] = SquareState.DISCOVERED;
+                        flMap[i, j] = angle / neigbCount;
+                    }
+                }
         }
 
         /// <summary>

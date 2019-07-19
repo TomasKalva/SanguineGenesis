@@ -73,6 +73,19 @@ namespace wpfTest
             physics.Step(Map,units,deltaT);
             physics.ResetCollision(units);
 
+            //attack nearby enemy if idle
+            foreach(Unit u in units)
+            {
+                if(!u.CommandQueue.Any())
+                {
+                    //unit isn't doing anything
+                    Unit en = units.Where((v) => v.Owner!=u.Owner && Map.Distance(u, v) < u.AttackDistance).FirstOrDefault();
+                    if(en!=null)
+                        u.CommandQueue.Enqueue(new AttackCommand(u, en));
+                }
+
+            }
+
             //remove dead units
             Players[0].RemoveDeadUnits();
             Players[1].RemoveDeadUnits();

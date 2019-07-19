@@ -70,6 +70,7 @@
     <Compile Include="GameLogic\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
+    <Compile Include="GameLogic\MovementGenerator.cs" />
     <Compile Include="GameLogic\UnitView.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />
     <Compile Include="GameLogic\Maps\Pathfinding.cs" />
@@ -184,6 +185,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\riverMap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\riverBuildingsMap.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

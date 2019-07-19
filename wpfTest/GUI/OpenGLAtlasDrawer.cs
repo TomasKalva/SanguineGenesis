@@ -89,8 +89,8 @@ namespace wpfTest
             map.VertexBufferArray.Bind(gl);
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
 
-            /*flowMap.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);*/
+            flowMap.VertexBufferArray.Bind(gl);
+            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
 
             if (!unitsEmpty)
             {
