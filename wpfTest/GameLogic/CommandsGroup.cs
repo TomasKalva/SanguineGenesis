@@ -51,6 +51,7 @@ namespace wpfTest
         /// <param name="commandFactory">Determines command type.</param>
         public void AddCommand(CommandAssignment commandFactory)
         {
+            Units.RemoveAll((u) => u.IsDead);
             foreach (Unit u in Units)
                 u.AddCommand(commandFactory.NewInstance(u));
         }
@@ -61,6 +62,7 @@ namespace wpfTest
         /// <param name="commandFactory">Determines command type.</param>
         public void SetCommand(CommandAssignment commandFactory)
         {
+            Units.RemoveAll((u) => u.IsDead);
             foreach (Unit u in Units)
                 u.SetCommand(commandFactory.NewInstance(u));
         }

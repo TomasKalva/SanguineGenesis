@@ -130,13 +130,17 @@ namespace wpfTest
 
         public void AddCommand(Command command)
         {
-            CommandQueue.Enqueue(command);
+            if(!IsDead)
+                CommandQueue.Enqueue(command);
         }
 
         public void SetCommand(Command command)
         {
-            CommandQueue.Clear();
-            CommandQueue.Enqueue(command);
+            if (!IsDead)
+            {
+                CommandQueue.Clear();
+                CommandQueue.Enqueue(command);
+            }
         }
 
         public void AnimationStep(float deltaT)

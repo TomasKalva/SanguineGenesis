@@ -126,6 +126,11 @@ namespace wpfTest
 
         public override bool PerformCommand(Game game, float deltaT)
         {
+            ((MoveToCommandAssignment)Creator).Active = true;
+            //map wasn't set yet
+            if (flowMap == null)
+                return false;
+
             CommandedEntity.Accelerate(flowMap.GetIntensity(CommandedEntity.Pos, CommandedEntity.Acceleration));
             AddToLast4(CommandedEntity.Pos);
             CommandedEntity.WantsToMove = true;
@@ -135,6 +140,7 @@ namespace wpfTest
             if (finished || (Last4TooClose(deltaT) && CanStop()))
             {
                 CommandedEntity.StopMoving = true;
+                Creator.Units.Remove(CommandedEntity);
                 return true;
             }
             return false;
@@ -143,6 +149,11 @@ namespace wpfTest
         private bool CanStop()
         {
             return (targetPos - CommandedEntity.Pos).Length < minStoppingDistance;
+        }
+
+        public void UpdateFlowMap(FlowMap flMap)
+        {
+            this.flowMap = flMap;
         }
     }
 

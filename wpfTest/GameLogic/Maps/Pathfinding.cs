@@ -60,7 +60,7 @@ namespace wpfTest.GameLogic.Maps
                 InferSmoothly(distance, state, flMap);
                 iterations++;
             }
-            Console.WriteLine("Number of iterations: " + iterations);
+            //Console.WriteLine("Number of iterations: " + iterations);
             //remove vectors pointing to blocked squares
             RepairEdges(flMap, obst);
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using wpfTest.GameLogic;
 
 namespace wpfTest
 {
@@ -42,6 +43,9 @@ namespace wpfTest
             }
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
             InitializeObstacleMaps();
+            MovementGenerator mg = MovementGenerator.GetMovementGenerator();
+            mg.SetMapChanged(wpfTest.Players.PLAYER0, ObstacleMaps);
+            mg.SetMapChanged(wpfTest.Players.PLAYER1, ObstacleMaps);
         }
 
         private void InitializeColorToTerrain()

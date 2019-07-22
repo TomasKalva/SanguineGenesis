@@ -11,6 +11,8 @@ namespace wpfTest
     {
         public List<Unit> Units { get; private set; }
         public VisibilityMap VisibilityMap { get; set; }
+        public bool MapChanged { get; private set; }
+        public Map MapView { get; private set; }
         public Players PlayerID { get; }
 
         public Player(Players playerID)
@@ -61,6 +63,12 @@ namespace wpfTest
                 }
             }
             Units.RemoveAll((unit) => toBeRemoved.Contains(unit));
+        }
+
+        public void UpdateMap(Map map)
+        {
+            //todo: implement with visibility map
+            MapView = map;
         }
     }
 

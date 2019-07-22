@@ -9,7 +9,7 @@ namespace wpfTest.GameLogic
     public abstract class Ability
     {
         public AbilityType AbilityType { get; }
-
+        
         public Ability(AbilityType abilityType)
         {
             AbilityType = abilityType;
@@ -30,31 +30,32 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Assigns a new instance of the command assignment for this ability and returns it.
         /// </summary>
-        public void AssignCommands(List<Unit> units, Vector2 target, Game game)
+        public void AssignCommands(Players player, List<Unit> units, Vector2 target, Game game)
         {
             //move to the target until the minimal distance is reached
             if(!(AbilityType==AbilityType.MOVE_TO) && !(AbilityType==AbilityType.MOVE_TOWARDS))
-                AssignMovementTo(units, target, Distance, game);
+                AssignMovementTo(player, units, target, Distance, game);
 
             switch (AbilityType)
             {
                 case AbilityType.MOVE_TO:
                     {
                         //first use flowmap to navigate close to the point
-                        MoveToCommandAssignment mto = new MoveToCommandAssignment(units.ToList(), target);
-                        mto.Process(game);
+                        MoveToCommandAssignment mto = new MoveToCommandAssignment(player, units.ToList(), target, Movement.GROUND);
+                        //mto.Process(game.Map.GetObstacleMap(mto.Movement));
+                        MovementGenerator.GetMovementGenerator().AddNewCommand(Players.PLAYER0,mto);
                         mto.AssignCommands();
                         //then move straight towards the point
-                        MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units.ToList(), target);
-                        mtow.Process(game);
+                        MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(player, units.ToList(), target);
+                        //mtow.Process(game);
                         mtow.AssignCommands();
                         return;
                     }
                 case AbilityType.MOVE_TOWARDS:
                     {
                         //move straight towards the point
-                        MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units.ToList(), target);
-                        mtow.Process(game);
+                        MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(player, units.ToList(), target);
+                        //mtow.Process(game);
                         mtow.AssignCommands();
                         return;
                     }
@@ -68,13 +69,13 @@ namespace wpfTest.GameLogic
         /// from it
         /// </summary>
         /// <param name="endDistance">Distance to the target when the unit stops moving.</param>
-        private void AssignMovementTo(List<Unit> units, Vector2 target, float endDistance, Game game)
+        private void AssignMovementTo(Players player, List<Unit> units, Vector2 target, float endDistance, Game game)
         {
-            MoveToCommandAssignment mto=new MoveToCommandAssignment(units.ToList(), target, endDistance);
-            mto.Process(game);
+            MoveToCommandAssignment mto=new MoveToCommandAssignment(player, units.ToList(), target, Movement.GROUND, endDistance);
+            mto.Process(game.Map.GetObstacleMap(mto.Movement));
             mto.AssignCommands();
-            MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units.ToList(), target, endDistance);
-            mtow.Process(game);
+            MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(player, units.ToList(), target, endDistance);
+            //mtow.Process(game);
             mtow.AssignCommands();
         }
     }
@@ -92,17 +93,17 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Assigns a new instance of the command assignment for this ability and returns it.
         /// </summary>
-        public void AssignCommands(List<Unit> units, Unit target, Game game)
+        public void AssignCommands(Players player, List<Unit> units, Unit target, Game game)
         {
             //move to the target until the minimal distance is reached
             if (!(AbilityType == AbilityType.MOVE_TO) && !(AbilityType == AbilityType.MOVE_TOWARDS))
-                AssignMovementTo(units, target.Pos, Distance, game);
+                AssignMovementTo(player, units, target.Pos, Distance, game);
 
             switch (AbilityType)
             {
                 case AbilityType.ATTACK:
-                    AttackCommandAssignment mto = new AttackCommandAssignment(units.ToList(), target);
-                    mto.Process(game);
+                    AttackCommandAssignment mto = new AttackCommandAssignment(player, units.ToList(), target);
+                    //mto.Process(game);
                     mto.AssignCommands();
                     return;
             }
@@ -115,13 +116,13 @@ namespace wpfTest.GameLogic
         /// from it
         /// </summary>
         /// <param name="endDistance">Distance to the target when the unit stops moving.</param>
-        private void AssignMovementTo(List<Unit> units, Vector2 target, float endDistance, Game game)
+        private void AssignMovementTo(Players player, List<Unit> units, Vector2 target, float endDistance, Game game)
         {
-            MoveToCommandAssignment mto = new MoveToCommandAssignment(units.ToList(), target, endDistance);
-            mto.Process(game);
+            MoveToCommandAssignment mto = new MoveToCommandAssignment(player, units.ToList(), target,Movement.GROUND, endDistance);
+            mto.Process(game.Map.GetObstacleMap(mto.Movement));
             mto.AssignCommands();
-            MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(units.ToList(), target, endDistance);
-            mtow.Process(game);
+            MoveTowardsCommandAssignment mtow = new MoveTowardsCommandAssignment(player, units.ToList(), target, endDistance);
+            //mtow.Process(game);
             mtow.AssignCommands();
         }
     }

@@ -75,13 +75,13 @@ namespace wpfTest
                         {
                             TargetPointAbility move = (TargetPointAbility)UnitCommandsInput
                                 .AbilityTypeToAbility[AbilityType.MOVE_TO];
-                            move.AssignCommands(SelectedUnits.Units, clickCoords, game);
+                            move.AssignCommands(Players.PLAYER0,SelectedUnits.Units, clickCoords, game);
                         }
                         else
                         {
                             TargetUnitAbility attack = (TargetUnitAbility)UnitCommandsInput
                                 .AbilityTypeToAbility[AbilityType.ATTACK];
-                            attack.AssignCommands(SelectedUnits.Units, targ, game);
+                            attack.AssignCommands(Players.PLAYER0,SelectedUnits.Units, targ, game);
                         }
                     }
                     else
@@ -89,7 +89,7 @@ namespace wpfTest
                         Ability abil = UnitCommandsInput.Ability;
                         if (abil.GetType() == typeof(TargetPointAbility))
                         {
-                            ((TargetPointAbility)abil).AssignCommands(SelectedUnits.Units,
+                            ((TargetPointAbility)abil).AssignCommands(Players.PLAYER0,SelectedUnits.Units,
                                 UnitCommandsInput.MapCoordinates, game);
                         }
                         /*else if (abil.GetType() == typeof(TargetUnitAbility))

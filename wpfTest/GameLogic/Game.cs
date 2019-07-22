@@ -19,7 +19,7 @@ namespace wpfTest
         public Map Map { get; }
         public FlowMap FlowMap { get; set; }
         public bool GameEnded { get; set; }
-        Player[] Players { get; }
+        public Dictionary<Players,Player> Players { get; }
         public GameQuerying GameQuerying { get; }
         public Player CurrentPlayer { get; private set; }
         Physics physics;
@@ -32,9 +32,9 @@ namespace wpfTest
             FlowMap = new FlowMap(Map.Width, Map.Height);
             FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap(Movement.GROUND));
             GameEnded = false;
-            Players = new Player[2];
-            Players[0] = new Player(wpfTest.Players.PLAYER0);
-            Players[1] = new Player(wpfTest.Players.PLAYER1);
+            Players = new Dictionary<Players, Player>();
+            Players.Add(wpfTest.Players.PLAYER0, new Player(wpfTest.Players.PLAYER0));
+            Players.Add(wpfTest.Players.PLAYER1, new Player(wpfTest.Players.PLAYER1));
             CurrentPlayer = Players[0];
             GameQuerying = GameQuerying.GetGameQuerying();
             physics = Physics.GetPhysics();
@@ -44,9 +44,9 @@ namespace wpfTest
         public List<Unit> GetUnits()
         {
             List<Unit> units=new List<Unit>();
-            foreach(Player player in Players)
+            foreach(Players player in Enum.GetValues(typeof(Players)))
             {
-                units=units.Concat(player.Units).ToList();
+                units=units.Concat(Players[player].Units).ToList();
             }
             return units;
         }
@@ -60,15 +60,15 @@ namespace wpfTest
                 Map.UpdateObstacleMaps();
             }
 
-            //physics
             List<Unit> units = GetUnits();
+            //commands
             foreach (Unit u in units)
             {
                 u.PerformCommand(this, deltaT);
                 u.AnimationStep(deltaT);
             }
+            //physics
             physics.PushOutsideOfObstacles(Map, units,deltaT);
-            //physics.Repulse(Map,units,deltaT);
             physics.PushAway(Map, units, deltaT);
             physics.Step(Map,units,deltaT);
             physics.ResetCollision(units);
@@ -87,10 +87,10 @@ namespace wpfTest
             }
 
             //remove dead units
-            Players[0].RemoveDeadUnits();
-            Players[1].RemoveDeadUnits();
+            Players[wpfTest.Players.PLAYER0].RemoveDeadUnits();
+            Players[wpfTest.Players.PLAYER1].RemoveDeadUnits();
 
-            //update player's view of the map
+            //update players' view of the map
             if (visibilityGenerator.Done)
             {
                 Players[0].VisibilityMap = visibilityGenerator.VisibilityMap;
@@ -98,6 +98,23 @@ namespace wpfTest
                 visibilityGenerator.SetNewTask(Map.GetViewMap(),
                     Players[0].Units.Select((unit) => unit.UnitView).ToList());
             }
+            Players[wpfTest.Players.PLAYER0].UpdateMap(Map);
+            Players[wpfTest.Players.PLAYER0].UpdateMap(Map);
+            MovementGenerator mg = MovementGenerator.GetMovementGenerator();
+            if (Players[wpfTest.Players.PLAYER0].MapChanged)
+            {
+                mg.SetMapChanged(wpfTest.Players.PLAYER0, Map.ObstacleMaps);
+                
+            }
+            if (Players[wpfTest.Players.PLAYER1].MapChanged)
+            {
+                mg.SetMapChanged(wpfTest.Players.PLAYER1, Map.ObstacleMaps);
+
+            }
+
+            //update move to commands
+            mg.UseProcessedCommands();
+
         }
     }
 }
