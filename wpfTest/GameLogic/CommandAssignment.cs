@@ -95,33 +95,28 @@ namespace wpfTest.GameLogic
         }
     }*/
 
-    public class MoveToCommandAssignment : MovementCommandAssignment
+    public abstract class MoveToCommandAssignment : MovementCommandAssignment
     {
-        public override bool Invalid(Game game) => game.Players[Player].MapView[(int)target.X, (int)target.Y].Blocked;
-        private Vector2 target;
-        private float goalDistance;//distance where the unit stops moving
-        private bool usesAttackDistance;
-        private FlowMap flowMap;
+        protected float goalDistance;//distance where the unit stops moving
+        protected FlowMap flowMap;
+        /// <summary>
+        /// If enemy in range, cancel commands and attack the enemy.
+        /// </summary>
+        protected bool interruptable;
+        public abstract Vector2 TargetPoint { get; }
         public Movement Movement { get; }
         /// <summary>
         /// True if there are units that are currently using this command.
         /// </summary>
         public bool Active { get; set; }
 
-        public MoveToCommandAssignment(Players player, List<Unit> units, Vector2 target, Movement movement, float goalDistance=0.1f,
-            bool usesAttackDistance=false)
+        public MoveToCommandAssignment(Players player, List<Unit> units, Movement movement, float goalDistance=0.1f, bool interruptable=true)
             : base(player,units)
         {
-            this.target = target;
             this.goalDistance = goalDistance;
-            this.usesAttackDistance = usesAttackDistance;
             Movement = movement;
             Active = false;
-        }
-
-        public override Command NewInstance(Unit commandedEntity)
-        {
-            return new MoveToCommand(commandedEntity, target, null, minStoppingDistance, goalDistance);
+            this.interruptable = interruptable;
         }
 
         public void Process(ObstacleMap obst)
@@ -129,7 +124,7 @@ namespace wpfTest.GameLogic
             Stopwatch sw = new Stopwatch();
             sw.Start();
             //todo: separete units to different groups by their movement
-            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(obst, target);
+            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(obst, TargetPoint);
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
         }
@@ -152,7 +147,44 @@ namespace wpfTest.GameLogic
         }
     }
 
-    
+    public class MoveToPointCommandAssignment : MoveToCommandAssignment
+    {
+        public override bool Invalid(Game game) => game.Players[Player].MapView[(int)target.X, (int)target.Y].Blocked;
+        public Vector2 target;
+        public override Vector2 TargetPoint => target;
+
+        public MoveToPointCommandAssignment(Players player, List<Unit> units, Vector2 target, Movement movement, float goalDistance = 0.1f, bool interruptable=true)
+            : base(player, units,movement,goalDistance,interruptable)
+        {
+            this.target = target;
+        }
+        
+        public override Command NewInstance(Unit commandedEntity)
+        {
+            return new MoveToPointCommand(commandedEntity, target, null, minStoppingDistance, goalDistance);
+        }
+    }
+
+    public class MoveToUnitCommandAssignment : MoveToCommandAssignment
+    {
+        public override bool Invalid(Game game) => targetUnit.IsDead;
+        public Unit targetUnit;
+        public override Vector2 TargetPoint => targetUnit.Pos;
+        public bool UsesAttackDistance { get; }
+
+        public MoveToUnitCommandAssignment(Players player, List<Unit> units, Unit targetUnit, Movement movement, float goalDistance = 0.1f,
+            bool usesAttackDistance=false, bool interruptable=true)
+            : base(player, units, movement, goalDistance, interruptable)
+        {
+            this.targetUnit = targetUnit;
+            UsesAttackDistance = usesAttackDistance;
+        }
+
+        public override Command NewInstance(Unit commandedEntity)
+        {
+            return new MoveToUnitCommand(commandedEntity, targetUnit, null, minStoppingDistance, goalDistance,UsesAttackDistance);
+        }
+    }
 
     public class AttackCommandAssignment : CommandAssignment
     {

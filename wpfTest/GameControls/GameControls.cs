@@ -65,7 +65,7 @@ namespace wpfTest
                     //SelectedUnits.SetCommand(new MoveTowardsCommandFactory(UnitCommandsInput.MapCoordinates));
                     //SelectedUnits.SetCommand(new MoveToCommandAssignment(UnitCommandsInput.MapCoordinates,game));
                     Vector2 clickCoords = UnitCommandsInput.MapCoordinates;
-                    Unit targ=GameQuerying.GetGameQuerying().SelectUnits(
+                    Unit targ=GameQuerying.GetGameQuerying().SelectRectUnits(
                         game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y), (unit) => true)
                         .FirstOrDefault();
                     if (!UnitCommandsInput.AbilitySelected)

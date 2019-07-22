@@ -138,7 +138,11 @@ namespace wpfTest
         {
             if (!IsDead)
             {
+                //clear the queue
+                RemoveFromAllCommandsAssignments();
                 CommandQueue.Clear();
+
+                //set new command
                 CommandQueue.Enqueue(command);
             }
         }
@@ -160,6 +164,14 @@ namespace wpfTest
                 if(c.Creator!=null)
                     c.Creator.Units.Remove(this);
             }
+        }
+
+        /// <summary>
+        /// Distance between closest parts of unit circles of the units.
+        /// </summary>
+        public float DistanceTo(Unit u)
+        {
+            return (this.Pos - u.Pos).Length - this.Range - u.Range;
         }
     }
 

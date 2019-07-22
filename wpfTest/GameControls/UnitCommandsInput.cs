@@ -38,7 +38,7 @@ namespace wpfTest
             AbilityTypeToAbility.Add(AbilityType.MOVE_TO,
                 new TargetPointAbility(AbilityType.MOVE_TO, 0.1f));
             AbilityTypeToAbility.Add(AbilityType.ATTACK,
-                 new TargetUnitAbility(AbilityType.ATTACK, -1.2f, true));
+                 new TargetUnitAbility(AbilityType.ATTACK, 1.2f, true));
         }
 
         public void NewPoint(Vector2 mousePos)

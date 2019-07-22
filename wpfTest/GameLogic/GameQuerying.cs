@@ -12,7 +12,7 @@ namespace wpfTest
         public static GameQuerying GetGameQuerying()=>new GameQuerying(); 
         private GameQuerying() { }
 
-        public List<Unit> SelectUnits(Game game, Rect area, Func<Unit,bool> unitProperty)
+        public List<Unit> SelectRectUnits(Game game, Rect area, Func<Unit,bool> unitProperty)
         {
             List<Unit> selected = new List<Unit>();
             foreach (Unit unit in game.GetUnits().Where(unitProperty))
@@ -28,7 +28,18 @@ namespace wpfTest
 
         }
 
-        
+        public List<Unit> SelectUnits(Game game, Func<Unit, bool> unitProperty)
+        {
+            List<Unit> selected = new List<Unit>();
+            foreach (Unit unit in game.GetUnits().Where(unitProperty))
+            {
+                selected.Add(unit);
+            }
+            return selected;
+
+        }
+
+
 
         public Node[,] SelectNodes(Map map, Rect area)
         {

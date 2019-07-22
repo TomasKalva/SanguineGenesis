@@ -25,19 +25,6 @@ namespace wpfTest.GameLogic
             UsesAttackDistance = usesAttackDistance;
         }
 
-        /// <summary>
-        /// Assigns commands to units to move to the target until they are at most the goalDistance
-        /// from it
-        /// </summary>
-        /// <param name="endDistance">Distance to the target when the unit stops moving.</param>
-        protected void AssignMovementTo(Players player, List<Unit> units, Vector2 target, Game game)
-        {
-            //create new instace of move to command assignment and set it to all units
-            MoveToCommandAssignment mto = new MoveToCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance, UsesAttackDistance);
-            mto.AssignCommands();
-            //add the command assignment to movement generator to create the flowmap asynchronously
-            MovementGenerator.GetMovementGenerator().AddNewCommand(Players.PLAYER0, mto);
-        }
     }
 
     public class TargetPointAbility:Ability
@@ -53,14 +40,14 @@ namespace wpfTest.GameLogic
         {
             //move to the target until the minimal distance is reached
             if(!(AbilityType==AbilityType.MOVE_TO))
-                AssignMovementTo(player, units, target, game);
+                AssignMovementToPoint(player, units, target, game);
 
             switch (AbilityType)
             {
                 case AbilityType.MOVE_TO:
                     {
                         //create new instace of move to command assignment and set it to all units
-                        MoveToCommandAssignment mto = new MoveToCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance, UsesAttackDistance);
+                        MoveToCommandAssignment mto = new MoveToPointCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance,true);
                         mto.AssignCommands();
                         //add the command assignment to movement generator to create the flowmap asynchronously
                         MovementGenerator.GetMovementGenerator().AddNewCommand(Players.PLAYER0,mto);
@@ -68,6 +55,20 @@ namespace wpfTest.GameLogic
                     }
             }
             throw new NotImplementedException("Implementation for " + AbilityType + " in the method " + nameof(AssignCommands) + "is missing!");
+        }
+
+        /// <summary>
+        /// Assigns commands to units to move to the target until they are at most the goalDistance
+        /// from it
+        /// </summary>
+        /// <param name="endDistance">Distance to the target when the unit stops moving.</param>
+        protected void AssignMovementToPoint(Players player, List<Unit> units, Vector2 target, Game game)
+        {
+            //create new instace of move to command assignment and set it to all units
+            MoveToCommandAssignment mto = new MoveToPointCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance);
+            mto.AssignCommands();
+            //add the command assignment to movement generator to create the flowmap asynchronously
+            MovementGenerator.GetMovementGenerator().AddNewCommand(Players.PLAYER0, mto);
         }
     }
 
@@ -85,7 +86,7 @@ namespace wpfTest.GameLogic
         {
             //move to the target until the minimal distance is reached
             if (!(AbilityType == AbilityType.MOVE_TO))
-                AssignMovementTo(player, units, target.Pos, game);
+                AssignMovementToUnit(player, units, target, game);
 
             switch (AbilityType)
             {
@@ -95,7 +96,19 @@ namespace wpfTest.GameLogic
                     return;
             }
             throw new NotImplementedException("Implementation for " + AbilityType + " in the method " + nameof(AssignCommands) + "is missing!");
+        }
 
+        /// <summary>
+        /// Assigns commands to units to move to the target unit until they are at most the Distance required
+        /// by this ability from it.
+        /// </summary>
+        protected void AssignMovementToUnit(Players player, List<Unit> units, Unit target, Game game)
+        {
+            //create new instace of move to command assignment and set it to all units
+            MoveToCommandAssignment mto = new MoveToUnitCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance, UsesAttackDistance);
+            mto.AssignCommands();
+            //add the command assignment to movement generator to create the flowmap asynchronously
+            MovementGenerator.GetMovementGenerator().AddNewCommand(Players.PLAYER0, mto);
         }
     }
 
