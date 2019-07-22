@@ -26,21 +26,19 @@ namespace wpfTest
         {
             State = UnitsCommandInputState.IDLE;
             MapCoordinates = new Vector2();
-            AbilityType = AbilityType.MOVE_TOWARDS;
+            AbilityType = AbilityType.MOVE_TO;
             AbilitySelected = false;
 
             //initialize keyToAbilityType
             keyToAbilityType = new Dictionary<Key, AbilityType>();
-            keyToAbilityType.Add(Key.Escape, AbilityType.MOVE_TOWARDS);
+            keyToAbilityType.Add(Key.Escape, AbilityType.MOVE_TO);
 
             //initialize abilityTypeToAbility
             AbilityTypeToAbility = new Dictionary<AbilityType, Ability>();
-            AbilityTypeToAbility.Add(AbilityType.MOVE_TOWARDS,
-                new TargetPointAbility(AbilityType.MOVE_TOWARDS, 1.41f));
             AbilityTypeToAbility.Add(AbilityType.MOVE_TO,
-                new TargetPointAbility(AbilityType.MOVE_TO, -1f));
+                new TargetPointAbility(AbilityType.MOVE_TO, 0.1f));
             AbilityTypeToAbility.Add(AbilityType.ATTACK,
-                 new TargetUnitAbility(AbilityType.ATTACK, 1.2f));
+                 new TargetUnitAbility(AbilityType.ATTACK, -1.2f, true));
         }
 
         public void NewPoint(Vector2 mousePos)

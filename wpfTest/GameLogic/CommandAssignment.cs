@@ -76,7 +76,7 @@ namespace wpfTest.GameLogic
         }
     }
 
-    public class MoveTowardsCommandAssignment : MovementCommandAssignment
+    /*public class MoveTowardsCommandAssignment : MovementCommandAssignment
     {
         public override bool Invalid(Game game)=> game.Players[Player].MapView[(int)target.X, (int)target.Y].Blocked;
         private Vector2 target;
@@ -93,13 +93,14 @@ namespace wpfTest.GameLogic
         {
             return new MoveTowardsCommand(commandedEntity, target, minStoppingDistance, endDistance);
         }
-    }
+    }*/
 
     public class MoveToCommandAssignment : MovementCommandAssignment
     {
         public override bool Invalid(Game game) => game.Players[Player].MapView[(int)target.X, (int)target.Y].Blocked;
         private Vector2 target;
-        private float endDistance;//distance where the unit stops moving
+        private float goalDistance;//distance where the unit stops moving
+        private bool usesAttackDistance;
         private FlowMap flowMap;
         public Movement Movement { get; }
         /// <summary>
@@ -107,18 +108,20 @@ namespace wpfTest.GameLogic
         /// </summary>
         public bool Active { get; set; }
 
-        public MoveToCommandAssignment(Players player, List<Unit> units, Vector2 target, Movement movement, float endDistance=1.42f)
+        public MoveToCommandAssignment(Players player, List<Unit> units, Vector2 target, Movement movement, float goalDistance=0.1f,
+            bool usesAttackDistance=false)
             : base(player,units)
         {
             this.target = target;
-            this.endDistance = endDistance;
+            this.goalDistance = goalDistance;
+            this.usesAttackDistance = usesAttackDistance;
             Movement = movement;
             Active = false;
         }
 
         public override Command NewInstance(Unit commandedEntity)
         {
-            return new MoveToCommand(commandedEntity, target, null, minStoppingDistance, endDistance);
+            return new MoveToCommand(commandedEntity, target, null, minStoppingDistance, goalDistance);
         }
 
         public void Process(ObstacleMap obst)
@@ -148,6 +151,8 @@ namespace wpfTest.GameLogic
             }
         }
     }
+
+    
 
     public class AttackCommandAssignment : CommandAssignment
     {

@@ -73,7 +73,7 @@ namespace wpfTest
 
     }
 
-    public class MoveTowardsCommand : MovementCommand
+    /*public class MoveTowardsCommand : MovementCommand
     {
         public Vector2 TargetPoint;
         private float endDistance;//distance where the unit stops moving
@@ -107,36 +107,75 @@ namespace wpfTest
         {
             return (TargetPoint-CommandedEntity.Pos).Length < minStoppingDistance;
         }
-    }
+    }*/
     
     public class MoveToCommand : MovementCommand
     {
+        /// <summary>
+        /// If the distance to the target is higher than this, flowmap will be used. 
+        /// Otherwise unit will walk straight to the target.
+        /// </summary>
+        private const float FLOWMAP_DISTANCE = 1.41f;
+
+        /// <summary>
+        /// Flowmap used for navigation. It can be set after the command was assigned.
+        /// </summary>
         private FlowMap flowMap;
+        /// <summary>
+        /// Point on the map where the units should go.
+        /// </summary>
         private Vector2 targetPos;
-        private float endDistance;//distance where the unit stops moving
+        /// <summary>
+        /// Distance where the unit stops moving.
+        /// </summary>
+        private float goalDistance;
+        /// <summary>
+        /// True if instead of goalDistance should be used the units AttackDistance.
+        /// </summary>
+        private bool usesAttackDistance;
 
 
-        public MoveToCommand(Unit commandedEntity, Vector2 targetPos, FlowMap flowMap, float minStoppingDistance, float endDistance=1.42f) 
+        public MoveToCommand(Unit commandedEntity, Vector2 targetPos, FlowMap flowMap, float minStoppingDistance, float goalDistance=0.1f, bool usesAttackDistance=false) 
             : base(commandedEntity, minStoppingDistance)
         {
             this.flowMap = flowMap;
             this.targetPos = targetPos;
-            this.endDistance = endDistance;
+            this.goalDistance = goalDistance;
+            this.usesAttackDistance = usesAttackDistance;
         }
 
         public override bool PerformCommand(Game game, float deltaT)
         {
             ((MoveToCommandAssignment)Creator).Active = true;
-            //map wasn't set yet
+            //check if the map was set already
             if (flowMap == null)
                 return false;
 
-            CommandedEntity.Accelerate(flowMap.GetIntensity(CommandedEntity.Pos, CommandedEntity.Acceleration));
+            float dist = (CommandedEntity.Pos - targetPos).Length;
+            if (dist > FLOWMAP_DISTANCE)
+            {
+                //use flowmap
+                CommandedEntity.Accelerate(flowMap.GetIntensity(CommandedEntity.Pos, CommandedEntity.Acceleration));
+            }
+            else
+            {
+                //go in straight line
+                Vector2 direction = CommandedEntity.Pos.UnitDirectionTo(targetPos);
+                CommandedEntity.Accelerate(CommandedEntity.Acceleration * direction);
+            }
+            //update last four positions
             AddToLast4(CommandedEntity.Pos);
+            //set that entity want to move
             CommandedEntity.WantsToMove = true;
 
-            bool finished = (CommandedEntity.Pos - targetPos).Length <= endDistance;
+            bool finished;
+            if (usesAttackDistance)
+                finished= (CommandedEntity.Pos - targetPos).Length <= CommandedEntity.AttackDistance;
+            else
+                finished = (CommandedEntity.Pos - targetPos).Length <= goalDistance;
             
+            //command is finished if unit reached the goal distance or if it stayed at one
+            //place near the target position for a long time
             if (finished || (Last4TooClose(deltaT) && CanStop()))
             {
                 CommandedEntity.StopMoving = true;
