@@ -3,31 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
 using wpfTest.GUI;
 
-namespace wpfTest
+namespace wpfTest.GameLogic
 {
-    public class Unit
+    public class Unit:Entity
     {
-        public Vector2 Pos { get; set; }
+        public override Vector2 Pos { get; set; }
         public Vector2 Vel { get; set; }
+        public override float Size => 2 * Range;
         public float Range { get; }//range of the circle collider
-        public float ViewRange { get; }//how far the unit sees
         public bool CanBeMoved { get; set; }//false if the unit has to stand still
         public bool StopMoving { get; set; }//set to true to set WantsToMove to false after Move
         public bool WantsToMove { get; set; }//true if the unit has a target destination
         public bool IsInCollision { get; set; }//true if the unit is colliding with obstacles or other units
         public float MaxSpeed { get; }
         public float Acceleration { get; }
-        public CommandsGroup Group { get; set; }
-        public Queue<Command> CommandQueue { get; }
-        public UnitView UnitView => new UnitView(Pos, ViewRange);
-        public Players Owner { get; }
-        public UnitType UnitType { get; }
-        public AnimationState AnimationState { get; set; }
-        public float MaxHealth { get; set; }
-        public float Health { get; set; }
+        public override UnitView UnitView => new UnitView(Pos, ViewRange);
         public bool HasEnergy { get; }//true if the unit uses energy
         public float MaxEnergy { get; set; }
         public float Energy { get; set; }
@@ -37,79 +29,71 @@ namespace wpfTest
         public float AttackDamage { get; }
         public float AttackPeriod { get; }
         public float AttackDistance { get; }
-        public bool IsDead => Health <= 0;
-        public List<AbilityType> Abilities { get; }
 
-        public Unit(Players owner, UnitType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement=Movement.GROUND, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f,
-            float attackDamage=10f, float attackPeriod=0.9f, float attackDistance=0.2f)
+        public Unit(Players owner, EntityType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement = Movement.GROUND, float range = 0.5f, float viewRange = 6.0f, float maxSpeed = 2f, float acceleration = 4f,
+               float attackDamage = 10f, float attackPeriod = 0.9f, float attackDistance = 0.2f)
+            :base(owner, unitType, maxHealth, viewRange)
         {
-            Owner = owner;
             Pos = pos;
             Vel = new Vector2(0f, 0f);
             Range = range;
-            ViewRange = viewRange;
             CanBeMoved = true;
             IsInCollision = false;
             MaxSpeed = maxSpeed;
             Acceleration = acceleration;
             Group = null;
-            CommandQueue = new Queue<Command>();
-            UnitType = unitType;
             MaxHealth = maxHealth;
             Health = maxHealth;
             if (maxEnergy > 0)
                 HasEnergy = true;
             MaxEnergy = maxEnergy;
             Energy = maxEnergy;
-            AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(unitType));
             Direction = new Vector2(1f, 0f);
             Movement = movement;
             AttackDamage = attackDamage;
             AttackPeriod = attackPeriod;
             AttackDistance = attackDistance;
-            Abilities = new List<AbilityType>();
             Abilities.Add(AbilityType.MOVE_TO);
             Abilities.Add(AbilityType.ATTACK);
         }
-
-        public void PerformCommand(Game game, float deltaT)
-        {
-            if(CommandQueue.Any())
-            {
-                Command command = CommandQueue.Peek();
-                if (command.PerformCommand(game, deltaT))
-                {
-                    //if command is finished, remove it from the queue
-                    if(command.Creator!=null)
-                        command.Creator.Units.Remove(this);
-                    CommandQueue.Dequeue();
-                }
-            }
-        }
-
+        
+        /// <summary>
+        /// Unit moves using its velocity.
+        /// </summary>
         public void Move(Map map, float deltaT)
         {
-            Pos = new Vector2( 
-                Math.Max(Range, Math.Min(Pos.X + deltaT * Vel.X,map.Width-Range)),
-                Math.Max(Range, Math.Min(Pos.Y + deltaT * Vel.Y, map.Height-Range)));
-            if(WantsToMove && Vel.Length!=0)
+            Pos = new Vector2(
+                Math.Max(Range, Math.Min(Pos.X + deltaT * Vel.X, map.Width - Range)),
+                Math.Max(Range, Math.Min(Pos.Y + deltaT * Vel.Y, map.Height - Range)));
+            if (WantsToMove && Vel.Length != 0)
                 Direction = Vel;
-            if(StopMoving)
+            if (StopMoving)
             {
                 StopMoving = false;
                 WantsToMove = false;
             }
         }
-        
-        public float GetActualBottom(float imageBottom)
+
+        /// <summary>
+        /// Add acceleration to units velocity.
+        /// </summary>
+        /// <param name="acc"></param>
+        public void Accelerate(Vector2 acc)
+        {
+            Vel += acc;
+            float l = Vel.Length;
+            if (l > MaxSpeed && l != 0)
+                Vel = (MaxSpeed / l) * Vel;
+        }
+        public override float GetActualBottom(float imageBottom)
             => Math.Min(Pos.Y - Range, Pos.Y - imageBottom);
-        public float GetActualTop(float imageHeight, float imageBottom)
-            => Math.Max(Pos.Y + Range, Pos.Y - imageBottom+imageHeight);
-        public float GetActualLeft(float imageLeft)
+        public override float GetActualTop(float imageHeight, float imageBottom)
+            => Math.Max(Pos.Y + Range, Pos.Y - imageBottom + imageHeight);
+        public override float GetActualLeft(float imageLeft)
             => Math.Min(Pos.X - Range, Pos.X - imageLeft);
-        public float GetActualRight(float imageWidth, float imageLeft)
+        public override float GetActualRight(float imageWidth, float imageLeft)
             => Math.Max(Pos.X + Range, Pos.X - imageLeft + imageWidth);
-        public Rect GetActualRect(ImageAtlas atlas)
+        public override Rect GetActualRect(ImageAtlas atlas)
         {
             Animation anim = atlas.GetAnimation(UnitType);
             return new Rect(
@@ -119,76 +103,18 @@ namespace wpfTest
                 Math.Max(Pos.Y + Range, Pos.Y - anim.LeftBottom.Y + anim.Height));
         }
 
-        public float Left => Pos.X - Range;
-        public float Right => Pos.X + Range;
-        public float Bottom => Pos.Y - Range;
-        public float Top => Pos.Y + Range;
-
-        public void Accelerate(Vector2 acc)
+        public override float Left => Pos.X - Range;
+        public override float Right => Pos.X + Range;
+        public override float Bottom => Pos.Y - Range;
+        public override float Top => Pos.Y + Range;
+        
+        public override float DistanceTo(Entity e)
         {
-            Vel += acc;
-            float l= Vel.Length;
-            if (l>MaxSpeed && l!=0)
-                Vel = (MaxSpeed / l)*Vel;
+            Unit u = e as Unit;
+            if (u != null)
+                return (this.Pos - u.Pos).Length - this.Range - u.Range;
+            else
+                throw new NotImplementedException();
         }
-
-        public void AddCommand(Command command)
-        {
-            if(!IsDead)
-                CommandQueue.Enqueue(command);
-        }
-
-        public void SetCommand(Command command)
-        {
-            if (!IsDead)
-            {
-                //clear the queue
-                RemoveFromAllCommandsAssignments();
-                CommandQueue.Clear();
-
-                //set new command
-                CommandQueue.Enqueue(command);
-            }
-        }
-
-        public void AnimationStep(float deltaT)
-        {
-            AnimationState.Step(deltaT);
-        }
-
-        /// <summary>
-        /// Removes referece to this unit from all CommandsAssignments.
-        /// </summary>
-        public void RemoveFromAllCommandsAssignments()
-        {
-            foreach(Command c in CommandQueue)
-            {
-                //it is enough to remove unit from CommandAssignment because
-                //there is no other reference to the Command other than this queue
-                c.RemoveFromCreator();
-            }
-            CommandQueue.Clear();
-        }
-
-        /// <summary>
-        /// Distance between closest parts of unit circles of the units.
-        /// </summary>
-        public float DistanceTo(Unit u)
-        {
-            return (this.Pos - u.Pos).Length - this.Range - u.Range;
-        }
-    }
-
-    public enum UnitType
-    {
-        TIGER,
-        BAOBAB
-    }
-
-    public enum Movement
-    {
-        GROUND,
-        WATER,
-        GROUND_WATER
     }
 }

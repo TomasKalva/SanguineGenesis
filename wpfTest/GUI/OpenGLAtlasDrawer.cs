@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using wpfTest.GameLogic;
 using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
 using static wpfTest.MainWindow;
@@ -496,7 +497,7 @@ namespace wpfTest
 
             for(int i=0;i<visUnits.Count;i++)
             {                
-                Unit current = visUnits[i];
+                Entity current = visUnits[i];
                 //buffer indices
                 int index = i * 6 * 3;
                 int texIndex = i * 6 * 2;
@@ -570,7 +571,7 @@ namespace wpfTest
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Unit> visUnits = mapView.GetVisibleUnits(game);
+            List<Entity> visUnits = mapView.GetVisibleEntities(game);
 
             int size = visUnits.Count;
             if (size == 0)
@@ -593,7 +594,7 @@ namespace wpfTest
 
             for (int i = 0; i < visUnits.Count; i++)
             {
-                Unit current = visUnits[i];
+                Entity current = visUnits[i];
                 //buffer indices
                 int index = i * 6 * 3;
                 int texIndex = i * 6 * 2;
@@ -623,7 +624,7 @@ namespace wpfTest
                     SetColor(colors, 1f, 1f, 1f, index, 6);
 
                     //texture coordinates
-                    if(current.FacingLeft)
+                    if(current is Unit && ((Unit)current).FacingLeft)
                         SetSquareTextureCoordinates(textureCoords, texIndex);
                     else
                         SetHorizFlipSquareTextureCoordinates(textureCoords, texIndex);
@@ -660,7 +661,7 @@ namespace wpfTest
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Unit> visUnits = mapView.GetVisibleUnits(game);
+            List<Entity> visUnits = mapView.GetVisibleEntities(game);
 
             int size = visUnits.Count;
             if (size == 0)
@@ -683,7 +684,7 @@ namespace wpfTest
 
             for (int i = 0; i < visUnits.Count; i++)
             {
-                Unit current = visUnits[i];
+                Entity current = visUnits[i];
                 //buffer indices
                 int index = i * 24 * 3;
                 int texIndex = i * 24 * 2;
@@ -696,7 +697,7 @@ namespace wpfTest
 
                 float unitSize = nodeSize;
 
-                float indicatorWidth = current.Range * 1.5f;
+                float indicatorWidth = current.Size * 0.75f;
                 float indicatorHeight = 0.15f;
                 {
                     Animation anim = current.AnimationState.Animation;
@@ -710,20 +711,24 @@ namespace wpfTest
                     //depth is from [2,3]
                     float depth = 2f + current.Pos.Y / game.Map.Height;
 
-                    if (current.HasEnergy)
+                    Unit u = current as Unit;
+                    if(u != null)
                     {
-                        //energy
-                        AddRectangle(left, bottom, right, top, indicatorImage, depth, index, vertices,
-                            index, colors, texIndex, textureCoords, atlasInd, texAtlas, 0f, 0f, 0f);
-                        index += 6 * 3;
-                        texIndex += 6 * 2;
-                        atlasInd += 6 * 4;
-                        float energyRight = Math.Max(left, left + (right - left) * current.Energy / current.MaxEnergy);
-                        AddRectangle(left, bottom, energyRight, top, indicatorImage, depth, index, vertices,
-                            index, colors, texIndex, textureCoords, atlasInd, texAtlas, 0f, 0f, 1f);
-                        index += 6 * 3;
-                        texIndex += 6 * 2;
-                        atlasInd += 6 * 4;
+                        if (u.HasEnergy)
+                        {
+                            //energy
+                            AddRectangle(left, bottom, right, top, indicatorImage, depth, index, vertices,
+                                index, colors, texIndex, textureCoords, atlasInd, texAtlas, 0f, 0f, 0f);
+                            index += 6 * 3;
+                            texIndex += 6 * 2;
+                            atlasInd += 6 * 4;
+                            float energyRight = Math.Max(left, left + (right - left) * u.Energy / u.MaxEnergy);
+                            AddRectangle(left, bottom, energyRight, top, indicatorImage, depth, index, vertices,
+                                index, colors, texIndex, textureCoords, atlasInd, texAtlas, 0f, 0f, 1f);
+                            index += 6 * 3;
+                            texIndex += 6 * 2;
+                            atlasInd += 6 * 4;
+                        }
                     }
 
                     //health

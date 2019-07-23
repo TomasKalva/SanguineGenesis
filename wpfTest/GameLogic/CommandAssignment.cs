@@ -18,15 +18,15 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Units whose commands will be affected by invalidation.
         /// </summary>
-        public List<Unit> Units { get; }
+        public List<Entity> Entities { get; }
         /// <summary>
         /// Whose units are performing this command.
         /// </summary>
         public Players Player { get; }
-        public CommandAssignment(Players player, List<Unit> units)
+        public CommandAssignment(Players player, List<Entity> units)
         {
             Player = player;
-            Units = units;
+            Entities = units;
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace wpfTest.GameLogic
         public virtual void DestroyIfInvalidated(Game game)
         {
             if(Invalid(game))
-                Units.Clear();
+                Entities.Clear();
         }
         /// <summary>
         /// Assigns commands to the units. All calculations that take long and can be pre-processed
@@ -47,7 +47,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public virtual void AssignCommands()
         {
-            foreach (Unit u in Units)
+            foreach (Entity u in Entities)
             {
                 Command com = NewInstance(u);
                 com.Creator = this;
@@ -57,15 +57,15 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Creates a new instance of the command with given commanded entity. 
         /// </summary>
-        public abstract Command NewInstance(Unit commandedEntity);
+        public abstract Command NewInstance(Entity commandedEntity);
     }
 
     public abstract class MovementCommandAssignment:CommandAssignment
     {
         protected float minStoppingDistance;
 
-        public MovementCommandAssignment(Players player, List<Unit> units)
-            : base(player,units)
+        public MovementCommandAssignment(Players player, List<Entity> units)
+            : base(player, units)
         {
             float volume = 0f;
             foreach(Unit u in units)
@@ -110,7 +110,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public bool Active { get; set; }
 
-        public MoveToCommandAssignment(Players player, List<Unit> units, Movement movement, float goalDistance=0.1f, bool interruptable=true)
+        public MoveToCommandAssignment(Players player, List<Entity> units, Movement movement, float goalDistance=0.1f, bool interruptable=true)
             : base(player,units)
         {
             this.goalDistance = goalDistance;
@@ -134,7 +134,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public virtual void UpdateCommands()
         {
-            foreach (Unit u in Units)
+            foreach (Entity u in Entities)
             {
                 //find command from this assignment
                 foreach(Command c in u.CommandQueue)
@@ -153,26 +153,26 @@ namespace wpfTest.GameLogic
         public Vector2 target;
         public override Vector2 TargetPoint => target;
 
-        public MoveToPointCommandAssignment(Players player, List<Unit> units, Vector2 target, Movement movement, float goalDistance = 0.1f, bool interruptable=true)
+        public MoveToPointCommandAssignment(Players player, List<Entity> units, Vector2 target, Movement movement, float goalDistance = 0.1f, bool interruptable=true)
             : base(player, units,movement,goalDistance,interruptable)
         {
             this.target = target;
         }
         
-        public override Command NewInstance(Unit commandedEntity)
+        public override Command NewInstance(Entity commandedEntity)
         {
-            return new MoveToPointCommand(commandedEntity, target, null, minStoppingDistance, goalDistance);
+            return new MoveToPointCommand((Unit)commandedEntity, target, null, minStoppingDistance, goalDistance);
         }
     }
 
     public class MoveToUnitCommandAssignment : MoveToCommandAssignment
     {
         public override bool Invalid(Game game) => targetUnit.IsDead;
-        public Unit targetUnit;
+        public Entity targetUnit;
         public override Vector2 TargetPoint => targetUnit.Pos;
         public bool UsesAttackDistance { get; }
 
-        public MoveToUnitCommandAssignment(Players player, List<Unit> units, Unit targetUnit, Movement movement, float goalDistance = 0.1f,
+        public MoveToUnitCommandAssignment(Players player, List<Entity> units, Entity targetUnit, Movement movement, float goalDistance = 0.1f,
             bool usesAttackDistance=false, bool interruptable=true)
             : base(player, units, movement, goalDistance, interruptable)
         {
@@ -180,24 +180,24 @@ namespace wpfTest.GameLogic
             UsesAttackDistance = usesAttackDistance;
         }
 
-        public override Command NewInstance(Unit commandedEntity)
+        public override Command NewInstance(Entity commandedEntity)
         {
-            return new MoveToUnitCommand(commandedEntity, targetUnit, null, minStoppingDistance, goalDistance,UsesAttackDistance);
+            return new MoveToUnitCommand((Unit)commandedEntity, targetUnit, null, minStoppingDistance, goalDistance,UsesAttackDistance);
         }
     }
 
     public class AttackCommandAssignment : CommandAssignment
     {
-        private Unit target;
+        private Entity target;
         public override bool Invalid(Game game) => target.IsDead;//dead units are no longer in the game
 
-        public AttackCommandAssignment(Players player, List<Unit> units, Unit target)
+        public AttackCommandAssignment(Players player, List<Entity> units, Entity target)
             : base(player, units)
         {
             this.target = target;
         }
 
-        public override Command NewInstance(Unit commandedEntity)
+        public override Command NewInstance(Entity commandedEntity)
         {
             return new AttackCommand(commandedEntity, target);
         }

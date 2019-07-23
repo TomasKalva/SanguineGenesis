@@ -41,12 +41,22 @@ namespace wpfTest
             visibilityGenerator = new VisibilityGenerator();
         }
 
-        public List<Unit> GetUnits()
+        public List<Entity> GetEntities()
         {
-            List<Unit> units=new List<Unit>();
+            List<Entity> units=new List<Entity>();
             foreach(Players player in Enum.GetValues(typeof(Players)))
             {
-                units=units.Concat(Players[player].Units.Where((u) => !u.IsDead).ToList()).ToList();
+                units=units.Concat(Players[player].Entities.Where((u) => !u.IsDead).ToList()).ToList();
+            }
+            return units;
+        }
+
+        public List<Unit> GetUnits()
+        {
+            var units = new List<Unit>();
+            foreach (Players player in Enum.GetValues(typeof(Players)))
+            {
+                units = units.Concat(Players[player].Units.Where((u) => !u.IsDead).ToList()).ToList();
             }
             return units;
         }
@@ -60,13 +70,14 @@ namespace wpfTest
                 Map.UpdateObstacleMaps();
             }
 
-            List<Unit> units = GetUnits();
+            List<Entity> entities = GetEntities();
             //commands
-            foreach (Unit u in units)
+            foreach (Entity e in entities)
             {
-                u.PerformCommand(this, deltaT);
-                u.AnimationStep(deltaT);
+                e.PerformCommand(this, deltaT);
+                e.AnimationStep(deltaT);
             }
+            List<Unit> units = GetUnits();
             //physics
             physics.PushOutsideOfObstacles(Map, units,deltaT);
             physics.PushAway(Map, units, deltaT);
@@ -79,7 +90,7 @@ namespace wpfTest
                 if(!u.CommandQueue.Any())
                 {
                     //unit isn't doing anything
-                    Unit en = units.Where((v) => v.Owner!=u.Owner && Map.Distance(u, v) < u.AttackDistance).FirstOrDefault();
+                    Entity en = units.Where((v) => v.Owner!=u.Owner && u.DistanceTo(v) < u.AttackDistance).FirstOrDefault();
                     if(en!=null)
                         u.CommandQueue.Enqueue(new AttackCommand(u, en));
                 }
@@ -96,7 +107,7 @@ namespace wpfTest
                 Players[0].VisibilityMap = visibilityGenerator.VisibilityMap;
 
                 visibilityGenerator.SetNewTask(Map.GetViewMap(),
-                    Players[0].Units.Select((unit) => unit.UnitView).ToList());
+                    Players[0].Entities.Select((unit) => unit.UnitView).ToList());
             }
             Players[wpfTest.Players.PLAYER0].UpdateMap(Map);
             Players[wpfTest.Players.PLAYER0].UpdateMap(Map);

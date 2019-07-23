@@ -17,7 +17,7 @@ namespace wpfTest.GUI
         private const int ATLAS_WIDTH = 2048;
         private const int ATLAS_HEIGHT = 2048;
         private Dictionary<Terrain, Rect> terrainImages;
-        private Dictionary<UnitType, Animation> unitsAnimations;
+        private Dictionary<EntityType, Animation> unitsAnimations;
 
         public Rect UnitCircle { get; }
         public Rect UnitsSelector { get; }
@@ -56,14 +56,14 @@ namespace wpfTest.GUI
 
         private void InitializeUnitsAnimations()
         {
-            unitsAnimations = new Dictionary<UnitType, Animation>();
-            AddUnitsAnimation(UnitType.TIGER,
+            unitsAnimations = new Dictionary<EntityType, Animation>();
+            AddUnitsAnimation(EntityType.TIGER,
                 new Vector2(0.75f, 0.2f),
                 1.5f, 1f, 0.5f,
                 new List<Rect>()
                 { ToRelative(GridToCoordinates(0,2,1.5f,1)),
                   ToRelative(GridToCoordinates(1.5f,2,1.5f,1))});
-            AddUnitsAnimation(UnitType.BAOBAB,
+            AddUnitsAnimation(EntityType.BAOBAB,
                 new Vector2(2.5f, 1.5f),
                 5, 6, 0.8f,
                 new List<Rect>()
@@ -78,7 +78,7 @@ namespace wpfTest.GUI
             terrainImages.Add(terrain, ToRelative(GridToCoordinates(left, bottom,width,height)));
         }
 
-        private void AddUnitsAnimation(UnitType unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
+        private void AddUnitsAnimation(EntityType unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
         {
             unitsAnimations.Add(unit, new Animation(leftBottom,width, height, animChangeTimeS, images));
         }
@@ -118,7 +118,7 @@ namespace wpfTest.GUI
         /// <summary>
         /// Get animation for the unit.
         /// </summary>
-        public Animation GetAnimation(UnitType unitType)
+        public Animation GetAnimation(EntityType unitType)
         {
             return unitsAnimations[unitType];
         }

@@ -14,7 +14,7 @@ namespace wpfTest
         public Dictionary<AbilityType, Ability> AbilityTypeToAbility { get; }
         public UnitsCommandInputState State { get; set; }
         public Vector2 MapCoordinates { get; private set; }
-        public Unit TargetedUnit { get; private set; }
+        public Entity TargetedUnit { get; private set; }
         private AbilityType abilityType;
         public AbilityType AbilityType { get { return abilityType; } set { abilityType = value; AbilitySelected = true; } }
         public bool AbilitySelected { get; set; }

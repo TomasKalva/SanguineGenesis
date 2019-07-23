@@ -9,28 +9,28 @@ namespace wpfTest
 {
     public class CommandsGroup
     {
-        public List<Unit> Units { get; private set; }
+        public List<Entity> Units { get; private set; }
 
         public CommandsGroup()
         {
-            Units = new List<Unit>();
+            Units = new List<Entity>();
         }
 
-        public void SetUnits(List<Unit> units)
+        public void SetUnits(List<Entity> units)
         {
-            foreach (Unit u in Units)
+            foreach (Entity u in Units)
                 u.Group = null;
             Units.Clear();
-            foreach (Unit u in units)
+            foreach (Entity u in units)
             {
                 Units.Add(u);
                 u.Group = this;
             }
         }
 
-        public void AddUnits(List<Unit> units)
+        public void AddUnits(List<Entity> units)
         {
-            foreach(Unit u in units)
+            foreach(Entity u in units)
                 if (!Units.Contains(u))
                 {
                     Units.Add(u);
@@ -38,9 +38,9 @@ namespace wpfTest
                 }
         }
 
-        public void RemoveUnits(List<Unit> units)
+        public void RemoveUnits(List<Entity> units)
         {
-            foreach (Unit u in units)
+            foreach (Entity u in units)
                 u.Group = null;
             Units.RemoveAll((unit) => units.Contains(unit));
         }
@@ -57,7 +57,7 @@ namespace wpfTest
         public void AddCommand(CommandAssignment commandFactory)
         {
             Units.RemoveAll((u) => u.IsDead);
-            foreach (Unit u in Units)
+            foreach (Entity u in Units)
                 u.AddCommand(commandFactory.NewInstance(u));
         }
 
@@ -68,7 +68,7 @@ namespace wpfTest
         public void SetCommand(CommandAssignment commandFactory)
         {
             Units.RemoveAll((u) => u.IsDead);
-            foreach (Unit u in Units)
+            foreach (Entity u in Units)
                 u.SetCommand(commandFactory.NewInstance(u));
         }
     }

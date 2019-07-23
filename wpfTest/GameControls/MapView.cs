@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic;
 using static wpfTest.MainWindow;
 
 namespace wpfTest
@@ -73,6 +74,16 @@ namespace wpfTest
 
             return game.GameQuerying.SelectPartOfMap(game.CurrentPlayer.VisibilityMap, ((IEntity)this).GetRect());
         }
+        
+        public List<Entity> GetVisibleEntities(Game game)
+        {
+            if (actualHeight == 0 || actualWidth == 0)
+                throw new InvalidOperationException(
+                    "The actual extents have to be specified before calling this method");
+
+            return game.GameQuerying.SelectRectEntities(game, ((IEntity)this).GetRect(), (unit) => true);
+        }
+
 
         public List<Unit> GetVisibleUnits(Game game)
         {

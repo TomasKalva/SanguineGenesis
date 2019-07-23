@@ -132,11 +132,11 @@ namespace wpfTest
             //gameControls.MapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
         }
 
-        private List<Unit> selectedUnits;
+        private List<Entity> selectedUnits;
         private Button[] unitButtons;
         private List<AbilityType> selectedUnitsAbilities;
         private Button[] abilityButtons;
-        private Unit selectedUnit;
+        private Entity selectedUnit;
         private Label[] selUnCommands;
 
         private void InitializeUnitPanel()
@@ -235,7 +235,7 @@ namespace wpfTest
             selectedUnits = gameControls.SelectedUnits.Units.Take(unitButtons.Length).ToList();
             //initialize list of abilities
             selectedUnitsAbilities.Clear();
-            foreach (Unit u in selectedUnits)
+            foreach (Entity u in selectedUnits)
                 foreach(AbilityType at in u.Abilities)
                     if (!selectedUnitsAbilities.Contains(at))
                         selectedUnitsAbilities.Add(at);
@@ -302,15 +302,19 @@ namespace wpfTest
             }
             else
             {
-                nameL.Content = selectedUnit.UnitType;
-                healthL.Content = selectedUnit.Health + "/" + selectedUnit.MaxHealth;
-                energyL.Content = selectedUnit.MaxEnergy > 0 ? selectedUnit.Energy + "/" + selectedUnit.MaxEnergy : "-";
-                sizeL.Content = selectedUnit.Range * 2;
-                viewRangeL.Content = selectedUnit.ViewRange;
-                maxSpeedL.Content = selectedUnit.MaxSpeed;
-                atDamageL.Content = selectedUnit.AttackDamage;
-                atPeriodL.Content = selectedUnit.AttackPeriod;
-                atDistanceL.Content = selectedUnit.AttackDistance;
+                Unit u = selectedUnit as Unit;
+                if (u != null)
+                {
+                    nameL.Content = u.UnitType;
+                    healthL.Content = u.Health + "/" + u.MaxHealth;
+                    energyL.Content = u.MaxEnergy > 0 ? u.Energy + "/" + u.MaxEnergy : "-";
+                    sizeL.Content = u.Range * 2;
+                    viewRangeL.Content = u.ViewRange;
+                    maxSpeedL.Content = u.MaxSpeed;
+                    atDamageL.Content = u.AttackDamage;
+                    atPeriodL.Content = u.AttackPeriod;
+                    atDistanceL.Content = u.AttackDistance;
+                }
                 //commands panel
                 List<Command> commands = selectedUnit.CommandQueue.ToList();
                 for (int i = 0; i < selUnCommands.Length; i++)

@@ -10,7 +10,7 @@ namespace wpfTest
 {
     public abstract class Command
     {
-        public Unit CommandedEntity { get; }
+        public Entity CommandedEntity { get; }
         /// <summary>
         /// Factory that created this command.
         /// </summary>
@@ -19,19 +19,20 @@ namespace wpfTest
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
         public abstract bool PerformCommand(Game game, float deltaT);
-        public Command(Unit commandedEntity)
+        public Command(Entity commandedEntity)
         {
             CommandedEntity = commandedEntity;
         }
         public virtual void RemoveFromCreator()
         {
             if (Creator != null)
-                Creator.Units.Remove(CommandedEntity);
+                Creator.Entities.Remove(CommandedEntity);
         }
     }
 
     public abstract class MovementCommand:Command
     {
+        public Unit CommandedUnit => (Unit)CommandedEntity;
         private static Vector2 INVALID { get; }
         protected float minStoppingDistance;
         public override abstract bool PerformCommand(Game game, float deltaT);
@@ -70,7 +71,7 @@ namespace wpfTest
                 float d2 = (last4positions[1] - last4positions[2]).Length;
                 float d3 = (last4positions[2] - last4positions[3]).Length;
 
-                if (d1 + d2 + d3 < CommandedEntity.MaxSpeed*deltaT/2)
+                if (d1 + d2 + d3 < CommandedUnit.MaxSpeed*deltaT/2)
                     return true;
             }
             return false;
@@ -123,13 +124,13 @@ namespace wpfTest
             //if an enemy is in attack range, attack it instead of other commands
             if(interruptable)
             {
-                Unit enemy = GameQuerying.GetGameQuerying().SelectUnits(game, 
+                Entity enemy = GameQuerying.GetGameQuerying().SelectUnits(game, 
                     (u) => u.Owner!=CommandedEntity.Owner 
-                            && CommandedEntity.DistanceTo(u) <= CommandedEntity.AttackDistance).FirstOrDefault();
+                            && CommandedEntity.DistanceTo(u) <= CommandedUnit.AttackDistance).FirstOrDefault();
                 if(enemy!=null)
                 {
                     //attack the enemy
-                    CommandedEntity.StopMoving = true;
+                    CommandedUnit.StopMoving = true;
                     RemoveFromCreator();
                     CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy));
                     return false;//new command is already set
@@ -140,22 +141,22 @@ namespace wpfTest
             if (flowMap == null)
                 return false;
 
-            float dist = (CommandedEntity.Pos - TargetPoint).Length;
+            float dist = (CommandedUnit.Pos - TargetPoint).Length;
             if (dist > FLOWMAP_DISTANCE)
             {
                 //use flowmap
-                CommandedEntity.Accelerate(flowMap.GetIntensity(CommandedEntity.Pos, CommandedEntity.Acceleration));
+                CommandedUnit.Accelerate(flowMap.GetIntensity(CommandedUnit.Pos, CommandedUnit.Acceleration));
             }
             else
             {
                 //go in straight line
-                Vector2 direction = CommandedEntity.Pos.UnitDirectionTo(TargetPoint);
-                CommandedEntity.Accelerate(CommandedEntity.Acceleration * direction);
+                Vector2 direction = CommandedUnit.Pos.UnitDirectionTo(TargetPoint);
+                CommandedUnit.Accelerate(CommandedUnit.Acceleration * direction);
             }
             //update last four positions
-            AddToLast4(CommandedEntity.Pos);
+            AddToLast4(CommandedUnit.Pos);
             //set that entity want to move
-            CommandedEntity.WantsToMove = true;
+            CommandedUnit.WantsToMove = true;
 
             bool finished=Finished();
 
@@ -163,7 +164,7 @@ namespace wpfTest
             //place near the target position for a long time
             if (finished || (Last4TooClose(deltaT) && CanStop()))
             {
-                CommandedEntity.StopMoving = true;
+                CommandedUnit.StopMoving = true;
                 RemoveFromCreator();
                 return true;
             }
@@ -177,9 +178,12 @@ namespace wpfTest
             this.flowMap = flMap;
         }
 
+        /// <summary>
+        /// Returns true if the unit can stop because of being stuck.
+        /// </summary>
         private bool CanStop()
         {
-            return (TargetPoint - CommandedEntity.Pos).Length < minStoppingDistance;
+            return (TargetPoint - CommandedUnit.Pos).Length < minStoppingDistance;
         }
     }
 
@@ -199,7 +203,7 @@ namespace wpfTest
 
         public override bool Finished()
         {
-            return (TargetPoint - CommandedEntity.Pos).Length <= goalDistance;
+            return (TargetPoint - CommandedUnit.Pos).Length <= goalDistance;
         }
     }
 
@@ -208,14 +212,14 @@ namespace wpfTest
         /// <summary>
         /// Unit on the map to which the units should go.
         /// </summary>
-        private Unit targetUnit;
-        public override Vector2 TargetPoint => targetUnit.Pos;
+        private Entity targetUnit;
+        public override Vector2 TargetPoint => ((Unit)targetUnit).Pos;
         /// <summary>
         /// True if instead of goalDistance should be used the units AttackDistance.
         /// </summary>
         public bool UsesAttackDistance { get; }
 
-        public MoveToUnitCommand(Unit commandedEntity, Unit targetUnit, FlowMap flowMap, float minStoppingDistance, float goalDistance = 0.1f, bool usesAttackDistance=false)
+        public MoveToUnitCommand(Unit commandedEntity, Entity targetUnit, FlowMap flowMap, float minStoppingDistance, float goalDistance = 0.1f, bool usesAttackDistance=false)
             : base(commandedEntity, flowMap, minStoppingDistance, goalDistance)
         {
             this.targetUnit = targetUnit;
@@ -224,9 +228,9 @@ namespace wpfTest
 
         public override bool Finished()
         {
-            float dist = (targetUnit.Pos - CommandedEntity.Pos).Length - targetUnit.Range - CommandedEntity.Range;
+            float dist = CommandedUnit.DistanceTo(targetUnit);
             if (UsesAttackDistance)
-                return dist <= CommandedEntity.AttackDistance;
+                return dist <= CommandedUnit.AttackDistance;
             else
                 return dist <= goalDistance;
         }
@@ -234,10 +238,11 @@ namespace wpfTest
 
     public class AttackCommand : Command
     {
-        private Unit target;
+        public Unit CommandedUnit => (Unit)CommandedEntity;
+        private Entity target;
         private float timeUntilAttack;//time in s until this unit attacks
 
-        public AttackCommand(Unit commandedEntity, Unit target)
+        public AttackCommand(Entity commandedEntity, Entity target)
             : base(commandedEntity)
         {
             this.target = target;
@@ -249,23 +254,23 @@ namespace wpfTest
             //dead target cannont be attacked
             if (target.IsDead)
             {
-                CommandedEntity.CanBeMoved = true;
+                CommandedUnit.CanBeMoved = true;
                 return true;
             }
-            CommandedEntity.Direction = target.Pos - CommandedEntity.Pos;
+            CommandedUnit.Direction = ((Unit)target).Pos - CommandedUnit.Pos;
 
-            CommandedEntity.CanBeMoved = false;
+            CommandedUnit.CanBeMoved = false;
             timeUntilAttack += deltaT;
-            if (timeUntilAttack >= CommandedEntity.AttackPeriod)
+            if (timeUntilAttack >= CommandedUnit.AttackPeriod)
             {
-                timeUntilAttack -= CommandedEntity.AttackPeriod;
-                target.Health -= CommandedEntity.AttackDamage;
+                timeUntilAttack -= CommandedUnit.AttackPeriod;
+                target.Health -= CommandedUnit.AttackDamage;
             }
 
-            bool finished= game.Map.Distance(CommandedEntity, target) >= CommandedEntity.AttackDistance;
+            bool finished= CommandedEntity.DistanceTo(target) >= CommandedUnit.AttackDistance;
             if (finished)
             {
-                CommandedEntity.CanBeMoved = true;
+                CommandedUnit.CanBeMoved = true;
                 return true;
             }
             return false;

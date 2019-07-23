@@ -63,7 +63,7 @@ namespace wpfTest
                     break;
                 case UnitsCommandInputState.ABILITY:
                     Vector2 clickCoords = UnitCommandsInput.MapCoordinates;
-                    Unit targ=GameQuerying.GetGameQuerying().SelectRectUnits(
+                    Entity targ=GameQuerying.GetGameQuerying().SelectRectEntities(
                         game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y), (unit) => true)
                         .FirstOrDefault();
                     

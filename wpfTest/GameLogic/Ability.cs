@@ -36,7 +36,7 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Assigns a new instance of the command assignment for this ability and returns it.
         /// </summary>
-        public void AssignCommands(Players player, List<Unit> units, Vector2 target, Game game)
+        public void AssignCommands(Players player, List<Entity> units, Vector2 target, Game game)
         {
             //move to the target until the minimal distance is reached
             if(!(AbilityType==AbilityType.MOVE_TO))
@@ -62,7 +62,7 @@ namespace wpfTest.GameLogic
         /// from it
         /// </summary>
         /// <param name="endDistance">Distance to the target when the unit stops moving.</param>
-        protected void AssignMovementToPoint(Players player, List<Unit> units, Vector2 target, Game game)
+        protected void AssignMovementToPoint(Players player, List<Entity> units, Vector2 target, Game game)
         {
             //create new instace of move to command assignment and set it to all units
             MoveToCommandAssignment mto = new MoveToPointCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance);
@@ -82,7 +82,7 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Assigns a new instance of the command assignment for this ability and returns it.
         /// </summary>
-        public void AssignCommands(Players player, List<Unit> units, Unit target, Game game)
+        public void AssignCommands(Players player, List<Entity> units, Entity target, Game game)
         {
             //move to the target until the minimal distance is reached
             if (!(AbilityType == AbilityType.MOVE_TO))
@@ -102,7 +102,7 @@ namespace wpfTest.GameLogic
         /// Assigns commands to units to move to the target unit until they are at most the Distance required
         /// by this ability from it.
         /// </summary>
-        protected void AssignMovementToUnit(Players player, List<Unit> units, Unit target, Game game)
+        protected void AssignMovementToUnit(Players player, List<Entity> units, Entity target, Game game)
         {
             //create new instace of move to command assignment and set it to all units
             MoveToCommandAssignment mto = new MoveToUnitCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance, UsesAttackDistance);
