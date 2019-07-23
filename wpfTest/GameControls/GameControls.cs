@@ -62,13 +62,21 @@ namespace wpfTest
                     MapSelectorFrame = null;
                     break;
                 case UnitsCommandInputState.ABILITY:
-                    //SelectedUnits.SetCommand(new MoveTowardsCommandFactory(UnitCommandsInput.MapCoordinates));
-                    //SelectedUnits.SetCommand(new MoveToCommandAssignment(UnitCommandsInput.MapCoordinates,game));
                     Vector2 clickCoords = UnitCommandsInput.MapCoordinates;
                     Unit targ=GameQuerying.GetGameQuerying().SelectRectUnits(
                         game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y), (unit) => true)
                         .FirstOrDefault();
-                    if (!UnitCommandsInput.AbilitySelected)
+                    
+                    bool abilitySelected;
+                    Ability abil;
+                    lock (UnitCommandsInput)
+                    {
+                        abilitySelected = UnitCommandsInput.AbilitySelected;
+                        abil = UnitCommandsInput.Ability;
+                        UnitCommandsInput.AbilitySelected = false;
+                    }
+
+                    if (!abilitySelected)
                     {
                         if (targ == null || 
                             targ.Owner == game.CurrentPlayer.PlayerID)//do not attack own units
@@ -86,29 +94,18 @@ namespace wpfTest
                     }
                     else
                     {
-                        Ability abil = UnitCommandsInput.Ability;
                         if (abil.GetType() == typeof(TargetPointAbility))
                         {
                             ((TargetPointAbility)abil).AssignCommands(Players.PLAYER0,SelectedUnits.Units,
                                 UnitCommandsInput.MapCoordinates, game);
                         }
-                        /*else if (abil.GetType() == typeof(TargetUnitAbility))
-                        {
-                            ((TargetUnitAbility)abil).AssignCommands(SelectedUnits.Units,
-                                UnitCommandsInput.MapCoordinates, game);
-                        }*/
-                        /*MoveToCommandAssignment mca = new MoveToCommandAssignment(SelectedUnits.Units,
-                            UnitCommandsInput.MapCoordinates);
-                        mca.Process(game);
-                        mca.AssignCommands();*/
-
-
                     }
                     //setting state from this thread can cause inconsistency of State
                     //todo: maybe encode states into byte - operations should be atomic => no inconsistent state
                     UnitCommandsInput.State = UnitsCommandInputState.SELECTED;
                     break;
             }
+            SelectedUnits.RemoveDead();
         }
     }
 }

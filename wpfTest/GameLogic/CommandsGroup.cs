@@ -45,6 +45,11 @@ namespace wpfTest
             Units.RemoveAll((unit) => units.Contains(unit));
         }
 
+        public void RemoveDead()
+        {
+            Units.RemoveAll((u) => u.IsDead);
+        }
+
         /// <summary>
         /// Adds a new command created by the factory to every entity in the group.
         /// </summary>

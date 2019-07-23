@@ -46,7 +46,7 @@ namespace wpfTest
             List<Unit> units=new List<Unit>();
             foreach(Players player in Enum.GetValues(typeof(Players)))
             {
-                units=units.Concat(Players[player].Units).ToList();
+                units=units.Concat(Players[player].Units.Where((u) => !u.IsDead).ToList()).ToList();
             }
             return units;
         }

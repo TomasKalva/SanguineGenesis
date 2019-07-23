@@ -76,43 +76,11 @@ namespace wpfTest
             return false;
         }
 
+        public override string ToString()
+        {
+            return "Move";
+        }
     }
-
-    /*public class MoveTowardsCommand : MovementCommand
-    {
-        public Vector2 TargetPoint;
-        private float endDistance;//distance where the unit stops moving
-
-        public MoveTowardsCommand(Unit commandedEntity, Vector2 targetPoint, float minStoppingDistance, float endDistance = 0.1f) 
-            : base(commandedEntity,minStoppingDistance)
-        {
-            TargetPoint = targetPoint;
-            this.endDistance = endDistance;
-        }
-
-        public override bool PerformCommand(Game game, float deltaT)
-        {
-            Vector2 direction = CommandedEntity.Pos.UnitDirectionTo(TargetPoint);
-            CommandedEntity.Accelerate(CommandedEntity.Acceleration*direction);
-            AddToLast4(CommandedEntity.Pos);
-            //return (TargetPoint - CommandedEntity.Pos).Length < endDistance; 
-
-            CommandedEntity.WantsToMove = true;
-
-            bool finished = (CommandedEntity.Pos - TargetPoint).Length <= endDistance;
-            if (finished || (Last4TooClose(deltaT) && CanStop()))
-            {
-                CommandedEntity.StopMoving = true;
-                return true;
-            }
-            return false;
-        }
-
-        private bool CanStop()
-        {
-            return (TargetPoint-CommandedEntity.Pos).Length < minStoppingDistance;
-        }
-    }*/
     
     public abstract class MoveToCommand : MovementCommand
     {
@@ -301,6 +269,11 @@ namespace wpfTest
                 return true;
             }
             return false;
+        }
+
+        public override string ToString()
+        {
+            return "Attack";
         }
     }
 }

@@ -14,15 +14,105 @@
             <sharpGL:OpenGLControl Name="openGLControl1" OpenGLDraw="OpenGLControl_OpenGLDraw" RenderContextType="FBO"
                                    MouseLeftButtonDown="openGLControl1_MouseLeftButtonDown" MouseLeftButtonUp="openGLControl1_MouseLeftButtonUp"
                                    MouseMove="openGLControl1_MouseMove" MouseRightButtonDown="openGLControl1_MouseRightButtonDown"/>
-        </Grid>
-        <!--<Grid Name="mapPanel">
-            <Canvas Name="tiles">
-                <Image Name="mapImage">
-                    <Image.LayoutTransform>
-                        <ScaleTransform x:Name="mapImageScaler" ScaleX="1" ScaleY="1"/>
-                    </Image.LayoutTransform>
-                </Image>
+            <!--<DataGridCellsPanel Width="50" Height="50">-->
+            <Canvas>
+                <Grid Name="unitInfoPanel" Width="200" Height="200" Background="Gray">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="Yellow" />
+                            <Setter Property="FontSize" Value="10" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </Grid.Resources>
+                    <Label Grid.Row="0" Grid.Column="0">Name:</Label>
+                    <Label Name="nameL" Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Label Grid.Row="1" Grid.Column="0">Health:</Label>
+                    <Label Name="healthL" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Label Grid.Row="2" Grid.Column="0">Energy:</Label>
+                    <Label Name="energyL" Grid.Row="2" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Label Grid.Row="3" Grid.Column="0">Size:</Label>
+                    <Label Name="sizeL" Grid.Row="3" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Label Grid.Row="4" Grid.Column="0">View range:</Label>
+                    <Label Name="viewRangeL" Grid.Row="4" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Label Grid.Row="5" Grid.Column="0">Max speed:</Label>
+                    <Label Name="maxSpeedL" Grid.Row="5" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Label Grid.Row="6" Grid.Column="0">Attack damage:</Label>
+                    <Label Name="atDamageL" Grid.Row="6" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Label Grid.Row="7" Grid.Column="0">Attack period:</Label>
+                    <Label Name="atPeriodL" Grid.Row="7" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Label Grid.Row="8" Grid.Column="0">Attack distance:</Label>
+                    <Label Name="atDistanceL" Grid.Row="8" Grid.Column="1" HorizontalContentAlignment="Center">50/75</Label>
+                    <Grid Name="commandsPanel" Grid.Row="9" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2">
+                        <Grid.Resources>
+                            <Style TargetType="Label">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="Black" />
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </Grid>
+                <Grid Name="unitPanel" Width="300" Height="188" Background="Black">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                </Grid>
+                <Grid Name="abilityPanel" Width="200" Height="200" Background="Gray">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                </Grid>
             </Canvas>
-        </Grid>-->
+        </Grid>
     </Grid>
 </Window>

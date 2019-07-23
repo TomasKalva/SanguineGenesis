@@ -38,6 +38,7 @@ namespace wpfTest
         public float AttackPeriod { get; }
         public float AttackDistance { get; }
         public bool IsDead => Health <= 0;
+        public List<AbilityType> Abilities { get; }
 
         public Unit(Players owner, UnitType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement=Movement.GROUND, float range = 0.5f, float viewRange=6.0f, float maxSpeed=2f, float acceleration=4f,
             float attackDamage=10f, float attackPeriod=0.9f, float attackDistance=0.2f)
@@ -66,6 +67,9 @@ namespace wpfTest
             AttackDamage = attackDamage;
             AttackPeriod = attackPeriod;
             AttackDistance = attackDistance;
+            Abilities = new List<AbilityType>();
+            Abilities.Add(AbilityType.MOVE_TO);
+            Abilities.Add(AbilityType.ATTACK);
         }
 
         public void PerformCommand(Game game, float deltaT)
@@ -161,9 +165,9 @@ namespace wpfTest
             {
                 //it is enough to remove unit from CommandAssignment because
                 //there is no other reference to the Command other than this queue
-                if(c.Creator!=null)
-                    c.Creator.Units.Remove(this);
+                c.RemoveFromCreator();
             }
+            CommandQueue.Clear();
         }
 
         /// <summary>
