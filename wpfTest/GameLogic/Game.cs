@@ -107,7 +107,7 @@ namespace wpfTest
                 Players[0].VisibilityMap = visibilityGenerator.VisibilityMap;
 
                 visibilityGenerator.SetNewTask(Map.GetViewMap(),
-                    Players[0].Entities.Select((unit) => unit.UnitView).ToList());
+                    Players[0].Entities.Select((unit) => unit.View).ToList());
             }
             Players[wpfTest.Players.PLAYER0].UpdateMap(Map);
             Players[wpfTest.Players.PLAYER0].UpdateMap(Map);

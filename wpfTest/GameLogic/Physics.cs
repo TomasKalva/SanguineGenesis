@@ -53,12 +53,12 @@ namespace wpfTest
                     if (u1.GetHashCode() < u2.GetHashCode())
                     {
 
-                        float dist = (u1.Pos - u2.Pos).Length;
+                        float dist = (u1.Center - u2.Center).Length;
                         //if two units get stuck on top of each other, move them apart
                         if (dist == 0)
                         {
                             Vector2 epsilon = new Vector2(0.1f, 0.1f);
-                            u1.Pos = u1.Pos + epsilon;
+                            u1.Position = u1.Center + epsilon;
                             dist = epsilon.Length;
                         }
                         float totalR = u1.Range + u2.Range;
@@ -66,24 +66,24 @@ namespace wpfTest
                         if (dist < totalR && dist != 0)
                         {
                             //push centres of the units from each other
-                            Vector2 dir12 = u1.Pos.UnitDirectionTo(u2.Pos);
+                            Vector2 dir12 = u1.Center.UnitDirectionTo(u2.Center);
                             Vector2 pushVec = (totalR - dist) / 2 * dir12;
                             if (u1.Owner != u2.Owner)
                             {
                                 if (u1.WantsToMove && !u2.WantsToMove)
                                 {
-                                    u1.Pos = u1.Pos - 2 * pushVec;
+                                    u1.Position = u1.Center - 2 * pushVec;
 
                                 }
                                 else if (u2.WantsToMove && !u1.WantsToMove)
                                 {
-                                    u2.Pos = u2.Pos + 2 * pushVec;
+                                    u2.Position = u2.Center + 2 * pushVec;
 
                                 }
                                 else
                                 {
-                                    u1.Pos = u1.Pos - pushVec;
-                                    u2.Pos = u2.Pos + pushVec;
+                                    u1.Position = u1.Center - pushVec;
+                                    u2.Position = u2.Center + pushVec;
 
                                 }
                             }
@@ -91,17 +91,17 @@ namespace wpfTest
                             {
                                 if(u1.CanBeMoved && !u2.CanBeMoved)
                                 {
-                                    u1.Pos = u1.Pos - 2 * pushVec;
+                                    u1.Position = u1.Center - 2 * pushVec;
 
                                 }
                                 else if (u2.CanBeMoved && !u1.CanBeMoved)
                                 {
-                                    u2.Pos = u2.Pos + 2 * pushVec;
+                                    u2.Position = u2.Center + 2 * pushVec;
                                 }
                                 else
                                 {
-                                    u1.Pos = u1.Pos - pushVec;
-                                    u2.Pos = u2.Pos + pushVec;
+                                    u1.Position = u1.Center - pushVec;
+                                    u2.Position = u2.Center + pushVec;
                                 }
                                 //u1.Accelerate((-unitAcc * deltaT) * dir12);
                                 //u2.Accelerate((unitAcc * deltaT) * dir12);
@@ -133,23 +133,23 @@ namespace wpfTest
                 {
                     case Movement.GROUND:
                         u.Accelerate(
-                            deltaT * gPMap.GetIntensity(u.Pos, terrainAcc)
+                            deltaT * gPMap.GetIntensity(u.Center, terrainAcc)
                             );
-                        if (gOMap.CollidingWithObstacle(u.Pos))
+                        if (gOMap.CollidingWithObstacle(u.Center))
                             u.IsInCollision = true;
                         break;
                     case Movement.WATER:
                         u.Accelerate(
-                            deltaT * wPMap.GetIntensity(u.Pos, terrainAcc)
+                            deltaT * wPMap.GetIntensity(u.Center, terrainAcc)
                             );
-                        if (wOMap.CollidingWithObstacle(u.Pos))
+                        if (wOMap.CollidingWithObstacle(u.Center))
                             u.IsInCollision = true;
                         break;
                     case Movement.GROUND_WATER:
                         u.Accelerate(
-                            deltaT * gwPMap.GetIntensity(u.Pos, terrainAcc)
+                            deltaT * gwPMap.GetIntensity(u.Center, terrainAcc)
                             );
-                        if (gwOMap.CollidingWithObstacle(u.Pos))
+                        if (gwOMap.CollidingWithObstacle(u.Center))
                             u.IsInCollision = true;
                         break;
                 }

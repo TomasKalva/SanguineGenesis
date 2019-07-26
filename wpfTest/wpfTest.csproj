@@ -69,6 +69,7 @@
     </ApplicationDefinition>
     <Compile Include="GameLogic\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
+    <Compile Include="GameLogic\Building.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\MovementGenerator.cs" />
     <Compile Include="GameLogic\Unit.cs" />

@@ -590,7 +590,7 @@ namespace wpfTest
             float[] texAtlas = new float[size * 6 * 4];
 
             //visible units have to be sorted to draw them properly
-            visUnits.Sort((u, v) => Math.Sign(v.Pos.Y - u.Pos.Y));
+            visUnits.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
 
             for (int i = 0; i < visUnits.Count; i++)
             {
@@ -610,13 +610,13 @@ namespace wpfTest
                     Animation anim = current.AnimationState.Animation;
 
                     //tile position
-                    float bottom = (current.Pos.Y - anim.LeftBottom.Y - viewBottom) * unitSize;
-                    float top = (current.Pos.Y - anim.LeftBottom.Y - viewBottom + anim.Height) * unitSize;
-                    float left = (current.Pos.X - anim.LeftBottom.X - viewLeft) * unitSize;
-                    float right = (current.Pos.X - anim.LeftBottom.X - viewLeft + anim.Width) * unitSize;
+                    float bottom = (current.Center.Y - anim.LeftBottom.Y - viewBottom) * unitSize;
+                    float top = (current.Center.Y - anim.LeftBottom.Y - viewBottom + anim.Height) * unitSize;
+                    float left = (current.Center.X - anim.LeftBottom.X - viewLeft) * unitSize;
+                    float right = (current.Center.X - anim.LeftBottom.X - viewLeft + anim.Width) * unitSize;
 
                     //depth is from [4,5]
-                    float depth = 4f + current.Pos.Y / game.Map.Height;
+                    float depth = 4f + current.Center.Y / game.Map.Height;
                     //vertices
                     SetSquareVertices(vertices, bottom, top, left, right, -depth, index);
 
@@ -680,7 +680,7 @@ namespace wpfTest
             float[] texAtlas = new float[size * 24 * 4];
 
             //visible units have to be sorted to draw the indicators properly
-            visUnits.Sort((u, v) => Math.Sign(v.Pos.Y - u.Pos.Y));
+            visUnits.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
 
             for (int i = 0; i < visUnits.Count; i++)
             {
@@ -703,13 +703,13 @@ namespace wpfTest
                     Animation anim = current.AnimationState.Animation;
 
                     //rectangle
-                    float bottom = (current.Pos.Y - anim.LeftBottom.Y - viewBottom + anim.Height) * unitSize;
-                    float top = (current.Pos.Y - anim.LeftBottom.Y - viewBottom + anim.Height + indicatorHeight) * unitSize;
-                    float left = (current.Pos.X - indicatorWidth/2f - viewLeft) * unitSize;
-                    float right = (current.Pos.X + indicatorWidth/2f - viewLeft) * unitSize;
+                    float bottom = (current.Center.Y - anim.LeftBottom.Y - viewBottom + anim.Height) * unitSize;
+                    float top = (current.Center.Y - anim.LeftBottom.Y - viewBottom + anim.Height + indicatorHeight) * unitSize;
+                    float left = (current.Center.X - indicatorWidth/2f - viewLeft) * unitSize;
+                    float right = (current.Center.X + indicatorWidth/2f - viewLeft) * unitSize;
 
                     //depth is from [2,3]
-                    float depth = 2f + current.Pos.Y / game.Map.Height;
+                    float depth = 2f + current.Center.Y / game.Map.Height;
 
                     Unit u = current as Unit;
                     if(u != null)

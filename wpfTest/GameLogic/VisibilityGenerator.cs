@@ -14,7 +14,7 @@ namespace wpfTest.GameLogic
     public class VisibilityGenerator
     {
         //inputs
-        private List<UnitView> views;
+        private List<View> views;
         private ObstacleMap obstMap;
         private bool newTask;
 
@@ -53,7 +53,7 @@ namespace wpfTest.GameLogic
         /// Set parameters for creating the visibility map. Does nothing if the current
         /// task is not done yet.
         /// </summary>
-        public void SetNewTask(ObstacleMap obstMap, List<UnitView> unitViews)
+        public void SetNewTask(ObstacleMap obstMap, List<View> unitViews)
         {
             if (newTask) return;
 

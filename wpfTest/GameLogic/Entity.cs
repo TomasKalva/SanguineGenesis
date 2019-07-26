@@ -10,12 +10,13 @@ namespace wpfTest
 {
     public abstract class Entity
     {
-        public abstract Vector2 Pos { get; set; }
-        public abstract float Size { get; }
+        public virtual Vector2 Center { get; }
+        public float Size => 2 * Range;
+        public abstract float Range { get; }//range of the circle collider
         public float ViewRange { get; }//how far the unit sees
         public CommandsGroup Group { get; set; }
         public Queue<Command> CommandQueue { get; }
-        public abstract UnitView UnitView { get; }
+        public View View => new View(Center, ViewRange);
         public Players Owner { get; }
         public EntityType UnitType { get; }
         public AnimationState AnimationState { get; set; }
@@ -51,18 +52,29 @@ namespace wpfTest
                 }
             }
         }
-        
-        public abstract float GetActualBottom(float imageBottom);
-        public abstract float GetActualTop(float imageHeight, float imageBottom);
-        public abstract float GetActualLeft(float imageLeft);
-        public abstract float GetActualRight(float imageWidth, float imageLeft);
-        public abstract Rect GetActualRect(ImageAtlas atlas);
 
+        public float GetActualBottom(float imageBottom)
+            => Math.Min(Center.Y - Range, Center.Y - imageBottom);
+        public float GetActualTop(float imageHeight, float imageBottom)
+            => Math.Max(Center.Y + Range, Center.Y - imageBottom + imageHeight);
+        public float GetActualLeft(float imageLeft)
+            => Math.Min(Center.X - Range, Center.X - imageLeft);
+        public float GetActualRight(float imageWidth, float imageLeft)
+            => Math.Max(Center.X + Range, Center.X - imageLeft + imageWidth);
+        public Rect GetActualRect(ImageAtlas atlas)
+        {
+            Animation anim = atlas.GetAnimation(UnitType);
+            return new Rect(
+                Math.Min(Center.X - Range, Center.X - anim.LeftBottom.X),
+                Math.Min(Center.Y - Range, Center.Y - anim.LeftBottom.Y),
+                Math.Max(Center.X + Range, Center.X - anim.LeftBottom.X + anim.Width),
+                Math.Max(Center.Y + Range, Center.Y - anim.LeftBottom.Y + anim.Height));
+        }
 
-        public abstract float Left { get; }
-        public abstract float Right { get; }
-        public abstract float Bottom { get; }
-        public abstract float Top { get; }
+        public float Left => Center.X - Range;
+        public float Right => Center.X + Range;
+        public float Bottom => Center.Y - Range;
+        public float Top => Center.Y + Range;
 
 
         public void AddCommand(Command command)
@@ -106,7 +118,15 @@ namespace wpfTest
         /// <summary>
         /// Distance between closest parts of the entities.
         /// </summary>
-        public abstract float DistanceTo(Entity u);
+
+        public float DistanceTo(Entity e)
+        {
+            Unit u = e as Unit;
+            if (u != null)
+                return (this.Center - u.Center).Length - this.Range - u.Range;
+            else
+                throw new NotImplementedException();
+        }
     }
 
     public enum EntityType

@@ -20,9 +20,9 @@ namespace wpfTest.GameLogic.Maps
             visible = new bool[width, height];
         }
 
-        public void FindVisibility(List<UnitView> units, ObstacleMap obstMap)
+        public void FindVisibility(List<View> units, ObstacleMap obstMap)
         {
-            foreach(UnitView v in units)
+            foreach(View v in units)
             {
                 AddVisibility(v, obstMap);
             }
@@ -31,7 +31,7 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// Set true to all squares visible by the unit.
         /// </summary>
-        public void AddVisibility(UnitView v, ObstacleMap obstMap)
+        public void AddVisibility(View v, ObstacleMap obstMap)
         {
             float viewRange = v.Range;
             int left = (int)(v.Pos.X - viewRange);

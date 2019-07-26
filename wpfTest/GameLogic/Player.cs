@@ -25,15 +25,21 @@ namespace wpfTest
 
         public void InitUnits()
         {
+
             Entities = new List<Entity>();
+
+            //if (PlayerID == Players.PLAYER1)
+            //    return;
+
+
             UnitFactory normalUnits = new UnitFactory(EntityType.TIGER, 0.5f,2f,2f,100,10);
             UnitFactory smallFastUnits = new UnitFactory(EntityType.TIGER, 0.25f, 3f, 3f,50,0);
             UnitFactory bigUnits = new UnitFactory(EntityType.BAOBAB, 1f, 2f, 4f,150,0);
             for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < 10; j++)
+                for (int j = 0; j < 30; j++)
                 {
-                    Entities.Add(normalUnits.NewInstance(PlayerID, new Vector2(20 + i*.25f,10+ j*.25f)));
+                    Entities.Add(smallFastUnits.NewInstance(PlayerID, new Vector2(20 + i*.25f,10+ j*.25f)));
                 }
             }
             Entities.Add(bigUnits.NewInstance(PlayerID, new Vector2(5f, 6f)));
@@ -45,7 +51,7 @@ namespace wpfTest
 
         public void UpdateVisibilityMap(ObstacleMap obstMap)
         {
-            VisibilityMap.FindVisibility(Entities.Select((unit) => unit.UnitView).ToList(), obstMap);
+            VisibilityMap.FindVisibility(Entities.Select((unit) => unit.View).ToList(), obstMap);
         }
 
         /// <summary>

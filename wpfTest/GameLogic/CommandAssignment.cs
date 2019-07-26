@@ -169,7 +169,7 @@ namespace wpfTest.GameLogic
     {
         public override bool Invalid(Game game) => targetUnit.IsDead;
         public Entity targetUnit;
-        public override Vector2 TargetPoint => targetUnit.Pos;
+        public override Vector2 TargetPoint => targetUnit.Center;
         public bool UsesAttackDistance { get; }
 
         public MoveToUnitCommandAssignment(Players player, List<Entity> units, Entity targetUnit, Movement movement, float goalDistance = 0.1f,

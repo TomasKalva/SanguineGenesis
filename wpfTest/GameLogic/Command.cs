@@ -141,20 +141,20 @@ namespace wpfTest
             if (flowMap == null)
                 return false;
 
-            float dist = (CommandedUnit.Pos - TargetPoint).Length;
+            float dist = (CommandedUnit.Center - TargetPoint).Length;
             if (dist > FLOWMAP_DISTANCE)
             {
                 //use flowmap
-                CommandedUnit.Accelerate(flowMap.GetIntensity(CommandedUnit.Pos, CommandedUnit.Acceleration));
+                CommandedUnit.Accelerate(flowMap.GetIntensity(CommandedUnit.Center, CommandedUnit.Acceleration));
             }
             else
             {
                 //go in straight line
-                Vector2 direction = CommandedUnit.Pos.UnitDirectionTo(TargetPoint);
+                Vector2 direction = CommandedUnit.Center.UnitDirectionTo(TargetPoint);
                 CommandedUnit.Accelerate(CommandedUnit.Acceleration * direction);
             }
             //update last four positions
-            AddToLast4(CommandedUnit.Pos);
+            AddToLast4(CommandedUnit.Center);
             //set that entity want to move
             CommandedUnit.WantsToMove = true;
 
@@ -183,7 +183,7 @@ namespace wpfTest
         /// </summary>
         private bool CanStop()
         {
-            return (TargetPoint - CommandedUnit.Pos).Length < minStoppingDistance;
+            return (TargetPoint - CommandedUnit.Center).Length < minStoppingDistance;
         }
     }
 
@@ -203,7 +203,7 @@ namespace wpfTest
 
         public override bool Finished()
         {
-            return (TargetPoint - CommandedUnit.Pos).Length <= goalDistance;
+            return (TargetPoint - CommandedUnit.Center).Length <= goalDistance;
         }
     }
 
@@ -213,7 +213,7 @@ namespace wpfTest
         /// Unit on the map to which the units should go.
         /// </summary>
         private Entity targetUnit;
-        public override Vector2 TargetPoint => ((Unit)targetUnit).Pos;
+        public override Vector2 TargetPoint => ((Unit)targetUnit).Center;
         /// <summary>
         /// True if instead of goalDistance should be used the units AttackDistance.
         /// </summary>
@@ -257,7 +257,7 @@ namespace wpfTest
                 CommandedUnit.CanBeMoved = true;
                 return true;
             }
-            CommandedUnit.Direction = ((Unit)target).Pos - CommandedUnit.Pos;
+            CommandedUnit.Direction = ((Unit)target).Center - CommandedUnit.Center;
 
             CommandedUnit.CanBeMoved = false;
             timeUntilAttack += deltaT;
