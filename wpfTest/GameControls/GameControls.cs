@@ -81,24 +81,21 @@ namespace wpfTest
                         if (targ == null || 
                             targ.Owner == game.CurrentPlayer.PlayerID)//do not attack own units
                         {
-                            TargetPointAbility move = (TargetPointAbility)UnitCommandsInput
-                                .AbilityTypeToAbility[AbilityType.MOVE_TO];
-                            move.AssignCommands(Players.PLAYER0,SelectedUnits.Units, clickCoords, game);
+                            MoveToPoint.Get.SetCommands(Players.PLAYER0,SelectedUnits.Units, clickCoords);
+                            //move.AssignCommands(Players.PLAYER0,SelectedUnits.Units, clickCoords, game);
                         }
                         else
                         {
-                            TargetUnitAbility attack = (TargetUnitAbility)UnitCommandsInput
-                                .AbilityTypeToAbility[AbilityType.ATTACK];
-                            attack.AssignCommands(Players.PLAYER0,SelectedUnits.Units, targ, game);
+                            Attack.Get.SetCommands(Players.PLAYER0,SelectedUnits.Units, targ);
                         }
                     }
                     else
                     {
-                        if (abil.GetType() == typeof(TargetPointAbility))
+                        /*if (abil.GetType() == typeof(TargetPointAbility))
                         {
                             ((TargetPointAbility)abil).AssignCommands(Players.PLAYER0,SelectedUnits.Units,
                                 UnitCommandsInput.MapCoordinates, game);
-                        }
+                        }*/
                     }
                     //setting state from this thread can cause inconsistency of State
                     //todo: maybe encode states into byte - operations should be atomic => no inconsistent state

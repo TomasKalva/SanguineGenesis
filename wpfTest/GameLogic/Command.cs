@@ -10,26 +10,114 @@ namespace wpfTest
 {
     public abstract class Command
     {
-        public Entity CommandedEntity { get; }
-        /// <summary>
-        /// Factory that created this command.
-        /// </summary>
-        public CommandAssignment Creator { get; set; }
         /// <summary>
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
         public abstract bool PerformCommand(Game game, float deltaT);
-        public Command(Entity commandedEntity)
+        /*public Command(Entity commandedEntity)
         {
             CommandedEntity = commandedEntity;
-        }
-        public virtual void RemoveFromCreator()
+        }*/
+        //public abstract Command NewInstance(Entity caster, ITargetable target);
+    }
+
+    public abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
+                                                                    where Target : ITargetable
+                                                                    where Abil:TargetAbility<Caster,Target>
+    {
+        public Caster CommandedEntity { get; }
+        public Target Targ { get; }
+
+        protected Command(Caster commandedEntity, Target target)
         {
-            if (Creator != null)
-                Creator.Entities.Remove(CommandedEntity);
+            CommandedEntity = commandedEntity;
+            Targ = target;
+        }
+        /*
+        public static Command NewInstance(Entity caster, ITargetable target)
+        {
+            return NewInstance((Caster)caster, (Target)target);
+        }
+
+        public static Command NewInstance(Caster caster, Target target) { throw new NotImplementedException(); }*/
+    }
+
+    public class AttackCommand : Command<Unit, Entity, Attack>
+    {
+        private float timeUntilAttack;//time in s until this unit attacks
+
+        private AttackCommand():base(null,null) => throw new NotImplementedException();
+        public AttackCommand(Unit commandedEntity, Entity target)
+            : base(commandedEntity, target)
+        {
+            this.timeUntilAttack = 0f;
+        }
+        
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            //dead target cannont be attacked
+            if (Targ.IsDead)
+            {
+                CommandedEntity.CanBeMoved = true;
+                return true;
+            }
+            CommandedEntity.Direction = ((Unit)Targ).Center - CommandedEntity.Center;
+
+            CommandedEntity.CanBeMoved = false;
+            timeUntilAttack += deltaT;
+            if (timeUntilAttack >= CommandedEntity.AttackPeriod)
+            {
+                timeUntilAttack -= CommandedEntity.AttackPeriod;
+                Targ.Health -= CommandedEntity.AttackDamage;
+            }
+
+            bool finished = CommandedEntity.DistanceTo(Targ) >= CommandedEntity.AttackDistance;
+            if (finished)
+            {
+                CommandedEntity.CanBeMoved = true;
+                return true;
+            }
+            return false;
         }
     }
 
+    public interface IComputable
+    {
+        MoveToCommandAssignment Creator { get; set; }
+    }
+
+    public class MoveToPointCommand : Command<Unit, Vector2, MoveToPoint>,IComputable
+    {
+        public MoveToCommandAssignment Creator { get; set; }
+        private MoveToLogic moveToLogic;
+        /// <summary>
+        /// Flowmap used for navigation. It can be set after the command was assigned.
+        /// </summary>
+        private FlowMap flowMap;
+
+        private MoveToPointCommand() : base(null, default(Vector2)) => throw new NotImplementedException();
+        public MoveToPointCommand(Unit commandedEntity, Vector2 target)
+            : base(commandedEntity, target)
+        {
+            moveToLogic = new MoveToLogic(CommandedEntity, null, 0,target);
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            return moveToLogic.Step(game, deltaT, flowMap);
+        }
+
+        public void UpdateFlowMap(FlowMap flowMap)
+        {
+            this.flowMap = flowMap;
+        }
+
+        public void RemoveFromCreator()
+        {
+            Creator.Units.Remove(CommandedEntity);
+        }
+    }
+    /*
     public abstract class MovementCommand:Command
     {
         public Unit CommandedUnit => (Unit)CommandedEntity;
@@ -81,97 +169,112 @@ namespace wpfTest
         {
             return "Move";
         }
-    }
+    }*/
     
-    public abstract class MoveToCommand : MovementCommand
+    public class MoveToLogic
     {
         /// <summary>
         /// If the distance to the target is higher than this, flowmap will be used. 
         /// Otherwise unit will walk straight to the target.
         /// </summary>
-        protected const float FLOWMAP_DISTANCE = 1.41f;
+        private const float FLOWMAP_DISTANCE = 1.41f;
 
+        /// <summary>
+        /// Moving unit.
+        /// </summary>
+        private Unit unit;
         /// <summary>
         /// Flowmap used for navigation. It can be set after the command was assigned.
         /// </summary>
-        protected FlowMap flowMap;
+        private FlowMap flowMap;
         /// <summary>
         /// Distance where the unit stops moving.
         /// </summary>
-        protected float goalDistance;
+        private float goalDistance;
         /// <summary>
-        /// Point on the map where the units should go.
+        /// Point on the map where the unit should go.
         /// </summary>
-        public abstract Vector2 TargetPoint { get; }
+        public ITargetable TargetPoint { get; set; }
         /// <summary>
         /// If enemy in range, cancel commands and attack the enemy.
         /// </summary>
-        protected bool interruptable;
+        private bool interruptable;
+        private float minStoppingDistance;
+        private bool usesAttackDistance;
+        private StuckBreaking stuckBreaking;
 
-        public MoveToCommand(Unit commandedEntity, FlowMap flowMap, float minStoppingDistance, float goalDistance=0.1f, bool usesAttackDistance=false, 
-            bool interruptable=true) 
-            : base(commandedEntity, minStoppingDistance)
+        public MoveToLogic(Unit unit, FlowMap flowMap, float minStoppingDistance, ITargetable target, float goalDistance = 0.1f, bool usesAttackDistance = false,
+            bool interruptable = true)
         {
+            this.unit = unit;
             this.flowMap = flowMap;
+            this.minStoppingDistance = minStoppingDistance;
             this.goalDistance = goalDistance;
+            this.usesAttackDistance = usesAttackDistance;
             this.interruptable = interruptable;
+            stuckBreaking = new StuckBreaking();
+            this.TargetPoint = target;
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public bool Step(Game game, float deltaT, FlowMap flowMap)
         {
-            ((MoveToCommandAssignment)Creator).Active = true;
-
+            //((MoveToCommandAssignment)Creator).Active = true;
+            
+            /*
             //if an enemy is in attack range, attack it instead of other commands
             if(interruptable)
             {
                 Entity enemy = GameQuerying.GetGameQuerying().SelectUnits(game, 
-                    (u) => u.Owner!=CommandedEntity.Owner 
-                            && CommandedEntity.DistanceTo(u) <= CommandedUnit.AttackDistance).FirstOrDefault();
+                    (u) => u.Owner!=unit.Owner 
+                            && unit.DistanceTo(u) <= unit.AttackDistance).FirstOrDefault();
                 if(enemy!=null)
                 {
                     //attack the enemy
-                    CommandedUnit.StopMoving = true;
+                    unit.StopMoving = true;
                     RemoveFromCreator();
-                    CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy));
+                    unit.SetCommand(new AttackCommand(unit, enemy));
                     return false;//new command is already set
                 }
-            }
+            }*/
 
             //check if the map was set already
             if (flowMap == null)
                 return false;
 
-            float dist = (CommandedUnit.Center - TargetPoint).Length;
+            float dist = (unit.Center - TargetPoint.Center).Length;
             if (dist > FLOWMAP_DISTANCE)
             {
                 //use flowmap
-                CommandedUnit.Accelerate(flowMap.GetIntensity(CommandedUnit.Center, CommandedUnit.Acceleration));
+                unit.Accelerate(flowMap.GetIntensity(unit.Center, unit.Acceleration));
             }
             else
             {
                 //go in straight line
-                Vector2 direction = CommandedUnit.Center.UnitDirectionTo(TargetPoint);
-                CommandedUnit.Accelerate(CommandedUnit.Acceleration * direction);
+                Vector2 direction = unit.Center.UnitDirectionTo(TargetPoint.Center);
+                unit.Accelerate(unit.Acceleration * direction);
             }
             //update last four positions
-            AddToLast4(CommandedUnit.Center);
+            stuckBreaking.AddToLast4(unit.Center);
             //set that entity want to move
-            CommandedUnit.WantsToMove = true;
+            unit.WantsToMove = true;
 
             bool finished=Finished();
 
             //command is finished if unit reached the goal distance or if it stayed at one
             //place near the target position for a long time
-            if (finished || (Last4TooClose(deltaT) && CanStop()))
+            if (finished || (stuckBreaking.Last4TooClose(deltaT, unit.MaxSpeed * deltaT / 2) && CanStop()))
             {
-                CommandedUnit.StopMoving = true;
-                RemoveFromCreator();
+                unit.StopMoving = true;
+                //RemoveFromCreator();
                 return true;
             }
             return false;
         }
 
-        public abstract bool Finished();
+        public bool Finished()
+        {
+            return (TargetPoint.Center - unit.Center).Length <= goalDistance;
+        }
 
         public void UpdateFlowMap(FlowMap flMap)
         {
@@ -183,10 +286,53 @@ namespace wpfTest
         /// </summary>
         private bool CanStop()
         {
-            return (TargetPoint - CommandedUnit.Center).Length < minStoppingDistance;
+            return (TargetPoint.Center - unit.Center).Length < minStoppingDistance;
         }
     }
 
+    public class StuckBreaking
+    {
+        private static Vector2 INVALID { get; }
+        private Vector2[] last4positions;
+        static StuckBreaking()
+        {
+            INVALID = new Vector2(-1, -1);
+        }
+        public StuckBreaking()
+        {
+            last4positions = new Vector2[4];
+            last4positions[0] = INVALID;
+            last4positions[1] = INVALID;
+            last4positions[2] = INVALID;
+            last4positions[3] = INVALID;
+        }
+
+        public void AddToLast4(Vector2 v)
+        {
+            last4positions[3] = last4positions[2];
+            last4positions[2] = last4positions[1];
+            last4positions[1] = last4positions[0];
+            last4positions[0] = v;
+        }
+
+        public bool Last4TooClose(float deltaT, float minDistSum)
+        {
+            if (last4positions[0] != INVALID &&
+                last4positions[1] != INVALID &&
+                last4positions[2] != INVALID &&
+                last4positions[3] != INVALID)
+            {
+                float d1 = (last4positions[0] - last4positions[1]).Length;
+                float d2 = (last4positions[1] - last4positions[2]).Length;
+                float d3 = (last4positions[2] - last4positions[3]).Length;
+
+                if (d1 + d2 + d3 < minDistSum)
+                    return true;
+            }
+            return false;
+        }
+    }
+    /*
     public class MoveToPointCommand:MoveToCommand
     {
         /// <summary>
@@ -205,8 +351,8 @@ namespace wpfTest
         {
             return (TargetPoint - CommandedUnit.Center).Length <= goalDistance;
         }
-    }
-
+    }*/
+    /*
     public class MoveToUnitCommand : MoveToCommand
     {
         /// <summary>
@@ -234,8 +380,9 @@ namespace wpfTest
             else
                 return dist <= goalDistance;
         }
-    }
+    }*/
 
+    /*
     public class AttackCommand : Command
     {
         public Unit CommandedUnit => (Unit)CommandedEntity;
@@ -280,5 +427,5 @@ namespace wpfTest
         {
             return "Attack";
         }
-    }
+    }*/
 }

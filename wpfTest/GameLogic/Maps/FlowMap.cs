@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic;
 
 namespace wpfTest
 {
@@ -61,8 +62,10 @@ namespace wpfTest
         public static bool IsValidValue(float val) => val >= MIN_VALID_VALUE;
     }
 
-    public struct Vector2
+    public struct Vector2:ITargetable
     {
+        Vector2 ITargetable.Center => this;
+
         public float X { get; set; }
         public float Y { get; set; }
 
@@ -106,5 +109,6 @@ namespace wpfTest
         }
 
         public float Length =>(float)Math.Sqrt(X * X + Y * Y);
+
     }
 }

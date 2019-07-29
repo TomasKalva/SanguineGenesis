@@ -8,7 +8,7 @@ using wpfTest.GUI;
 
 namespace wpfTest
 {
-    public abstract class Entity
+    public abstract class Entity:ITargetable
     {
         public virtual Vector2 Center { get; }
         public float Size => 2 * Range;
@@ -23,7 +23,7 @@ namespace wpfTest
         public float MaxHealth { get; set; }
         public float Health { get; set; }
         public bool IsDead => Health <= 0;
-        public List<AbilityType> Abilities { get; }
+        public List<Ability> Abilities { get; }
 
         public Entity(Players owner, EntityType unitType, float maxHealth, float viewRange=6.0f)
         {
@@ -35,7 +35,7 @@ namespace wpfTest
             MaxHealth = maxHealth;
             Health = maxHealth;
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(unitType));
-            Abilities = new List<AbilityType>();
+            Abilities = new List<Ability>();
         }
 
         public void PerformCommand(Game game, float deltaT)
@@ -46,8 +46,10 @@ namespace wpfTest
                 if (command.PerformCommand(game, deltaT))
                 {
                     //if command is finished, remove it from the queue
-                    if(command.Creator!=null)
-                        command.Creator.Entities.Remove(this);
+                    if(command is MoveToPointCommand)
+                    {
+                        ((MoveToPointCommand)command).RemoveFromCreator();
+                    }
                     CommandQueue.Dequeue();
                 }
             }
@@ -110,7 +112,7 @@ namespace wpfTest
             {
                 //it is enough to remove unit from CommandAssignment because
                 //there is no other reference to the Command other than this queue
-                c.RemoveFromCreator();
+                //c.RemoveFromCreator();
             }
             CommandQueue.Clear();
         }

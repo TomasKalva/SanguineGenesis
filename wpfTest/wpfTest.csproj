@@ -72,6 +72,7 @@
     <Compile Include="GameLogic\Building.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\MovementGenerator.cs" />
+    <Compile Include="GameLogic\MovementParameters.cs" />
     <Compile Include="GameLogic\Unit.cs" />
     <Compile Include="GameLogic\UnitView.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />

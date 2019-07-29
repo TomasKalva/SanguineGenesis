@@ -8,6 +8,7 @@ using wpfTest.GameLogic.Maps;
 
 namespace wpfTest.GameLogic
 {
+    /*
     /// <summary>
     /// Creates new instances of commands with parameters specified by the factory
     /// for the units that are using this factory. If the instace gets invalidated by
@@ -94,29 +95,38 @@ namespace wpfTest.GameLogic
             return new MoveTowardsCommand(commandedEntity, target, minStoppingDistance, endDistance);
         }
     }*/
-
-    public abstract class MoveToCommandAssignment : MovementCommandAssignment
-    {
+    
+    public class MoveToCommandAssignment
+    {/// <summary>
+     /// Units whose commands will be affected by invalidation.
+     /// </summary>
+        public List<Unit> Units { get; }
+        /// <summary>
+        /// Whose units are performing this command.
+        /// </summary>
+        public Players Player { get; }
         protected float goalDistance;//distance where the unit stops moving
         protected FlowMap flowMap;
         /// <summary>
         /// If enemy in range, cancel commands and attack the enemy.
         /// </summary>
         protected bool interruptable;
-        public abstract Vector2 TargetPoint { get; }
+        public ITargetable TargetPoint { get; }
         public Movement Movement { get; }
         /// <summary>
         /// True if there are units that are currently using this command.
         /// </summary>
         public bool Active { get; set; }
 
-        public MoveToCommandAssignment(Players player, List<Entity> units, Movement movement, float goalDistance=0.1f, bool interruptable=true)
-            : base(player,units)
+        public MoveToCommandAssignment(Players player, List<Unit> units, Movement movement, ITargetable target, float goalDistance=0.1f, bool interruptable=true)
         {
             this.goalDistance = goalDistance;
             Movement = movement;
             Active = false;
             this.interruptable = interruptable;
+            Player = player;
+            Units = units;
+            TargetPoint = target;
         }
 
         public void Process(ObstacleMap obst)
@@ -124,7 +134,7 @@ namespace wpfTest.GameLogic
             Stopwatch sw = new Stopwatch();
             sw.Start();
             //todo: separete units to different groups by their movement
-            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(obst, TargetPoint);
+            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(obst, TargetPoint.Center);
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
         }
@@ -134,22 +144,23 @@ namespace wpfTest.GameLogic
         /// </summary>
         public virtual void UpdateCommands()
         {
-            foreach (Entity u in Entities)
+            foreach (Unit u in Units)
             {
                 //find command from this assignment
                 foreach(Command c in u.CommandQueue)
                 {
-                    //update its flow map
-                    if (c.Creator == this)
-                        ((MoveToCommand)c).UpdateFlowMap(flowMap);
+                    MoveToPointCommand mtpc;
+                    if ((mtpc = c as MoveToPointCommand)!=null)
+                        //update its flow map
+                        if (mtpc.Creator == this)
+                            mtpc.UpdateFlowMap(flowMap);
                 }
             }
         }
     }
-
+    /*
     public class MoveToPointCommandAssignment : MoveToCommandAssignment
     {
-        public override bool Invalid(Game game) => game.Players[Player].MapView[(int)target.X, (int)target.Y].Blocked;
         public Vector2 target;
         public override Vector2 TargetPoint => target;
 
@@ -201,5 +212,5 @@ namespace wpfTest.GameLogic
         {
             return new AttackCommand(commandedEntity, target);
         }
-    }
+    }*/
 }

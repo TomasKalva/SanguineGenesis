@@ -52,8 +52,8 @@ namespace wpfTest.GameLogic
             AttackDamage = attackDamage;
             AttackPeriod = attackPeriod;
             AttackDistance = attackDistance;
-            Abilities.Add(AbilityType.MOVE_TO);
-            Abilities.Add(AbilityType.ATTACK);
+            Abilities.Add(MoveToPoint.Get);
+            Abilities.Add(Attack.Get);
         }
         
         /// <summary>

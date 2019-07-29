@@ -92,7 +92,7 @@ namespace wpfTest
                     //unit isn't doing anything
                     Entity en = units.Where((v) => v.Owner!=u.Owner && u.DistanceTo(v) < u.AttackDistance).FirstOrDefault();
                     if(en!=null)
-                        u.CommandQueue.Enqueue(new AttackCommand(u, en));
+                        u.CommandQueue.Enqueue(Attack.Get.NewCommand(u, en));
                 }
 
             }

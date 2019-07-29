@@ -134,14 +134,14 @@ namespace wpfTest
 
         private List<Entity> selectedUnits;
         private Button[] unitButtons;
-        private List<AbilityType> selectedUnitsAbilities;
+        private List<Ability> selectedUnitsAbilities;
         private Button[] abilityButtons;
         private Entity selectedUnit;
         private Label[] selUnCommands;
 
         private void InitializeUnitPanel()
         {
-            selectedUnitsAbilities = new List<AbilityType>();
+            selectedUnitsAbilities = new List<Ability>();
 
             //fill ui elements with buttons
             //units panel
@@ -179,10 +179,10 @@ namespace wpfTest
                   {
                       if (buttonInd < selectedUnitsAbilities.Count)
                       {
-                          AbilityType at = selectedUnitsAbilities[buttonInd];
+                          Ability at = selectedUnitsAbilities[buttonInd];
                           lock (gameControls.UnitCommandsInput)
                           {
-                              gameControls.UnitCommandsInput.AbilityType = at;
+                              gameControls.UnitCommandsInput.SelectedAbility = at;
                           }
                       }
                   };
@@ -236,7 +236,7 @@ namespace wpfTest
             //initialize list of abilities
             selectedUnitsAbilities.Clear();
             foreach (Entity u in selectedUnits)
-                foreach(AbilityType at in u.Abilities)
+                foreach(Ability at in u.Abilities)
                     if (!selectedUnitsAbilities.Contains(at))
                         selectedUnitsAbilities.Add(at);
             if (selectedUnits == null)

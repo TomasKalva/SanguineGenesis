@@ -39,7 +39,7 @@ namespace wpfTest
             {
                 for (int j = 0; j < 30; j++)
                 {
-                    Entities.Add(smallFastUnits.NewInstance(PlayerID, new Vector2(20 + i*.25f,10+ j*.25f)));
+                    Entities.Add(normalUnits.NewInstance(PlayerID, new Vector2(20 + i*.25f,10+ j*.25f)));
                 }
             }
             Entities.Add(bigUnits.NewInstance(PlayerID, new Vector2(5f, 6f)));

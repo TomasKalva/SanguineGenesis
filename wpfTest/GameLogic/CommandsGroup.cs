@@ -49,27 +49,29 @@ namespace wpfTest
         {
             Units.RemoveAll((u) => u.IsDead);
         }
-
+        /*
         /// <summary>
         /// Adds a new command created by the factory to every entity in the group.
         /// </summary>
-        /// <param name="commandFactory">Determines command type.</param>
-        public void AddCommand(CommandAssignment commandFactory)
+        /// <param name="ability">Determines command type.</param>
+        public void AddCommand(Ability ability, ITargetable target)
         {
             Units.RemoveAll((u) => u.IsDead);
-            foreach (Entity u in Units)
-                u.AddCommand(commandFactory.NewInstance(u));
+            ability.SetCommands(Players.PLAYER0,Units, target);
+            //foreach (Entity u in Units)
+            //    u.AddCommand(ability.NewInstance(u));
         }
 
         /// <summary>
         /// Sets a new command created by the factory to every entity in the group.
         /// </summary>
-        /// <param name="commandFactory">Determines command type.</param>
-        public void SetCommand(CommandAssignment commandFactory)
+        /// <param name="ability">Determines command type.</param>
+        public void SetCommand(Ability ability, ITargetable target)
         {
             Units.RemoveAll((u) => u.IsDead);
-            foreach (Entity u in Units)
-                u.SetCommand(commandFactory.NewInstance(u));
-        }
+            ability.SetCommands(Players.PLAYER0, Units, target);
+            //foreach (Entity u in Units)
+            //    u.SetCommand(commandFactory.NewInstance(u));
+        }*/
     }
 }

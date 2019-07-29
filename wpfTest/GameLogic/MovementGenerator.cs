@@ -91,7 +91,7 @@ namespace wpfTest.GameLogic
                     foreach (MoveToCommandAssignment c in commands)
                     {
                         //remove command assignment if there are no units listening to it
-                        if (!c.Entities.Any())
+                        if (!c.Units.Any())
                             toBeRemoved.Add(c);
                     }
                     Console.WriteLine("active commands: "+commands.Count);
