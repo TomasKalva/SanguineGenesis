@@ -62,7 +62,7 @@ namespace wpfTest
         public static bool IsValidValue(float val) => val >= MIN_VALID_VALUE;
     }
 
-    public struct Vector2:ITargetable
+    public struct Vector2: ITargetable, IMovementTarget
     {
         Vector2 ITargetable.Center => this;
 

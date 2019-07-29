@@ -77,6 +77,11 @@ namespace wpfTest.GameLogic
                         AddedCommands = false;
                     }
 
+                    //remove commands that don't need to be updated anymore
+                    Console.WriteLine("active commands: " + commands.Count);
+                    commands.RemoveAll((c) => c.Invalid);
+                    Console.WriteLine("active commands: " + commands.Count);
+
                     if (MapChanged)
                     {
                         inputs = commands.ToList();//we don't want the same reference
@@ -85,17 +90,6 @@ namespace wpfTest.GameLogic
 
                     if (inputs.Any())
                         Finished = false;
-
-                    //remove commands that don't need to be updated anymore
-                    var toBeRemoved = new List<MoveToCommandAssignment>();
-                    foreach (MoveToCommandAssignment c in commands)
-                    {
-                        //remove command assignment if there are no units listening to it
-                        if (!c.Units.Any())
-                            toBeRemoved.Add(c);
-                    }
-                    Console.WriteLine("active commands: "+commands.Count);
-                    commands.RemoveAll((c) => toBeRemoved.Contains(c));
                 }
             }
 

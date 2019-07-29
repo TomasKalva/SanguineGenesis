@@ -6,8 +6,19 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic
 {
-    struct MovementParameters
+    public interface IMovementParametrizing
     {
-
+        /// <summary>
+        /// Distance where the unit naturaly stops moving.
+        /// </summary>
+        float GoalDistance { get; }
+        /// <summary>
+        /// If enemy in range, cancel commands and attack the enemy.
+        /// </summary>
+        bool Interruptable { get; }
+        /// <summary>
+        /// True if the goal distance should be attack distance of the moving unit.
+        /// </summary>
+        bool UsesAttackDistance { get; }
     }
 }

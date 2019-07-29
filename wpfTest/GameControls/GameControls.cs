@@ -81,12 +81,12 @@ namespace wpfTest
                         if (targ == null || 
                             targ.Owner == game.CurrentPlayer.PlayerID)//do not attack own units
                         {
-                            MoveToPoint.Get.SetCommands(Players.PLAYER0,SelectedUnits.Units, clickCoords);
+                            MoveTo.Get.SetCommands(SelectedUnits.Units, clickCoords);
                             //move.AssignCommands(Players.PLAYER0,SelectedUnits.Units, clickCoords, game);
                         }
                         else
                         {
-                            Attack.Get.SetCommands(Players.PLAYER0,SelectedUnits.Units, targ);
+                            Attack.Get.SetCommands(SelectedUnits.Units, targ);
                         }
                     }
                     else

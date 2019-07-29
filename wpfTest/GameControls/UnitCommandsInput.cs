@@ -26,12 +26,12 @@ namespace wpfTest
         {
             State = UnitsCommandInputState.IDLE;
             MapCoordinates = new Vector2();
-            SelectedAbility = MoveToPoint.Get;
+            SelectedAbility = MoveTo.Get;
             AbilitySelected = false;
 
             //initialize keyToAbilityType
             keyToAbility = new Dictionary<Key, Ability>();
-            keyToAbility.Add(Key.Escape, MoveToPoint.Get);
+            keyToAbility.Add(Key.Escape, MoveTo.Get);
 
             //initialize abilityTypeToAbility
             /*AbilityTypeToAbility = new Dictionary<Ability, Ability>();

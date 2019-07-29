@@ -25,11 +25,13 @@ namespace wpfTest
                                                                     where Target : ITargetable
                                                                     where Abil:TargetAbility<Caster,Target>
     {
+        public Abil Ability { get; }
         public Caster CommandedEntity { get; }
         public Target Targ { get; }
 
-        protected Command(Caster commandedEntity, Target target)
+        protected Command(Caster commandedEntity, Target target, Abil ability)
         {
+            Ability = ability;
             CommandedEntity = commandedEntity;
             Targ = target;
         }
@@ -46,11 +48,12 @@ namespace wpfTest
     {
         private float timeUntilAttack;//time in s until this unit attacks
 
-        private AttackCommand():base(null,null) => throw new NotImplementedException();
+        private AttackCommand():base(null,null,null) => throw new NotImplementedException();
         public AttackCommand(Unit commandedEntity, Entity target)
-            : base(commandedEntity, target)
+            : base(commandedEntity, target, Attack.Get)
         {
             this.timeUntilAttack = 0f;
+
         }
         
         public override bool PerformCommand(Game game, float deltaT)
@@ -83,93 +86,46 @@ namespace wpfTest
 
     public interface IComputable
     {
-        MoveToCommandAssignment Creator { get; set; }
+        MoveToCommandAssignment Assignment { get; set; }
     }
 
-    public class MoveToPointCommand : Command<Unit, Vector2, MoveToPoint>,IComputable
+    public class MoveToPointCommand : Command<Unit, IMovementTarget, MoveTo>,IComputable
     {
-        public MoveToCommandAssignment Creator { get; set; }
+        public MoveToCommandAssignment Assignment { get; set; }
         private MoveToLogic moveToLogic;
         /// <summary>
         /// Flowmap used for navigation. It can be set after the command was assigned.
         /// </summary>
         private FlowMap flowMap;
+        
 
-        private MoveToPointCommand() : base(null, default(Vector2)) => throw new NotImplementedException();
-        public MoveToPointCommand(Unit commandedEntity, Vector2 target)
-            : base(commandedEntity, target)
+        private MoveToPointCommand() : base(null, null, null) => throw new NotImplementedException();
+        public MoveToPointCommand(Unit commandedEntity, IMovementTarget target, float minStoppingDistance, MoveTo ability)
+            : base(commandedEntity, target, ability)
         {
-            moveToLogic = new MoveToLogic(CommandedEntity, null, 0,target);
+            moveToLogic = new MoveToLogic(CommandedEntity, null, minStoppingDistance, target, Ability);
         }
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            return moveToLogic.Step(game, deltaT, flowMap);
+            //command immediately finishes if the assignment was invalidated
+            if (Assignment != null && Assignment.Invalid)
+                return true;
+
+            return moveToLogic.Step(game, deltaT, flowMap,this);
         }
+
 
         public void UpdateFlowMap(FlowMap flowMap)
         {
             this.flowMap = flowMap;
         }
 
-        public void RemoveFromCreator()
+        public void RemoveFromAssignment()
         {
-            Creator.Units.Remove(CommandedEntity);
+            Assignment.Units.Remove(CommandedEntity);
         }
     }
-    /*
-    public abstract class MovementCommand:Command
-    {
-        public Unit CommandedUnit => (Unit)CommandedEntity;
-        private static Vector2 INVALID { get; }
-        protected float minStoppingDistance;
-        public override abstract bool PerformCommand(Game game, float deltaT);
-        static MovementCommand()
-        {
-            INVALID = new Vector2(-1, -1);
-        }
-        public MovementCommand(Unit commandedEntity, float minStoppingDistance)
-            :base(commandedEntity)
-        {
-            this.minStoppingDistance = minStoppingDistance;
-            last4positions = new Vector2[4];
-            last4positions[0] = INVALID;
-            last4positions[1] = INVALID;
-            last4positions[2] = INVALID;
-            last4positions[3] = INVALID;
-        }
-        protected Vector2[] last4positions;
-
-        protected void AddToLast4(Vector2 v)
-        {
-            last4positions[3] = last4positions[2];
-            last4positions[2] = last4positions[1];
-            last4positions[1] = last4positions[0];
-            last4positions[0] = v;
-        }
-
-        protected bool Last4TooClose(float deltaT)
-        {
-            if (last4positions[0] != INVALID &&
-                last4positions[1] != INVALID &&
-                last4positions[2] != INVALID &&
-                last4positions[3] != INVALID)
-            {
-                float d1 = (last4positions[0] - last4positions[1]).Length;
-                float d2 = (last4positions[1] - last4positions[2]).Length;
-                float d3 = (last4positions[2] - last4positions[3]).Length;
-
-                if (d1 + d2 + d3 < CommandedUnit.MaxSpeed*deltaT/2)
-                    return true;
-            }
-            return false;
-        }
-
-        public override string ToString()
-        {
-            return "Move";
-        }
-    }*/
     
     public class MoveToLogic
     {
@@ -184,45 +140,37 @@ namespace wpfTest
         /// </summary>
         private Unit unit;
         /// <summary>
+        /// Point on the map where the unit should go.
+        /// </summary>
+        public ITargetable TargetPoint { get; }
+        /// <summary>
         /// Flowmap used for navigation. It can be set after the command was assigned.
         /// </summary>
         private FlowMap flowMap;
         /// <summary>
-        /// Distance where the unit stops moving.
+        /// Distance from the target when unit can stop if it gets stuck.
         /// </summary>
-        private float goalDistance;
-        /// <summary>
-        /// Point on the map where the unit should go.
-        /// </summary>
-        public ITargetable TargetPoint { get; set; }
-        /// <summary>
-        /// If enemy in range, cancel commands and attack the enemy.
-        /// </summary>
-        private bool interruptable;
         private float minStoppingDistance;
-        private bool usesAttackDistance;
-        private StuckBreaking stuckBreaking;
+        private IMovementParametrizing movementParametrizing;
+        private NoMovementDetection noMovementDetection;
 
-        public MoveToLogic(Unit unit, FlowMap flowMap, float minStoppingDistance, ITargetable target, float goalDistance = 0.1f, bool usesAttackDistance = false,
-            bool interruptable = true)
+        public MoveToLogic(Unit unit, FlowMap flowMap, float minStoppingDistance, IMovementTarget target, IMovementParametrizing movementParametrizing)
         {
             this.unit = unit;
             this.flowMap = flowMap;
             this.minStoppingDistance = minStoppingDistance;
-            this.goalDistance = goalDistance;
-            this.usesAttackDistance = usesAttackDistance;
-            this.interruptable = interruptable;
-            stuckBreaking = new StuckBreaking();
+            noMovementDetection = new NoMovementDetection();
             this.TargetPoint = target;
+            this.movementParametrizing = movementParametrizing;
         }
 
-        public bool Step(Game game, float deltaT, FlowMap flowMap)
+        public bool Step(Game game, float deltaT, FlowMap flowMap, MoveToPointCommand command)
         {
-            //((MoveToCommandAssignment)Creator).Active = true;
+            //set the command assignment to be active to increase its priority
+            command.Assignment.Active = true;
             
-            /*
             //if an enemy is in attack range, attack it instead of other commands
-            if(interruptable)
+            if(movementParametrizing.Interruptable)
             {
                 Entity enemy = GameQuerying.GetGameQuerying().SelectUnits(game, 
                     (u) => u.Owner!=unit.Owner 
@@ -231,11 +179,11 @@ namespace wpfTest
                 {
                     //attack the enemy
                     unit.StopMoving = true;
-                    RemoveFromCreator();
+                    command.RemoveFromAssignment();
                     unit.SetCommand(new AttackCommand(unit, enemy));
                     return false;//new command is already set
                 }
-            }*/
+            }
 
             //check if the map was set already
             if (flowMap == null)
@@ -254,18 +202,19 @@ namespace wpfTest
                 unit.Accelerate(unit.Acceleration * direction);
             }
             //update last four positions
-            stuckBreaking.AddToLast4(unit.Center);
-            //set that entity want to move
+            noMovementDetection.AddNextPosition(unit.Center);
+            //set that unit wants to move
             unit.WantsToMove = true;
 
             bool finished=Finished();
 
             //command is finished if unit reached the goal distance or if it stayed at one
             //place near the target position for a long time
-            if (finished || (stuckBreaking.Last4TooClose(deltaT, unit.MaxSpeed * deltaT / 2) && CanStop()))
+            if (finished 
+                || (noMovementDetection.NotMovingMuch(deltaT, unit.MaxSpeed * deltaT / 2) && CanStop()))
             {
                 unit.StopMoving = true;
-                //RemoveFromCreator();
+                command.RemoveFromAssignment();
                 return true;
             }
             return false;
@@ -273,7 +222,22 @@ namespace wpfTest
 
         public bool Finished()
         {
-            return (TargetPoint.Center - unit.Center).Length <= goalDistance;
+            Entity e;
+            if ((e=TargetPoint as Entity)==null)
+            {
+                //target is vector
+                //use distance between center of the unit and the point
+                return (TargetPoint.Center - unit.Center).Length <= movementParametrizing.GoalDistance;
+            }
+            else
+            {
+                //target is entity
+                //use distance between closest points of the entities
+                if(movementParametrizing.UsesAttackDistance)
+                    return unit.DistanceTo(e) <= unit.AttackDistance;
+                else
+                    return unit.DistanceTo(e) <= movementParametrizing.GoalDistance;
+            }
         }
 
         public void UpdateFlowMap(FlowMap flMap)
@@ -290,15 +254,18 @@ namespace wpfTest
         }
     }
 
-    public class StuckBreaking
+    /// <summary>
+    /// Detects if the unit is not moving much.
+    /// </summary>
+    public class NoMovementDetection
     {
         private static Vector2 INVALID { get; }
         private Vector2[] last4positions;
-        static StuckBreaking()
+        static NoMovementDetection()
         {
             INVALID = new Vector2(-1, -1);
         }
-        public StuckBreaking()
+        public NoMovementDetection()
         {
             last4positions = new Vector2[4];
             last4positions[0] = INVALID;
@@ -307,7 +274,7 @@ namespace wpfTest
             last4positions[3] = INVALID;
         }
 
-        public void AddToLast4(Vector2 v)
+        public void AddNextPosition(Vector2 v)
         {
             last4positions[3] = last4positions[2];
             last4positions[2] = last4positions[1];
@@ -315,7 +282,7 @@ namespace wpfTest
             last4positions[0] = v;
         }
 
-        public bool Last4TooClose(float deltaT, float minDistSum)
+        public bool NotMovingMuch(float deltaT, float minDistSum)
         {
             if (last4positions[0] != INVALID &&
                 last4positions[1] != INVALID &&
@@ -332,100 +299,4 @@ namespace wpfTest
             return false;
         }
     }
-    /*
-    public class MoveToPointCommand:MoveToCommand
-    {
-        /// <summary>
-        /// Point on the map where the units should go.
-        /// </summary>
-        private Vector2 targetPos;
-        public override Vector2 TargetPoint=>targetPos;
-
-        public MoveToPointCommand(Unit commandedEntity, Vector2 targetPos, FlowMap flowMap, float minStoppingDistance, float goalDistance = 0.1f)
-            : base(commandedEntity, flowMap, minStoppingDistance, goalDistance)
-        {
-            this.targetPos = targetPos;
-        }
-
-        public override bool Finished()
-        {
-            return (TargetPoint - CommandedUnit.Center).Length <= goalDistance;
-        }
-    }*/
-    /*
-    public class MoveToUnitCommand : MoveToCommand
-    {
-        /// <summary>
-        /// Unit on the map to which the units should go.
-        /// </summary>
-        private Entity targetUnit;
-        public override Vector2 TargetPoint => ((Unit)targetUnit).Center;
-        /// <summary>
-        /// True if instead of goalDistance should be used the units AttackDistance.
-        /// </summary>
-        public bool UsesAttackDistance { get; }
-
-        public MoveToUnitCommand(Unit commandedEntity, Entity targetUnit, FlowMap flowMap, float minStoppingDistance, float goalDistance = 0.1f, bool usesAttackDistance=false)
-            : base(commandedEntity, flowMap, minStoppingDistance, goalDistance)
-        {
-            this.targetUnit = targetUnit;
-            UsesAttackDistance = usesAttackDistance;
-        }
-
-        public override bool Finished()
-        {
-            float dist = CommandedUnit.DistanceTo(targetUnit);
-            if (UsesAttackDistance)
-                return dist <= CommandedUnit.AttackDistance;
-            else
-                return dist <= goalDistance;
-        }
-    }*/
-
-    /*
-    public class AttackCommand : Command
-    {
-        public Unit CommandedUnit => (Unit)CommandedEntity;
-        private Entity target;
-        private float timeUntilAttack;//time in s until this unit attacks
-
-        public AttackCommand(Entity commandedEntity, Entity target)
-            : base(commandedEntity)
-        {
-            this.target = target;
-            this.timeUntilAttack = 0f;
-        }
-
-        public override bool PerformCommand(Game game, float deltaT)
-        {
-            //dead target cannont be attacked
-            if (target.IsDead)
-            {
-                CommandedUnit.CanBeMoved = true;
-                return true;
-            }
-            CommandedUnit.Direction = ((Unit)target).Center - CommandedUnit.Center;
-
-            CommandedUnit.CanBeMoved = false;
-            timeUntilAttack += deltaT;
-            if (timeUntilAttack >= CommandedUnit.AttackPeriod)
-            {
-                timeUntilAttack -= CommandedUnit.AttackPeriod;
-                target.Health -= CommandedUnit.AttackDamage;
-            }
-
-            bool finished= CommandedEntity.DistanceTo(target) >= CommandedUnit.AttackDistance;
-            if (finished)
-            {
-                CommandedUnit.CanBeMoved = true;
-                return true;
-            }
-            return false;
-        }
-
-        public override string ToString()
-        {
-            return "Attack";
-        }
-    }*/
 }

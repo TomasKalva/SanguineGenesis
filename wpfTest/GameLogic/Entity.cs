@@ -8,7 +8,7 @@ using wpfTest.GUI;
 
 namespace wpfTest
 {
-    public abstract class Entity:ITargetable
+    public abstract class Entity: ITargetable, IMovementTarget
     {
         public virtual Vector2 Center { get; }
         public float Size => 2 * Range;
@@ -48,7 +48,7 @@ namespace wpfTest
                     //if command is finished, remove it from the queue
                     if(command is MoveToPointCommand)
                     {
-                        ((MoveToPointCommand)command).RemoveFromCreator();
+                        ((MoveToPointCommand)command).RemoveFromAssignment();
                     }
                     CommandQueue.Dequeue();
                 }
@@ -123,11 +123,7 @@ namespace wpfTest
 
         public float DistanceTo(Entity e)
         {
-            Unit u = e as Unit;
-            if (u != null)
-                return (this.Center - u.Center).Length - this.Range - u.Range;
-            else
-                throw new NotImplementedException();
+            return (this.Center - e.Center).Length - this.Range - e.Range;
         }
     }
 
