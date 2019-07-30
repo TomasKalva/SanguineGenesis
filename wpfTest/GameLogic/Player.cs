@@ -16,11 +16,13 @@ namespace wpfTest
         public bool MapChanged { get; private set; }
         public Map MapView { get; private set; }
         public Players PlayerID { get; }
+        public float Resource { get; set; }
 
         public Player(Players playerID)
         {
             PlayerID = playerID;
             InitUnits();
+            Resource = 100;
         }
 
         public void InitUnits()
@@ -31,21 +33,21 @@ namespace wpfTest
             //if (PlayerID == Players.PLAYER1)
             //    return;
 
-            UnitFactory normalUnits = new UnitFactory(EntityType.TIGER, 0.5f,2f,2f,100,10,Movement.GROUND);
-            UnitFactory smallFastUnits = new UnitFactory(EntityType.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER);
-            UnitFactory bigUnits = new UnitFactory(EntityType.BAOBAB, 1f, 2f, 4f,150,0,Movement.GROUND_WATER);
+            UnitFactory normalUnits = new UnitFactory(EntityType.TIGER, 0.5f,2f,2f,100,10,Movement.GROUND,4f);
+            UnitFactory smallFastUnits = new UnitFactory(EntityType.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
+            UnitFactory bigUnits = new UnitFactory(EntityType.BAOBAB, 1f, 2f, 4f,150,0,Movement.GROUND_WATER,4f);
             for (int i = 0; i < 10; i++)
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    Entities.Add(normalUnits.NewInstance(PlayerID, new Vector2(20 + i*.25f,10+ j*.25f)));
+                    Entities.Add(normalUnits.NewInstance(this, new Vector2(20 + i*.25f,10+ j*.25f)));
                 }
             }
-            Entities.Add(bigUnits.NewInstance(PlayerID, new Vector2(5f, 6f)));
-            Entities.Add(new Unit(PlayerID, EntityType.TIGER, 10, 10, new Vector2(5f, 6f)));
-            Entities.Add(new Unit(PlayerID, EntityType.TIGER, 10, 10, new Vector2(7f, 6f)));
-            Entities.Add(new Unit(PlayerID, EntityType.TIGER, 10, 10, new Vector2(6.5f, 6f)));
-            Entities.Add(new Unit(PlayerID, EntityType.TIGER, 10, 10, new Vector2(4f, 9f)));
+            Entities.Add(bigUnits.NewInstance(this, new Vector2(5f, 6f)));
+            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(5f, 6f)));
+            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(7f, 6f)));
+            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(6.5f, 6f)));
+            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(4f, 9f)));
         }
 
         public void UpdateVisibilityMap(ObstacleMap obstMap)
@@ -55,7 +57,7 @@ namespace wpfTest
 
         /// <summary>
         /// Removes dead units and references to them from their commands. The references
-        /// from other commands stay - other commands need to check for the death of the unit.
+        /// from other commands stay - other commands need to check for dead units.
         /// </summary>
         public void RemoveDeadUnits()
         {

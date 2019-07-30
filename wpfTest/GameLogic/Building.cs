@@ -11,7 +11,8 @@ namespace wpfTest.GameLogic
     {
         public override Vector2 Center { get; }
         public override float Range { get; }
-        public Building(Players owner, EntityType unitType, float maxHealth, float viewRange = 6) : base(owner, unitType, maxHealth, viewRange)
+        public Building(Player player, EntityType bulidingType, float maxHealth, float viewRange, float maxEnergy) 
+            : base(player, bulidingType, maxHealth, viewRange, maxEnergy)
         {
         }
     }

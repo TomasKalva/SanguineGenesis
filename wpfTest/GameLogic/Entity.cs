@@ -17,24 +17,32 @@ namespace wpfTest
         public CommandsGroup Group { get; set; }
         public Queue<Command> CommandQueue { get; }
         public View View => new View(Center, ViewRange);
-        public Players Owner { get; }
-        public EntityType UnitType { get; }
+        public Player Player { get; }
+        public EntityType EntityType { get; }
         public AnimationState AnimationState { get; set; }
         public float MaxHealth { get; set; }
         public float Health { get; set; }
+        /// <summary>
+        /// True iff this entity uses energy.
+        /// </summary>
+        public bool HasEnergy => MaxEnergy > 0;
+        public float MaxEnergy { get; set; }
+        public float Energy { get; set; }
         public bool IsDead => Health <= 0;
         public List<Ability> Abilities { get; }
 
-        public Entity(Players owner, EntityType unitType, float maxHealth, float viewRange=6.0f)
+        public Entity(Player player, EntityType entityType, float maxHealth, float viewRange, float maxEnergy)
         {
-            Owner = owner;
+            Player = player;
             ViewRange = viewRange;
             Group = null;
             CommandQueue = new Queue<Command>();
-            UnitType = unitType;
+            EntityType = entityType;
             MaxHealth = maxHealth;
             Health = maxHealth;
-            AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(unitType));
+            MaxEnergy = maxEnergy;
+            Energy = maxEnergy;
+            AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(entityType));
             Abilities = new List<Ability>();
         }
 
@@ -65,7 +73,7 @@ namespace wpfTest
             => Math.Max(Center.X + Range, Center.X - imageLeft + imageWidth);
         public Rect GetActualRect(ImageAtlas atlas)
         {
-            Animation anim = atlas.GetAnimation(UnitType);
+            Animation anim = atlas.GetAnimation(EntityType);
             return new Rect(
                 Math.Min(Center.X - Range, Center.X - anim.LeftBottom.X),
                 Math.Min(Center.Y - Range, Center.Y - anim.LeftBottom.Y),
@@ -131,6 +139,41 @@ namespace wpfTest
     {
         TIGER,
         BAOBAB
+    }
+
+    public static class EntityTypeExtensions
+    {
+        private static Dictionary<EntityType, bool> isUnit;
+
+        static EntityTypeExtensions()
+        {
+            isUnit = new Dictionary<EntityType, bool>()
+            {
+                {EntityType.TIGER, true },
+                {EntityType.BAOBAB, false }
+            };
+        }
+
+        /// <summary>
+        /// Returns true iff the entity type is unit.
+        /// </summary>
+        public static bool Unit(this EntityType type) => isUnit[type];
+
+        /// <summary>
+        /// Returns true iff the entity type is unit.
+        /// </summary>
+        public static bool Building(this EntityType type) => !isUnit[type];
+
+        /// <summary>
+        /// Returns all EntityTypes representing units.
+        /// </summary>
+        public static IEnumerable<EntityType> Units
+            => isUnit.Where((type) => type.Value).Select((type)=>type.Key);
+        /// <summary>
+        /// Returns all EntityTypes representing buildings.
+        /// </summary>
+        public static IEnumerable<EntityType> Buildings
+            => isUnit.Where((type) => !type.Value).Select((type) => type.Key);
     }
 
     public enum Movement

@@ -13,7 +13,7 @@ namespace wpfTest
         private Dictionary<Key, Ability> keyToAbility;
         public UnitsCommandInputState State { get; set; }
         public Vector2 MapCoordinates { get; private set; }
-        public Entity TargetedUnit { get; private set; }
+        public Entity TargetedEntity { get; private set; }
         private Ability selectedAbility;
         public Ability SelectedAbility { get { return selectedAbility; } set { selectedAbility = value; AbilitySelected = true; } }
         public bool AbilitySelected { get; set; }

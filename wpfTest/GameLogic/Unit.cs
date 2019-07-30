@@ -19,9 +19,6 @@ namespace wpfTest.GameLogic
         public bool IsInCollision { get; set; }//true if the unit is colliding with obstacles or other units
         public float MaxSpeed { get; }
         public float Acceleration { get; }
-        public bool HasEnergy { get; }//true if the unit uses energy
-        public float MaxEnergy { get; set; }
-        public float Energy { get; set; }
         public Vector2 Direction { get; set; }//direction the unit is facing
         public bool FacingLeft => Direction.X <= 0;
         public Movement Movement { get; }//where can the unit walk
@@ -29,9 +26,9 @@ namespace wpfTest.GameLogic
         public float AttackPeriod { get; }
         public float AttackDistance { get; }
 
-        public Unit(Players owner, EntityType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement = Movement.GROUND, float range = 0.5f, float viewRange = 6.0f, float maxSpeed = 2f, float acceleration = 4f,
+        public Unit(Player player, EntityType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement = Movement.GROUND, float range = 0.5f, float viewRange = 6.0f, float maxSpeed = 2f, float acceleration = 4f,
                float attackDamage = 10f, float attackPeriod = 0.9f, float attackDistance = 0.2f)
-            :base(owner, unitType, maxHealth, viewRange)
+            :base(player, unitType, maxHealth, viewRange, maxEnergy)
         {
             Position = pos;
             Vel = new Vector2(0f, 0f);
@@ -43,10 +40,6 @@ namespace wpfTest.GameLogic
             Group = null;
             MaxHealth = maxHealth;
             Health = maxHealth;
-            if (maxEnergy > 0)
-                HasEnergy = true;
-            MaxEnergy = maxEnergy;
-            Energy = maxEnergy;
             Direction = new Vector2(1f, 0f);
             Movement = movement;
             AttackDamage = attackDamage;
@@ -54,6 +47,7 @@ namespace wpfTest.GameLogic
             AttackDistance = attackDistance;
             Abilities.Add(MoveTo.Get);
             Abilities.Add(Attack.Get);
+            Abilities.Add(Spawn.GetAbility(EntityType.TIGER));
         }
         
         /// <summary>

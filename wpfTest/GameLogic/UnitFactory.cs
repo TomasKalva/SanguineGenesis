@@ -16,13 +16,14 @@ namespace wpfTest
         public float MaxHealth { get; }
         public float MaxEnergy { get; }
         public Movement Movement { get; }
+        public float SpawningTime { get; }
 
-        public Entity NewInstance(Players playerID, Vector2 pos)
+        public Unit NewInstance(Player player, Vector2 pos)
         {
-            return new Unit(playerID, UnitType, maxHealth:MaxHealth, maxEnergy:MaxEnergy, pos:pos, range:Range, maxSpeed:MaxSpeed, acceleration:Acceleration,movement:Movement);
+            return new Unit(player, UnitType, maxHealth:MaxHealth, maxEnergy:MaxEnergy, pos:pos, range:Range, maxSpeed:MaxSpeed, acceleration:Acceleration,movement:Movement);
         }
 
-        public UnitFactory(EntityType unitType, float range, float maxSpeed, float acceleration, float maxHealth, float maxEnergy, Movement movement)
+        public UnitFactory(EntityType unitType, float range, float maxSpeed, float acceleration, float maxHealth, float maxEnergy, Movement movement, float spawningTime)
         {
             Range = range;
             MaxSpeed = maxSpeed;
@@ -31,6 +32,7 @@ namespace wpfTest
             MaxEnergy = maxEnergy;
             UnitType = unitType;
             Movement = movement;
+            SpawningTime = spawningTime;
         }
     }
 }

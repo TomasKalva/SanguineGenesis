@@ -14,11 +14,6 @@ namespace wpfTest
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
         public abstract bool PerformCommand(Game game, float deltaT);
-        /*public Command(Entity commandedEntity)
-        {
-            CommandedEntity = commandedEntity;
-        }*/
-        //public abstract Command NewInstance(Entity caster, ITargetable target);
     }
 
     public abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
@@ -35,13 +30,10 @@ namespace wpfTest
             CommandedEntity = commandedEntity;
             Targ = target;
         }
-        /*
-        public static Command NewInstance(Entity caster, ITargetable target)
+        public override string ToString()
         {
-            return NewInstance((Caster)caster, (Target)target);
+            return Ability.ToString();
         }
-
-        public static Command NewInstance(Caster caster, Target target) { throw new NotImplementedException(); }*/
     }
 
     public class AttackCommand : Command<Unit, Entity, Attack>
@@ -70,6 +62,7 @@ namespace wpfTest
             timeUntilAttack += deltaT;
             if (timeUntilAttack >= CommandedEntity.AttackPeriod)
             {
+                //damage target
                 timeUntilAttack -= CommandedEntity.AttackPeriod;
                 Targ.Health -= CommandedEntity.AttackDamage;
             }
@@ -173,7 +166,7 @@ namespace wpfTest
             if(movementParametrizing.Interruptable)
             {
                 Entity enemy = GameQuerying.GetGameQuerying().SelectUnits(game, 
-                    (u) => u.Owner!=unit.Owner 
+                    (u) => u.Player!=unit.Player 
                             && unit.DistanceTo(u) <= unit.AttackDistance).FirstOrDefault();
                 if(enemy!=null)
                 {
@@ -295,6 +288,35 @@ namespace wpfTest
 
                 if (d1 + d2 + d3 < minDistSum)
                     return true;
+            }
+            return false;
+        }
+    }
+
+
+    public class SpawnCommand : Command<Entity, Vector2, Spawn>
+    {
+        /// <summary>
+        /// Time in s until the unit spawns.
+        /// </summary>
+        public float TimeUntilSpawn { get; private set; }
+
+        private SpawnCommand() : base(null, default(Vector2), null) => throw new NotImplementedException();
+        public SpawnCommand(Entity commandedEntity, Vector2 target, EntityType entityType)
+            : base(commandedEntity, target, Spawn.GetAbility(entityType))
+        {
+            TimeUntilSpawn = 0f;
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            TimeUntilSpawn += deltaT;
+            if (TimeUntilSpawn >= Ability.SpawningUnitFactory.SpawningTime)
+            {
+                Player newUnitOwner = CommandedEntity.Player;
+                Unit newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Targ);
+                game.Players[newUnitOwner.PlayerID].Entities.Add(newUnit);
+                return true;
             }
             return false;
         }

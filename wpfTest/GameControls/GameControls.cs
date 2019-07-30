@@ -50,6 +50,11 @@ namespace wpfTest
                     {
                         MapSelectorFrame = new MapSelectorFrame(mapPoint);
                         SelectedUnits.RemoveUnits(SelectedUnits.Units);
+                        //reset selected ability
+                        lock (UnitCommandsInput)
+                        {
+                            UnitCommandsInput.AbilitySelected = false;
+                        }
                     }
                     else
                     {
@@ -62,11 +67,10 @@ namespace wpfTest
                     MapSelectorFrame = null;
                     break;
                 case UnitsCommandInputState.ABILITY:
+                    //find target
                     Vector2 clickCoords = UnitCommandsInput.MapCoordinates;
-                    Entity targ=GameQuerying.GetGameQuerying().SelectRectEntities(
-                        game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y), (unit) => true)
-                        .FirstOrDefault();
                     
+                    //get information about selected ability
                     bool abilitySelected;
                     Ability abil;
                     lock (UnitCommandsInput)
@@ -78,24 +82,65 @@ namespace wpfTest
 
                     if (!abilitySelected)
                     {
-                        if (targ == null || 
-                            targ.Owner == game.CurrentPlayer.PlayerID)//do not attack own units
+                        //determine target
+                        ITargetable enemy = GameQuerying.GetGameQuerying().SelectRectEntities(
+                            game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y), 
+                            (unit) => unit.Player.PlayerID!=game.CurrentPlayer.PlayerID)//don't attack own units
+                            .FirstOrDefault();
+
+                        if (enemy == null)
                         {
                             MoveTo.Get.SetCommands(SelectedUnits.Units, clickCoords);
-                            //move.AssignCommands(Players.PLAYER0,SelectedUnits.Units, clickCoords, game);
                         }
                         else
                         {
-                            Attack.Get.SetCommands(SelectedUnits.Units, targ);
+                            Attack.Get.SetCommands(SelectedUnits.Units, enemy);
                         }
                     }
                     else
                     {
-                        /*if (abil.GetType() == typeof(TargetPointAbility))
+                        //determine target
+                        ITargetable targ=null;
+                        Type targetType = abil.TargetType;
+                        if(targetType == typeof(Vector2) ||
+                            targetType == typeof(IMovementTarget))
                         {
-                            ((TargetPointAbility)abil).AssignCommands(Players.PLAYER0,SelectedUnits.Units,
-                                UnitCommandsInput.MapCoordinates, game);
-                        }*/
+                            targ = clickCoords;
+                        }
+                        else if (targetType == typeof(Unit))
+                        {
+                            targ = GameQuerying.GetGameQuerying().SelectRectEntities(
+                                    game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y), 
+                                    (entity) => entity.GetType()==typeof(Unit))
+                                    .FirstOrDefault();
+                        }
+                        else if (targetType == typeof(Building))
+                        {
+                            targ = GameQuerying.GetGameQuerying().SelectRectEntities(
+                                    game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y),
+                                    (entity) => entity.GetType() == typeof(Unit))
+                                    .FirstOrDefault();
+                        }
+                        else if (targetType == typeof(Entity))
+                        {
+                            targ = GameQuerying.GetGameQuerying().SelectRectEntities(
+                                    game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y),
+                                    (entity) => true)
+                                    .FirstOrDefault();
+                        }
+                        else if (targetType == typeof(Node))
+                        {
+                            targ = game.Map[(int)clickCoords.X, (int)clickCoords.Y];
+                        }
+
+                        if (targ != null)
+                        {
+                            IEnumerable<Entity> unitsWithAbil = SelectedUnits.Units.Where((e) => e.Abilities.Contains(abil));
+                            if (unitsWithAbil != null)
+                            {
+                                abil.SetCommands(unitsWithAbil, targ);
+                            }
+                        }
                     }
                     //setting state from this thread can cause inconsistency of State
                     //todo: maybe encode states into byte - operations should be atomic => no inconsistent state

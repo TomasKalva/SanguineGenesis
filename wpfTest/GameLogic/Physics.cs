@@ -68,7 +68,7 @@ namespace wpfTest
                             //push centres of the units from each other
                             Vector2 dir12 = u1.Center.UnitDirectionTo(u2.Center);
                             Vector2 pushVec = (totalR - dist) / 2 * dir12;
-                            if (u1.Owner != u2.Owner)
+                            if (u1.Player != u2.Player)
                             {
                                 if (u1.WantsToMove && !u2.WantsToMove)
                                 {

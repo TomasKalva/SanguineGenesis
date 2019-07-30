@@ -112,6 +112,65 @@
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                 </Grid>
+                <Grid Name="abilityInfoPanel" Width="100" Height="200" Background="Black">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="Yellow" />
+                            <Setter Property="FontSize" Value="10" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Background" Value="LightBlue" />
+                            <Setter Property="Foreground" Value="Black" />
+                            <Setter Property="FontSize" Value="9" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="TextAlignment" Value="Center"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Label Name="abilityNameL" FontSize="13" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalContentAlignment="Center">Name:</Label>
+                    <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">Energy cost:</Label>
+                    <Label Name="abilityEnergyCostL" Grid.Row="1" Grid.Column="1" HorizontalContentAlignment="Right">50/75</Label>
+                    <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">Resource cost:</Label>
+                    <Label Name="abilityResourceCostL" Grid.Row="2" Grid.Column="1" HorizontalContentAlignment="Right">50/75</Label>
+                    <Label Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">Target type:</Label>
+                    <Label Name="abilityTargetL" Grid.Row="3" Grid.Column="1" HorizontalContentAlignment="Right">50/75</Label>
+                    <TextBlock Name="abilityDescriptionTB" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="4" TextWrapping="Wrap" />
+                </Grid>
+                <Grid Name="resourcesL" Width="100" Height="20" Background="Black">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="Label">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="Yellow" />
+                            <Setter Property="FontSize" Value="10" />
+                            <Setter Property="Padding" Value="0" />
+                        </Style>
+                    </Grid.Resources>
+                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">Resource:</Label>
+                    <Label Name="resourceL" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalContentAlignment="Center">500</Label>
+                </Grid>
             </Canvas>
         </Grid>
     </Grid>

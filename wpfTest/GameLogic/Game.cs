@@ -90,7 +90,7 @@ namespace wpfTest
                 if(!u.CommandQueue.Any())
                 {
                     //unit isn't doing anything
-                    Entity en = units.Where((v) => v.Owner!=u.Owner && u.DistanceTo(v) < u.AttackDistance).FirstOrDefault();
+                    Entity en = units.Where((v) => v.Player!=u.Player && u.DistanceTo(v) < u.AttackDistance).FirstOrDefault();
                     if(en!=null)
                         u.CommandQueue.Enqueue(Attack.Get.NewCommand(u, en));
                 }

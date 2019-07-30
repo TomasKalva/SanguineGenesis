@@ -44,7 +44,8 @@ namespace wpfTest
 
         public List<Entity> GetSelectedUnits(Game game)
         {
-            return game.GameQuerying.SelectRectEntities(game,((IEntity)this).GetRect(),(unit)=>unit.Owner==game.CurrentPlayer.PlayerID);
+            return game.GameQuerying.SelectRectEntities(game,((IEntity)this).GetRect(),
+                (unit)=>unit.Player.PlayerID==game.CurrentPlayer.PlayerID);
         }
     }
 }

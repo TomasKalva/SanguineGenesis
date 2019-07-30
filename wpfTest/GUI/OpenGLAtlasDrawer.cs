@@ -523,7 +523,7 @@ namespace wpfTest
                     if (current.Group == null)
                     {
                         //fill the circle with color of the corresponding player
-                        switch (current.Owner)
+                        switch (current.Player.PlayerID)
                         {
                             case Players.PLAYER0:
                                 SetColor(colors, 0f, 0f, 1f, index, 6);

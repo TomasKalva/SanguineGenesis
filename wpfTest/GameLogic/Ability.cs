@@ -27,27 +27,51 @@ namespace wpfTest.GameLogic
         /// Maximal distance from the target where the ability can be cast.
         /// </summary>
         public float Distance { get; }
-        
-        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target);
-        /*/// <summary>
-        /// Assigns commands to the units. All calculations that take long and can be pre-processed
-        /// should be put into Process.
+        /// <summary>
+        /// Energy required to use this ability.
         /// </summary>
-        public override void SetCommands(Players player, List<Entity> casters, ITargetable target)
-        {
-            foreach (Entity u in casters)
-            {
-                Command com = NewCommand(u,target);
-                //com.Creator = this;
-                u.AddCommand(com);
-            }
-        }*/
+        public float EnergyCost { get; }
+        /// <summary>
+        /// Resource required to use this ability.
+        /// </summary>
+        public float ResourceCost { get; }
+        /// <summary>
+        /// True iff this ability should be performed only by one of the selected units.
+        /// </summary>
+        public bool OnlyOne { get; }
+
+        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target);
+        /// <summary>
+        /// Returns true if the target type is valid for this ability.
+        /// </summary>
+        public abstract bool ValidTargetType(ITargetable target);
+        public abstract Type TargetType { get; }
         public abstract Command NewCommand(Entity caster, ITargetable target);
+        /// <summary>
+        /// Returns text which describes what the ability does.
+        /// </summary>>
+        public abstract string Description();
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
+        public Ability(float distance, float energyCost, float resourceCost, bool onlyOne)
+        {
+            Distance = distance;
+            EnergyCost = energyCost;
+            ResourceCost = resourceCost;
+            OnlyOne = onlyOne;
+        }
     }
 
     public abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
+        public TargetAbility(float distance, float energyCost, float resourceCost, bool onlyOne)
+            :base(distance, energyCost, resourceCost, onlyOne)
+        {
+        }
+
         /// <summary>
         /// Calls generic version of this method. 
         /// </summary>
@@ -67,26 +91,51 @@ namespace wpfTest.GameLogic
         {
             SetCommands(casters.Cast<Caster>(), (Target)target);
         }
+        
+        public sealed override bool ValidTargetType(ITargetable target)
+        {
+            return target is Target;
+        }
+
+        public sealed override Type TargetType 
+            => typeof(Target);
 
         public virtual void SetCommands(IEnumerable<Caster> casters, Target target)
         {
-            //if there are no casters do nothing
-            if (!casters.Any())
+            //select only the casters who can pay and put the to list so 
+            //they can be enumerated multiple times
+            List<Caster> payingCasters = casters
+                .Where((c) => c.Energy >= EnergyCost &&
+                    c.Player.Resource >= ResourceCost)
+                 .ToList();
+            //paying casters pay for the ability
+            foreach(Caster payingCaster in payingCasters)
+            {
+                payingCaster.Energy -= EnergyCost;
+                payingCaster.Player.Resource -= ResourceCost;
+            }
+            
+            //if there are no casters that can pay do nothing
+            if (!payingCasters.Any())
                 return;
 
+            if (OnlyOne)
+                payingCasters = payingCasters.Take(1).ToList();
+
             //move to the target until the required distance is reached
-            MoveTo.GetMoveTo(this).SetCommands(casters, target);
+            MoveTo.GetMoveTo(this).SetCommands(payingCasters, target);
 
             //give command to each caster
-            foreach (Caster c in casters)
+            foreach (Caster c in payingCasters)
             {
+                //create new command and assign it to c
                 Command com = NewCommand(c, target);
                 c.AddCommand(com);
             }
         }
     }
 
-    public class MoveTo: TargetAbility<Unit,IMovementTarget>,IMovementParametrizing
+    public sealed class MoveTo: TargetAbility<Unit,IMovementTarget>,IMovementParametrizing
     {
         private static MoveTo ability;
         /// <summary>
@@ -96,10 +145,20 @@ namespace wpfTest.GameLogic
         static MoveTo()
         {
             ability = new MoveTo(0.1f, true, false);
-            moveToCast = new Dictionary<Ability, MoveTo>();
-            moveToCast.Add(Attack.Get, new MoveTo(-1, true, true));
+            //initialize MoveTo for all abilities
+            {
+                moveToCast = new Dictionary<Ability, MoveTo>();
+                moveToCast.Add(Attack.Get, new MoveTo(-1, true, true));
+                //spawn abilities
+                foreach (EntityType unit in EntityTypeExtensions.Units)
+                {
+                    Ability a = Spawn.GetAbility(unit);
+                    moveToCast.Add(a, new MoveTo(a.Distance, false, false));
+                }
+            }
         }
         private MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
+            :base(-1, 0, 0, false)
         {
             GoalDistance = goalDistance;
             Interruptable = interruptable;
@@ -119,7 +178,7 @@ namespace wpfTest.GameLogic
             if (!casters.Any())
                 return;
             //player whose units are receiving commands
-            Players player = casters.First().Owner;
+            Players player = casters.First().Player.PlayerID;
 
             //separete units to different groups by their movement
             var castersGroups = casters.ToLookup((unit) => unit.Movement);
@@ -136,9 +195,9 @@ namespace wpfTest.GameLogic
                 if (!castersMov.Any())
                     continue;
 
-                MoveToCommandAssignment mtca = new MoveToCommandAssignment(player, casters.Cast<Unit>().ToList(), m, target);
+                MoveToCommandAssignment mtca = new MoveToCommandAssignment(player, castersMov.Cast<Unit>().ToList(), m, target);
                 //give command to each caster and set the command's creator
-                foreach (Unit caster in casters)
+                foreach (Unit caster in castersMov)
                 {
                     IComputable com = new MoveToPointCommand(caster, target, minStoppingDistance, this);
                     com.Assignment = mtca;
@@ -153,6 +212,12 @@ namespace wpfTest.GameLogic
         {
             throw new NotImplementedException("This method is not necessary because the virtual method " + nameof(SetCommands) + " was overriden");
         }
+
+        public override string Description()
+        {
+            return "The unit moves to the target. If the target is on a terrain " +
+                "this unit can't move to, the unit won't do anything. If unit meets an enemy it attacks it instead.";
+        }
     }
 
     public sealed class Attack : TargetAbility<Unit, Entity>
@@ -162,11 +227,51 @@ namespace wpfTest.GameLogic
         {
             ability = new Attack();
         }
-        private Attack() { }
+        private Attack():base(-1, 0, 0, false) { }
         public static Attack Get => ability;
         public override Command NewCommand(Unit caster, Entity target)
         {
             return new AttackCommand(caster, target);
+        }
+
+        public override string Description()
+        {
+            return "The unit deals repeatedly its attack damage to the target.";
+        }
+    }
+
+    public sealed class Spawn : TargetAbility<Entity, Vector2>
+    {
+        private static Dictionary<EntityType,Spawn> unitSpawningAbilities;
+        static Spawn()
+        {
+            unitSpawningAbilities = new Dictionary<EntityType, Spawn>()
+            {
+                { EntityType.TIGER, new Spawn(new UnitFactory(EntityType.TIGER, 0.5f, 2f, 4f, 50f, 20f, Movement.GROUND_WATER,4f),0,50)}
+            };
+        }
+        private Spawn(UnitFactory spawningUnitFactory, float energyCost, float resourceCost)
+            : base(2 * spawningUnitFactory.Range, energyCost, resourceCost, true)
+        {
+            SpawningUnitFactory = spawningUnitFactory;
+        }
+        public static Spawn GetAbility(EntityType t) => unitSpawningAbilities[t];
+        
+        public UnitFactory SpawningUnitFactory { get; }
+
+        public override Command NewCommand(Entity caster, Vector2 target)
+        {
+            return new SpawnCommand(caster, target, SpawningUnitFactory.UnitType);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + " " + SpawningUnitFactory.UnitType;
+        }
+
+        public override string Description()
+        {
+            return "The entity spawns a new unit at the target point.";
         }
     }
 }
