@@ -81,7 +81,7 @@ namespace wpfTest
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
 
-            return game.GameQuerying.SelectRectEntities(game, ((IEntity)this).GetRect(), (unit) => true);
+            return game.GameQuerying.SelectRectEntities(game, ((IEntity)this).GetRect(), (entity) => true);
         }
 
 

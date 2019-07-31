@@ -26,7 +26,7 @@ namespace wpfTest.GameLogic
         public float AttackPeriod { get; }
         public float AttackDistance { get; }
 
-        public Unit(Player player, EntityType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement = Movement.GROUND, float range = 0.5f, float viewRange = 6.0f, float maxSpeed = 2f, float acceleration = 4f,
+        public Unit(Player player, EntityType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement = Movement.LAND, float range = 0.5f, float viewRange=5.0f, float maxSpeed = 2f, float acceleration = 4f,
                float attackDamage = 10f, float attackPeriod = 0.9f, float attackDistance = 0.2f)
             :base(player, unitType, maxHealth, viewRange, maxEnergy)
         {
@@ -48,6 +48,7 @@ namespace wpfTest.GameLogic
             Abilities.Add(MoveTo.Get);
             Abilities.Add(Attack.Get);
             Abilities.Add(Spawn.GetAbility(EntityType.TIGER));
+            Abilities.Add(Build.GetAbility(EntityType.BAOBAB));
         }
         
         /// <summary>

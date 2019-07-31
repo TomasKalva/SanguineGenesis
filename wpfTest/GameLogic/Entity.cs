@@ -11,7 +11,6 @@ namespace wpfTest
     public abstract class Entity: ITargetable, IMovementTarget
     {
         public virtual Vector2 Center { get; }
-        public float Size => 2 * Range;
         public abstract float Range { get; }//range of the circle collider
         public float ViewRange { get; }//how far the unit sees
         public CommandsGroup Group { get; set; }
@@ -178,8 +177,8 @@ namespace wpfTest
 
     public enum Movement
     {
-        GROUND,
+        LAND,
         WATER,
-        GROUND_WATER
+        LAND_WATER
     }
 }

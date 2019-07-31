@@ -30,24 +30,24 @@ namespace wpfTest
 
             Entities = new List<Entity>();
 
-            //if (PlayerID == Players.PLAYER1)
-            //    return;
+            if (PlayerID == Players.PLAYER1)
+                return;
 
-            UnitFactory normalUnits = new UnitFactory(EntityType.TIGER, 0.5f,2f,2f,100,10,Movement.GROUND,4f);
+            UnitFactory normalUnits = new UnitFactory(EntityType.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             UnitFactory smallFastUnits = new UnitFactory(EntityType.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
-            UnitFactory bigUnits = new UnitFactory(EntityType.BAOBAB, 1f, 2f, 4f,150,0,Movement.GROUND_WATER,4f);
-            for (int i = 0; i < 10; i++)
+            UnitFactory bigUnits = new UnitFactory(EntityType.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);
+            for (int i = 0; i < 1; i++)
             {
-                for (int j = 0; j < 5; j++)
+                for (int j = 0; j < 1; j++)
                 {
                     Entities.Add(normalUnits.NewInstance(this, new Vector2(20 + i*.25f,10+ j*.25f)));
                 }
             }
-            Entities.Add(bigUnits.NewInstance(this, new Vector2(5f, 6f)));
+            /*Entities.Add(bigUnits.NewInstance(this, new Vector2(5f, 6f)));
             Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(5f, 6f)));
             Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(7f, 6f)));
             Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(6.5f, 6f)));
-            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(4f, 9f)));
+            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(4f, 9f)));*/
         }
 
         public void UpdateVisibilityMap(ObstacleMap obstMap)

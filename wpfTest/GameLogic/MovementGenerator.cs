@@ -52,13 +52,13 @@ namespace wpfTest.GameLogic
                 commands = new List<MoveToCommandAssignment>();
                 newCommands = new List<MoveToCommandAssignment>();
                 newObstMaps = new Dictionary<Movement, ObstacleMap>();
-                newObstMaps.Add(Movement.GROUND, null);
+                newObstMaps.Add(Movement.LAND, null);
                 newObstMaps.Add(Movement.WATER, null);
-                newObstMaps.Add(Movement.GROUND_WATER, null);
+                newObstMaps.Add(Movement.LAND_WATER, null);
                 obstMaps = new Dictionary<Movement, ObstacleMap>();
-                obstMaps.Add(Movement.GROUND, null);
+                obstMaps.Add(Movement.LAND, null);
                 obstMaps.Add(Movement.WATER, null);
-                obstMaps.Add(Movement.GROUND_WATER, null);
+                obstMaps.Add(Movement.LAND_WATER, null);
             }
 
             public void UpdateInputs(object lockObj)

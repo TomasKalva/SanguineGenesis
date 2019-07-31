@@ -30,7 +30,7 @@ namespace wpfTest
             PixelColor[,] mapPC = mapBitmap.GetPixels();
             Map=new Map(mapPC);
             FlowMap = new FlowMap(Map.Width, Map.Height);
-            FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap(Movement.GROUND));
+            FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap(Movement.LAND));
             GameEnded = false;
             Players = new Dictionary<Players, Player>();
             Players.Add(wpfTest.Players.PLAYER0, new Player(wpfTest.Players.PLAYER0));
@@ -68,6 +68,7 @@ namespace wpfTest
             if (Map.MapWasChanged)
             {
                 Map.UpdateObstacleMaps();
+                MovementGenerator.GetMovementGenerator().SetMapChanged(wpfTest.Players.PLAYER0, Map.ObstacleMaps);
             }
 
             List<Entity> entities = GetEntities();
@@ -80,7 +81,7 @@ namespace wpfTest
             List<Unit> units = GetUnits();
             //physics
             physics.PushOutsideOfObstacles(Map, units,deltaT);
-            physics.PushAway(Map, units, deltaT);
+            physics.PushAway(Map, units, entities, deltaT);
             physics.Step(Map,units,deltaT);
             physics.ResetCollision(units);
 

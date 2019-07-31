@@ -469,7 +469,7 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateUnitCirclesDataBuffers(OpenGL gl, MapView mapView, Game game)
+        public static void UpdateEntityCirclesDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
@@ -477,9 +477,9 @@ namespace wpfTest
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Unit> visUnits = mapView.GetVisibleUnits(game);
+            List<Entity> visEntity = mapView.GetVisibleEntities(game);
 
-            int size = visUnits.Count;
+            int size = visEntity.Count;
             if (size == 0)
             {
                 unitsEmpty = true;
@@ -495,9 +495,9 @@ namespace wpfTest
             float[] textureCoords = new float[size * 6 * 2];
             float[] texAtlas = new float[size * 6 * 4];
 
-            for(int i=0;i<visUnits.Count;i++)
+            for(int i=0;i<visEntity.Count;i++)
             {                
-                Entity current = visUnits[i];
+                Entity current = visEntity[i];
                 //buffer indices
                 int index = i * 6 * 3;
                 int texIndex = i * 6 * 2;
@@ -697,7 +697,7 @@ namespace wpfTest
 
                 float unitSize = nodeSize;
 
-                float indicatorWidth = current.Size * 0.75f;
+                float indicatorWidth = current.Range * 1.5f;
                 float indicatorHeight = 0.15f;
                 {
                     Animation anim = current.AnimationState.Animation;

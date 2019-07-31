@@ -20,9 +20,22 @@ namespace wpfTest
                                                                     where Target : ITargetable
                                                                     where Abil:TargetAbility<Caster,Target>
     {
+        /// <summary>
+        /// The ability this command is performing.
+        /// </summary>
         public Abil Ability { get; }
+        /// <summary>
+        /// The entity who performs this command.
+        /// </summary>
         public Caster CommandedEntity { get; }
+        /// <summary>
+        /// Target of the ability.
+        /// </summary>
         public Target Targ { get; }
+        /// <summary>
+        /// True iff the ability was paid.
+        /// </summary>
+        private bool Paid { get; set; }
 
         protected Command(Caster commandedEntity, Target target, Abil ability)
         {
@@ -33,6 +46,28 @@ namespace wpfTest
         public override string ToString()
         {
             return Ability.ToString();
+        }
+
+        /// <summary>
+        /// Try to pay for the ability. Returns if paying was successful.
+        /// </summary>
+        protected bool TryPay()
+        {
+            if (Paid)
+                //the ability was paid already
+                return true;
+
+            if (CommandedEntity.Energy >= Ability.EnergyCost &&
+                CommandedEntity.Player.Resource >= Ability.ResourceCost)
+            {
+                //pay for the ability
+                CommandedEntity.Energy -= Ability.EnergyCost;
+                CommandedEntity.Player.Resource -= Ability.ResourceCost;
+                Paid = true;
+                return true;
+            }
+            //not enough resource/energy
+            return false;
         }
     }
 
@@ -56,7 +91,7 @@ namespace wpfTest
                 CommandedEntity.CanBeMoved = true;
                 return true;
             }
-            CommandedEntity.Direction = ((Unit)Targ).Center - CommandedEntity.Center;
+            CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
 
             CommandedEntity.CanBeMoved = false;
             timeUntilAttack += deltaT;
@@ -297,21 +332,25 @@ namespace wpfTest
     public class SpawnCommand : Command<Entity, Vector2, Spawn>
     {
         /// <summary>
-        /// Time in s until the unit spawns.
+        /// How long the unit was spawning in s.
         /// </summary>
-        public float TimeUntilSpawn { get; private set; }
+        public float SpawnTimer { get; private set; }
 
         private SpawnCommand() : base(null, default(Vector2), null) => throw new NotImplementedException();
         public SpawnCommand(Entity commandedEntity, Vector2 target, EntityType entityType)
             : base(commandedEntity, target, Spawn.GetAbility(entityType))
         {
-            TimeUntilSpawn = 0f;
+            SpawnTimer = 0f;
         }
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            TimeUntilSpawn += deltaT;
-            if (TimeUntilSpawn >= Ability.SpawningUnitFactory.SpawningTime)
+            if (!TryPay())
+                //finish command if paying was unsuccessful
+                return true;
+
+            SpawnTimer += deltaT;
+            if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
             {
                 Player newUnitOwner = CommandedEntity.Player;
                 Unit newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Targ);
@@ -319,6 +358,61 @@ namespace wpfTest
                 return true;
             }
             return false;
+        }
+    }
+
+    public class BuildCommand : Command<Entity, Node, Build>
+    {
+        private BuildCommand() : base(null, null, null) => throw new NotImplementedException();
+        public BuildCommand(Entity commandedEntity, Node target, EntityType entityType)
+            : base(commandedEntity, target, Build.GetAbility(entityType))
+        {
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+
+            Map map = game.Map;
+            BuildingFactory bf = Ability.BuildingFactory;
+            //check if the building can be built on the node
+            bool canBeBuilt = true;
+            int nX = Targ.X;
+            int nY = Targ.Y;
+            int size = bf.Size;
+            Node[,] buildNodes = GameQuerying.GetGameQuerying().SelectNodes(map, nX, nY, nX + (size-1), nY + (size-1));
+
+            if (buildNodes.GetLength(0)==size &&
+                buildNodes.GetLength(1)==size)
+            {
+                for(int i=0;i<size;i++)
+                    for (int j = 0; j < size; j++)
+                    {
+                        Node ijN = buildNodes[i, j];
+                        //the building can't be built if the node is blocked or contains
+                        //incompatible terrain
+                        if (ijN.Blocked || !bf.Terrains.Contains(ijN.Terrain))
+                            canBeBuilt = false;
+                    }
+            }
+            else
+            {
+                //the whole building has to be on the map
+                canBeBuilt = false;
+            }
+
+            if (canBeBuilt)
+            {
+                if (!TryPay())
+                    //finish command if paying was unsuccessful
+                    return true;
+
+                Player newUnitOwner = CommandedEntity.Player;
+                Building newBuilding = Ability.BuildingFactory.NewInstance(newUnitOwner, buildNodes);
+                game.Players[newUnitOwner.PlayerID].Entities.Add(newBuilding);
+                game.Map.MapWasChanged = true;
+            }
+            //the command always immediately finishes regardless of the success of building the building
+            return true;
         }
     }
 }

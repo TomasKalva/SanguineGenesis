@@ -250,7 +250,7 @@ namespace wpfTest
         private void UpdateBottomPanel()
         {
             //locking the units can slow down the game so we only create a copy
-            selectedUnits = gameControls.SelectedUnits.Units.Take(unitButtons.Length).ToList();
+            selectedUnits = gameControls.SelectedEntities.Entities.Take(unitButtons.Length).ToList();
             //initialize list of abilities
             selectedUnitsAbilities.Clear();
             foreach (Entity u in selectedUnits)
@@ -476,7 +476,7 @@ namespace wpfTest
             {
                 gameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
                 OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateUnitCirclesDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitsDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitIndicatorsDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);

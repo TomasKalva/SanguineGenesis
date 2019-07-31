@@ -20,9 +20,9 @@ namespace wpfTest
         private Physics()
         {
             PushingMaps = new Dictionary<Movement, FlowMap>();
-            PushingMaps.Add(Movement.GROUND, null);
+            PushingMaps.Add(Movement.LAND, null);
             PushingMaps.Add(Movement.WATER, null);
-            PushingMaps.Add(Movement.GROUND_WATER, null);
+            PushingMaps.Add(Movement.LAND_WATER, null);
         }
 
         /// <summary>
@@ -32,81 +32,89 @@ namespace wpfTest
         public void UpdatePushingMaps(Map map)
         {
             
-            ObstacleMap groundObst = map.ObstacleMaps[Movement.GROUND];
+            ObstacleMap groundObst = map.ObstacleMaps[Movement.LAND];
             ObstacleMap waterObst = map.ObstacleMaps[Movement.WATER];
-            ObstacleMap bothObst = map.ObstacleMaps[Movement.GROUND_WATER];
+            ObstacleMap bothObst = map.ObstacleMaps[Movement.LAND_WATER];
             FlowMap gPMap = PushingMapGenerator.GeneratePushingMap(groundObst);
             FlowMap wPMap = PushingMapGenerator.GeneratePushingMap(waterObst);
             FlowMap gwPMap = PushingMapGenerator.GeneratePushingMap(bothObst);
-            PushingMaps[Movement.GROUND] = gPMap;
+            PushingMaps[Movement.LAND] = gPMap;
             PushingMaps[Movement.WATER] = wPMap;
-            PushingMaps[Movement.GROUND_WATER]= gwPMap;
+            PushingMaps[Movement.LAND_WATER]= gwPMap;
         }
 
-        public void PushAway(Map map, List<Unit> units, float deltaT)
+        public void PushAway(Map map, List<Unit> units, List<Entity> entities, float deltaT)
         {
-            foreach (Unit u1 in units)
-                foreach (Unit u2 in units)
+            foreach (Unit u in units)
+                foreach (Entity e in entities)
                 {
-                    //accelerate only distinct units and calculate acceleration for each
-                    //pair of units only once
-                    if (u1.GetHashCode() < u2.GetHashCode())
+                    //calculate collisions for each pair of unit and entity only once
+                    if (u.GetHashCode() < e.GetHashCode() || e.GetType()==typeof(Building))
                     {
 
-                        float dist = (u1.Center - u2.Center).Length;
+                        float dist = (u.Center - e.Center).Length;
                         //if two units get stuck on top of each other, move them apart
                         if (dist == 0)
                         {
                             Vector2 epsilon = new Vector2(0.1f, 0.1f);
-                            u1.Position = u1.Center + epsilon;
+                            u.Position = u.Center + epsilon;
                             dist = epsilon.Length;
                         }
-                        float totalR = u1.Range + u2.Range;
-                        //check if the units u1 and u2 are in collision
+                        float totalR = u.Range + e.Range;
+                        //check if u and e are in collision
                         if (dist < totalR && dist != 0)
                         {
                             //push centres of the units from each other
-                            Vector2 dir12 = u1.Center.UnitDirectionTo(u2.Center);
+                            Vector2 dir12 = u.Center.UnitDirectionTo(e.Center);
                             Vector2 pushVec = (totalR - dist) / 2 * dir12;
-                            if (u1.Player != u2.Player)
+                            if (e.GetType() == typeof(Building))
                             {
-                                if (u1.WantsToMove && !u2.WantsToMove)
-                                {
-                                    u1.Position = u1.Center - 2 * pushVec;
-
-                                }
-                                else if (u2.WantsToMove && !u1.WantsToMove)
-                                {
-                                    u2.Position = u2.Center + 2 * pushVec;
-
-                                }
-                                else
-                                {
-                                    u1.Position = u1.Center - pushVec;
-                                    u2.Position = u2.Center + pushVec;
-
-                                }
+                                //buildings can't be pushed
+                                u.Position = u.Center - 2 * pushVec;
                             }
                             else
                             {
-                                if(u1.CanBeMoved && !u2.CanBeMoved)
+                                Unit u1 = (Unit)e;
+                                if (u.Player != u1.Player)
                                 {
-                                    u1.Position = u1.Center - 2 * pushVec;
+                                    if (u.WantsToMove && !u1.WantsToMove)
+                                    {
+                                        u.Position = u.Center - 2 * pushVec;
 
-                                }
-                                else if (u2.CanBeMoved && !u1.CanBeMoved)
-                                {
-                                    u2.Position = u2.Center + 2 * pushVec;
+                                    }
+                                    else if (u1.WantsToMove && !u.WantsToMove)
+                                    {
+                                        u1.Position = u1.Center + 2 * pushVec;
+
+                                    }
+                                    else
+                                    {
+                                        u.Position = u.Center - pushVec;
+                                        u1.Position = u1.Center + pushVec;
+
+                                    }
                                 }
                                 else
                                 {
-                                    u1.Position = u1.Center - pushVec;
-                                    u2.Position = u2.Center + pushVec;
+                                    if (u.CanBeMoved && !u1.CanBeMoved)
+                                    {
+                                        u.Position = u.Center - 2 * pushVec;
+
+                                    }
+                                    else if (u1.CanBeMoved && !u.CanBeMoved)
+                                    {
+                                        u1.Position = u1.Center + 2 * pushVec;
+                                    }
+                                    else
+                                    {
+                                        u.Position = u.Center - pushVec;
+                                        u1.Position = u1.Center + pushVec;
+                                    }
+                                    //u1.Accelerate((-unitAcc * deltaT) * dir12);
+                                    //u2.Accelerate((unitAcc * deltaT) * dir12);
+                                    //u1.IsInCollision = true;
+                                    //u2.IsInCollision = true;}
                                 }
-                                //u1.Accelerate((-unitAcc * deltaT) * dir12);
-                                //u2.Accelerate((unitAcc * deltaT) * dir12);
-                                //u1.IsInCollision = true;
-                                //u2.IsInCollision = true;}
                             }
                         }
                     }
@@ -116,22 +124,22 @@ namespace wpfTest
         public void PushOutsideOfObstacles(Map map, List<Unit> units, float deltaT)
         {
 
-            ObstacleMap gOMap = map.ObstacleMaps[Movement.GROUND];
+            ObstacleMap gOMap = map.ObstacleMaps[Movement.LAND];
             ObstacleMap wOMap = map.ObstacleMaps[Movement.WATER];
-            ObstacleMap gwOMap = map.ObstacleMaps[Movement.GROUND_WATER];
+            ObstacleMap gwOMap = map.ObstacleMaps[Movement.LAND_WATER];
             if (map.MapWasChanged
-                || PushingMaps[Movement.GROUND] == null
+                || PushingMaps[Movement.LAND] == null
                 || PushingMaps[Movement.WATER] == null
-                || PushingMaps[Movement.GROUND_WATER] == null)
+                || PushingMaps[Movement.LAND_WATER] == null)
                 UpdatePushingMaps(map);
-            FlowMap gPMap = PushingMaps[Movement.GROUND];
+            FlowMap gPMap = PushingMaps[Movement.LAND];
             FlowMap wPMap = PushingMaps[Movement.WATER];
-            FlowMap gwPMap = PushingMaps[Movement.GROUND_WATER];
+            FlowMap gwPMap = PushingMaps[Movement.LAND_WATER];
             foreach (Unit u in units)
             {
                 switch (u.Movement)
                 {
-                    case Movement.GROUND:
+                    case Movement.LAND:
                         u.Accelerate(
                             deltaT * gPMap.GetIntensity(u.Center, terrainAcc)
                             );
@@ -145,7 +153,7 @@ namespace wpfTest
                         if (wOMap.CollidingWithObstacle(u.Center))
                             u.IsInCollision = true;
                         break;
-                    case Movement.GROUND_WATER:
+                    case Movement.LAND_WATER:
                         u.Accelerate(
                             deltaT * gwPMap.GetIntensity(u.Center, terrainAcc)
                             );

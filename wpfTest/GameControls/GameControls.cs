@@ -14,7 +14,7 @@ namespace wpfTest
         public UnitCommandsInput UnitCommandsInput { get; }
         public MapView MapView { get; }
         public MapSelectorFrame MapSelectorFrame { get; set; }
-        public CommandsGroup SelectedUnits { get; private set; }
+        public CommandsGroup SelectedEntities { get; private set; }
         
 
         public GameControls(MapView mapView, MapMovementInput mapMovementInput)
@@ -23,7 +23,7 @@ namespace wpfTest
             MapMovementInput = mapMovementInput;
             UnitCommandsInput = UnitCommandsInput.GetUnitCommandsInput();
             MapSelectorFrame = null;
-            SelectedUnits = new CommandsGroup();
+            SelectedEntities = new CommandsGroup();
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace wpfTest
                     if (MapSelectorFrame == null)
                     {
                         MapSelectorFrame = new MapSelectorFrame(mapPoint);
-                        SelectedUnits.RemoveUnits(SelectedUnits.Units);
+                        SelectedEntities.RemoveUnits(SelectedEntities.Entities);
                         //reset selected ability
                         lock (UnitCommandsInput)
                         {
@@ -59,7 +59,7 @@ namespace wpfTest
                     else
                     {
                         MapSelectorFrame.SetEndPoint(mapPoint);
-                        SelectedUnits.SetUnits(MapSelectorFrame.GetSelectedUnits(game));
+                        SelectedEntities.SetUnits(MapSelectorFrame.GetSelectedUnits(game));
                         MapSelectorFrame.Update();
                     }
                     break;
@@ -90,11 +90,12 @@ namespace wpfTest
 
                         if (enemy == null)
                         {
-                            MoveTo.Get.SetCommands(SelectedUnits.Units, clickCoords);
+                            MoveTo.Get.SetCommands(SelectedEntities.Entities
+                                .Where((e)=>e.GetType()==typeof(Unit)).Cast<Unit>(), clickCoords);
                         }
                         else
                         {
-                            Attack.Get.SetCommands(SelectedUnits.Units, enemy);
+                            Attack.Get.SetCommands(SelectedEntities.Entities, enemy);
                         }
                     }
                     else
@@ -135,7 +136,7 @@ namespace wpfTest
 
                         if (targ != null)
                         {
-                            IEnumerable<Entity> unitsWithAbil = SelectedUnits.Units.Where((e) => e.Abilities.Contains(abil));
+                            IEnumerable<Entity> unitsWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(abil));
                             if (unitsWithAbil != null)
                             {
                                 abil.SetCommands(unitsWithAbil, targ);
@@ -147,7 +148,7 @@ namespace wpfTest
                     UnitCommandsInput.State = UnitsCommandInputState.SELECTED;
                     break;
             }
-            SelectedUnits.RemoveDead();
+            SelectedEntities.RemoveDead();
         }
     }
 }

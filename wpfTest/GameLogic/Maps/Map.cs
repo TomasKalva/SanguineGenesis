@@ -63,9 +63,9 @@ namespace wpfTest
 
         private void InitializeObstacleMaps()
         {
-            ObstacleMaps.Add(Movement.GROUND, GetObstacleMap(Movement.GROUND));
+            ObstacleMaps.Add(Movement.LAND, GetObstacleMap(Movement.LAND));
             ObstacleMaps.Add(Movement.WATER, GetObstacleMap(Movement.WATER));
-            ObstacleMaps.Add(Movement.GROUND_WATER, GetObstacleMap(Movement.GROUND_WATER));
+            ObstacleMaps.Add(Movement.LAND_WATER, GetObstacleMap(Movement.LAND_WATER));
         }
 
         /// <summary>
@@ -73,9 +73,10 @@ namespace wpfTest
         /// </summary>
         public void UpdateObstacleMaps()
         {
-            ObstacleMaps[Movement.GROUND] = GetObstacleMap(Movement.GROUND);
+            ObstacleMaps[Movement.LAND] = GetObstacleMap(Movement.LAND);
             ObstacleMaps[Movement.WATER] = GetObstacleMap(Movement.WATER);
-            ObstacleMaps[Movement.GROUND_WATER] = GetObstacleMap(Movement.GROUND_WATER);
+            ObstacleMaps[Movement.LAND_WATER] = GetObstacleMap(Movement.LAND_WATER);
+            MapWasChanged = false;
         }
 
         public ObstacleMap GetObstacleMap(Movement movement)
@@ -87,7 +88,7 @@ namespace wpfTest
                     Terrain ter = this[i, j].Terrain;
                     switch (movement)
                     {
-                        case Movement.GROUND:
+                        case Movement.LAND:
                             om[i, j] = ter == Terrain.DEEP_WATER ||
                                         nodes[i,j].Blocked;
                             break;
@@ -96,7 +97,7 @@ namespace wpfTest
                                         ter != Terrain.SHALLOW_WATER) ||
                                         nodes[i,j].Blocked;
                             break;
-                        case Movement.GROUND_WATER:
+                        case Movement.LAND_WATER:
                             om[i, j] = nodes[i,j].Blocked;
                             break;
                     }

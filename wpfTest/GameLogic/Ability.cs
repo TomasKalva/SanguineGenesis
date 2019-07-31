@@ -104,29 +104,27 @@ namespace wpfTest.GameLogic
         {
             //select only the casters who can pay and put the to list so 
             //they can be enumerated multiple times
-            List<Caster> payingCasters = casters
-                .Where((c) => c.Energy >= EnergyCost &&
-                    c.Player.Resource >= ResourceCost)
+            List<Caster> ableToPay = casters
+                .Where((caster) =>(caster.Energy >= EnergyCost &&
+                     caster.Player.Resource >= ResourceCost))
                  .ToList();
-            //paying casters pay for the ability
-            foreach(Caster payingCaster in payingCasters)
-            {
-                payingCaster.Energy -= EnergyCost;
-                payingCaster.Player.Resource -= ResourceCost;
-            }
+            
             
             //if there are no casters that can pay do nothing
-            if (!payingCasters.Any())
+            if (!ableToPay.Any())
                 return;
 
             if (OnlyOne)
-                payingCasters = payingCasters.Take(1).ToList();
+                ableToPay = ableToPay.Take(1).ToList();
 
-            //move to the target until the required distance is reached
-            MoveTo.GetMoveTo(this).SetCommands(payingCasters, target);
+            //move units to the target until the required distance is reached
+            MoveTo.GetMoveTo(this)
+                .SetCommands(ableToPay
+                .Where(caster=>caster.GetType()==typeof(Unit))
+                .Cast<Unit>(), target);
 
             //give command to each caster
-            foreach (Caster c in payingCasters)
+            foreach (Caster c in ableToPay)
             {
                 //create new command and assign it to c
                 Command com = NewCommand(c, target);
@@ -153,6 +151,12 @@ namespace wpfTest.GameLogic
                 foreach (EntityType unit in EntityTypeExtensions.Units)
                 {
                     Ability a = Spawn.GetAbility(unit);
+                    moveToCast.Add(a, new MoveTo(a.Distance, false, false));
+                }
+                //build abilities
+                foreach (EntityType building in EntityTypeExtensions.Buildings)
+                {
+                    Ability a = Build.GetAbility(building);
                     moveToCast.Add(a, new MoveTo(a.Distance, false, false));
                 }
             }
@@ -247,7 +251,7 @@ namespace wpfTest.GameLogic
         {
             unitSpawningAbilities = new Dictionary<EntityType, Spawn>()
             {
-                { EntityType.TIGER, new Spawn(new UnitFactory(EntityType.TIGER, 0.5f, 2f, 4f, 50f, 20f, Movement.GROUND_WATER,4f),0,50)}
+                { EntityType.TIGER, new Spawn(new UnitFactory(EntityType.TIGER, 0.5f, 2f, 4f, 50f, 20f, Movement.LAND_WATER,4f),0,50)}
             };
         }
         private Spawn(UnitFactory spawningUnitFactory, float energyCost, float resourceCost)
@@ -272,6 +276,42 @@ namespace wpfTest.GameLogic
         public override string Description()
         {
             return "The entity spawns a new unit at the target point.";
+        }
+    }
+
+
+    public sealed class Build : TargetAbility<Entity, Node>
+    {
+        private static Dictionary<EntityType, Build> buildingBuildingAbilities;
+        static Build()
+        {
+            buildingBuildingAbilities = new Dictionary<EntityType, Build>()
+            {
+                { EntityType.BAOBAB, new Build(new BuildingFactory(EntityType.BAOBAB, 3, 150, 100, new List<Terrain>{ Terrain.SAVANA_GRASS}, 20),0,50)}
+            };
+        }
+        private Build(BuildingFactory buildingFactory, float energyCost, float resourceCost)
+            : base(20f, energyCost, resourceCost, true)
+        {
+            BuildingFactory = buildingFactory;
+        }
+        public static Build GetAbility(EntityType t) => buildingBuildingAbilities[t];
+
+        public BuildingFactory BuildingFactory { get; }
+
+        public override Command NewCommand(Entity caster, Node target)
+        {
+            return new BuildCommand(caster, target, BuildingFactory.UnitType);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + " " + BuildingFactory.UnitType;
+        }
+
+        public override string Description()
+        {
+            return "The building is build at the target node.";
         }
     }
 }
