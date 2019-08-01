@@ -105,12 +105,13 @@ namespace wpfTest
             return om;
         }
 
-        public ObstacleMap GetViewMap()
+        public ObstacleMap GetViewMap(Players player)
         {
             ObstacleMap om = new ObstacleMap(Width, Height);
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
-                    om[i, j] = nodes[i, j].Blocked;
+                    //player can't see through blocked squares that he doesn't own
+                    om[i, j] = nodes[i, j].Blocked && nodes[i, j].Building.Player.PlayerID != player;
             return om;
         }
         /*

@@ -79,6 +79,15 @@ namespace wpfTest
             //todo: implement with visibility map
             MapView = map;
         }
+
+        /*public ObstacleMap GetViewMap()
+        {
+            ObstacleMap om = new ObstacleMap(Width, Height);
+            for (int i = 0; i < Width; i++)
+                for (int j = 0; j < Height; j++)
+                    om[i, j] = nodes[i, j].Blocked;
+            return om;
+        }*/
     }
 
     public enum Players

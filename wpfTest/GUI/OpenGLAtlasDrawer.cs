@@ -158,6 +158,11 @@ namespace wpfTest
             public VertexBuffer TextureDataBuffer { get; set; }
             public VertexBuffer TexAtlasDataBuffer { get; set; }
 
+            public float[] vertices;
+            public float[] colors;
+            public float[] texture;
+            public float[] texAtlas;
+
             public MyBufferArray(OpenGL gl)
             {
                 //initialize map.VertexBufferArray and link it to its VertexBuffers
@@ -182,6 +187,12 @@ namespace wpfTest
                 TexAtlasDataBuffer.Create(gl);
 
                 VertexBufferArray.Unbind(gl);
+
+                //create initial arrays so that they are not null
+                vertices = new float[0];
+                colors = new float[0];
+                texture = new float[0];
+                texAtlas = new float[0];
             }
 
             /// <summary>
@@ -207,6 +218,30 @@ namespace wpfTest
                 TexAtlasDataBuffer.SetData(gl, attributeIndexTexBL, aValues, false, aStride);
 
                 VertexBufferArray.Unbind(gl);
+            }
+
+            /// <summary>
+            /// Initialize arrays with zeros with the given sizes.
+            /// </summary>
+            public void InitializeArrays(int verticesSize, int colorsSize, int textureSize, int texAtlasSize)
+            {
+                InitArray(ref vertices, verticesSize);
+                InitArray(ref colors, colorsSize);
+                InitArray(ref texture, textureSize);
+                InitArray(ref texAtlas, texAtlasSize);
+            }
+
+            /// <summary>
+            /// If the array is shorter than the size, create a new array with the size, otherwise clear the array.
+            /// </summary>
+            /// <param name="array"></param>
+            /// <param name="size"></param>
+            private void InitArray(ref float[] array, int size)
+            {
+                if (array.Length < size)
+                    array = new float[size];
+                else
+                    Array.Clear(array, 0, array.Length);
             }
         }
 
@@ -254,10 +289,17 @@ namespace wpfTest
             float sqW = nodeSize;
             float sqH = nodeSize;
 
-            float[] vertices= new float[width * height * 6 * 3];
-            float[] colors= new float[width * height * 6 * 3];
-            float[] textureCoords = new float[width * height * 6 * 2];
-            float[] texBottomLeft = new float[width * height * 6 * 4];
+            int verticesPerOne = width * height * 6;
+            int verticesSize = verticesPerOne * 3;
+            int colorsSize = verticesPerOne * 3;
+            int textureSize = verticesPerOne * 2;
+            int textureAtlasSize = verticesPerOne * 4;
+            
+            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = map.vertices;
+            float[] colors = map.colors;
+            float[] texture = map.texture;
+            float[] texAtlas = map.texAtlas;
 
             for (int i = 0; i < width; i++)
             {
@@ -289,12 +331,12 @@ namespace wpfTest
                         SetColor(colors, 1f, 1f, 1f, coord,6);
                     else
                         SetColor(colors, .8f, .8f, .8f, coord, 6);
-                    SetSquareTextureCoordinates(textureCoords, texCoord);
-                    SetAtlasCoordinates(texBottomLeft, atlasCoords, bottomLeftInd, 6);
+                    SetSquareTextureCoordinates(texture, texCoord);
+                    SetAtlasCoordinates(texAtlas, atlasCoords, bottomLeftInd, 6);
                 }
             }
 
-            map.BindData(gl, 3, vertices, 3, colors, 2, textureCoords, 4, texBottomLeft);
+            map.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
         private static void SetSquareVertices(float[] vertices, float bottom, float top,
@@ -490,12 +532,24 @@ namespace wpfTest
                 unitsEmpty = false;
             }
 
-            float[] vertices = new float[size * 6 * 3];
+            /*float[] vertices = new float[size * 6 * 3];
             float[] colors = new float[size * 6 * 3];
             float[] textureCoords = new float[size * 6 * 2];
-            float[] texAtlas = new float[size * 6 * 4];
+            float[] texAtlas = new float[size * 6 * 4];*/
 
-            for(int i=0;i<visEntity.Count;i++)
+            int verticesPerOne = size * 6;
+            int verticesSize = verticesPerOne * 3;
+            int colorsSize = verticesPerOne * 3;
+            int textureSize = verticesPerOne * 2;
+            int textureAtlasSize = verticesPerOne * 4;
+
+            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = map.vertices;
+            float[] colors = map.colors;
+            float[] texture = map.texture;
+            float[] texAtlas = map.texAtlas;
+
+            for (int i=0;i<visEntity.Count;i++)
             {                
                 Entity current = visEntity[i];
                 //buffer indices
@@ -537,7 +591,7 @@ namespace wpfTest
                         SetColor(colors, 1f, 1f, 0f, index, 6);
 
                     //texture coordinates
-                    SetSquareTextureCoordinates(textureCoords, texIndex);
+                    SetSquareTextureCoordinates(texture, texIndex);
 
                     //atlas coordinates
                     Rect atlasCoords = ImageAtlas.GetImageAtlas.UnitCircle;
@@ -545,7 +599,7 @@ namespace wpfTest
                 }
             }
 
-            unitCircles.BindData(gl, 3, vertices, 3, colors, 2, textureCoords, 4, texAtlas);
+            unitCircles.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
         /// <summary>
@@ -584,10 +638,21 @@ namespace wpfTest
                 unitsEmpty = false;
             }
 
-            float[] vertices = new float[size * 6 * 3];
+            /*float[] vertices = new float[size * 6 * 3];
             float[] colors = new float[size * 6 * 3];
             float[] textureCoords = new float[size * 6 * 2];
-            float[] texAtlas = new float[size * 6 * 4];
+            float[] texAtlas = new float[size * 6 * 4];*/
+            int verticesPerOne = size * 6;
+            int verticesSize = verticesPerOne * 3;
+            int colorsSize = verticesPerOne * 3;
+            int textureSize = verticesPerOne * 2;
+            int textureAtlasSize = verticesPerOne * 4;
+
+            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = map.vertices;
+            float[] colors = map.colors;
+            float[] texture = map.texture;
+            float[] texAtlas = map.texAtlas;
 
             //visible units have to be sorted to draw them properly
             visUnits.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
@@ -625,9 +690,9 @@ namespace wpfTest
 
                     //texture coordinates
                     if(current is Unit && ((Unit)current).FacingLeft)
-                        SetSquareTextureCoordinates(textureCoords, texIndex);
+                        SetSquareTextureCoordinates(texture, texIndex);
                     else
-                        SetHorizFlipSquareTextureCoordinates(textureCoords, texIndex);
+                        SetHorizFlipSquareTextureCoordinates(texture, texIndex);
 
                     //atlas coordinates
                     Rect unitImage = current.AnimationState.CurrentImage;
@@ -635,7 +700,7 @@ namespace wpfTest
                 }
             }
 
-            units.BindData(gl, 3, vertices, 3, colors, 2, textureCoords, 4, texAtlas);
+            units.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
         /// <summary>
@@ -674,10 +739,21 @@ namespace wpfTest
                 unitsEmpty = false;
             }
 
-            float[] vertices = new float[size * 24 * 3];
+            /*float[] vertices = new float[size * 24 * 3];
             float[] colors = new float[size * 24 * 3];
             float[] textureCoords = new float[size * 24 * 2];
-            float[] texAtlas = new float[size * 24 * 4];
+            float[] texAtlas = new float[size * 24 * 4];*/
+            int verticesPerOne = size * 24;
+            int verticesSize = verticesPerOne * 3;
+            int colorsSize = verticesPerOne * 3;
+            int textureSize = verticesPerOne * 2;
+            int textureAtlasSize = verticesPerOne * 4;
+
+            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = map.vertices;
+            float[] colors = map.colors;
+            float[] texture = map.texture;
+            float[] texAtlas = map.texAtlas;
 
             //visible units have to be sorted to draw the indicators properly
             visUnits.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
@@ -718,13 +794,13 @@ namespace wpfTest
                         {
                             //energy
                             AddRectangle(left, bottom, right, top, indicatorImage, depth, index, vertices,
-                                index, colors, texIndex, textureCoords, atlasInd, texAtlas, 0f, 0f, 0f);
+                                index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
                             index += 6 * 3;
                             texIndex += 6 * 2;
                             atlasInd += 6 * 4;
                             float energyRight = Math.Max(left, left + (right - left) * u.Energy / u.MaxEnergy);
                             AddRectangle(left, bottom, energyRight, top, indicatorImage, depth, index, vertices,
-                                index, colors, texIndex, textureCoords, atlasInd, texAtlas, 0f, 0f, 1f);
+                                index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 0f, 1f);
                             index += 6 * 3;
                             texIndex += 6 * 2;
                             atlasInd += 6 * 4;
@@ -735,17 +811,17 @@ namespace wpfTest
                     bottom += indicatorHeight*unitSize;
                     top += indicatorHeight*unitSize;
                     AddRectangle(left, bottom, right, top, indicatorImage, depth, index, vertices,
-                        index, colors, texIndex, textureCoords, atlasInd, texAtlas, 0f, 0f, 0f);
+                        index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
                     index += 6 * 3;
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
                     float healthRight =Math.Max(left, left + (right - left) * current.Health/current.MaxHealth);
                     AddRectangle(left, bottom, healthRight, top, indicatorImage, depth, index, vertices,
-                        index, colors, texIndex, textureCoords, atlasInd, texAtlas, 1f, 0f, 0f);
+                        index, colors, texIndex, texture, atlasInd, texAtlas, 1f, 0f, 0f);
                 }
             }
 
-            unitIndicators.BindData(gl, 3, vertices, 3, colors, 2, textureCoords, 4, texAtlas);
+            unitIndicators.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
         public static void AddRectangle(float left, float bottom, float right, float top, Rect image, float depth,
@@ -798,10 +874,21 @@ namespace wpfTest
             float sqW = nodeSize;
             float sqH = nodeSize;
 
-            float[] vertices = new float[width * height * 3 * 3];
+            /*float[] vertices = new float[width * height * 3 * 3];
             float[] colors = new float[width * height * 3 * 3];
             float[] textureCoords = new float[width * height * 3 * 2];
-            float[] texAtlas = new float[width * height * 3 * 4];
+            float[] texAtlas = new float[width * height * 3 * 4];*/
+            int verticesPerOne = width * height * 3;
+            int verticesSize = verticesPerOne * 3;
+            int colorsSize = verticesPerOne * 3;
+            int textureSize = verticesPerOne * 2;
+            int textureAtlasSize = verticesPerOne * 4;
+
+            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = map.vertices;
+            float[] colors = map.colors;
+            float[] texture = map.texture;
+            float[] texAtlas = map.texAtlas;
 
             //triangle
             vec2 triLB = new vec2(-0.25f, -0.15f);
@@ -858,20 +945,20 @@ namespace wpfTest
                     }
 
                     //bottom left
-                    textureCoords[texCoord + texOffset + 0] = 0;
-                    textureCoords[texCoord + texOffset + 1] = 0;
+                    texture[texCoord + texOffset + 0] = 0;
+                    texture[texCoord + texOffset + 1] = 0;
 
                     texOffset += 2;
 
                     //top left
-                    textureCoords[texCoord + texOffset + 0] = 0;
-                    textureCoords[texCoord + texOffset + 1] = 1;
+                    texture[texCoord + texOffset + 0] = 0;
+                    texture[texCoord + texOffset + 1] = 1;
 
                     texOffset += 2;
 
                     //top right
-                    textureCoords[texCoord + texOffset + 0] = 1;
-                    textureCoords[texCoord + texOffset + 1] = 0.5f;
+                    texture[texCoord + texOffset + 0] = 1;
+                    texture[texCoord + texOffset + 1] = 0.5f;
 
                     SetColor(colors, 0f, 0f, 0f, coord,3);
                     Rect atlasCoords = ImageAtlas.GetImageAtlas.BlankWhite;//the triangles are black
@@ -879,7 +966,7 @@ namespace wpfTest
                 }
             }
 
-            flowMap.BindData(gl, 3, vertices, 3, colors, 2, textureCoords, 4, texAtlas);
+            flowMap.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
         /// <summary>

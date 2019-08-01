@@ -46,7 +46,7 @@ namespace wpfTest
             InitializeComponent();
             
 
-            BitmapImage mapBitmap = (BitmapImage)FindResource("riverBuildingsMap");
+            BitmapImage mapBitmap = (BitmapImage)FindResource("riverMap");
             game = new Game(mapBitmap);
             var MapView = new MapView(0, 0, 60, game.Map, game);
             var MapMovementInput = new MapMovementInput();
