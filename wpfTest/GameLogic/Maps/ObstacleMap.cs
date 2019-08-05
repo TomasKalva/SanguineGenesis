@@ -41,6 +41,20 @@ namespace wpfTest
         }
 
         /// <summary>
+        /// Creates an obstacle map with a frame around it.
+        /// </summary>
+        /// <param name="width">Width of the map.</param>
+        /// <param name="height">Height of the map.</param>
+        public ObstacleMap(ObstacleMap source)
+            :this(source.Width, source.Height)
+        {
+            for(int i=0;i<Width;i++)
+                for (int j = 0; j < Height; j++)
+                {
+                    this[i, j] = source[i, j];
+                }
+        }
+        /// <summary>
         /// Returns true if the point is inside an obstacle.
         /// </summary>
         public bool CollidingWithObstacle(Vector2 point)

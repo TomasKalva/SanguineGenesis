@@ -13,20 +13,15 @@ namespace wpfTest
         public static GameQuerying GetGameQuerying()=>new GameQuerying(); 
         private GameQuerying() { }
 
-        public List<Entity> SelectRectEntities(Game game, Rect area, Func<Entity,bool> entityProperty)
+        public IEnumerable<Entity> SelectRectEntities(Game game, Rect area, Func<Entity,bool> entityProperty)
         {
-            List<Entity> selected = new List<Entity>();
-            foreach (Entity unit in game.GetEntities().Where(entityProperty))
-            {
-                Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
-                unitRect=((IRectangle)unit).GetRect();
-                //todo: select units by circles on the ground
-                if (area.IntersectsWith(unitRect))
+            return game.GetEntities()
+                .Where(entityProperty)
+                .Where((unit) =>
                 {
-                    selected.Add(unit);
-                }
-            }
-            return selected;
+                    Rect unitRect = ((IRectangle)unit).GetRect();
+                    return area.IntersectsWith(unitRect);
+                });
         }
 
         public List<Unit> SelectRectUnits(Game game, Rect area, Func<Unit, bool> unitProperty)
@@ -53,6 +48,21 @@ namespace wpfTest
                 selected.Add(unit);
             }
             return selected;
+        }
+
+        public IEnumerable<Entity> SelectVisibleEntities(Game game, Player observer, IEnumerable<Entity> entities)
+        {
+            return entities.Where((e) =>
+            {
+                if (e is Unit u)
+                {
+                    return u.IsVisible(observer.VisibilityMap);
+                }
+                else
+                {
+                    return observer.VisibleBuildings.Contains(e);
+                }
+            });
         }
 
         public Node[,] SelectNodes(Map map, Rect area)

@@ -42,7 +42,7 @@ namespace wpfTest
             Top = Math.Max(OriginalPoint.Y, EndPoint.Y);
         }
 
-        public List<Entity> GetSelectedUnits(Game game)
+        public IEnumerable<Entity> GetSelectedUnits(Game game)
         {
             return game.GameQuerying.SelectRectEntities(game,((IRectangle)this).GetRect(),
                 (unit)=>unit.Player.PlayerID==game.CurrentPlayer.PlayerID);

@@ -249,8 +249,8 @@ namespace wpfTest
             //place near the target position for a long time
             if (finished //unit is close to the target point
                 || (noMovementDetection.NotMovingMuch(deltaT, unit.MaxSpeed * deltaT / 2) && CanStop())//unit is stuck
-                || game.Players[unit.Player.PlayerID].MapView
-                    .GetObstacleMap(unit.Movement)[(int)TargetPoint.Center.X,(int)TargetPoint.Center.Y])//target point is blocked
+                /*|| game.Players[unit.Player.PlayerID].MapView
+                    .GetObstacleMap(unit.Movement)[(int)TargetPoint.Center.X,(int)TargetPoint.Center.Y]*/)//target point is blocked
             {
                 return true;
             }

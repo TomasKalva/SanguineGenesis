@@ -48,17 +48,38 @@ namespace wpfTest.GameLogic
         /// </summary>
         public void Process(ObstacleMap obst)
         {
-            //if there is an obstacle on the target square or no more units, cancel this assignment
-            if(obst[(int)TargetPoint.Center.X, (int)TargetPoint.Center.Y] ||
-                !Units.Any())
+            //if there are no more units, cancel this assignment
+            if (!Units.Any())
             {
                 Invalid = true;
                 return;
             }
 
+            //map used in the pathfinding algorithm
+            ObstacleMap forPathfinding = obst;
+
+            if (TargetPoint is Building b)
+            {
+                forPathfinding = new ObstacleMap(obst);
+                foreach(Node n in b.Nodes)
+                {
+                    forPathfinding[n.X, n.Y] = false;
+                }
+            }
+            else
+            {
+                //if there is an obstacle on the target square, cancel this assignment
+                if (obst[(int)TargetPoint.Center.X, (int)TargetPoint.Center.Y] ||
+                    !Units.Any())
+                {
+                    Invalid = true;
+                    return;
+                }
+            }
+
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(obst, TargetPoint.Center);
+            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(forPathfinding, TargetPoint.Center);
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
         }
