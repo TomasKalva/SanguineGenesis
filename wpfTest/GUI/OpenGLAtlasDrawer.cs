@@ -280,8 +280,8 @@ namespace wpfTest
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game);
-            Node[,] visible = mapView.GetVisibleNodes(game);
+            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.PlayerID].VisibilityMap);
+            Node[,] visible = mapView.GetVisibleNodes(game.Players[game.CurrentPlayer.PlayerID].MapView);
             int width = visible.GetLength(0);
             int height = visible.GetLength(1);
 
@@ -519,7 +519,7 @@ namespace wpfTest
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Entity> visEntity = mapView.GetVisibleEntities(game);
+            List<Entity> visEntity = mapView.GetVisibleEntities(game, game.CurrentPlayer);
 
             int size = visEntity.Count;
             if (size == 0)
@@ -625,7 +625,7 @@ namespace wpfTest
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Entity> visUnits = mapView.GetVisibleEntities(game);
+            List<Entity> visUnits = mapView.GetVisibleEntities(game, game.CurrentPlayer);
 
             int size = visUnits.Count;
             if (size == 0)
@@ -726,7 +726,7 @@ namespace wpfTest
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Entity> visUnits = mapView.GetVisibleEntities(game);
+            List<Entity> visUnits = mapView.GetVisibleEntities(game, game.CurrentPlayer);
 
             int size = visUnits.Count;
             if (size == 0)

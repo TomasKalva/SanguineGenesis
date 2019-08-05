@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace wpfTest
 {
-    interface IEntity
+    interface IRectangle
     {
         float Bottom { get; }
         float Left { get; }
@@ -17,13 +17,13 @@ namespace wpfTest
     }
 
     /// <summary>
-    /// Used to implement default methods in the interface IEntity.
+    /// Used to implement default methods in the interface IRectangle.
     /// </summary>
-    static class IEntityExtensions
+    static class IRectangleExtensions
     {
-        public static Rect GetRect(this IEntity entity)
+        public static Rect GetRect(this IRectangle rect)
         {
-            return new Rect(entity.Left, entity.Bottom, entity.Right, entity.Top);
+            return new Rect(rect.Left, rect.Bottom, rect.Right, rect.Top);
         }
     }
 }

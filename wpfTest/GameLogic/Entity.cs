@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
 
 namespace wpfTest
 {
-    public abstract class Entity: ITargetable, IMovementTarget
+    public abstract class Entity: ITargetable, IMovementTarget, IRectangle
     {
         public virtual Vector2 Center { get; }
         public abstract float Range { get; }//range of the circle collider
@@ -84,6 +85,8 @@ namespace wpfTest
         public float Right => Center.X + Range;
         public float Bottom => Center.Y - Range;
         public float Top => Center.Y + Range;
+        public float Width => Right - Left;
+        public float Height => Top - Bottom;
 
 
         public void AddCommand(Command command)
@@ -132,6 +135,11 @@ namespace wpfTest
         {
             return (this.Center - e.Center).Length - this.Range - e.Range;
         }
+
+        /// <summary>
+        /// Returns true if the entity is visible.
+        /// </summary>
+        public abstract bool IsVisible(VisibilityMap visibilityMap);
     }
 
     public enum EntityType

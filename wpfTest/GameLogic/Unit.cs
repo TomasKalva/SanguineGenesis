@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
 
 namespace wpfTest.GameLogic
@@ -79,6 +80,17 @@ namespace wpfTest.GameLogic
             if (l > MaxSpeed && l != 0)
                 Vel = (MaxSpeed / l) * Vel;
         }
-        
+
+        /// <summary>
+        /// Returns true if at least part of the unit is visible.
+        /// </summary>
+        public override bool IsVisible(VisibilityMap visibilityMap)
+        {
+            if (visibilityMap == null)
+                return false;
+
+            //todo: check for intersection with the circle instead of the center
+            return visibilityMap[(int)Center.X, (int)Center.Y];
+        }
     }
 }

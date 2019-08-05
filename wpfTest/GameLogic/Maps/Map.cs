@@ -48,6 +48,25 @@ namespace wpfTest
             mg.SetMapChanged(wpfTest.Players.PLAYER1, ObstacleMaps);
         }
 
+        /// <summary>
+        /// Copy the terrain of already existing map.
+        /// </summary>
+        public Map(Map map)
+        {
+            int width = map.Width;
+            int height = map.Height;
+            nodes = new Node[width, height];
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    nodes[i, j] = new Node(i, j, map[i,j].Terrain);
+                }
+            }
+            ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
+            InitializeObstacleMaps();
+        }
+
         private void InitializeColorToTerrain()
         {
             colorToTerrain = new Dictionary<int, Terrain>();
@@ -114,15 +133,29 @@ namespace wpfTest
                     om[i, j] = nodes[i, j].Blocked && nodes[i, j].Building.Player.PlayerID != player;
             return om;
         }
-        /*
-        /// <summary>
-        /// Returns the distance between the closest points of the circles of the units.
-        /// </summary>
-        public float Distance(Entity u1, Entity u2)
+
+        public void AddBuilding(Building building)
         {
-            float dx = u1.Pos.X - u2.Pos.X;
-            float dy = u1.Pos.Y - u2.Pos.Y;
-            return (float)Math.Sqrt(dx * dx + dy * dy) - u1.Range - u2.Range;
-        }*/
+            Node[,] nodes = GameQuerying.GetGameQuerying()
+                .SelectNodes(this,
+                building.NodeLeft,
+                building.NodeBottom,
+                building.NodeLeft + (building.Size - 1),
+                building.NodeBottom + (building.Size - 1));
+            foreach (Node n in nodes)
+            {
+                n.Building = building;
+            }
+            MapWasChanged = true;
+        }
+
+        public void RemoveBuilding(Building building)
+        {
+            foreach (Node n in building.Nodes)
+            {
+                this[n.X,n.Y].Building = null;
+            }
+            MapWasChanged = true;
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace wpfTest
     /// <summary>
     /// Represents rectangle for selecting units.
     /// </summary>
-    public class MapSelectorFrame:IEntity
+    public class MapSelectorFrame:IRectangle
     {   
         public Vector2 OriginalPoint { get; }
         public Vector2 EndPoint { get; private set; }
@@ -44,7 +44,7 @@ namespace wpfTest
 
         public List<Entity> GetSelectedUnits(Game game)
         {
-            return game.GameQuerying.SelectRectEntities(game,((IEntity)this).GetRect(),
+            return game.GameQuerying.SelectRectEntities(game,((IRectangle)this).GetRect(),
                 (unit)=>unit.Player.PlayerID==game.CurrentPlayer.PlayerID);
         }
     }

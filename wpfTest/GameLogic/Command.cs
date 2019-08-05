@@ -136,11 +136,20 @@ namespace wpfTest
 
         public override bool PerformCommand(Game game, float deltaT)
         {
+            bool finished = false;
             //command immediately finishes if the assignment was invalidated
             if (Assignment != null && Assignment.Invalid)
-                return true;
+                finished = true;
+            else
+                finished = moveToLogic.Step(game, deltaT, flowMap, this);
 
-            return moveToLogic.Step(game, deltaT, flowMap,this);
+
+            if (finished)
+            {
+                CommandedEntity.StopMoving = true;
+                this.RemoveFromAssignment();
+            }
+            return finished;
         }
 
 
@@ -213,7 +222,7 @@ namespace wpfTest
                 }
             }
 
-            //check if the map was set already
+            //check if the map was set yet
             if (flowMap == null)
                 return false;
 
@@ -238,11 +247,11 @@ namespace wpfTest
 
             //command is finished if unit reached the goal distance or if it stayed at one
             //place near the target position for a long time
-            if (finished 
-                || (noMovementDetection.NotMovingMuch(deltaT, unit.MaxSpeed * deltaT / 2) && CanStop()))
+            if (finished //unit is close to the target point
+                || (noMovementDetection.NotMovingMuch(deltaT, unit.MaxSpeed * deltaT / 2) && CanStop())//unit is stuck
+                || game.Players[unit.Player.PlayerID].MapView
+                    .GetObstacleMap(unit.Movement)[(int)TargetPoint.Center.X,(int)TargetPoint.Center.Y])//target point is blocked
             {
-                unit.StopMoving = true;
-                command.RemoveFromAssignment();
                 return true;
             }
             return false;
@@ -406,9 +415,10 @@ namespace wpfTest
                     //finish command if paying was unsuccessful
                     return true;
 
-                Player newUnitOwner = CommandedEntity.Player;
+                Player newUnitOwner = game.Players[CommandedEntity.Player.PlayerID+1];
                 Building newBuilding = Ability.BuildingFactory.NewInstance(newUnitOwner, buildNodes);
                 game.Players[newUnitOwner.PlayerID].Entities.Add(newBuilding);
+                map.AddBuilding(newBuilding);
                 game.Map.MapWasChanged = true;
             }
             //the command always immediately finishes regardless of the success of building the building

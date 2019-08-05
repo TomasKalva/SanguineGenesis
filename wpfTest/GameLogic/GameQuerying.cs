@@ -19,6 +19,7 @@ namespace wpfTest
             foreach (Entity unit in game.GetEntities().Where(entityProperty))
             {
                 Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
+                unitRect=((IRectangle)unit).GetRect();
                 //todo: select units by circles on the ground
                 if (area.IntersectsWith(unitRect))
                 {
@@ -34,6 +35,7 @@ namespace wpfTest
             foreach (Unit unit in SelectRectEntities(game, area, (e)=>e.GetType()==typeof(Unit)))
             {
                 Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
+                unitRect = ((IRectangle)unit).GetRect();
                 //todo: select units by circles on the ground
                 if (area.IntersectsWith(unitRect))
                 {
@@ -51,7 +53,6 @@ namespace wpfTest
                 selected.Add(unit);
             }
             return selected;
-
         }
 
         public Node[,] SelectNodes(Map map, Rect area)

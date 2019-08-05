@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
 
 namespace wpfTest.GameLogic
@@ -14,6 +15,14 @@ namespace wpfTest.GameLogic
         public int Size { get; }
         public List<Terrain> Soil { get; }
         public float BuildingTime { get; }
+        /// <summary>
+        /// X coordinate of bottom left node.
+        /// </summary>
+        public int NodeLeft { get; }
+        /// <summary>
+        /// Y coordinate of bottom left node.
+        /// </summary>
+        public int NodeBottom { get; }
         public Node[,] Nodes { get; }
 
         public Building(Player player, EntityType bulidingType, float maxHealth, float viewRange, float maxEnergy, Node[,] nodes, List<Terrain> soil, int size, float buildingTime) 
@@ -24,9 +33,34 @@ namespace wpfTest.GameLogic
             Soil = soil;
             BuildingTime = buildingTime;
             Nodes = nodes;
-            foreach(Node n in nodes)
+            NodeLeft = nodes[0,0].X;
+            NodeBottom = nodes[0,0].Y;
+        }
+
+        /// <summary>
+        /// Returns true if at least one of the building's nodes is visible.
+        /// </summary>
+        public override bool IsVisible(VisibilityMap visibilityMap)
+        {
+            if (visibilityMap == null)
+                return false;
+
+            foreach (Node n in Nodes)
             {
-                n.Building = this;
+                if (visibilityMap[n.X, n.Y])
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Removes this building from the main map.
+        /// </summary>
+        public void RemoveFromMap()
+        {
+            foreach (Node n in Nodes)
+            {
+                n.Building = null;
             }
         }
     }

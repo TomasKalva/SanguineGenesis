@@ -24,6 +24,10 @@ namespace wpfTest
         public Player CurrentPlayer { get; private set; }
         Physics physics;
         VisibilityGenerator visibilityGenerator;
+        /// <summary>
+        /// The next player for who will be generated visibility map.
+        /// </summary>
+        private Players nextVisibilityPlayer;
 
         public Game(BitmapImage mapBitmap)
         {
@@ -36,9 +40,12 @@ namespace wpfTest
             Players.Add(wpfTest.Players.PLAYER0, new Player(wpfTest.Players.PLAYER0));
             Players.Add(wpfTest.Players.PLAYER1, new Player(wpfTest.Players.PLAYER1));
             CurrentPlayer = Players[0];
+            Players[wpfTest.Players.PLAYER0].InitializeMapView(Map);
+            Players[wpfTest.Players.PLAYER1].InitializeMapView(Map);
             GameQuerying = GameQuerying.GetGameQuerying();
             physics = Physics.GetPhysics();
             visibilityGenerator = new VisibilityGenerator();
+            nextVisibilityPlayer = wpfTest.Players.PLAYER0;
         }
 
         public List<Entity> GetEntities()
@@ -61,15 +68,25 @@ namespace wpfTest
             return units;
         }
 
+        public List<Building> GetBuildings()
+        {
+            var buildings = new List<Building>();
+            foreach (Players player in Enum.GetValues(typeof(Players)))
+            {
+                buildings = buildings.Concat(Players[player].Buildings.Where((b) => !b.IsDead).ToList()).ToList();
+            }
+            return buildings;
+        }
+
         public void Update(float deltaT)
         {
             //map changing phase
 
-            if (Map.MapWasChanged)
+            /*if (Map.MapWasChanged)
             {
                 Map.UpdateObstacleMaps();
                 MovementGenerator.GetMovementGenerator().SetMapChanged(wpfTest.Players.PLAYER0, Map.ObstacleMaps);
-            }
+            }*/
 
             List<Entity> entities = GetEntities();
             //commands
@@ -99,29 +116,40 @@ namespace wpfTest
             }
 
             //remove dead units
-            Players[wpfTest.Players.PLAYER0].RemoveDeadUnits();
-            Players[wpfTest.Players.PLAYER1].RemoveDeadUnits();
+            Players[wpfTest.Players.PLAYER0].RemoveDeadEntities();
+            Players[wpfTest.Players.PLAYER1].RemoveDeadEntities();
 
             //update players' view of the map
             if (visibilityGenerator.Done)
             {
-                Players[0].VisibilityMap = visibilityGenerator.VisibilityMap;
+                Players current = nextVisibilityPlayer;
+                Players other = nextVisibilityPlayer == wpfTest.Players.PLAYER0 ?
+                                        wpfTest.Players.PLAYER1 :
+                                        wpfTest.Players.PLAYER0;
+                //update current player's view of the map
+                Players[current].VisibilityMap = visibilityGenerator.VisibilityMap;
+                Players[current].UpdateViewMap(GetBuildings());
 
-                visibilityGenerator.SetNewTask(Map.GetViewMap(wpfTest.Players.PLAYER0),
-                    Players[0].Entities.Select((entity) => entity.View).ToList());
+                //generated visibility map for the other player
+                nextVisibilityPlayer = other;
+
+                visibilityGenerator.SetNewTask(Map.GetViewMap(nextVisibilityPlayer),
+                    Players[nextVisibilityPlayer].Entities.Select((entity) => entity.View).ToList());
+
             }
-            Players[wpfTest.Players.PLAYER0].UpdateMap(Map);
-            Players[wpfTest.Players.PLAYER0].UpdateMap(Map);
             MovementGenerator mg = MovementGenerator.GetMovementGenerator();
             if (Players[wpfTest.Players.PLAYER0].MapChanged)
             {
-                mg.SetMapChanged(wpfTest.Players.PLAYER0, Map.ObstacleMaps);
-                
+                Players[wpfTest.Players.PLAYER0].MapView.UpdateObstacleMaps();
+                mg.SetMapChanged(wpfTest.Players.PLAYER0, Players[wpfTest.Players.PLAYER0].MapView.ObstacleMaps);
+                Players[wpfTest.Players.PLAYER0].MapView.MapWasChanged = false;
+
             }
             if (Players[wpfTest.Players.PLAYER1].MapChanged)
             {
-                mg.SetMapChanged(wpfTest.Players.PLAYER1, Map.ObstacleMaps);
-
+                Players[wpfTest.Players.PLAYER1].MapView.UpdateObstacleMaps();
+                mg.SetMapChanged(wpfTest.Players.PLAYER1, Players[wpfTest.Players.PLAYER1].MapView.ObstacleMaps);
+                Players[wpfTest.Players.PLAYER1].MapView.MapWasChanged = false;
             }
 
             //update move to commands
