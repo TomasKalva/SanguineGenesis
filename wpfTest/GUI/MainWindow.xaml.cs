@@ -46,7 +46,7 @@ namespace wpfTest
             InitializeComponent();
             
 
-            BitmapImage mapBitmap = (BitmapImage)FindResource("riverBuildingsMap");
+            BitmapImage mapBitmap = (BitmapImage)FindResource("riverMap");
             game = new Game(mapBitmap);
             var MapView = new MapView(0, 0, 60, game.Map, game);
             var MapMovementInput = new MapMovementInput();
@@ -59,7 +59,7 @@ namespace wpfTest
                     //wait for window layout initialization
                 }));
                 Dispatcher.Invoke(InitializeOpenGL);
-                Dispatcher.Invoke(InitializeUnitPanel);
+                Dispatcher.Invoke(InitializeBottomPanel);
                 MainLoop();
             });
             t.IsBackground = true;
@@ -106,6 +106,9 @@ namespace wpfTest
                 }
 
                 stepStopwatch.Stop();
+                //set resource value for the window
+                lock (resourceLock)
+                    currentPlayersResource = game.CurrentPlayer.Resource;
 
                 //calculate sleep time
                 double diff = stepStopwatch.Elapsed.TotalMilliseconds;
@@ -131,17 +134,20 @@ namespace wpfTest
         {
             //gameControls.MapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
         }
-
+        //these variables are used because the original variables can be modified from other threads
         private List<Entity> selectedUnits;
         private Button[] unitButtons;
-        private List<AbilityType> selectedUnitsAbilities;
+        private List<Ability> selectedUnitsAbilities;
         private Button[] abilityButtons;
         private Entity selectedUnit;
+        private Ability selectedAbility;
         private Label[] selUnCommands;
+        private object resourceLock=new object();
+        private float currentPlayersResource;
 
-        private void InitializeUnitPanel()
+        private void InitializeBottomPanel()
         {
-            selectedUnitsAbilities = new List<AbilityType>();
+            selectedUnitsAbilities = new List<Ability>();
 
             //fill ui elements with buttons
             //units panel
@@ -179,10 +185,10 @@ namespace wpfTest
                   {
                       if (buttonInd < selectedUnitsAbilities.Count)
                       {
-                          AbilityType at = selectedUnitsAbilities[buttonInd];
+                          selectedAbility = selectedUnitsAbilities[buttonInd];
                           lock (gameControls.UnitCommandsInput)
                           {
-                              gameControls.UnitCommandsInput.AbilityType = at;
+                              gameControls.UnitCommandsInput.SelectedAbility = selectedAbility;
                           }
                       }
                   };
@@ -191,6 +197,13 @@ namespace wpfTest
                 b.SetValue(Grid.RowProperty, i / 4);
                 b.Background = Brushes.Orange;
                 b.Focusable = false;
+                //add text block for the button
+                TextBlock t = new TextBlock();
+                t.TextWrapping = TextWrapping.Wrap;
+                t.TextAlignment = TextAlignment.Center;
+                b.Content = t;
+                t.Text = "hello world";
+                //add button to the panel
                 abilityPanel.Children.Add(b);
                 abilityButtons[i] = b;
             }
@@ -214,7 +227,8 @@ namespace wpfTest
             double unitInfoW = unitInfoPanel.ActualWidth;
             double unitPanelW = unitPanel.ActualWidth;
             double abilityPanelW = abilityPanel.ActualWidth;
-            double offsetX=(openGLControl1.ActualWidth - (unitInfoW + unitPanelW + abilityPanelW))/ 2;
+            double abilitInfoW = abilityInfoPanel.ActualWidth;
+            double offsetX=(openGLControl1.ActualWidth - (unitInfoW + unitPanelW + abilityPanelW + abilitInfoW))/ 2;
             
             double unitInfoX = offsetX;
             Canvas.SetLeft(unitInfoPanel, unitInfoX);
@@ -227,22 +241,26 @@ namespace wpfTest
             double abilityPanelX = unitPanelX + unitPanelW;
             Canvas.SetLeft(abilityPanel, abilityPanelX);
             Canvas.SetBottom(abilityPanel, 0);
+
+            double abilityInfoX = abilityPanelX + abilityPanelW;
+            Canvas.SetLeft(abilityInfoPanel, abilityInfoX);
+            Canvas.SetBottom(abilityInfoPanel, 0);
         }
 
-        private void UpdateUnitPanel()
+        private void UpdateBottomPanel()
         {
             //locking the units can slow down the game so we only create a copy
-            selectedUnits = gameControls.SelectedUnits.Units.Take(unitButtons.Length).ToList();
+            selectedUnits = gameControls.SelectedEntities.Entities.Take(unitButtons.Length).ToList();
             //initialize list of abilities
             selectedUnitsAbilities.Clear();
             foreach (Entity u in selectedUnits)
-                foreach(AbilityType at in u.Abilities)
+                foreach(Ability at in u.Abilities)
                     if (!selectedUnitsAbilities.Contains(at))
                         selectedUnitsAbilities.Add(at);
             if (selectedUnits == null)
                 return;
-            selectedUnits.Sort((u, v) => u.UnitType - v.UnitType);
-            //units panel
+            selectedUnits.Sort((u, v) => u.EntityType - v.EntityType);
+            //update units panel
             for (int i = 0; i < unitButtons.Length; i++)
             {
                 Button b = unitButtons[i];
@@ -252,11 +270,11 @@ namespace wpfTest
                 }
                 else
                 {
-                    b.Content = selectedUnits[i].UnitType;
+                    b.Content = selectedUnits[i].EntityType;
                     b.Visibility = Visibility.Visible;
                 }
             }
-            //ability panel
+            //update ability panel
             for (int i = 0; i < abilityButtons.Length; i++)
             {
                 Button b = abilityButtons[i];
@@ -266,12 +284,17 @@ namespace wpfTest
                 }
                 else
                 {
-                    b.Content = selectedUnitsAbilities[i];
+                    ((TextBlock)b.Content).Text = selectedUnitsAbilities[i].ToString();
                     b.Visibility = Visibility.Visible;
                 }
             }
 
             UpdateUnitInfo();
+            SelectAbility();
+            UpdateAbilityInfo();
+
+            lock(resourceLock)
+                resourceL.Content = currentPlayersResource.ToString();
         }
 
         /// <summary>
@@ -305,7 +328,7 @@ namespace wpfTest
                 Unit u = selectedUnit as Unit;
                 if (u != null)
                 {
-                    nameL.Content = u.UnitType;
+                    nameL.Content = u.EntityType;
                     healthL.Content = u.Health + "/" + u.MaxHealth;
                     energyL.Content = u.MaxEnergy > 0 ? u.Energy + "/" + u.MaxEnergy : "-";
                     sizeL.Content = u.Range * 2;
@@ -332,7 +355,54 @@ namespace wpfTest
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Update info about currently selected unit.
+        /// </summary>
+        private void UpdateAbilityInfo()
+        {
+            if (selectedAbility != null)
+            {
+                abilityNameL.Content = selectedAbility.ToString();
+                abilityEnergyCostL.Content = selectedAbility.EnergyCost.ToString();
+                abilityResourceCostL.Content = selectedAbility.ResourceCost.ToString();
+                abilityTargetL.Content = selectedAbility.TargetType.Name;
+                abilityDescriptionTB.Text = selectedAbility.Description();
+            }
+            else
+            {
+                abilityNameL.Content = "";
+                abilityEnergyCostL.Content = "";
+                abilityResourceCostL.Content = "";
+                abilityTargetL.Content = "";
+                abilityDescriptionTB.Text = "";
+            }
+        }
+
+        /// <summary>
+        /// Sets currently selected unit.
+        /// </summary>
+        private void SelectUnit()
+        {
+            if (selectedUnits != null && selectedUnits.Any())
+                selectedUnit = selectedUnits.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Sets currently selected ability.
+        /// </summary>
+        private void SelectAbility()
+        {
+            lock (gameControls.UnitCommandsInput)
+            {
+                if (gameControls.UnitCommandsInput.AbilitySelected)
+                    //set currently selected ability
+                    selectedAbility = gameControls.UnitCommandsInput.SelectedAbility;
+                else
+                    //reset currently selected ability
+                    selectedAbility = null;
+            }
+        }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -406,13 +476,13 @@ namespace wpfTest
             {
                 gameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
                 OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateUnitCirclesDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitsDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitIndicatorsDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, gameControls.MapView, gameControls.MapSelectorFrame);
                 OpenGLAtlasDrawer.Draw(gl);
-                UpdateUnitPanel();
+                UpdateBottomPanel();
             }
             sw.Stop();
             //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
@@ -421,7 +491,7 @@ namespace wpfTest
         private void openGLControl1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //reset selected unit
-            selectedUnit = null;
+            SelectUnit();
 
             Point clickPos = e.GetPosition(openGLControl1);
             Vector2 mapCoordinates = gameControls.MapView
@@ -437,8 +507,7 @@ namespace wpfTest
             gameControls.UnitCommandsInput.EndSelection(mapCoordinates);
 
             //set selected unit
-            if (selectedUnits != null && selectedUnits.Any())
-                selectedUnit = selectedUnits.FirstOrDefault();
+            SelectUnit();
         }
 
         private void openGLControl1_MouseMove(object sender, MouseEventArgs e)
@@ -452,8 +521,7 @@ namespace wpfTest
                 gameControls.UnitCommandsInput.NewPoint(mapCoordinates);
 
                 //set selected unit
-                if (selectedUnits != null && selectedUnits.Any())
-                    selectedUnit = selectedUnits.FirstOrDefault();
+                SelectUnit();
             }
         }
 
@@ -463,7 +531,7 @@ namespace wpfTest
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
             gameControls.UnitCommandsInput.SetTarget(mapCoordinates);
-           // game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(Movement.GROUND),  mapCoordinates);
+            // game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(Movement.GROUND),  mapCoordinates);
         }
     }
 

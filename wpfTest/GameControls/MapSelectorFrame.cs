@@ -9,7 +9,7 @@ namespace wpfTest
     /// <summary>
     /// Represents rectangle for selecting units.
     /// </summary>
-    public class MapSelectorFrame:IEntity
+    public class MapSelectorFrame:IRectangle
     {   
         public Vector2 OriginalPoint { get; }
         public Vector2 EndPoint { get; private set; }
@@ -42,9 +42,10 @@ namespace wpfTest
             Top = Math.Max(OriginalPoint.Y, EndPoint.Y);
         }
 
-        public List<Entity> GetSelectedUnits(Game game)
+        public IEnumerable<Entity> GetSelectedUnits(Game game)
         {
-            return game.GameQuerying.SelectRectEntities(game,((IEntity)this).GetRect(),(unit)=>unit.Owner==game.CurrentPlayer.PlayerID);
+            return game.GameQuerying.SelectRectEntities(game,((IRectangle)this).GetRect(),
+                (unit)=>unit.Player.PlayerID==game.CurrentPlayer.PlayerID);
         }
     }
 }

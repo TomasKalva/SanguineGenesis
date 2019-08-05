@@ -10,15 +10,14 @@ namespace wpfTest
 {
     class UnitCommandsInput
     {
-        private Dictionary<Key, AbilityType> keyToAbilityType;
-        public Dictionary<AbilityType, Ability> AbilityTypeToAbility { get; }
+        private Dictionary<Key, Ability> keyToAbility;
         public UnitsCommandInputState State { get; set; }
         public Vector2 MapCoordinates { get; private set; }
-        public Entity TargetedUnit { get; private set; }
-        private AbilityType abilityType;
-        public AbilityType AbilityType { get { return abilityType; } set { abilityType = value; AbilitySelected = true; } }
+        public Entity TargetedEntity { get; private set; }
+        private Ability selectedAbility;
+        public Ability SelectedAbility { get { return selectedAbility; } set { selectedAbility = value; AbilitySelected = true; } }
         public bool AbilitySelected { get; set; }
-        public Ability Ability => AbilityTypeToAbility[AbilityType];
+        public Ability Ability => SelectedAbility;// AbilityTypeToAbility[SelectedAbility];
 
         private static UnitCommandsInput unitCommandsInput=new UnitCommandsInput();
         public static UnitCommandsInput GetUnitCommandsInput() => unitCommandsInput;
@@ -27,19 +26,19 @@ namespace wpfTest
         {
             State = UnitsCommandInputState.IDLE;
             MapCoordinates = new Vector2();
-            AbilityType = AbilityType.MOVE_TO;
+            SelectedAbility = MoveTo.Get;
             AbilitySelected = false;
 
             //initialize keyToAbilityType
-            keyToAbilityType = new Dictionary<Key, AbilityType>();
-            keyToAbilityType.Add(Key.Escape, AbilityType.MOVE_TO);
+            keyToAbility = new Dictionary<Key, Ability>();
+            keyToAbility.Add(Key.Escape, MoveTo.Get);
 
             //initialize abilityTypeToAbility
-            AbilityTypeToAbility = new Dictionary<AbilityType, Ability>();
-            AbilityTypeToAbility.Add(AbilityType.MOVE_TO,
-                new TargetPointAbility(AbilityType.MOVE_TO, 0.1f));
-            AbilityTypeToAbility.Add(AbilityType.ATTACK,
-                 new TargetUnitAbility(AbilityType.ATTACK, 1.2f, true));
+            /*AbilityTypeToAbility = new Dictionary<Ability, Ability>();
+            AbilityTypeToAbility.Add(SelectedAbility.MOVE_TO,
+                new TargetPointAbility(SelectedAbility.MOVE_TO, 0.1f));
+            AbilityTypeToAbility.Add(SelectedAbility.ATTACK,
+                 new TargetUnitAbility(SelectedAbility.ATTACK, 1.2f, true));*/
         }
 
         public void NewPoint(Vector2 mousePos)

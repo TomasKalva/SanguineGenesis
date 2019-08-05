@@ -52,13 +52,13 @@ namespace wpfTest.GameLogic
                 commands = new List<MoveToCommandAssignment>();
                 newCommands = new List<MoveToCommandAssignment>();
                 newObstMaps = new Dictionary<Movement, ObstacleMap>();
-                newObstMaps.Add(Movement.GROUND, null);
+                newObstMaps.Add(Movement.LAND, null);
                 newObstMaps.Add(Movement.WATER, null);
-                newObstMaps.Add(Movement.GROUND_WATER, null);
+                newObstMaps.Add(Movement.LAND_WATER, null);
                 obstMaps = new Dictionary<Movement, ObstacleMap>();
-                obstMaps.Add(Movement.GROUND, null);
+                obstMaps.Add(Movement.LAND, null);
                 obstMaps.Add(Movement.WATER, null);
-                obstMaps.Add(Movement.GROUND_WATER, null);
+                obstMaps.Add(Movement.LAND_WATER, null);
             }
 
             public void UpdateInputs(object lockObj)
@@ -77,6 +77,11 @@ namespace wpfTest.GameLogic
                         AddedCommands = false;
                     }
 
+                    //remove commands that don't need to be updated anymore
+                    Console.WriteLine("active commands: " + commands.Count);
+                    commands.RemoveAll((c) => c.Invalid);
+                    Console.WriteLine("active commands: " + commands.Count);
+
                     if (MapChanged)
                     {
                         inputs = commands.ToList();//we don't want the same reference
@@ -85,17 +90,6 @@ namespace wpfTest.GameLogic
 
                     if (inputs.Any())
                         Finished = false;
-
-                    //remove commands that don't need to be updated anymore
-                    var toBeRemoved = new List<MoveToCommandAssignment>();
-                    foreach (MoveToCommandAssignment c in commands)
-                    {
-                        //remove command assignment if there are no units listening to it
-                        if (!c.Entities.Any())
-                            toBeRemoved.Add(c);
-                    }
-                    Console.WriteLine("active commands: "+commands.Count);
-                    commands.RemoveAll((c) => toBeRemoved.Contains(c));
                 }
             }
 

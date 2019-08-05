@@ -48,6 +48,25 @@ namespace wpfTest
             mg.SetMapChanged(wpfTest.Players.PLAYER1, ObstacleMaps);
         }
 
+        /// <summary>
+        /// Copy the terrain of already existing map.
+        /// </summary>
+        public Map(Map map)
+        {
+            int width = map.Width;
+            int height = map.Height;
+            nodes = new Node[width, height];
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    nodes[i, j] = new Node(i, j, map[i,j].Terrain);
+                }
+            }
+            ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
+            InitializeObstacleMaps();
+        }
+
         private void InitializeColorToTerrain()
         {
             colorToTerrain = new Dictionary<int, Terrain>();
@@ -63,9 +82,9 @@ namespace wpfTest
 
         private void InitializeObstacleMaps()
         {
-            ObstacleMaps.Add(Movement.GROUND, GetObstacleMap(Movement.GROUND));
+            ObstacleMaps.Add(Movement.LAND, GetObstacleMap(Movement.LAND));
             ObstacleMaps.Add(Movement.WATER, GetObstacleMap(Movement.WATER));
-            ObstacleMaps.Add(Movement.GROUND_WATER, GetObstacleMap(Movement.GROUND_WATER));
+            ObstacleMaps.Add(Movement.LAND_WATER, GetObstacleMap(Movement.LAND_WATER));
         }
 
         /// <summary>
@@ -73,9 +92,10 @@ namespace wpfTest
         /// </summary>
         public void UpdateObstacleMaps()
         {
-            ObstacleMaps[Movement.GROUND] = GetObstacleMap(Movement.GROUND);
+            ObstacleMaps[Movement.LAND] = GetObstacleMap(Movement.LAND);
             ObstacleMaps[Movement.WATER] = GetObstacleMap(Movement.WATER);
-            ObstacleMaps[Movement.GROUND_WATER] = GetObstacleMap(Movement.GROUND_WATER);
+            ObstacleMaps[Movement.LAND_WATER] = GetObstacleMap(Movement.LAND_WATER);
+            MapWasChanged = false;
         }
 
         public ObstacleMap GetObstacleMap(Movement movement)
@@ -87,7 +107,7 @@ namespace wpfTest
                     Terrain ter = this[i, j].Terrain;
                     switch (movement)
                     {
-                        case Movement.GROUND:
+                        case Movement.LAND:
                             om[i, j] = ter == Terrain.DEEP_WATER ||
                                         nodes[i,j].Blocked;
                             break;
@@ -96,7 +116,7 @@ namespace wpfTest
                                         ter != Terrain.SHALLOW_WATER) ||
                                         nodes[i,j].Blocked;
                             break;
-                        case Movement.GROUND_WATER:
+                        case Movement.LAND_WATER:
                             om[i, j] = nodes[i,j].Blocked;
                             break;
                     }
@@ -104,23 +124,38 @@ namespace wpfTest
             return om;
         }
 
-        public ObstacleMap GetViewMap()
+        public ObstacleMap GetViewMap(Players player)
         {
             ObstacleMap om = new ObstacleMap(Width, Height);
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
-                    om[i, j] = nodes[i, j].Blocked;
+                    //player can't see through blocked squares that he doesn't own
+                    om[i, j] = nodes[i, j].Blocked && nodes[i, j].Building.Player.PlayerID != player;
             return om;
         }
-        /*
-        /// <summary>
-        /// Returns the distance between the closest points of the circles of the units.
-        /// </summary>
-        public float Distance(Entity u1, Entity u2)
+
+        public void AddBuilding(Building building)
         {
-            float dx = u1.Pos.X - u2.Pos.X;
-            float dy = u1.Pos.Y - u2.Pos.Y;
-            return (float)Math.Sqrt(dx * dx + dy * dy) - u1.Range - u2.Range;
-        }*/
+            Node[,] nodes = GameQuerying.GetGameQuerying()
+                .SelectNodes(this,
+                building.NodeLeft,
+                building.NodeBottom,
+                building.NodeLeft + (building.Size - 1),
+                building.NodeBottom + (building.Size - 1));
+            foreach (Node n in nodes)
+            {
+                n.Building = building;
+            }
+            MapWasChanged = true;
+        }
+
+        public void RemoveBuilding(Building building)
+        {
+            foreach (Node n in building.Nodes)
+            {
+                this[n.X,n.Y].Building = null;
+            }
+            MapWasChanged = true;
+        }
     }
 }

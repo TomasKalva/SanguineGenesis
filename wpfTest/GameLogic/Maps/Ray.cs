@@ -40,15 +40,16 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// Moves to the next (from the start to the end) square that 
         /// intersects this ray and returns its coordinates x, y.
-        /// Returns false if no such square exists.
+        /// Returns false if no such square exists or the square is blocked.
+        /// If the square doesn't exist, x=-1 and y=-1. If the square is blocked,
+        /// it contains correct coordinates.
         /// </summary>
         public bool Next(out int x, out int y)
         {
             //initial values are set, because we might return false
             x = -1;
             y = -1;
-
-            ////now just for rays pointing to the right top
+            
             //the next axis to be intersected
             int intersAxX, intersAxY;
             if(End.X > Start.X)
@@ -123,7 +124,11 @@ namespace wpfTest.GameLogic.Maps
                 x < 0 ||
                 y >= ObstMap.Height ||
                 y < 0)
+            {
+                x = -1;
+                y = -1;
                 return false;
+            }
 
             //return false if the ray hits an obstacle
             if (ObstMap[x, y])

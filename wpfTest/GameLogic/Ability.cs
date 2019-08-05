@@ -6,115 +6,312 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Represents a target on the map.
+    /// </summary>
+    public interface ITargetable
+    {
+        Vector2 Center { get; }
+    }
+
+    /// <summary>
+    /// Place where unit can go to.
+    /// </summary>
+    public interface IMovementTarget:ITargetable
+    {
+    }
+
     public abstract class Ability
     {
-        public AbilityType AbilityType { get; }
         /// <summary>
-        /// Minimal distance for using this ability.
+        /// Maximal distance from the target where the ability can be cast.
         /// </summary>
         public float Distance { get; }
         /// <summary>
-        /// True if attack distance of the unit should be used instead of Distance.
+        /// Energy required to use this ability.
         /// </summary>
-        public bool UsesAttackDistance { get; }
+        public float EnergyCost { get; }
+        /// <summary>
+        /// Resource required to use this ability.
+        /// </summary>
+        public float ResourceCost { get; }
+        /// <summary>
+        /// True iff this ability should be performed only by one of the selected units.
+        /// </summary>
+        public bool OnlyOne { get; }
 
-        public Ability(AbilityType abilityType, float distance, bool usesAttackDistance)
+        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target);
+        /// <summary>
+        /// Returns true if the target type is valid for this ability.
+        /// </summary>
+        public abstract bool ValidTargetType(ITargetable target);
+        public abstract Type TargetType { get; }
+        public abstract Command NewCommand(Entity caster, ITargetable target);
+        /// <summary>
+        /// Returns text which describes what the ability does.
+        /// </summary>>
+        public abstract string Description();
+        public override string ToString()
         {
-            AbilityType = abilityType;
+            return GetType().Name;
+        }
+        public Ability(float distance, float energyCost, float resourceCost, bool onlyOne)
+        {
             Distance = distance;
+            EnergyCost = energyCost;
+            ResourceCost = resourceCost;
+            OnlyOne = onlyOne;
+        }
+    }
+
+    public abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
+                                                                    where Target: ITargetable
+    {
+        public TargetAbility(float distance, float energyCost, float resourceCost, bool onlyOne)
+            :base(distance, energyCost, resourceCost, onlyOne)
+        {
+        }
+
+        /// <summary>
+        /// Calls generic version of this method. 
+        /// </summary>
+        /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
+        /// <exception cref="NullReferenceException">If some casters are null.</exception>
+        public sealed override Command NewCommand(Entity caster, ITargetable target)
+        {
+            return NewCommand((Caster)caster, (Target)target);
+        }
+
+        public abstract Command NewCommand(Caster caster, Target target);
+
+        /// <summary>
+        /// Assigns commands to the units.
+        /// </summary>
+        public sealed override void SetCommands(IEnumerable<Entity> casters, ITargetable target)
+        {
+            SetCommands(casters.Cast<Caster>(), (Target)target);
+        }
+        
+        public sealed override bool ValidTargetType(ITargetable target)
+        {
+            return target is Target;
+        }
+
+        public sealed override Type TargetType 
+            => typeof(Target);
+
+        public virtual void SetCommands(IEnumerable<Caster> casters, Target target)
+        {
+            //select only the casters who can pay and put the to list so 
+            //they can be enumerated multiple times
+            List<Caster> ableToPay = casters
+                .Where((caster) =>(caster.Energy >= EnergyCost &&
+                     caster.Player.Resource >= ResourceCost))
+                 .ToList();
+            
+            
+            //if there are no casters that can pay do nothing
+            if (!ableToPay.Any())
+                return;
+
+            if (OnlyOne)
+                ableToPay = ableToPay.Take(1).ToList();
+
+            //move units to the target until the required distance is reached
+            MoveTo.GetMoveTo(this)
+                .SetCommands(ableToPay
+                .Where(caster=>caster.GetType()==typeof(Unit))
+                .Cast<Unit>(), target);
+
+            //give command to each caster
+            foreach (Caster c in ableToPay)
+            {
+                //create new command and assign it to c
+                Command com = NewCommand(c, target);
+                c.AddCommand(com);
+            }
+        }
+    }
+
+    public sealed class MoveTo: TargetAbility<Unit,IMovementTarget>,IMovementParametrizing
+    {
+        private static MoveTo ability;
+        /// <summary>
+        /// Movement parameters for each ability other than MoveTo.
+        /// </summary>
+        private static Dictionary<Ability, MoveTo> moveToCast;
+        static MoveTo()
+        {
+            ability = new MoveTo(0.1f, true, false);
+            //initialize MoveTo for all abilities
+            {
+                moveToCast = new Dictionary<Ability, MoveTo>();
+                moveToCast.Add(Attack.Get, new MoveTo(-1, true, true));
+                //spawn abilities
+                foreach (EntityType unit in EntityTypeExtensions.Units)
+                {
+                    Ability a = Spawn.GetAbility(unit);
+                    moveToCast.Add(a, new MoveTo(a.Distance, false, false));
+                }
+                //build abilities
+                foreach (EntityType building in EntityTypeExtensions.Buildings)
+                {
+                    Ability a = Build.GetAbility(building);
+                    moveToCast.Add(a, new MoveTo(a.Distance, false, false));
+                }
+            }
+        }
+        private MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
+            :base(-1, 0, 0, false)
+        {
+            GoalDistance = goalDistance;
+            Interruptable = interruptable;
             UsesAttackDistance = usesAttackDistance;
         }
+        public static MoveTo Get => ability;
+        public static MoveTo GetMoveTo(Ability a) => moveToCast[a];
 
-    }
+        //interface IMovementParametrizing properties
+        public float GoalDistance { get; }
+        public bool Interruptable { get; }
+        public bool UsesAttackDistance { get; }
 
-    public class TargetPointAbility:Ability
-    {
-        public TargetPointAbility(AbilityType abilityType, float distance, bool usesAttackDistance=false)
-            :base(abilityType,distance, usesAttackDistance)
-        { }
-
-        /// <summary>
-        /// Assigns a new instance of the command assignment for this ability and returns it.
-        /// </summary>
-        public void AssignCommands(Players player, List<Entity> units, Vector2 target, Game game)
+        public override void SetCommands(IEnumerable<Unit> casters, IMovementTarget target)
         {
-            //move to the target until the minimal distance is reached
-            if(!(AbilityType==AbilityType.MOVE_TO))
-                AssignMovementToPoint(player, units, target, game);
+            //if there are no casters do nothing
+            if (!casters.Any())
+                return;
+            //player whose units are receiving commands
+            Players player = casters.First().Player.PlayerID;
 
-            switch (AbilityType)
+            //separete units to different groups by their movement
+            var castersGroups = casters.ToLookup((unit) => unit.Movement);
+
+            //volume of all units' circles /pi
+            float volume = casters.Select((e) => e.Range * e.Range).Sum();
+            //distance from the target when unit can stop if it gets stuck
+            float minStoppingDistance = (float)Math.Sqrt(volume) * 1.3f;
+
+            foreach(Movement m in Enum.GetValues(typeof(Movement)))
             {
-                case AbilityType.MOVE_TO:
-                    {
-                        //create new instace of move to command assignment and set it to all units
-                        MoveToCommandAssignment mto = new MoveToPointCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance,true);
-                        mto.AssignCommands();
-                        //add the command assignment to movement generator to create the flowmap asynchronously
-                        MovementGenerator.GetMovementGenerator().AddNewCommand(Players.PLAYER0,mto);
-                        return;
-                    }
+                IEnumerable<Unit> castersMov = castersGroups[m];
+                //set commands only if any unit can receive it
+                if (!castersMov.Any())
+                    continue;
+
+                MoveToCommandAssignment mtca = new MoveToCommandAssignment(player, castersMov.Cast<Unit>().ToList(), m, target);
+                //give command to each caster and set the command's creator
+                foreach (Unit caster in castersMov)
+                {
+                    IComputable com = new MoveToPointCommand(caster, target, minStoppingDistance, this);
+                    com.Assignment = mtca;
+
+                    caster.AddCommand((Command)com);
+                }
+                MovementGenerator.GetMovementGenerator().AddNewCommand(player, mtca);
             }
-            throw new NotImplementedException("Implementation for " + AbilityType + " in the method " + nameof(AssignCommands) + "is missing!");
         }
 
-        /// <summary>
-        /// Assigns commands to units to move to the target until they are at most the goalDistance
-        /// from it
-        /// </summary>
-        /// <param name="endDistance">Distance to the target when the unit stops moving.</param>
-        protected void AssignMovementToPoint(Players player, List<Entity> units, Vector2 target, Game game)
+        public override Command NewCommand(Unit caster, IMovementTarget target)
         {
-            //create new instace of move to command assignment and set it to all units
-            MoveToCommandAssignment mto = new MoveToPointCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance);
-            mto.AssignCommands();
-            //add the command assignment to movement generator to create the flowmap asynchronously
-            MovementGenerator.GetMovementGenerator().AddNewCommand(Players.PLAYER0, mto);
+            throw new NotImplementedException("This method is not necessary because the virtual method " + nameof(SetCommands) + " was overriden");
+        }
+
+        public override string Description()
+        {
+            return "The unit moves to the target. If the target is on a terrain " +
+                "this unit can't move to, the unit won't do anything. If unit meets an enemy it attacks it instead.";
         }
     }
 
-    public class TargetUnitAbility : Ability
+    public sealed class Attack : TargetAbility<Unit, Entity>
     {
-
-        public TargetUnitAbility(AbilityType abilityType, float distance, bool usesAttackDistance = false)
-            : base(abilityType,distance, usesAttackDistance)
-        { }
-
-        /// <summary>
-        /// Assigns a new instance of the command assignment for this ability and returns it.
-        /// </summary>
-        public void AssignCommands(Players player, List<Entity> units, Entity target, Game game)
+        private static Attack ability;
+        static Attack()
         {
-            //move to the target until the minimal distance is reached
-            if (!(AbilityType == AbilityType.MOVE_TO))
-                AssignMovementToUnit(player, units, target, game);
+            ability = new Attack();
+        }
+        private Attack():base(-1, 0, 0, false) { }
+        public static Attack Get => ability;
+        public override Command NewCommand(Unit caster, Entity target)
+        {
+            return new AttackCommand(caster, target);
+        }
 
-            switch (AbilityType)
+        public override string Description()
+        {
+            return "The unit deals repeatedly its attack damage to the target.";
+        }
+    }
+
+    public sealed class Spawn : TargetAbility<Entity, Vector2>
+    {
+        private static Dictionary<EntityType,Spawn> unitSpawningAbilities;
+        static Spawn()
+        {
+            unitSpawningAbilities = new Dictionary<EntityType, Spawn>()
             {
-                case AbilityType.ATTACK:
-                    AttackCommandAssignment mto = new AttackCommandAssignment(player, units.ToList(), target);
-                    mto.AssignCommands();
-                    return;
-            }
-            throw new NotImplementedException("Implementation for " + AbilityType + " in the method " + nameof(AssignCommands) + "is missing!");
+                { EntityType.TIGER, new Spawn(new UnitFactory(EntityType.TIGER, 0.5f, 2f, 4f, 50f, 20f, Movement.LAND_WATER,4f),0,50)}
+            };
+        }
+        private Spawn(UnitFactory spawningUnitFactory, float energyCost, float resourceCost)
+            : base(2 * spawningUnitFactory.Range, energyCost, resourceCost, true)
+        {
+            SpawningUnitFactory = spawningUnitFactory;
+        }
+        public static Spawn GetAbility(EntityType t) => unitSpawningAbilities[t];
+        
+        public UnitFactory SpawningUnitFactory { get; }
+
+        public override Command NewCommand(Entity caster, Vector2 target)
+        {
+            return new SpawnCommand(caster, target, SpawningUnitFactory.UnitType);
         }
 
-        /// <summary>
-        /// Assigns commands to units to move to the target unit until they are at most the Distance required
-        /// by this ability from it.
-        /// </summary>
-        protected void AssignMovementToUnit(Players player, List<Entity> units, Entity target, Game game)
+        public override string ToString()
         {
-            //create new instace of move to command assignment and set it to all units
-            MoveToCommandAssignment mto = new MoveToUnitCommandAssignment(player, units.ToList(), target, Movement.GROUND, Distance, UsesAttackDistance);
-            mto.AssignCommands();
-            //add the command assignment to movement generator to create the flowmap asynchronously
-            MovementGenerator.GetMovementGenerator().AddNewCommand(Players.PLAYER0, mto);
+            return base.ToString() + " " + SpawningUnitFactory.UnitType;
+        }
+
+        public override string Description()
+        {
+            return "The entity spawns a new unit at the target point.";
         }
     }
 
-    public enum AbilityType
+
+    public sealed class Build : TargetAbility<Entity, Node>
     {
-        MOVE_TO,
-        ATTACK
+        private static Dictionary<EntityType, Build> buildingBuildingAbilities;
+        static Build()
+        {
+            buildingBuildingAbilities = new Dictionary<EntityType, Build>()
+            {
+                { EntityType.BAOBAB, new Build(new BuildingFactory(EntityType.BAOBAB, 3, 150, 100, new List<Terrain>{ Terrain.SAVANA_GRASS}, 20),0,50)}
+            };
+        }
+        private Build(BuildingFactory buildingFactory, float energyCost, float resourceCost)
+            : base(20f, energyCost, resourceCost, true)
+        {
+            BuildingFactory = buildingFactory;
+        }
+        public static Build GetAbility(EntityType t) => buildingBuildingAbilities[t];
+
+        public BuildingFactory BuildingFactory { get; }
+
+        public override Command NewCommand(Entity caster, Node target)
+        {
+            return new BuildCommand(caster, target, BuildingFactory.UnitType);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + " " + BuildingFactory.UnitType;
+        }
+
+        public override string Description()
+        {
+            return "The building is build at the target node.";
+        }
     }
 }

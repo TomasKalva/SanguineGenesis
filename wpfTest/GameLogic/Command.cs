@@ -10,168 +10,272 @@ namespace wpfTest
 {
     public abstract class Command
     {
-        public Entity CommandedEntity { get; }
-        /// <summary>
-        /// Factory that created this command.
-        /// </summary>
-        public CommandAssignment Creator { get; set; }
         /// <summary>
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
         public abstract bool PerformCommand(Game game, float deltaT);
-        public Command(Entity commandedEntity)
+    }
+
+    public abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
+                                                                    where Target : ITargetable
+                                                                    where Abil:TargetAbility<Caster,Target>
+    {
+        /// <summary>
+        /// The ability this command is performing.
+        /// </summary>
+        public Abil Ability { get; }
+        /// <summary>
+        /// The entity who performs this command.
+        /// </summary>
+        public Caster CommandedEntity { get; }
+        /// <summary>
+        /// Target of the ability.
+        /// </summary>
+        public Target Targ { get; }
+        /// <summary>
+        /// True iff the ability was paid.
+        /// </summary>
+        private bool Paid { get; set; }
+
+        protected Command(Caster commandedEntity, Target target, Abil ability)
         {
+            Ability = ability;
             CommandedEntity = commandedEntity;
+            Targ = target;
         }
-        public virtual void RemoveFromCreator()
+        public override string ToString()
         {
-            if (Creator != null)
-                Creator.Entities.Remove(CommandedEntity);
+            return Ability.ToString();
+        }
+
+        /// <summary>
+        /// Try to pay for the ability. Returns if paying was successful.
+        /// </summary>
+        protected bool TryPay()
+        {
+            if (Paid)
+                //the ability was paid already
+                return true;
+
+            if (CommandedEntity.Energy >= Ability.EnergyCost &&
+                CommandedEntity.Player.Resource >= Ability.ResourceCost)
+            {
+                //pay for the ability
+                CommandedEntity.Energy -= Ability.EnergyCost;
+                CommandedEntity.Player.Resource -= Ability.ResourceCost;
+                Paid = true;
+                return true;
+            }
+            //not enough resource/energy
+            return false;
         }
     }
 
-    public abstract class MovementCommand:Command
+    public class AttackCommand : Command<Unit, Entity, Attack>
     {
-        public Unit CommandedUnit => (Unit)CommandedEntity;
-        private static Vector2 INVALID { get; }
-        protected float minStoppingDistance;
-        public override abstract bool PerformCommand(Game game, float deltaT);
-        static MovementCommand()
-        {
-            INVALID = new Vector2(-1, -1);
-        }
-        public MovementCommand(Unit commandedEntity, float minStoppingDistance)
-            :base(commandedEntity)
-        {
-            this.minStoppingDistance = minStoppingDistance;
-            last4positions = new Vector2[4];
-            last4positions[0] = INVALID;
-            last4positions[1] = INVALID;
-            last4positions[2] = INVALID;
-            last4positions[3] = INVALID;
-        }
-        protected Vector2[] last4positions;
+        private float timeUntilAttack;//time in s until this unit attacks
 
-        protected void AddToLast4(Vector2 v)
+        private AttackCommand():base(null,null,null) => throw new NotImplementedException();
+        public AttackCommand(Unit commandedEntity, Entity target)
+            : base(commandedEntity, target, Attack.Get)
         {
-            last4positions[3] = last4positions[2];
-            last4positions[2] = last4positions[1];
-            last4positions[1] = last4positions[0];
-            last4positions[0] = v;
-        }
+            this.timeUntilAttack = 0f;
 
-        protected bool Last4TooClose(float deltaT)
+        }
+        
+        public override bool PerformCommand(Game game, float deltaT)
         {
-            if (last4positions[0] != INVALID &&
-                last4positions[1] != INVALID &&
-                last4positions[2] != INVALID &&
-                last4positions[3] != INVALID)
+            //dead target cannont be attacked
+            if (Targ.IsDead)
             {
-                float d1 = (last4positions[0] - last4positions[1]).Length;
-                float d2 = (last4positions[1] - last4positions[2]).Length;
-                float d3 = (last4positions[2] - last4positions[3]).Length;
+                CommandedEntity.CanBeMoved = true;
+                return true;
+            }
+            CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
 
-                if (d1 + d2 + d3 < CommandedUnit.MaxSpeed*deltaT/2)
-                    return true;
+            CommandedEntity.CanBeMoved = false;
+            timeUntilAttack += deltaT;
+            if (timeUntilAttack >= CommandedEntity.AttackPeriod)
+            {
+                //damage target
+                timeUntilAttack -= CommandedEntity.AttackPeriod;
+                Targ.Health -= CommandedEntity.AttackDamage;
+            }
+
+            bool finished = CommandedEntity.DistanceTo(Targ) >= CommandedEntity.AttackDistance;
+            if (finished)
+            {
+                CommandedEntity.CanBeMoved = true;
+                return true;
             }
             return false;
         }
+    }
 
-        public override string ToString()
+    public interface IComputable
+    {
+        MoveToCommandAssignment Assignment { get; set; }
+    }
+
+    public class MoveToPointCommand : Command<Unit, IMovementTarget, MoveTo>,IComputable
+    {
+        public MoveToCommandAssignment Assignment { get; set; }
+        private MoveToLogic moveToLogic;
+        /// <summary>
+        /// Flowmap used for navigation. It can be set after the command was assigned.
+        /// </summary>
+        private FlowMap flowMap;
+        
+
+        private MoveToPointCommand() : base(null, null, null) => throw new NotImplementedException();
+        public MoveToPointCommand(Unit commandedEntity, IMovementTarget target, float minStoppingDistance, MoveTo ability)
+            : base(commandedEntity, target, ability)
         {
-            return "Move";
+            moveToLogic = new MoveToLogic(CommandedEntity, null, minStoppingDistance, target, Ability);
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            bool finished = false;
+            //command immediately finishes if the assignment was invalidated
+            if (Assignment != null && Assignment.Invalid)
+                finished = true;
+            else
+                finished = moveToLogic.Step(game, deltaT, flowMap, this);
+
+
+            if (finished)
+            {
+                CommandedEntity.StopMoving = true;
+                this.RemoveFromAssignment();
+            }
+            return finished;
+        }
+
+
+        public void UpdateFlowMap(FlowMap flowMap)
+        {
+            this.flowMap = flowMap;
+        }
+
+        public void RemoveFromAssignment()
+        {
+            Assignment.Units.Remove(CommandedEntity);
         }
     }
     
-    public abstract class MoveToCommand : MovementCommand
+    public class MoveToLogic
     {
         /// <summary>
         /// If the distance to the target is higher than this, flowmap will be used. 
         /// Otherwise unit will walk straight to the target.
         /// </summary>
-        protected const float FLOWMAP_DISTANCE = 1.41f;
+        private const float FLOWMAP_DISTANCE = 1.41f;
 
+        /// <summary>
+        /// Moving unit.
+        /// </summary>
+        private Unit unit;
+        /// <summary>
+        /// Point on the map where the unit should go.
+        /// </summary>
+        public ITargetable TargetPoint { get; }
         /// <summary>
         /// Flowmap used for navigation. It can be set after the command was assigned.
         /// </summary>
-        protected FlowMap flowMap;
+        private FlowMap flowMap;
         /// <summary>
-        /// Distance where the unit stops moving.
+        /// Distance from the target when unit can stop if it gets stuck.
         /// </summary>
-        protected float goalDistance;
-        /// <summary>
-        /// Point on the map where the units should go.
-        /// </summary>
-        public abstract Vector2 TargetPoint { get; }
-        /// <summary>
-        /// If enemy in range, cancel commands and attack the enemy.
-        /// </summary>
-        protected bool interruptable;
+        private float minStoppingDistance;
+        private IMovementParametrizing movementParametrizing;
+        private NoMovementDetection noMovementDetection;
 
-        public MoveToCommand(Unit commandedEntity, FlowMap flowMap, float minStoppingDistance, float goalDistance=0.1f, bool usesAttackDistance=false, 
-            bool interruptable=true) 
-            : base(commandedEntity, minStoppingDistance)
+        public MoveToLogic(Unit unit, FlowMap flowMap, float minStoppingDistance, IMovementTarget target, IMovementParametrizing movementParametrizing)
         {
+            this.unit = unit;
             this.flowMap = flowMap;
-            this.goalDistance = goalDistance;
-            this.interruptable = interruptable;
+            this.minStoppingDistance = minStoppingDistance;
+            noMovementDetection = new NoMovementDetection();
+            this.TargetPoint = target;
+            this.movementParametrizing = movementParametrizing;
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public bool Step(Game game, float deltaT, FlowMap flowMap, MoveToPointCommand command)
         {
-            ((MoveToCommandAssignment)Creator).Active = true;
-
+            //set the command assignment to be active to increase its priority
+            command.Assignment.Active = true;
+            
             //if an enemy is in attack range, attack it instead of other commands
-            if(interruptable)
+            if(movementParametrizing.Interruptable)
             {
                 Entity enemy = GameQuerying.GetGameQuerying().SelectUnits(game, 
-                    (u) => u.Owner!=CommandedEntity.Owner 
-                            && CommandedEntity.DistanceTo(u) <= CommandedUnit.AttackDistance).FirstOrDefault();
+                    (u) => u.Player!=unit.Player 
+                            && unit.DistanceTo(u) <= unit.AttackDistance).FirstOrDefault();
                 if(enemy!=null)
                 {
                     //attack the enemy
-                    CommandedUnit.StopMoving = true;
-                    RemoveFromCreator();
-                    CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy));
+                    unit.StopMoving = true;
+                    command.RemoveFromAssignment();
+                    unit.SetCommand(new AttackCommand(unit, enemy));
                     return false;//new command is already set
                 }
             }
 
-            //check if the map was set already
+            //check if the map was set yet
             if (flowMap == null)
                 return false;
 
-            float dist = (CommandedUnit.Center - TargetPoint).Length;
+            float dist = (unit.Center - TargetPoint.Center).Length;
             if (dist > FLOWMAP_DISTANCE)
             {
                 //use flowmap
-                CommandedUnit.Accelerate(flowMap.GetIntensity(CommandedUnit.Center, CommandedUnit.Acceleration));
+                unit.Accelerate(flowMap.GetIntensity(unit.Center, unit.Acceleration));
             }
             else
             {
                 //go in straight line
-                Vector2 direction = CommandedUnit.Center.UnitDirectionTo(TargetPoint);
-                CommandedUnit.Accelerate(CommandedUnit.Acceleration * direction);
+                Vector2 direction = unit.Center.UnitDirectionTo(TargetPoint.Center);
+                unit.Accelerate(unit.Acceleration * direction);
             }
             //update last four positions
-            AddToLast4(CommandedUnit.Center);
-            //set that entity want to move
-            CommandedUnit.WantsToMove = true;
+            noMovementDetection.AddNextPosition(unit.Center);
+            //set that unit wants to move
+            unit.WantsToMove = true;
 
             bool finished=Finished();
 
             //command is finished if unit reached the goal distance or if it stayed at one
             //place near the target position for a long time
-            if (finished || (Last4TooClose(deltaT) && CanStop()))
+            if (finished //unit is close to the target point
+                || (noMovementDetection.NotMovingMuch(deltaT, unit.MaxSpeed * deltaT / 2) && CanStop())//unit is stuck
+                /*|| game.Players[unit.Player.PlayerID].MapView
+                    .GetObstacleMap(unit.Movement)[(int)TargetPoint.Center.X,(int)TargetPoint.Center.Y]*/)//target point is blocked
             {
-                CommandedUnit.StopMoving = true;
-                RemoveFromCreator();
                 return true;
             }
             return false;
         }
 
-        public abstract bool Finished();
+        public bool Finished()
+        {
+            Entity e;
+            if ((e=TargetPoint as Entity)==null)
+            {
+                //target is vector
+                //use distance between center of the unit and the point
+                return (TargetPoint.Center - unit.Center).Length <= movementParametrizing.GoalDistance;
+            }
+            else
+            {
+                //target is entity
+                //use distance between closest points of the entities
+                if(movementParametrizing.UsesAttackDistance)
+                    return unit.DistanceTo(e) <= unit.AttackDistance;
+                else
+                    return unit.DistanceTo(e) <= movementParametrizing.GoalDistance;
+            }
+        }
 
         public void UpdateFlowMap(FlowMap flMap)
         {
@@ -183,102 +287,142 @@ namespace wpfTest
         /// </summary>
         private bool CanStop()
         {
-            return (TargetPoint - CommandedUnit.Center).Length < minStoppingDistance;
+            return (TargetPoint.Center - unit.Center).Length < minStoppingDistance;
         }
     }
 
-    public class MoveToPointCommand:MoveToCommand
+    /// <summary>
+    /// Detects if the unit is not moving much.
+    /// </summary>
+    public class NoMovementDetection
     {
-        /// <summary>
-        /// Point on the map where the units should go.
-        /// </summary>
-        private Vector2 targetPos;
-        public override Vector2 TargetPoint=>targetPos;
-
-        public MoveToPointCommand(Unit commandedEntity, Vector2 targetPos, FlowMap flowMap, float minStoppingDistance, float goalDistance = 0.1f)
-            : base(commandedEntity, flowMap, minStoppingDistance, goalDistance)
+        private static Vector2 INVALID { get; }
+        private Vector2[] last4positions;
+        static NoMovementDetection()
         {
-            this.targetPos = targetPos;
+            INVALID = new Vector2(-1, -1);
+        }
+        public NoMovementDetection()
+        {
+            last4positions = new Vector2[4];
+            last4positions[0] = INVALID;
+            last4positions[1] = INVALID;
+            last4positions[2] = INVALID;
+            last4positions[3] = INVALID;
         }
 
-        public override bool Finished()
+        public void AddNextPosition(Vector2 v)
         {
-            return (TargetPoint - CommandedUnit.Center).Length <= goalDistance;
+            last4positions[3] = last4positions[2];
+            last4positions[2] = last4positions[1];
+            last4positions[1] = last4positions[0];
+            last4positions[0] = v;
+        }
+
+        public bool NotMovingMuch(float deltaT, float minDistSum)
+        {
+            if (last4positions[0] != INVALID &&
+                last4positions[1] != INVALID &&
+                last4positions[2] != INVALID &&
+                last4positions[3] != INVALID)
+            {
+                float d1 = (last4positions[0] - last4positions[1]).Length;
+                float d2 = (last4positions[1] - last4positions[2]).Length;
+                float d3 = (last4positions[2] - last4positions[3]).Length;
+
+                if (d1 + d2 + d3 < minDistSum)
+                    return true;
+            }
+            return false;
         }
     }
 
-    public class MoveToUnitCommand : MoveToCommand
+
+    public class SpawnCommand : Command<Entity, Vector2, Spawn>
     {
         /// <summary>
-        /// Unit on the map to which the units should go.
+        /// How long the unit was spawning in s.
         /// </summary>
-        private Entity targetUnit;
-        public override Vector2 TargetPoint => ((Unit)targetUnit).Center;
-        /// <summary>
-        /// True if instead of goalDistance should be used the units AttackDistance.
-        /// </summary>
-        public bool UsesAttackDistance { get; }
+        public float SpawnTimer { get; private set; }
 
-        public MoveToUnitCommand(Unit commandedEntity, Entity targetUnit, FlowMap flowMap, float minStoppingDistance, float goalDistance = 0.1f, bool usesAttackDistance=false)
-            : base(commandedEntity, flowMap, minStoppingDistance, goalDistance)
+        private SpawnCommand() : base(null, default(Vector2), null) => throw new NotImplementedException();
+        public SpawnCommand(Entity commandedEntity, Vector2 target, EntityType entityType)
+            : base(commandedEntity, target, Spawn.GetAbility(entityType))
         {
-            this.targetUnit = targetUnit;
-            UsesAttackDistance = usesAttackDistance;
-        }
-
-        public override bool Finished()
-        {
-            float dist = CommandedUnit.DistanceTo(targetUnit);
-            if (UsesAttackDistance)
-                return dist <= CommandedUnit.AttackDistance;
-            else
-                return dist <= goalDistance;
-        }
-    }
-
-    public class AttackCommand : Command
-    {
-        public Unit CommandedUnit => (Unit)CommandedEntity;
-        private Entity target;
-        private float timeUntilAttack;//time in s until this unit attacks
-
-        public AttackCommand(Entity commandedEntity, Entity target)
-            : base(commandedEntity)
-        {
-            this.target = target;
-            this.timeUntilAttack = 0f;
+            SpawnTimer = 0f;
         }
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            //dead target cannont be attacked
-            if (target.IsDead)
-            {
-                CommandedUnit.CanBeMoved = true;
+            if (!TryPay())
+                //finish command if paying was unsuccessful
                 return true;
-            }
-            CommandedUnit.Direction = ((Unit)target).Center - CommandedUnit.Center;
 
-            CommandedUnit.CanBeMoved = false;
-            timeUntilAttack += deltaT;
-            if (timeUntilAttack >= CommandedUnit.AttackPeriod)
+            SpawnTimer += deltaT;
+            if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
             {
-                timeUntilAttack -= CommandedUnit.AttackPeriod;
-                target.Health -= CommandedUnit.AttackDamage;
-            }
-
-            bool finished= CommandedEntity.DistanceTo(target) >= CommandedUnit.AttackDistance;
-            if (finished)
-            {
-                CommandedUnit.CanBeMoved = true;
+                Player newUnitOwner = CommandedEntity.Player;
+                Unit newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Targ);
+                game.Players[newUnitOwner.PlayerID].Entities.Add(newUnit);
                 return true;
             }
             return false;
         }
+    }
 
-        public override string ToString()
+    public class BuildCommand : Command<Entity, Node, Build>
+    {
+        private BuildCommand() : base(null, null, null) => throw new NotImplementedException();
+        public BuildCommand(Entity commandedEntity, Node target, EntityType entityType)
+            : base(commandedEntity, target, Build.GetAbility(entityType))
         {
-            return "Attack";
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+
+            Map map = game.Map;
+            BuildingFactory bf = Ability.BuildingFactory;
+            //check if the building can be built on the node
+            bool canBeBuilt = true;
+            int nX = Targ.X;
+            int nY = Targ.Y;
+            int size = bf.Size;
+            Node[,] buildNodes = GameQuerying.GetGameQuerying().SelectNodes(map, nX, nY, nX + (size-1), nY + (size-1));
+
+            if (buildNodes.GetLength(0)==size &&
+                buildNodes.GetLength(1)==size)
+            {
+                for(int i=0;i<size;i++)
+                    for (int j = 0; j < size; j++)
+                    {
+                        Node ijN = buildNodes[i, j];
+                        //the building can't be built if the node is blocked or contains
+                        //incompatible terrain
+                        if (ijN.Blocked || !bf.Terrains.Contains(ijN.Terrain))
+                            canBeBuilt = false;
+                    }
+            }
+            else
+            {
+                //the whole building has to be on the map
+                canBeBuilt = false;
+            }
+
+            if (canBeBuilt)
+            {
+                if (!TryPay())
+                    //finish command if paying was unsuccessful
+                    return true;
+
+                Player newUnitOwner = game.Players[CommandedEntity.Player.PlayerID+1];
+                Building newBuilding = Ability.BuildingFactory.NewInstance(newUnitOwner, buildNodes);
+                game.Players[newUnitOwner.PlayerID].Entities.Add(newBuilding);
+                map.AddBuilding(newBuilding);
+                game.Map.MapWasChanged = true;
+            }
+            //the command always immediately finishes regardless of the success of building the building
+            return true;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace wpfTest
         public UnitCommandsInput UnitCommandsInput { get; }
         public MapView MapView { get; }
         public MapSelectorFrame MapSelectorFrame { get; set; }
-        public CommandsGroup SelectedUnits { get; private set; }
+        public CommandsGroup SelectedEntities { get; private set; }
         
 
         public GameControls(MapView mapView, MapMovementInput mapMovementInput)
@@ -23,7 +23,7 @@ namespace wpfTest
             MapMovementInput = mapMovementInput;
             UnitCommandsInput = UnitCommandsInput.GetUnitCommandsInput();
             MapSelectorFrame = null;
-            SelectedUnits = new CommandsGroup();
+            SelectedEntities = new CommandsGroup();
         }
 
         /// <summary>
@@ -49,12 +49,17 @@ namespace wpfTest
                     if (MapSelectorFrame == null)
                     {
                         MapSelectorFrame = new MapSelectorFrame(mapPoint);
-                        SelectedUnits.RemoveUnits(SelectedUnits.Units);
+                        SelectedEntities.RemoveUnits(SelectedEntities.Entities);
+                        //reset selected ability
+                        lock (UnitCommandsInput)
+                        {
+                            UnitCommandsInput.AbilitySelected = false;
+                        }
                     }
                     else
                     {
                         MapSelectorFrame.SetEndPoint(mapPoint);
-                        SelectedUnits.SetUnits(MapSelectorFrame.GetSelectedUnits(game));
+                        SelectedEntities.SetUnits(MapSelectorFrame.GetSelectedUnits(game).ToList());
                         MapSelectorFrame.Update();
                     }
                     break;
@@ -62,11 +67,10 @@ namespace wpfTest
                     MapSelectorFrame = null;
                     break;
                 case UnitsCommandInputState.ABILITY:
+                    //determine target
                     Vector2 clickCoords = UnitCommandsInput.MapCoordinates;
-                    Entity targ=GameQuerying.GetGameQuerying().SelectRectEntities(
-                        game, new Rect(clickCoords.X, clickCoords.Y, clickCoords.X, clickCoords.Y), (unit) => true)
-                        .FirstOrDefault();
                     
+                    //get information about selected ability
                     bool abilitySelected;
                     Ability abil;
                     lock (UnitCommandsInput)
@@ -77,27 +81,62 @@ namespace wpfTest
                     }
 
                     if (!abilitySelected)
+                    //ability wasn't selected => use default abilities
                     {
-                        if (targ == null || 
-                            targ.Owner == game.CurrentPlayer.PlayerID)//do not attack own units
+                        //determine target
+                        ITargetable enemy = SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, 
+                            (entity) => entity.Player.PlayerID != game.CurrentPlayer.PlayerID, typeof(Entity));
+
+                        if (enemy == null)
                         {
-                            TargetPointAbility move = (TargetPointAbility)UnitCommandsInput
-                                .AbilityTypeToAbility[AbilityType.MOVE_TO];
-                            move.AssignCommands(Players.PLAYER0,SelectedUnits.Units, clickCoords, game);
+                            //no enemy selected, move to the clicked coordiantes
+                            MoveTo.Get.SetCommands(SelectedEntities.Entities
+                                .Where((e)=>e.GetType()==typeof(Unit)).Cast<Unit>(), clickCoords);
                         }
                         else
                         {
-                            TargetUnitAbility attack = (TargetUnitAbility)UnitCommandsInput
-                                .AbilityTypeToAbility[AbilityType.ATTACK];
-                            attack.AssignCommands(Players.PLAYER0,SelectedUnits.Units, targ, game);
+                            //enemy selected => attack it
+                            Attack.Get.SetCommands(SelectedEntities.Entities, enemy);
                         }
                     }
                     else
+                    //ability was selected
                     {
-                        if (abil.GetType() == typeof(TargetPointAbility))
+                        //determine target
+                        ITargetable targ=null;
+                        //type of target of the selected ability
+                        Type targetType = abil.TargetType;
+                        if(targetType == typeof(Vector2))
                         {
-                            ((TargetPointAbility)abil).AssignCommands(Players.PLAYER0,SelectedUnits.Units,
-                                UnitCommandsInput.MapCoordinates, game);
+                            //target is a vector
+                            targ = clickCoords;
+                        }
+                        else if(targetType == typeof(IMovementTarget))
+                        {
+                            //target is a movement target
+                            targ= SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, targetType);
+                            if (targ == null)
+                                targ = clickCoords;
+                        }
+                        else if (targetType == typeof(Node))
+                        {
+                            //target is a node
+                            targ = game.Map[(int)clickCoords.X, (int)clickCoords.Y];
+                        }
+                        else if (targetType.IsAssignableFrom(typeof(Entity)))
+                        {
+                            //target is an entity
+                            targ = SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, targetType);
+                        }
+
+                        if (targ != null)
+                        {
+                            //cast the ability if a valid target was selected
+                            IEnumerable<Entity> unitsWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(abil));
+                            if (unitsWithAbil != null)
+                            {
+                                abil.SetCommands(unitsWithAbil, targ);
+                            }
                         }
                     }
                     //setting state from this thread can cause inconsistency of State
@@ -105,7 +144,24 @@ namespace wpfTest
                     UnitCommandsInput.State = UnitsCommandInputState.SELECTED;
                     break;
             }
-            SelectedUnits.RemoveDead();
+            SelectedEntities.RemoveDead();
+        }
+
+        /// <summary>
+        /// Selects target visible for the selecting player of the given type. Instances of the type have to implement
+        /// ITargetable.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if instances of type don't implement ITargetable.</exception>
+        private ITargetable SelectClickedEntityTarget(Game game, float x, float y, Player selectingPlayer, Func<Entity,bool> condition, Type type)
+        {
+            if (!typeof(ITargetable).IsAssignableFrom(type))
+                throw new ArgumentException("The type has to inherit from ITargetable!");
+
+            IEnumerable<Entity> allEntities = GameQuerying.GetGameQuerying().SelectRectEntities(
+                                    game, new Rect(x, y, x, y),
+                                    (entity) => type.IsAssignableFrom(entity.GetType()) && condition(entity))
+                                    .ToList();
+            return GameQuerying.GetGameQuerying().SelectVisibleEntities(game, selectingPlayer, allEntities).FirstOrDefault();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Maps;
 using static wpfTest.MainWindow;
 
 namespace wpfTest
@@ -12,7 +13,7 @@ namespace wpfTest
     /// The class describes player's view of the map.
     /// Enumerator returns the nodes inside current players view from left top to right bottom.
     /// </summary>
-    public class MapView:IEntity
+    public class MapView:IRectangle
     {
         private float actualWidth;
         private float actualHeight;
@@ -43,13 +44,13 @@ namespace wpfTest
             this.maxNodeSize = maxNodeSize;
         }
 
-        public Node[,] GetVisibleNodes(Game game)
+        public Node[,] GetVisibleNodes(Map map)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
 
-            return game.GameQuerying.SelectPartOfMap(game.Map, ((IEntity)this).GetRect());
+            return GameQuerying.GetGameQuerying().SelectPartOfMap(map, ((IRectangle)this).GetRect());
         }
 
         public float[,] GetVisibleFlowMap(Game game)
@@ -58,32 +59,37 @@ namespace wpfTest
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
 
-            return game.GameQuerying.SelectPartOfMap(game.FlowMap, ((IEntity)this).GetRect());
+            return game.GameQuerying.SelectPartOfMap(game.FlowMap, ((IRectangle)this).GetRect());
         }
 
         /// <summary>
         /// Returns null if the map doesn't exist.
         /// </summary>
-        public bool[,] GetVisibleVisibilityMap(Game game)
+        public bool[,] GetVisibleVisibilityMap(VisibilityMap map)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
-            if (game.CurrentPlayer.VisibilityMap == null)
+            if (map == null)
                 return null;
 
-            return game.GameQuerying.SelectPartOfMap(game.CurrentPlayer.VisibilityMap, ((IEntity)this).GetRect());
+            return GameQuerying.GetGameQuerying().SelectPartOfMap(map, ((IRectangle)this).GetRect());
         }
         
-        public List<Entity> GetVisibleEntities(Game game)
+        public List<Entity> GetVisibleEntities(Game game, Player observer)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
 
-            return game.GameQuerying.SelectRectEntities(game, ((IEntity)this).GetRect(), (unit) => true);
+            return GameQuerying.GetGameQuerying()
+                .SelectRectUnits(game, ((IRectangle)this).GetRect(),
+                (unit) => unit.IsVisible(observer.VisibilityMap))//select units
+                .Cast<Entity>()
+                .Concat(observer.VisibleBuildings)//select buildings
+                .Cast<Entity>()
+                .ToList();
         }
-
 
         public List<Unit> GetVisibleUnits(Game game)
         {
@@ -91,7 +97,7 @@ namespace wpfTest
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
 
-            return game.GameQuerying.SelectRectUnits(game, ((IEntity)this).GetRect(), (unit) => true);
+            return game.GameQuerying.SelectRectUnits(game, ((IRectangle)this).GetRect(), (unit) => true);
         }
 
         public void SetActualExtents(float width, float height)

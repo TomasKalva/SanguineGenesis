@@ -45,14 +45,19 @@ namespace wpfTest.GameLogic.Maps
                     new Vector2(i, top),
                     viewRange,
                     obstMap);
-                while (rTop.Next(out int x, out int y))
+                int x; int y;
+                while (rTop.Next(out x, out y))
+                    visible[x, y] = true;
+                if (x != -1 && y != -1)
                     visible[x, y] = true;
                 Ray rBottom = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
                     new Vector2(i, bottom),
                     viewRange,
                     obstMap);
-                while (rBottom.Next(out int x, out int y))
+                while (rBottom.Next(out x, out y))
                     visible[x, y] = true;
+                if (x != -1 && y != -1)
+                   visible[x, y] = true;
             }
             //cast rays to the lines on left and right of the square around v
             for (int j = bottom; j <= top; j++)
@@ -61,14 +66,19 @@ namespace wpfTest.GameLogic.Maps
                     new Vector2(left, j),
                     viewRange,
                     obstMap);
-                while (rLeft.Next(out int x, out int y))
+                int x; int y;
+                while (rLeft.Next(out x, out y))
+                    visible[x, y] = true;
+                if (x != -1 && y != -1)
                     visible[x, y] = true;
                 Ray rRight = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
                     new Vector2(right, j),
                     viewRange,
                     obstMap);
-                while (rRight.Next(out int x, out int y))
+                while (rRight.Next(out x, out y))
                     visible[x, y] = true;
+                if (x != -1 && y != -1)
+                   visible[x, y] = true;
             }
             //add the square which contains v
             int vX = (int)v.Pos.X;
@@ -76,5 +86,28 @@ namespace wpfTest.GameLogic.Maps
             if(vX >= 0 && vX < Width && vY >= 0 && vY < Height)
                 visible[vX, vY] = true;
         }
+
+        /*
+        /// <summary>
+        /// Returns true if at least one of the building's nodes is visible.
+        /// </summary>
+        public bool IsVisible(Building b)
+        {
+            foreach(Node n in b.Nodes)
+            {
+                if (visible[n.X, n.Y])
+                    return true;
+            }
+            return false;
+        }
+        
+        /// <summary>
+        /// Returns true if at least part of the unit is visible.
+        /// </summary>
+        public bool IsVisible(Unit u)
+        {
+            //todo: check for intersection with the circle instead of the center
+            return visible[(int)u.Center.X, (int)u.Center.Y];
+        }*/
     }
 }

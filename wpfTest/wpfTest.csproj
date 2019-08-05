@@ -70,8 +70,10 @@
     <Compile Include="GameLogic\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
     <Compile Include="GameLogic\Building.cs" />
+    <Compile Include="GameLogic\BuildingFactory.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\MovementGenerator.cs" />
+    <Compile Include="GameLogic\MovementParameters.cs" />
     <Compile Include="GameLogic\Unit.cs" />
     <Compile Include="GameLogic\UnitView.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />
@@ -85,7 +87,7 @@
     <Compile Include="GameLogic\GameQuerying.cs" />
     <Compile Include="GameLogic\CommandsGroup.cs" />
     <Compile Include="GameLogic\Command.cs" />
-    <Compile Include="GUI\IEntity.cs" />
+    <Compile Include="GUI\IRectangle.cs" />
     <Compile Include="GameLogic\Maps\IMap.cs" />
     <Compile Include="GameControls\MapMovementInput.cs" />
     <Compile Include="GameControls\MapSelectorFrame.cs" />

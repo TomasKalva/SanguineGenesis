@@ -9,21 +9,21 @@ namespace wpfTest
 {
     public class CommandsGroup
     {
-        public List<Entity> Units { get; private set; }
+        public List<Entity> Entities { get; private set; }
 
         public CommandsGroup()
         {
-            Units = new List<Entity>();
+            Entities = new List<Entity>();
         }
 
         public void SetUnits(List<Entity> units)
         {
-            foreach (Entity u in Units)
+            foreach (Entity u in Entities)
                 u.Group = null;
-            Units.Clear();
+            Entities.Clear();
             foreach (Entity u in units)
             {
-                Units.Add(u);
+                Entities.Add(u);
                 u.Group = this;
             }
         }
@@ -31,9 +31,9 @@ namespace wpfTest
         public void AddUnits(List<Entity> units)
         {
             foreach(Entity u in units)
-                if (!Units.Contains(u))
+                if (!Entities.Contains(u))
                 {
-                    Units.Add(u);
+                    Entities.Add(u);
                     u.Group = this;
                 }
         }
@@ -42,34 +42,36 @@ namespace wpfTest
         {
             foreach (Entity u in units)
                 u.Group = null;
-            Units.RemoveAll((unit) => units.Contains(unit));
+            Entities.RemoveAll((unit) => units.Contains(unit));
         }
 
         public void RemoveDead()
         {
-            Units.RemoveAll((u) => u.IsDead);
+            Entities.RemoveAll((u) => u.IsDead);
         }
-
+        /*
         /// <summary>
         /// Adds a new command created by the factory to every entity in the group.
         /// </summary>
-        /// <param name="commandFactory">Determines command type.</param>
-        public void AddCommand(CommandAssignment commandFactory)
+        /// <param name="ability">Determines command type.</param>
+        public void AddCommand(Ability ability, ITargetable target)
         {
             Units.RemoveAll((u) => u.IsDead);
-            foreach (Entity u in Units)
-                u.AddCommand(commandFactory.NewInstance(u));
+            ability.SetCommands(Players.PLAYER0,Units, target);
+            //foreach (Entity u in Units)
+            //    u.AddCommand(ability.NewInstance(u));
         }
 
         /// <summary>
         /// Sets a new command created by the factory to every entity in the group.
         /// </summary>
-        /// <param name="commandFactory">Determines command type.</param>
-        public void SetCommand(CommandAssignment commandFactory)
+        /// <param name="ability">Determines command type.</param>
+        public void SetCommand(Ability ability, ITargetable target)
         {
             Units.RemoveAll((u) => u.IsDead);
-            foreach (Entity u in Units)
-                u.SetCommand(commandFactory.NewInstance(u));
-        }
+            ability.SetCommands(Players.PLAYER0, Units, target);
+            //foreach (Entity u in Units)
+            //    u.SetCommand(commandFactory.NewInstance(u));
+        }*/
     }
 }

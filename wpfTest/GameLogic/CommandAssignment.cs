@@ -8,123 +8,78 @@ using wpfTest.GameLogic.Maps;
 
 namespace wpfTest.GameLogic
 {
-    /// <summary>
-    /// Creates new instances of commands with parameters specified by the factory
-    /// for the units that are using this factory. If the instace gets invalidated by
-    /// the state of the game, it removes the commands from its units.
-    /// </summary>
-    public abstract class CommandAssignment
+    public class MoveToCommandAssignment
     {
         /// <summary>
-        /// Units whose commands will be affected by invalidation.
+        /// Units whose commands should be updated.
         /// </summary>
-        public List<Entity> Entities { get; }
+        public List<Unit> Units { get; }
         /// <summary>
-        /// Whose units are performing this command.
+        /// Whose units are performing commands for this assignment.
         /// </summary>
         public Players Player { get; }
-        public CommandAssignment(Players player, List<Entity> units)
-        {
-            Player = player;
-            Entities = units;
-        }
-
-        /// <summary>
-        /// True if the command can no longer be executed.
-        /// </summary>
-        public abstract bool Invalid(Game game);
-        /// <summary>
-        /// Removes all references to this instance if it is no longer valid.
-        /// </summary>
-        public virtual void DestroyIfInvalidated(Game game)
-        {
-            if(Invalid(game))
-                Entities.Clear();
-        }
-        /// <summary>
-        /// Assigns commands to the units. All calculations that take long and can be pre-processed
-        /// should be put into Process.
-        /// </summary>
-        public virtual void AssignCommands()
-        {
-            foreach (Entity u in Entities)
-            {
-                Command com = NewInstance(u);
-                com.Creator = this;
-                u.AddCommand(com);
-            }
-        }
-        /// <summary>
-        /// Creates a new instance of the command with given commanded entity. 
-        /// </summary>
-        public abstract Command NewInstance(Entity commandedEntity);
-    }
-
-    public abstract class MovementCommandAssignment:CommandAssignment
-    {
-        protected float minStoppingDistance;
-
-        public MovementCommandAssignment(Players player, List<Entity> units)
-            : base(player, units)
-        {
-            float volume = 0f;
-            foreach(Unit u in units)
-            {
-                volume += u.Range * u.Range;
-            }
-            minStoppingDistance = (float)Math.Sqrt(volume)*1.3f;
-        }
-    }
-
-    /*public class MoveTowardsCommandAssignment : MovementCommandAssignment
-    {
-        public override bool Invalid(Game game)=> game.Players[Player].MapView[(int)target.X, (int)target.Y].Blocked;
-        private Vector2 target;
-        private float endDistance;//distance where the unit stops moving
-
-        public MoveTowardsCommandAssignment(Players player, List<Unit> units, Vector2 targetPoint, float endDistance = 0.1f)
-            : base(player, units)
-        {
-            target = targetPoint;
-            this.endDistance = endDistance;
-        }
-
-        public override Command NewInstance(Unit commandedEntity)
-        {
-            return new MoveTowardsCommand(commandedEntity, target, minStoppingDistance, endDistance);
-        }
-    }*/
-
-    public abstract class MoveToCommandAssignment : MovementCommandAssignment
-    {
-        protected float goalDistance;//distance where the unit stops moving
-        protected FlowMap flowMap;
-        /// <summary>
-        /// If enemy in range, cancel commands and attack the enemy.
-        /// </summary>
-        protected bool interruptable;
-        public abstract Vector2 TargetPoint { get; }
+        public IMovementTarget TargetPoint { get; }
         public Movement Movement { get; }
         /// <summary>
-        /// True if there are units that are currently using this command.
+        /// True if any units are currently using this command.
         /// </summary>
         public bool Active { get; set; }
+        /// <summary>
+        /// True if the target is on unreachable square or there are no units that are using this assignment. 
+        /// If set to true, this command assignment will be removed and all its commands canceled. Can only 
+        /// be used from the MovementGenerator and also from the game thread without locking, because it can 
+        /// only be set to true and reading an incorrect value once has no negative effects.
+        /// </summary>
+        public bool Invalid { get; set; }
 
-        public MoveToCommandAssignment(Players player, List<Entity> units, Movement movement, float goalDistance=0.1f, bool interruptable=true)
-            : base(player,units)
+        private FlowMap flowMap;
+
+        public MoveToCommandAssignment(Players player, List<Unit> units, Movement movement, IMovementTarget target, float goalDistance=0.1f, bool interruptable=true)
         {
-            this.goalDistance = goalDistance;
             Movement = movement;
             Active = false;
-            this.interruptable = interruptable;
+            Player = player;
+            Units = units;
+            TargetPoint = target;
         }
 
+        /// <summary>
+        /// Generate flowmap for the give obstacle map obst.
+        /// </summary>
         public void Process(ObstacleMap obst)
         {
+            //if there are no more units, cancel this assignment
+            if (!Units.Any())
+            {
+                Invalid = true;
+                return;
+            }
+
+            //map used in the pathfinding algorithm
+            ObstacleMap forPathfinding = obst;
+
+            if (TargetPoint is Building b)
+            {
+                forPathfinding = new ObstacleMap(obst);
+                foreach(Node n in b.Nodes)
+                {
+                    forPathfinding[n.X, n.Y] = false;
+                }
+            }
+            else
+            {
+                //if there is an obstacle on the target square, cancel this assignment
+                if (obst[(int)TargetPoint.Center.X, (int)TargetPoint.Center.Y] ||
+                    !Units.Any())
+                {
+                    Invalid = true;
+                    return;
+                }
+            }
+
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            //todo: separete units to different groups by their movement
-            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(obst, TargetPoint);
+            flowMap = Pathfinding.GetPathfinding.GenerateFlowMap(forPathfinding, TargetPoint.Center);
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
         }
@@ -134,72 +89,17 @@ namespace wpfTest.GameLogic
         /// </summary>
         public virtual void UpdateCommands()
         {
-            foreach (Entity u in Entities)
+            foreach (Unit u in Units)
             {
                 //find command from this assignment
                 foreach(Command c in u.CommandQueue)
                 {
-                    //update its flow map
-                    if (c.Creator == this)
-                        ((MoveToCommand)c).UpdateFlowMap(flowMap);
+                    if (c is MoveToPointCommand mtpc)
+                        //update its flowmap
+                        if (mtpc.Assignment == this)
+                            mtpc.UpdateFlowMap(flowMap);
                 }
             }
-        }
-    }
-
-    public class MoveToPointCommandAssignment : MoveToCommandAssignment
-    {
-        public override bool Invalid(Game game) => game.Players[Player].MapView[(int)target.X, (int)target.Y].Blocked;
-        public Vector2 target;
-        public override Vector2 TargetPoint => target;
-
-        public MoveToPointCommandAssignment(Players player, List<Entity> units, Vector2 target, Movement movement, float goalDistance = 0.1f, bool interruptable=true)
-            : base(player, units,movement,goalDistance,interruptable)
-        {
-            this.target = target;
-        }
-        
-        public override Command NewInstance(Entity commandedEntity)
-        {
-            return new MoveToPointCommand((Unit)commandedEntity, target, null, minStoppingDistance, goalDistance);
-        }
-    }
-
-    public class MoveToUnitCommandAssignment : MoveToCommandAssignment
-    {
-        public override bool Invalid(Game game) => targetUnit.IsDead;
-        public Entity targetUnit;
-        public override Vector2 TargetPoint => targetUnit.Center;
-        public bool UsesAttackDistance { get; }
-
-        public MoveToUnitCommandAssignment(Players player, List<Entity> units, Entity targetUnit, Movement movement, float goalDistance = 0.1f,
-            bool usesAttackDistance=false, bool interruptable=true)
-            : base(player, units, movement, goalDistance, interruptable)
-        {
-            this.targetUnit = targetUnit;
-            UsesAttackDistance = usesAttackDistance;
-        }
-
-        public override Command NewInstance(Entity commandedEntity)
-        {
-            return new MoveToUnitCommand((Unit)commandedEntity, targetUnit, null, minStoppingDistance, goalDistance,UsesAttackDistance);
-        }
-    }
-
-    public class AttackCommandAssignment : CommandAssignment
-    {
-        private Entity target;
-        public override bool Invalid(Game game) => target.IsDead;//dead units are no longer in the game
-
-        public AttackCommandAssignment(Players player, List<Entity> units, Entity target)
-            : base(player, units)
-        {
-            this.target = target;
-        }
-
-        public override Command NewInstance(Entity commandedEntity)
-        {
-            return new AttackCommand(commandedEntity, target);
         }
     }
 }
