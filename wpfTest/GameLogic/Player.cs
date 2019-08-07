@@ -53,8 +53,12 @@ namespace wpfTest
             Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(4f, 9f)));*/
         }
 
-        public void UpdateViewMap(List<Building> buildings)
+        public void UpdateViewMap(List<Building> buildings, Map map)
         {
+            if (VisibilityMap == null)
+                return;
+
+            //update view of buildings
             foreach(Building b in buildings)
             {
                 Node bottomLeft = b.Nodes[0, 0];
@@ -73,6 +77,21 @@ namespace wpfTest
                     AddBuilding(b);
                 }
             }
+
+            //update view of nodes
+            for(int i=0;i<map.Width;i++)
+                for(int j = 0; j < map.Height; j++)
+                {
+                    //update node if it can be seen
+                    if (VisibilityMap[i, j])
+                    {
+                        Node destN=MapView[i, j];
+                        Node sourceN = map[i, j];
+                        destN.Biome = sourceN.Biome;
+                        destN.SoilQuality = sourceN.SoilQuality;
+                        destN.Terrain = sourceN.Terrain;
+                    }
+                }
         }
 
         private void RemoveBuilding(Building building)

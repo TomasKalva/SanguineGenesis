@@ -399,7 +399,7 @@ namespace wpfTest
                         Node ijN = buildNodes[i, j];
                         //the building can't be built if the node is blocked or contains
                         //incompatible terrain
-                        if (ijN.Blocked || !bf.Terrains.Contains(ijN.Terrain))
+                        if (ijN.Blocked || !(bf.SoilQuality>ijN.SoilQuality))
                             canBeBuilt = false;
                     }
             }

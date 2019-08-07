@@ -13,7 +13,7 @@ namespace wpfTest.GameLogic
         public override Vector2 Center { get; }
         public override float Range => Size / 2f;
         public int Size { get; }
-        public List<Terrain> Soil { get; }
+        public SoilQuality SoilQuality { get; }
         public float BuildingTime { get; }
         /// <summary>
         /// X coordinate of bottom left node.
@@ -25,12 +25,12 @@ namespace wpfTest.GameLogic
         public int NodeBottom { get; }
         public Node[,] Nodes { get; }
 
-        public Building(Player player, EntityType bulidingType, float maxHealth, float viewRange, float maxEnergy, Node[,] nodes, List<Terrain> soil, int size, float buildingTime) 
+        public Building(Player player, EntityType bulidingType, float maxHealth, float viewRange, float maxEnergy, Node[,] nodes, SoilQuality soilQuality, int size, float buildingTime) 
             : base(player, bulidingType, maxHealth, viewRange, maxEnergy)
         {
             Size = size;
             Center = new Vector2(nodes[0, 0].X + Range, nodes[0, 0].Y + Range);
-            Soil = soil;
+            SoilQuality = soilQuality;
             BuildingTime = buildingTime;
             Nodes = nodes;
             NodeLeft = nodes[0,0].X;

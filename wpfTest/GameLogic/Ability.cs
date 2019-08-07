@@ -287,7 +287,7 @@ namespace wpfTest.GameLogic
         {
             buildingBuildingAbilities = new Dictionary<EntityType, Build>()
             {
-                { EntityType.BAOBAB, new Build(new BuildingFactory(EntityType.BAOBAB, 3, 150, 100, new List<Terrain>{ Terrain.SAVANA_GRASS}, 20),0,50)}
+                { EntityType.BAOBAB, new Build(new BuildingFactory(EntityType.BAOBAB, 3, 150, 100, SoilQuality.MEDIUM, 20),0,50)}
             };
         }
         private Build(BuildingFactory buildingFactory, float energyCost, float resourceCost)

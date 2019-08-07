@@ -128,7 +128,7 @@ namespace wpfTest
                                         wpfTest.Players.PLAYER0;
                 //update current player's view of the map
                 Players[current].VisibilityMap = visibilityGenerator.VisibilityMap;
-                Players[current].UpdateViewMap(GetBuildings());
+                Players[current].UpdateViewMap(GetBuildings(),Map);
 
                 //generated visibility map for the other player
                 nextVisibilityPlayer = other;

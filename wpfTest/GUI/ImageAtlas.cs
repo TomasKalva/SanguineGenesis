@@ -16,12 +16,26 @@ namespace wpfTest.GUI
         private const int TILE_SIZE = 64;
         private const int ATLAS_WIDTH = 2048;
         private const int ATLAS_HEIGHT = 2048;
-        private Dictionary<Terrain, Rect> terrainImages;
         private Dictionary<EntityType, Animation> unitsAnimations;
+        private Dictionary<int, Rect> glyphs;
 
         public Rect UnitCircle { get; }
         public Rect UnitsSelector { get; }
         public Rect BlankWhite { get; }
+
+        private struct Square
+        {
+            Biome Biome { get; }
+            SoilQuality SoilQuality { get; }
+            Terrain Terrain { get; }
+
+            public Square(Biome biome, SoilQuality soilQuality, Terrain terrain)
+            {
+                Biome = biome;
+                SoilQuality = soilQuality;
+                Terrain = terrain;
+            }
+        }
 
         public static ImageAtlas GetImageAtlas => imageAtlas;
 
@@ -32,7 +46,7 @@ namespace wpfTest.GUI
 
         private ImageAtlas()
         {
-            InitializeTerrainImages();
+            InitializeDigitImages();
             InitializeUnitsAnimations();
 
             UnitCircle = ToRelative(GridToCoordinates(2, 0, 1, 1));
@@ -41,17 +55,36 @@ namespace wpfTest.GUI
 
         }
 
-        private void InitializeTerrainImages()
+        private void InitializeDigitImages()
         {
-            terrainImages = new Dictionary<Terrain, Rect>();
-            AddTerrainImage(Terrain.LOW_GRASS, 0, 0, 1, 1);
-            AddTerrainImage(Terrain.DEEP_WATER, 1, 0, 1, 1);
-            AddTerrainImage(Terrain.DIRT, 4, 0, 1, 1);
-            AddTerrainImage(Terrain.SHALLOW_WATER, 5, 0, 1, 1);
-            AddTerrainImage(Terrain.HIGH_GRASS, 6, 0, 1, 1);
-            AddTerrainImage(Terrain.ENTANGLING_ROOTS, 7, 0, 1, 1);
-            AddTerrainImage(Terrain.SAVANA_DIRT, 8, 0, 1, 1);
-            AddTerrainImage(Terrain.SAVANA_GRASS, 9, 0, 1, 1);
+            glyphs = new Dictionary<int, Rect>();
+            float offset = 0;
+            AddGlyphImage(0, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(1, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(2, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(3, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(4, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(5, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(6, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(7, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(8, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(9, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(-1, offset, 3, 0.5f, 1);
+        }
+
+        private void AddGlyphImage(int glyph, float left, float bottom, float width, float height)
+        {
+            glyphs.Add(glyph, ToRelative(GridToCoordinates(new Rect(left, bottom, left + width, bottom + height))));
         }
 
         private void InitializeUnitsAnimations()
@@ -73,11 +106,6 @@ namespace wpfTest.GUI
                   ToRelative(GridToCoordinates(20,0,5,6)),});
         }
 
-        private void AddTerrainImage(Terrain terrain, float left, float bottom, float width, float height)
-        {
-            terrainImages.Add(terrain, ToRelative(GridToCoordinates(left, bottom,width,height)));
-        }
-
         private void AddUnitsAnimation(EntityType unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
         {
             unitsAnimations.Add(unit, new Animation(leftBottom,width, height, animChangeTimeS, images));
@@ -96,6 +124,14 @@ namespace wpfTest.GUI
         }
 
         /// <summary>
+        /// Transforms coordinates of a rectangle in the grid to the coordinates in the atlas.
+        /// </summary>
+        private Rect GridToCoordinates(Rect rect)
+        {
+            return GridToCoordinates(rect.Left, rect.Bottom, rect.Width, rect.Height);
+        }
+
+        /// <summary>
         /// Makes the rect's coordinates relative to the image atlas.
         /// </summary>
         private Rect ToRelative(Rect rect)
@@ -110,9 +146,54 @@ namespace wpfTest.GUI
         /// Get coordinates, where the image for the terrain is located in the atlas. The coordinates
         /// are relative to the atlas.
         /// </summary>
-        public Rect GetTerrainCoords(Terrain terrain)
+        public Rect GetTileCoords(Biome biome, SoilQuality soilQuality, Terrain terrain)
         {
-            return terrainImages[terrain];
+            Rect coords=default(Rect);
+            if(terrain==Terrain.SHALLOW_WATER)
+                coords = new Rect(5, 0, 6, 1);
+            else if(terrain==Terrain.DEEP_WATER)
+                coords = new Rect(1, 0, 2, 1);
+            else
+            {
+                //terrain is land
+                switch (biome)
+                {
+                    case Biome.RAINFOREST:
+                        switch (soilQuality)
+                        {
+                            case SoilQuality.LOW:
+                                coords =  new Rect (0, 0, 1, 1);
+                                break;
+                            case SoilQuality.MEDIUM:
+                                coords =  new Rect(6, 0, 7, 1);
+                                break;
+                            case SoilQuality.HIGH:
+                                coords =  new Rect(7, 0, 8, 1);
+                                break;
+                        }
+                        break;
+                    case Biome.SAVANNA:
+                        switch (soilQuality)
+                        {
+                            case SoilQuality.LOW:
+                                coords =  new Rect(8, 0, 9, 1);
+                                break;
+                            case SoilQuality.MEDIUM:
+                                coords =  new Rect(9, 0, 10, 1);
+                                break;
+                            case SoilQuality.HIGH:
+                                throw new ArgumentException("Savanna doesn't have high quality soil!");
+                        }
+                        break;
+                    default:
+                        coords =  new Rect(4, 0, 5, 1);
+                        break;
+                }
+            }
+            if(coords.Equals(default(Rect)))
+                throw new NotImplementedException("The case " + biome + " " + soilQuality + " should be implemented!");
+
+            return ToRelative(GridToCoordinates(coords));
         }
 
         /// <summary>
@@ -121,6 +202,18 @@ namespace wpfTest.GUI
         public Animation GetAnimation(EntityType unitType)
         {
             return unitsAnimations[unitType];
+        }
+
+        /// <summary>
+        /// Returns image for the char. If it doesn't exist, argument exception is thrown.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the image for the char doesn't exist.</exception>
+        public Rect GetGlyph(int glyph)
+        {
+            if (glyphs.TryGetValue(glyph, out Rect rect))
+                return rect;
+            else
+                throw new ArgumentException(glyph + " is not a valid glyph!");
         }
     }
 

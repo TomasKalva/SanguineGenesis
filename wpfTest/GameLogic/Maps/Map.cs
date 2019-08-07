@@ -21,7 +21,7 @@ namespace wpfTest
         public int Width => nodes.GetLength(0);
         public int Height => nodes.GetLength(1);
         //color is in rgb format
-        private Dictionary<int, Terrain> colorToTerrain;
+        private Dictionary<int, Node> colorToNode;
         public bool MapWasChanged { get; set; }//set to true after building was added/removed etc
         /// <summary>
         /// Obstacle maps for the current map. Is updated by the UpdateObstacleMaps.
@@ -38,7 +38,7 @@ namespace wpfTest
             {
                 for (int j = 0; j < height; j++)
                 {
-                    nodes[i, j] = new Node(i, j, colorToTerrain[map[i, j].RGB]);
+                    nodes[i, j] = colorToNode[map[i, j].RGB].Copy(i, j);
                 }
             }
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
@@ -60,7 +60,8 @@ namespace wpfTest
             {
                 for (int j = 0; j < height; j++)
                 {
-                    nodes[i, j] = new Node(i, j, map[i,j].Terrain);
+                    Node n = map[i, j];
+                    nodes[i, j] = new Node(i, j, n.Nutrients, n.Biome, n.Terrain);
                 }
             }
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
@@ -69,15 +70,20 @@ namespace wpfTest
 
         private void InitializeColorToTerrain()
         {
-            colorToTerrain = new Dictionary<int, Terrain>();
-            colorToTerrain.Add(new PixelColor(0, 255, 0).RGB, Terrain.LOW_GRASS);
-            colorToTerrain.Add(new PixelColor(0, 0, 255).RGB, Terrain.DEEP_WATER);
-            colorToTerrain.Add(new PixelColor(168, 142, 78).RGB, Terrain.DIRT);
-            colorToTerrain.Add(new PixelColor(0, 155, 255).RGB, Terrain.SHALLOW_WATER);
-            colorToTerrain.Add(new PixelColor(0, 160, 0).RGB, Terrain.HIGH_GRASS);
-            colorToTerrain.Add(new PixelColor(106, 103, 29).RGB, Terrain.ENTANGLING_ROOTS);
-            colorToTerrain.Add(new PixelColor(213, 180, 99).RGB, Terrain.SAVANA_DIRT);
-            colorToTerrain.Add(new PixelColor(0, 255, 137).RGB, Terrain.SAVANA_GRASS);
+            colorToNode = new Dictionary<int, Node>();
+            colorToNode.Add(new PixelColor(168, 142, 78).RGB, new Node(-1,-1, 0,Biome.DEFAULT,Terrain.LAND));
+            colorToNode.Add(new PixelColor(0, 155, 255).RGB, new Node(-1, -1, 0, Biome.DEFAULT, Terrain.SHALLOW_WATER));
+            colorToNode.Add(new PixelColor(0, 0, 255).RGB, new Node(-1, -1, 0, Biome.DEFAULT, Terrain.DEEP_WATER));
+            colorToNode.Add(new PixelColor(0, 255, 0).RGB, new Node(-1, -1, 
+                Biome.RAINFOREST.Nutrients(SoilQuality.LOW), Biome.RAINFOREST, Terrain.LAND));
+            colorToNode.Add(new PixelColor(0, 160, 0).RGB, new Node(-1, -1,
+                Biome.RAINFOREST.Nutrients(SoilQuality.MEDIUM), Biome.RAINFOREST, Terrain.LAND));
+            colorToNode.Add(new PixelColor(106, 103, 29).RGB, new Node(-1, -1,
+                Biome.RAINFOREST.Nutrients(SoilQuality.HIGH), Biome.RAINFOREST, Terrain.LAND));
+            colorToNode.Add(new PixelColor(213, 180, 99).RGB, new Node(-1, -1,
+                Biome.RAINFOREST.Nutrients(SoilQuality.LOW), Biome.SAVANNA, Terrain.LAND));
+            colorToNode.Add(new PixelColor(0, 255, 137).RGB, new Node(-1, -1,
+                Biome.RAINFOREST.Nutrients(SoilQuality.MEDIUM), Biome.SAVANNA, Terrain.LAND));
         }
 
         private void InitializeObstacleMaps()
@@ -157,5 +163,7 @@ namespace wpfTest
             }
             MapWasChanged = true;
         }
+
+
     }
 }

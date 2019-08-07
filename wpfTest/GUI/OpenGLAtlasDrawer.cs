@@ -92,6 +92,9 @@ namespace wpfTest
 
             flowMap.VertexBufferArray.Bind(gl);
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+            
+            nutrientsMap.VertexBufferArray.Bind(gl);
+            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 30000);
 
             if (!unitsEmpty)
             {
@@ -249,6 +252,7 @@ namespace wpfTest
         //color, texture and bottom left coordinates of textures
         private static MyBufferArray map;
         private static MyBufferArray flowMap;
+        private static MyBufferArray nutrientsMap;
         private static MyBufferArray unitCircles;
         private static MyBufferArray units;
         private static MyBufferArray unitIndicators;
@@ -318,7 +322,7 @@ namespace wpfTest
                     if (visibleVisibility != null)
                         isVisible = visibleVisibility[i, j];
                     
-                    Rect atlasCoords = ImageAtlas.GetImageAtlas.GetTerrainCoords(current.Terrain);
+                    Rect atlasCoords = ImageAtlas.GetImageAtlas.GetTileCoords(current.Biome,current.SoilQuality,current.Terrain);
 
                     //tile position
                     float bottom = (current.Y - viewBottom) * sqH;
@@ -337,6 +341,116 @@ namespace wpfTest
             }
 
             map.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+        }
+
+        /// <summary>
+        /// Creates vertex buffer array and its buffers for gl.
+        /// </summary>
+        /// <param name="gl">The instance of OpenGL.</param>
+        public static void CreateNutrientsMap(OpenGL gl)
+        {
+            nutrientsMap = new MyBufferArray(gl);
+        }
+
+        /// <summary>
+        /// Updates buffers of vertexArrayBuffer with the information about the map
+        /// from mapView.
+        /// </summary>
+        /// <param name="gl">Instance of OpenGL.</param>
+        /// <param name="mapView">Map view describing the map.</param>
+        public static void UpdateNutrientsMapDataBuffers(OpenGL gl, MapView mapView, Game game)
+        {
+            float nodeSize = mapView.NodeSize;
+            float viewLeft = mapView.Left;
+            float viewTop = mapView.Top;
+            float viewBottom = mapView.Bottom;
+            float viewRight = mapView.Right;
+
+            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.PlayerID].VisibilityMap);
+            Node[,] visible = mapView.GetVisibleNodes(game.CurrentPlayer.MapView);
+            int width = visible.GetLength(0);
+            int height = visible.GetLength(1);
+
+            //extents of one rectangle
+            float sqW = nodeSize;
+            float sqH = nodeSize;
+
+            int verticesPerOne = width * height * 6 * 3;
+            int verticesSize = verticesPerOne * 3;
+            int colorsSize = verticesPerOne * 3;
+            int textureSize = verticesPerOne * 2;
+            int textureAtlasSize = verticesPerOne * 4;
+
+            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = map.vertices;
+            float[] colors = map.colors;
+            float[] texture = map.texture;
+            float[] texAtlas = map.texAtlas;
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    //buffer indices
+                    int coord = (i + j * width) * 6 * 3 * 3;
+                    int texCoord = (i + j * width) * 6 * 2 * 3;
+                    int bottomLeftInd = (i + j * width) * 6 * 4 * 3;
+
+                    Node current = visible[i, j];
+                    if (current == null)
+                        continue;
+
+                    //find digits and their glyphs
+                    if (current.Nutrients > 0)
+                        ;
+                    int leftDig = (int)current.Nutrients;
+                    int rightDig = (int)(current.Nutrients/10f);
+                    Rect leftDigAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(leftDig);
+                    Rect rightDigAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(rightDig);
+                    Rect decPointAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(-1);
+
+                    //numbers y position
+                    float bottom = (current.Y - viewBottom + 0.25f) * sqH;
+                    float top = (current.Y - viewBottom + 0.75f) * sqH;
+                    
+                    //left digit position
+                    float left = (current.X - viewLeft + 0.2f) * sqW;
+                    float right = (current.X - viewLeft + 0.45f) * sqW;
+
+                    SetSquareVertices(vertices, bottom, top, left, right, -10, coord);
+                    SetColor(colors, 1f, 1f, 1f, coord, 6);
+                    SetSquareTextureCoordinates(texture, texCoord);
+                    SetAtlasCoordinates(texAtlas, leftDigAtlasCoords, bottomLeftInd, 6);
+
+                    coord += 6 * 3;
+                    texCoord +=  6 * 2;
+                    bottomLeftInd += 6 * 4;
+
+                    //decimal point position
+                    left = (current.X - viewLeft + 0.4f) * sqW;
+                    right = (current.X - viewLeft + 0.6f) * sqW;
+
+                    SetSquareVertices(vertices, bottom, top, left, right, -10, coord);
+                    SetColor(colors, 1f, 1f, 1f, coord, 6);
+                    SetSquareTextureCoordinates(texture, texCoord);
+                    SetAtlasCoordinates(texAtlas, decPointAtlasCoords, bottomLeftInd, 6);
+
+                    coord += 6 * 3;
+                    texCoord += 6 * 2;
+                    bottomLeftInd += 6 * 4;
+                    
+                    //left digit position
+                    left = (current.X - viewLeft + 0.55f) * sqW;
+                    right = (current.X - viewLeft + 0.8f) * sqW;
+
+                    SetSquareVertices(vertices, bottom, top, left, right, -10, coord);
+                    SetColor(colors, 1f, 1f, 1f, coord, 6);
+                    SetSquareTextureCoordinates(texture, texCoord);
+                    SetAtlasCoordinates(texAtlas, rightDigAtlasCoords, bottomLeftInd, 6);
+                }
+            }
+
+            nutrientsMap.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
         private static void SetSquareVertices(float[] vertices, float bottom, float top,

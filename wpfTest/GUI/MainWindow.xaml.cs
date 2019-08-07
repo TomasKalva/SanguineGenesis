@@ -459,6 +459,7 @@ namespace wpfTest
             OpenGL gl = openGLControl1.OpenGL;
             OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
             OpenGLAtlasDrawer.CreateMap(gl);
+            OpenGLAtlasDrawer.CreateNutrientsMap(gl);
             OpenGLAtlasDrawer.CreateUnitCircles(gl);
             OpenGLAtlasDrawer.CreateUnits(gl);
             OpenGLAtlasDrawer.CreateUnitIndicators(gl);
@@ -476,6 +477,7 @@ namespace wpfTest
             {
                 gameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
                 OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitsDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitIndicatorsDataBuffers(gl, gameControls.MapView, game);

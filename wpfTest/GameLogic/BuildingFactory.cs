@@ -12,21 +12,21 @@ namespace wpfTest.GameLogic
         public int Size { get; }
         public float MaxHealth { get; }
         public float MaxEnergy { get; }
-        public List<Terrain> Terrains { get; }
+        public SoilQuality SoilQuality { get; }
         public float BuildingTime { get; }
 
         public Building NewInstance(Player player, Node[,] nodes)
         {
-            return new Building(player, UnitType, maxHealth: MaxHealth, viewRange:10, maxEnergy: MaxEnergy, nodes: nodes, size: Size, soil:Terrains, buildingTime:BuildingTime);
+            return new Building(player, UnitType, maxHealth: MaxHealth, viewRange:10, maxEnergy: MaxEnergy, nodes: nodes, size: Size, soilQuality:SoilQuality, buildingTime:BuildingTime);
         }
 
-        public BuildingFactory(EntityType unitType, int size, float maxHealth, float maxEnergy, List<Terrain> soil, float buildingTime)
+        public BuildingFactory(EntityType unitType, int size, float maxHealth, float maxEnergy, SoilQuality soilQuality, float buildingTime)
         {
             Size = size;
             MaxHealth = maxHealth;
             MaxEnergy = maxEnergy;
             UnitType = unitType;
-            Terrains = soil;
+            SoilQuality = soilQuality;
             BuildingTime = buildingTime;
         }
     }
