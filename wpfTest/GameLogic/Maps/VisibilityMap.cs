@@ -8,6 +8,19 @@ namespace wpfTest.GameLogic.Maps
 {
     public class VisibilityMap : IMap<bool>
     {
+        private static VisibilityMap everythingVisible;
+        public static VisibilityMap GetEverythingVisible(int width, int height)
+        {
+            if(everythingVisible==null)
+            {
+                everythingVisible = new VisibilityMap(width, height);
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
+                        everythingVisible.visible[i, j] = true;
+            }
+            return everythingVisible;
+        }
+
         private bool[,] visible;
 
         public bool this[int i, int j] => visible[i, j];

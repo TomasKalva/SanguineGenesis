@@ -53,23 +53,23 @@ namespace wpfTest
             Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(4f, 9f)));*/
         }
 
-        public void UpdateViewMap(List<Building> buildings, Map map)
+        public void UpdateBuildingsView(List<Building> buildings)
         {
             if (VisibilityMap == null)
                 return;
 
             //update view of buildings
-            foreach(Building b in buildings)
+            foreach (Building b in buildings)
             {
                 Node bottomLeft = b.Nodes[0, 0];
                 //check if the building is visible and if it wasn't added to the view map yet
-                if (b.IsVisible(VisibilityMap) 
-                    && MapView[bottomLeft.X,bottomLeft.Y].Building!=b)
+                if (b.IsVisible(VisibilityMap)
+                    && MapView[bottomLeft.X, bottomLeft.Y].Building != b)
                 {
                     //remove buildings that no longer exist
-                    foreach(Node n in b.Nodes)
+                    foreach (Node n in b.Nodes)
                     {
-                        Building deprecB = MapView[n.X,n.Y].Building;
+                        Building deprecB = MapView[n.X, n.Y].Building;
                         if (deprecB != null)
                             RemoveBuilding(deprecB);
                     }
@@ -77,9 +77,15 @@ namespace wpfTest
                     AddBuilding(b);
                 }
             }
+        }
+
+        public void UpdateNodesView(Map map)
+        {
+            if (VisibilityMap == null)
+                return;
 
             //update view of nodes
-            for(int i=0;i<map.Width;i++)
+            for (int i=0;i<map.Width;i++)
                 for(int j = 0; j < map.Height; j++)
                 {
                     //update node if it can be seen
@@ -88,7 +94,7 @@ namespace wpfTest
                         Node destN=MapView[i, j];
                         Node sourceN = map[i, j];
                         destN.Biome = sourceN.Biome;
-                        destN.SoilQuality = sourceN.SoilQuality;
+                        destN.Nutrients = sourceN.Nutrients;
                         destN.Terrain = sourceN.Terrain;
                     }
                 }

@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
 {
@@ -28,6 +29,7 @@ namespace wpfTest
         /// The next player for who will be generated visibility map.
         /// </summary>
         private Players nextVisibilityPlayer;
+        private GameplayOptions gameplayOptions;
 
         public Game(BitmapImage mapBitmap)
         {
@@ -46,6 +48,8 @@ namespace wpfTest
             physics = Physics.GetPhysics();
             visibilityGenerator = new VisibilityGenerator();
             nextVisibilityPlayer = wpfTest.Players.PLAYER0;
+            gameplayOptions = new GameplayOptions();
+            gameplayOptions.WholeMapVisible = true;
         }
 
         public List<Entity> GetEntities()
@@ -78,6 +82,9 @@ namespace wpfTest
             return buildings;
         }
 
+        private const float NUTRIENT_UPDATE_TIME = 1f;
+        private float nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
+
         public void Update(float deltaT)
         {
             //map changing phase
@@ -89,13 +96,25 @@ namespace wpfTest
             }*/
 
             List<Entity> entities = GetEntities();
+            List<Unit> units = GetUnits();
+
+            //update nutrients
+            nutrientUpdateTimer -= deltaT;
+            if (nutrientUpdateTimer <= 0)
+            {
+                nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
+                Map.UpdateNutrients();
+            }
+            Map.UpdateBiomes();
+            foreach (var p in Players)
+                p.Value.UpdateNodesView(Map);
+
             //commands
             foreach (Entity e in entities)
             {
                 e.PerformCommand(this, deltaT);
                 e.AnimationStep(deltaT);
             }
-            List<Unit> units = GetUnits();
             //physics
             physics.PushOutsideOfObstacles(Map, units,deltaT);
             physics.PushAway(Map, units, entities, deltaT);
@@ -120,22 +139,32 @@ namespace wpfTest
             Players[wpfTest.Players.PLAYER1].RemoveDeadEntities();
 
             //update players' view of the map
-            if (visibilityGenerator.Done)
+            if (!gameplayOptions.WholeMapVisible)
             {
-                Players current = nextVisibilityPlayer;
-                Players other = nextVisibilityPlayer == wpfTest.Players.PLAYER0 ?
-                                        wpfTest.Players.PLAYER1 :
-                                        wpfTest.Players.PLAYER0;
-                //update current player's view of the map
-                Players[current].VisibilityMap = visibilityGenerator.VisibilityMap;
-                Players[current].UpdateViewMap(GetBuildings(),Map);
+                if (visibilityGenerator.Done)
+                {
+                    Players current = nextVisibilityPlayer;
+                    Players other = nextVisibilityPlayer == wpfTest.Players.PLAYER0 ?
+                                            wpfTest.Players.PLAYER1 :
+                                            wpfTest.Players.PLAYER0;
+                    //update current player's view of the map
+                    Players[current].VisibilityMap = visibilityGenerator.VisibilityMap;
+                    Players[current].UpdateBuildingsView(GetBuildings());
 
-                //generated visibility map for the other player
-                nextVisibilityPlayer = other;
+                    //generated visibility map for the other player
+                    nextVisibilityPlayer = other;
 
-                visibilityGenerator.SetNewTask(Map.GetViewMap(nextVisibilityPlayer),
-                    Players[nextVisibilityPlayer].Entities.Select((entity) => entity.View).ToList());
-
+                    visibilityGenerator.SetNewTask(Map.GetViewMap(nextVisibilityPlayer),
+                        Players[nextVisibilityPlayer].Entities.Select((entity) => entity.View).ToList());
+                }
+            }
+            else
+            {
+                foreach(var kvp in Players)
+                {
+                    kvp.Value.VisibilityMap = VisibilityMap.GetEverythingVisible(Map.Width, Map.Height);
+                    kvp.Value.UpdateBuildingsView(GetBuildings());
+                }
             }
             MovementGenerator mg = MovementGenerator.GetMovementGenerator();
             if (Players[wpfTest.Players.PLAYER0].MapChanged)

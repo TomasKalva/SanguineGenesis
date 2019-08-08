@@ -9,6 +9,8 @@ namespace wpfTest
 {
     public class Node:ITargetable,IMovementTarget
     {
+        public const decimal MAX_NUTRIENTS = 9.9m;
+
         public int X { get; }
         public int Y { get; }
 
@@ -16,20 +18,32 @@ namespace wpfTest
         /// <summary>
         /// Backing field for Nutrients.
         /// </summary>
-        private float nutrients;
+        private decimal nutrients;
         /// <summary>
-        /// Amount of nutrients in this node. Belongs to [0, 9.9].
+        /// Amount of nutrients in this node. Belongs to [0, MAX_NUTRIENTS].
         /// </summary>
-        public float Nutrients
+        public decimal Nutrients
         {
             get => nutrients;
             set
             {
-                nutrients = Math.Min(9.9f, Math.Max(0, value));
-                SoilQuality = Biome.Quality(nutrients);
+                nutrients = Math.Min(MAX_NUTRIENTS, Math.Max(0, value));
+                SoilQuality = Terrain.Quality(Biome, Nutrients);
             }
         }
-        public Biome Biome { get; set; }
+        /// <summary>
+        /// Backing field for Biome.
+        /// </summary>
+        private Biome biome;
+        public Biome Biome
+        {
+            get => biome;
+            set
+            {
+                biome = value;
+                SoilQuality = Terrain.Quality(Biome, Nutrients);
+            }
+        }
         public SoilQuality SoilQuality { get; set; }
         public bool Blocked { get; private set; }
         private Building building;
@@ -40,7 +54,7 @@ namespace wpfTest
         }
         Vector2 ITargetable.Center => new Vector2(X + 0.5f, Y + 0.5f);
 
-        public Node(int x, int y, float nutrients, Biome biome, Terrain terrain)
+        public Node(int x, int y, decimal nutrients, Biome biome, Terrain terrain)
         {
             Terrain = terrain;
             Biome = biome;
@@ -53,6 +67,11 @@ namespace wpfTest
         public Node Copy(int x, int y)
         {
             return new Node(x, y, Nutrients, Biome, Terrain);
+        }
+
+        public void GenerateNutrients()
+        {
+            Nutrients += SoilQuality.NutrientsProduction();
         }
     }
 }

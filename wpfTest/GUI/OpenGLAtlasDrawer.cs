@@ -401,10 +401,8 @@ namespace wpfTest
                         continue;
 
                     //find digits and their glyphs
-                    if (current.Nutrients > 0)
-                        ;
                     int leftDig = (int)current.Nutrients;
-                    int rightDig = (int)(current.Nutrients/10f);
+                    int rightDig = (int)((current.Nutrients - leftDig) * 10);//(int)((((1000*current.Nutrients))%1000)/100);
                     Rect leftDigAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(leftDig);
                     Rect rightDigAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(rightDig);
                     Rect decPointAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(-1);

@@ -150,9 +150,31 @@ namespace wpfTest.GUI
         {
             Rect coords=default(Rect);
             if(terrain==Terrain.SHALLOW_WATER)
-                coords = new Rect(5, 0, 6, 1);
+                switch (biome)
+                {
+                    case Biome.DEFAULT:
+                        coords = new Rect(5, 0, 6, 1);
+                        break;
+                    case Biome.SAVANNA:
+                        coords = new Rect(3, 1, 4, 2);
+                        break;
+                    case Biome.RAINFOREST:
+                        coords = new Rect(1, 1, 2, 2);
+                        break;
+                }
             else if(terrain==Terrain.DEEP_WATER)
-                coords = new Rect(1, 0, 2, 1);
+                switch (biome)
+                {
+                    case Biome.DEFAULT:
+                        coords = new Rect(1, 0, 2, 1);
+                        break;
+                    case Biome.SAVANNA:
+                        coords = new Rect(4, 1, 5, 2);
+                        break;
+                    case Biome.RAINFOREST:
+                        coords = new Rect(2, 1, 3, 2);
+                        break;
+                }
             else
             {
                 //terrain is land
