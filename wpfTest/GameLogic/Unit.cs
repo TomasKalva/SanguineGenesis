@@ -49,7 +49,7 @@ namespace wpfTest.GameLogic
             Abilities.Add(MoveTo.Get);
             Abilities.Add(Attack.Get);
             Abilities.Add(Spawn.GetAbility(EntityType.TIGER));
-            Abilities.Add(Build.GetAbility(EntityType.BAOBAB));
+            Abilities.Add(PlantBuilding.GetAbility(EntityType.BAOBAB));
         }
         
         /// <summary>

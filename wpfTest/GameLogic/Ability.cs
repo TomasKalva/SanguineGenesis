@@ -156,7 +156,7 @@ namespace wpfTest.GameLogic
                 //build abilities
                 foreach (EntityType building in EntityTypeExtensions.Buildings)
                 {
-                    Ability a = Build.GetAbility(building);
+                    Ability a = PlantBuilding.GetAbility(building);
                     moveToCast.Add(a, new MoveTo(a.Distance, false, false));
                 }
             }
@@ -235,7 +235,7 @@ namespace wpfTest.GameLogic
         public static Attack Get => ability;
         public override Command NewCommand(Unit caster, Entity target)
         {
-            return new AttackCommand(caster, target);
+            return new AttackCommand(caster, target, this);
         }
 
         public override string Description()
@@ -265,7 +265,7 @@ namespace wpfTest.GameLogic
 
         public override Command NewCommand(Entity caster, Vector2 target)
         {
-            return new SpawnCommand(caster, target, SpawningUnitFactory.UnitType);
+            return new SpawnCommand(caster, target, this, SpawningUnitFactory.UnitType);
         }
 
         public override string ToString()
@@ -280,33 +280,33 @@ namespace wpfTest.GameLogic
     }
 
 
-    public sealed class Build : TargetAbility<Entity, Node>
+    public sealed class PlantBuilding : TargetAbility<Entity, Node>
     {
-        private static Dictionary<EntityType, Build> buildingBuildingAbilities;
-        static Build()
+        private static Dictionary<EntityType, PlantBuilding> plantingBuildingAbilities;
+        static PlantBuilding()
         {
-            buildingBuildingAbilities = new Dictionary<EntityType, Build>()
+            plantingBuildingAbilities = new Dictionary<EntityType, PlantBuilding>()
             {
-                { EntityType.BAOBAB, new Build(new BuildingFactory(EntityType.BAOBAB, 3, 150, 100, SoilQuality.MEDIUM, 20),0,50)}
+                { EntityType.BAOBAB, new PlantBuilding(new TreeFactory(EntityType.BAOBAB,  150, 100, 15, 3, true, 50, Biome.SAVANNA, Terrain.LAND, SoilQuality.MEDIUM, 2, 10),0,50)}
             };
         }
-        private Build(BuildingFactory buildingFactory, float energyCost, float resourceCost)
+        private PlantBuilding(TreeFactory buildingFactory, float energyCost, float resourceCost)
             : base(20f, energyCost, resourceCost, true)
         {
             BuildingFactory = buildingFactory;
         }
-        public static Build GetAbility(EntityType t) => buildingBuildingAbilities[t];
+        public static PlantBuilding GetAbility(EntityType t) => plantingBuildingAbilities[t];
 
         public BuildingFactory BuildingFactory { get; }
 
         public override Command NewCommand(Entity caster, Node target)
         {
-            return new BuildCommand(caster, target, BuildingFactory.UnitType);
+            return new PlantBuildingCommand(caster, target, this);
         }
 
         public override string ToString()
         {
-            return base.ToString() + " " + BuildingFactory.UnitType;
+            return base.ToString() + " " + BuildingFactory.BuildingType;
         }
 
         public override string Description()

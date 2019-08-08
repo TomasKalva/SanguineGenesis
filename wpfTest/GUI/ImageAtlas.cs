@@ -213,7 +213,7 @@ namespace wpfTest.GUI
                 }
             }
             if(coords.Equals(default(Rect)))
-                throw new NotImplementedException("The case " + biome + " " + soilQuality + " should be implemented!");
+                throw new ArgumentException("Combination " + terrain + ", " + biome + ", " + soilQuality + " isn't valid");
 
             return ToRelative(GridToCoordinates(coords));
         }

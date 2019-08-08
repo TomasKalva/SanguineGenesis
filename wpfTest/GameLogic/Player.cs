@@ -12,7 +12,7 @@ namespace wpfTest
     {
         public List<Entity> Entities { get; private set; }
         public List<Unit> Units => Entities.Where((e) => e.GetType() == typeof(Unit)).Select((u)=>(Unit)u).ToList();
-        public List<Building> Buildings => Entities.Where((e) => e.GetType() == typeof(Building)).Select((u) => (Building)u).ToList();
+        public List<Building> Buildings => Entities.Where((e) => e is Building).Select((u) => (Building)u).ToList();
         public VisibilityMap VisibilityMap { get; set; }
         public bool MapChanged => MapView.MapWasChanged;
         public Map MapView { get; private set; }

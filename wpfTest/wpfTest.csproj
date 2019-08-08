@@ -71,10 +71,13 @@
     <Compile Include="GameLogic\AnimationState.cs" />
     <Compile Include="GameLogic\Building.cs" />
     <Compile Include="GameLogic\BuildingFactory.cs" />
+    <Compile Include="GameLogic\Structure.cs" />
+    <Compile Include="GameLogic\TreeFactory.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\GameplayOptions.cs" />
     <Compile Include="GameLogic\MovementGenerator.cs" />
     <Compile Include="GameLogic\MovementParameters.cs" />
+    <Compile Include="GameLogic\Tree.cs" />
     <Compile Include="GameLogic\Unit.cs" />
     <Compile Include="GameLogic\UnitView.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />
@@ -140,6 +143,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="GameLogic\Trees.csv" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

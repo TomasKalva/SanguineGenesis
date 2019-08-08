@@ -40,9 +40,9 @@ namespace wpfTest
                 {
                     if(i<=0 || i>Width || j<=0 || j > Height)
                         //nodes outside of the map have default biome and maximal nutrients
-                        nodes[i, j] = new Node(i, j, Node.MAX_NUTRIENTS, Biome.DEFAULT, Terrain.LAND);
+                        nodes[i, j] = new Node(i - 1, j - 1, Node.MAX_NUTRIENTS, Biome.DEFAULT, Terrain.LAND);
                     else
-                        nodes[i, j] = colorToNode[map[i - 1, j - 1].RGB].Copy(i, j);
+                        nodes[i, j] = colorToNode[map[i - 1, j - 1].RGB].Copy(i - 1, j - 1);
                 }
             }
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
@@ -213,7 +213,7 @@ namespace wpfTest
                         //maximum amount of transported nutrients so the soil doesn't downgrade
                         decimal noDownTrans = Math.Min(suppTrans, current.Nutrients - current.Terrain.Nutrients(current.Biome,current.SoilQuality));
                         newNutrients[i + 1, j + 1] += current.Nutrients - noDownTrans;
-                        newNutrients[lowestNutr.X, lowestNutr.Y] += noDownTrans;
+                        newNutrients[lowestNutr.X + 1, lowestNutr.Y + 1] += noDownTrans;
                     }
                     else
                     {

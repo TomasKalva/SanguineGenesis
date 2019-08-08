@@ -49,7 +49,7 @@ namespace wpfTest
                 foreach (Entity e in entities)
                 {
                     //calculate collisions for each pair of unit and entity only once
-                    if (u.GetHashCode() < e.GetHashCode() || e.GetType()==typeof(Building))
+                    if (u.GetHashCode() < e.GetHashCode() || e is Building)
                     {
 
                         float dist = (u.Center - e.Center).Length;
@@ -67,7 +67,7 @@ namespace wpfTest
                             //push centres of the units from each other
                             Vector2 dir12 = u.Center.UnitDirectionTo(e.Center);
                             Vector2 pushVec = (totalR - dist) / 2 * dir12;
-                            if (e.GetType() == typeof(Building))
+                            if (e is Building)
                             {
                                 //buildings can't be pushed
                                 u.Position = u.Center - 2 * pushVec;

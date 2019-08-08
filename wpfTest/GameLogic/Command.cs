@@ -76,8 +76,8 @@ namespace wpfTest
         private float timeUntilAttack;//time in s until this unit attacks
 
         private AttackCommand():base(null,null,null) => throw new NotImplementedException();
-        public AttackCommand(Unit commandedEntity, Entity target)
-            : base(commandedEntity, target, Attack.Get)
+        public AttackCommand(Unit commandedEntity, Entity target, Attack attack)
+            : base(commandedEntity, target, attack)
         {
             this.timeUntilAttack = 0f;
 
@@ -217,7 +217,7 @@ namespace wpfTest
                     //attack the enemy
                     unit.StopMoving = true;
                     command.RemoveFromAssignment();
-                    unit.SetCommand(new AttackCommand(unit, enemy));
+                    unit.SetCommand(new AttackCommand(unit, enemy, Attack.Get));
                     return false;//new command is already set
                 }
             }
@@ -346,8 +346,8 @@ namespace wpfTest
         public float SpawnTimer { get; private set; }
 
         private SpawnCommand() : base(null, default(Vector2), null) => throw new NotImplementedException();
-        public SpawnCommand(Entity commandedEntity, Vector2 target, EntityType entityType)
-            : base(commandedEntity, target, Spawn.GetAbility(entityType))
+        public SpawnCommand(Entity commandedEntity, Vector2 target, Spawn spawn, EntityType entityType)
+            : base(commandedEntity, target, spawn)
         {
             SpawnTimer = 0f;
         }
@@ -370,11 +370,11 @@ namespace wpfTest
         }
     }
 
-    public class BuildCommand : Command<Entity, Node, Build>
+    public class PlantBuildingCommand : Command<Entity, Node, PlantBuilding>
     {
-        private BuildCommand() : base(null, null, null) => throw new NotImplementedException();
-        public BuildCommand(Entity commandedEntity, Node target, EntityType entityType)
-            : base(commandedEntity, target, Build.GetAbility(entityType))
+        private PlantBuildingCommand() : base(null, null, null) => throw new NotImplementedException();
+        public PlantBuildingCommand(Entity commandedEntity, Node target, PlantBuilding plantBuilding)
+            : base(commandedEntity, target, plantBuilding)
         {
         }
 
@@ -399,7 +399,7 @@ namespace wpfTest
                         Node ijN = buildNodes[i, j];
                         //the building can't be built if the node is blocked or contains
                         //incompatible terrain
-                        if (ijN.Blocked || !(bf.SoilQuality>ijN.SoilQuality))
+                        if (ijN.Blocked || !(bf.NodeIsValid(ijN)))
                             canBeBuilt = false;
                     }
             }
@@ -415,13 +415,25 @@ namespace wpfTest
                     //finish command if paying was unsuccessful
                     return true;
 
-                Player newUnitOwner = game.Players[CommandedEntity.Player.PlayerID+1];
-                Building newBuilding = Ability.BuildingFactory.NewInstance(newUnitOwner, buildNodes);
+                //find energy source nodes
+                Node[,] energySourceNodes;
+                if (bf is TreeFactory trF)
+                { 
+                    int rDist = trF.RootsDistance;
+                    energySourceNodes = GameQuerying.GetGameQuerying().SelectNodes(map, nX - rDist, nY - rDist, nX + (size + rDist - 1), nY + (size + rDist - 1));
+                }
+                else
+                {
+                    energySourceNodes = buildNodes;
+                }
+                //put the new building on the main map
+                Player newUnitOwner = CommandedEntity.Player;
+                Building newBuilding = Ability.BuildingFactory.NewInstance(newUnitOwner, buildNodes, buildNodes);
                 game.Players[newUnitOwner.PlayerID].Entities.Add(newBuilding);
                 map.AddBuilding(newBuilding);
                 game.Map.MapWasChanged = true;
             }
-            //the command always immediately finishes regardless of the success of building the building
+            //the command always immediately finishes regardless of the success of placing the building
             return true;
         }
     }
