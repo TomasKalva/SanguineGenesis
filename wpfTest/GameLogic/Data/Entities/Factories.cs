@@ -71,9 +71,9 @@ namespace wpfTest.GameLogic
                             case "build":
                                 factory.Abilities.Add(abilities.PlantBuilding(abPar[1]));
                                 break;
-                            /*case "spawn":
-                                factory.Abilities.Add(abilities.UnitSpawn((string)Enum.Parse(typeof(string), abPar[1])));
-                                break;*/
+                            case "spawn":
+                                factory.Abilities.Add(abilities.UnitSpawn(abPar[1]));
+                                break;
                         }
                     }
                 }
@@ -99,29 +99,59 @@ namespace wpfTest.GameLogic
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality),fields[10]);
 
             Factorys.Add(treeType, new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
-                biome, terrain, soilQuality, false,  10f, rootsDistance, 2  ));
+                biome, terrain, soilQuality, physical,  10f, rootsDistance, 2  ));
             abilitiesList.Add(treeType, fields[11]);
         }
     }
 
-    public class UnitFactories : Factories<UnitFactory>
+    public class UnitFactories : Factories<AnimalFactory>
     {
         public override void AddNewFactory(string description)
         {
             string[] fields = description.Split(',');
             string unitType = fields[0];
-            /*decimal maxHealth = decimal.Parse(fields[1]);
+            decimal maxHealth = decimal.Parse(fields[1]);
             decimal maxEnergy = decimal.Parse(fields[2]);
-            decimal energyRegen = decimal.Parse(fields[3]);
-            bool physical = fields[4] == "yes";
-            int size = int.Parse(fields[5]);
-            int rootsDistance = int.Parse(fields[6]);
-            decimal energyCost = decimal.Parse(fields[7]);
-            Biome biome = (Biome)Enum.Parse(typeof(Biome), fields[8]);
-            Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[9]);
-            SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[10]);*/
+            decimal foodEnergyRegen = decimal.Parse(fields[3]);
+            float foodEatingPeriod = float.Parse(fields[4]);
+            float range = float.Parse(fields[5]);
+            decimal energyCost = decimal.Parse(fields[6]);
+            decimal attackDamage = decimal.Parse(fields[7]);
+            float attackDistance = float.Parse(fields[8]);
+            float attackPeriod = float.Parse(fields[9]);
+            bool mechanicalDamage = fields[10] == "yes";
+            //field[11] isn't important
+            float maxSpeedLand = float.Parse(fields[12]);
+            float maxSpeedWater = float.Parse(fields[13]);
+            Movement movement = (Movement)Enum.Parse(typeof(Movement), fields[14]);
+            bool thickSkin = fields[15] == "yes";
+            Diet diet = (Diet)Enum.Parse(typeof(Diet), fields[16]);
+            float spawningTime = float.Parse(fields[17]);
+            
+            Factorys.Add(unitType, 
+                new AnimalFactory(
+                    unitType: unitType,
+                    maxHealth: maxHealth,
+                    maxEnergy: maxEnergy,
+                    foodEnergyRegen: foodEnergyRegen,
+                    foodEatingPeriod: foodEatingPeriod,
+                    range: range,
+                    attackDamage: attackDamage,
+                    attackPeriod: attackPeriod,
+                    attackDistance: attackDistance,
+                    mechanicalDamage: mechanicalDamage,
+                    maxSpeedLand: maxSpeedLand,
+                    maxSpeedWater: maxSpeedWater,
+                    movement: movement,
+                    thickSkin: thickSkin,
+                    diet: diet,
+                    spawningTime: spawningTime,
+                    physical: true,
+                    energyCost: energyCost,
+                    viewRange: 5
+                    ));
+            //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f););
 
-            Factorys.Add(unitType, new UnitFactory(unitType , 200, 150, 0.5f, true, 30m, 5f, 2f, 4f, Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f));
             //abilitiesList.Add(treeType, fields[11]);
         }
     }

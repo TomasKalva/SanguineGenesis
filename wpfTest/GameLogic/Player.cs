@@ -11,7 +11,7 @@ namespace wpfTest
     public class Player
     {
         public List<Entity> Entities { get; private set; }
-        public List<Unit> Units => Entities.Where((e) => e.GetType() == typeof(Unit)).Select((u)=>(Unit)u).ToList();
+        public List<Animal> Units => Entities.Where((e) => e.GetType() == typeof(Animal)).Select((u)=>(Animal)u).ToList();
         public List<Building> Buildings => Entities.Where((e) => e is Building).Select((u) => (Building)u).ToList();
         public VisibilityMap VisibilityMap { get; set; }
         public bool MapChanged => MapView.MapWasChanged;
@@ -38,7 +38,7 @@ namespace wpfTest
             if (PlayerID == Players.PLAYER1)
                 return;
 
-            UnitFactory normalUnits = new UnitFactory("TIGER" , 200, 150, 0.3f, true, 30m, 5f, 3.5f, 4f, Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f);
+            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.5f, 5m, 0.5f, 0.1f, false, 4f, 2f, Movement.LAND_WATER, false, Diet.CARNIVORE, 5f, true, 20m, 5f);
                 //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
             UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/

@@ -91,7 +91,7 @@ namespace wpfTest
                 .ToList();
         }
 
-        public List<Unit> GetVisibleUnits(Game game)
+        public List<Animal> GetVisibleUnits(Game game)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(

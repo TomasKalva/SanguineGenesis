@@ -13,7 +13,7 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Units whose commands should be updated.
         /// </summary>
-        public List<Unit> Units { get; }
+        public List<Animal> Units { get; }
         /// <summary>
         /// Whose units are performing commands for this assignment.
         /// </summary>
@@ -34,7 +34,7 @@ namespace wpfTest.GameLogic
 
         private FlowMap flowMap;
 
-        public MoveToCommandAssignment(Players player, List<Unit> units, Movement movement, IMovementTarget target, float goalDistance=0.1f, bool interruptable=true)
+        public MoveToCommandAssignment(Players player, List<Animal> units, Movement movement, IMovementTarget target, float goalDistance=0.1f, bool interruptable=true)
         {
             Movement = movement;
             Active = false;
@@ -89,7 +89,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public virtual void UpdateCommands()
         {
-            foreach (Unit u in Units)
+            foreach (Animal u in Units)
             {
                 //find command from this assignment
                 foreach(Command c in u.CommandQueue)

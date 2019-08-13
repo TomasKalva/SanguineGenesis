@@ -18,16 +18,18 @@ namespace wpfTest
         public Queue<Command> CommandQueue { get; }
         public View View => new View(Center, ViewRange);
         public Player Player { get; }
-        public string EntityType { get; }
         public AnimationState AnimationState { get; set; }
-        public decimal MaxHealth { get; set; }
-        public decimal Health { get; set; }
-        public decimal MaxEnergy { get; set; }
-        public decimal Energy { get; set; }
         public bool IsDead => Health <= 0;
+        public decimal Health { get; set; }
+        public decimal Energy { get; set; }
+
+        public string EntityType { get; }
+        public decimal MaxHealth { get; set; }
+        public decimal MaxEnergy { get; set; }
+        public bool Physical { get; }
         public List<Ability> Abilities { get; }
 
-        public Entity(Player player, string entityType, decimal maxHealth, float viewRange, decimal maxEnergy, List<Ability> abilities)
+        public Entity(Player player, string entityType, decimal maxHealth, float viewRange, decimal maxEnergy, bool physical, List<Ability> abilities)
         {
             Player = player;
             ViewRange = viewRange;
@@ -37,11 +39,12 @@ namespace wpfTest
             MaxHealth = maxHealth;
             Health = maxHealth;
             MaxEnergy = maxEnergy;
-            if (this is Unit)
+            if (this is Animal)
                 Energy = maxEnergy;
             else
                 Energy = 0;
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(entityType));
+            Physical = physical;
             Abilities = abilities;
         }
 
@@ -140,161 +143,6 @@ namespace wpfTest
         /// </summary>
         public abstract bool IsVisible(VisibilityMap visibilityMap);
     }
-    /*
-    public enum string
-    {
-        TIGER,
-        BAOBAB,
-        RHODE_GRASS,
-        CANDELABRA,        ACACIA,
-        KIWI_TREE,
-        WATER_LETTUCE,
-        PANDANI,
-        WHISTLING_THORN,
-        EUCALYPTUS,
-        MIAMBO,
-        SPIKE_THORN,
-        ELEPHANT_GRASS,
-        JACKAL_BERRY_TREE,
-        KAPOC,
-        BANNANA_TREE,
-        COCONUT_TREE,
-        CANNONBALL_TREE,
-        BAMBOO,
-        TEAK,
-        ASHOKA,
-        WALKING_PALM,
-        PITCHER,
-        CYCAD,
-        CYCAD_PALM,
-        TYRANNOSAUR_TREE,
-        FERN,
-        MANGROVE,
-        WATER_LILY,
-        ALGAE,
-        SWORD_PLANT,
-        ZEBRA, 
-        GAZZELE, 
-        RHINO, 	
-        GIRAFFE, 		
-        HIPPO, 		
-        TURTLE, 		
-        MEERCAT, 		
-        TASMANIAN_DEVIL, 		
-        KANGAROO, 		
-        HYENA, 		
-        CHEETAH, 		
-        TARANTULA, 		
-        INDIAN_ELEPHANT, 		
-        ELEPHANT, 		
-        CHIMPANZEE, 		
-        GORILLA, 		
-        PANDA, 
-        OCELOT, 		
-        RAPTOR, 		
-        SAUROPOD, 		
-        TYRANNOSAUR, 		
-        ANACONDA, 		
-        COBRA, 		
-        ALIGATOR, 		
-        CROCODILE, 		
-        PUMA, 		
-        DODO, 		
-        TRICERATOPS, 		
-        BABOON
-    }*/
-    /*
-    public static class stringExtensions
-    {
-        private static Dictionary<string, bool> isUnit;
-
-        static stringExtensions()
-        {
-            isUnit = new Dictionary<string, bool>()
-            {
-                {string.TIGER, true },
-                {string.BAOBAB, false },
-                {string.RHODE_GRASS, false },
-                {string.CANDELABRA, false },
-                {string.ACACIA, false },
-                {string.KIWI_TREE, false },
-                {string.WATER_LETTUCE, false },
-                {string.PANDANI, false },
-                {string.WHISTLING_THORN, false },
-                {string.EUCALYPTUS, false },
-                {string.MIAMBO, false },
-                {string.SPIKE_THORN, false },
-                {string.ELEPHANT_GRASS, false },
-                {string.JACKAL_BERRY_TREE, false },
-                {string.KAPOC, false },
-                {string.BANNANA_TREE, false },
-                {string.COCONUT_TREE, false },
-                {string.CANNONBALL_TREE, false },
-                {string.BAMBOO, false },
-                {string.TEAK, false },
-                {string.ASHOKA, false },
-                {string.WALKING_PALM, false },
-                {string.PITCHER, false },
-                {string.CYCAD, false },
-                {string.CYCAD_PALM, false },
-                {string.TYRANNOSAUR_TREE, false },
-                {string.FERN, false },
-                {string.MANGROVE, false },
-                {string.WATER_LILY, false },
-                {string.ALGAE, false },
-                {string.SWORD_PLANT, false },
-                {string.ZEBRA, true },
-                {string.GAZZELE, true },
-                {string.RHINO, true },
-                {string.GIRAFFE, true },
-                {string.HIPPO, true },
-                {string.TURTLE, true },
-                {string.MEERCAT, true },
-                {string.TASMANIAN_DEVIL, true },
-                {string.KANGAROO, true },
-                {string.HYENA, true },
-                {string.CHEETAH, true },
-                {string.TARANTULA, true },
-                {string.INDIAN_ELEPHANT, true },
-                {string.ELEPHANT, true },
-                {string.CHIMPANZEE, true },
-                {string.GORILLA, true },
-                {string.PANDA, true },
-                {string.OCELOT, true },
-                {string.RAPTOR, true },
-                {string.SAUROPOD, true },
-                {string.TYRANNOSAUR, true },
-                {string.ANACONDA, true },
-                {string.ALIGATOR, true },
-                {string.CROCODILE, true },
-                {string.PUMA, true },
-                {string.DODO, true },
-                {string.TRICERATOPS, true },
-                {string.BABOON, true }
-            };
-        }
-
-        /// <summary>
-        /// Returns true iff the entity type is unit.
-        /// </summary>
-        public static bool Unit(this string type) => isUnit[type];
-
-        /// <summary>
-        /// Returns true iff the entity type is unit.
-        /// </summary>
-        public static bool Building(this string type) => !isUnit[type];
-
-        /// <summary>
-        /// Returns all strings representing units.
-        /// </summary>
-        public static IEnumerable<string> Units
-            => isUnit.Where((type) => type.Value).Select((type)=>type.Key);
-        /// <summary>
-        /// Returns all strings representing buildings.
-        /// </summary>
-        public static IEnumerable<string> Buildings
-            => isUnit.Where((type) => !type.Value).Select((type) => type.Key);
-    }*/
 
     public enum Movement
     {

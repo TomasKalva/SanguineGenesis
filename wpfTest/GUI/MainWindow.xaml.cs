@@ -325,7 +325,7 @@ namespace wpfTest
             }
             else
             {
-                Unit u = selectedEntity as Unit;
+                Animal u = selectedEntity as Animal;
                 if (u != null)
                 {
                     nameL.Content = u.EntityType;
@@ -333,7 +333,7 @@ namespace wpfTest
                     energyL.Content = u.MaxEnergy > 0 ? u.Energy + "/" + u.MaxEnergy : "-";
                     sizeL.Content = u.Range * 2;
                     viewRangeL.Content = u.ViewRange;
-                    maxSpeedL.Content = u.MaxSpeed;
+                    maxSpeedL.Content = u.MaxSpeedLand;
                     atDamageL.Content = u.AttackDamage;
                     atPeriodL.Content = u.AttackPeriod;
                     atDistanceL.Content = u.AttackDistance;

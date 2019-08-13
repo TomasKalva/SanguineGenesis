@@ -71,8 +71,10 @@
     <Compile Include="GameLogic\Data\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
     <Compile Include="GameLogic\Data\Entities\Building.cs" />
+    <Compile Include="GameLogic\Data\Entities\Corpse.cs" />
     <Compile Include="GameLogic\Data\Entities\EntityFactory.cs" />
     <Compile Include="GameLogic\Data\Entities\Factories.cs" />
+    <Compile Include="GameLogic\Data\Entities\Unit.cs" />
     <Compile Include="GameLogic\Data\GameStaticData.cs" />
     <Compile Include="GameLogic\Structure.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
@@ -80,7 +82,7 @@
     <Compile Include="GameLogic\MovementGenerator.cs" />
     <Compile Include="GameLogic\MovementParameters.cs" />
     <Compile Include="GameLogic\Data\Entities\Tree.cs" />
-    <Compile Include="GameLogic\Data\Entities\Unit.cs" />
+    <Compile Include="GameLogic\Data\Entities\Animal.cs" />
     <Compile Include="GameLogic\UnitView.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />
     <Compile Include="GameLogic\Maps\Pathfinding.cs" />
@@ -147,7 +149,7 @@
     <None Include="GameLogic\Data\Entities\Trees.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="GameLogic\Data\Entities\Units.csv">
+    <None Include="GameLogic\Data\Entities\Animals.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

@@ -91,7 +91,7 @@ namespace wpfTest
                         {
                             //no enemy selected, move to the clicked coordiantes
                             game.CurrentPlayer.GameStaticData.Abilities.MoveTo.SetCommands(SelectedEntities.Entities
-                                .Where((e)=>e.GetType()==typeof(Unit)).Cast<Unit>(), clickCoords);
+                                .Where((e)=>e.GetType()==typeof(Animal)).Cast<Animal>(), clickCoords);
                         }
                         else
                         {

@@ -70,12 +70,12 @@ namespace wpfTest
         }
     }
 
-    public class AttackCommand : Command<Unit, Entity, Attack>
+    public class AttackCommand : Command<Animal, Entity, Attack>
     {
         private float timeUntilAttack;//time in s until this unit attacks
 
         private AttackCommand() => throw new NotImplementedException();
-        public AttackCommand(Unit commandedEntity, Entity target, Attack attack)
+        public AttackCommand(Animal commandedEntity, Entity target, Attack attack)
             : base(commandedEntity, target, attack)
         {
             this.timeUntilAttack = 0f;
@@ -116,7 +116,7 @@ namespace wpfTest
         MoveToCommandAssignment Assignment { get; set; }
     }
 
-    public class MoveToPointCommand : Command<Unit, IMovementTarget, MoveTo>,IComputable
+    public class MoveToPointCommand : Command<Animal, IMovementTarget, MoveTo>,IComputable
     {
         public MoveToCommandAssignment Assignment { get; set; }
         private MoveToLogic moveToLogic;
@@ -127,7 +127,7 @@ namespace wpfTest
         
 
         private MoveToPointCommand()  => throw new NotImplementedException();
-        public MoveToPointCommand(Unit commandedEntity, IMovementTarget target, float minStoppingDistance, MoveTo ability)
+        public MoveToPointCommand(Animal commandedEntity, IMovementTarget target, float minStoppingDistance, MoveTo ability)
             : base(commandedEntity, target, ability)
         {
             moveToLogic = new MoveToLogic(CommandedEntity, null, minStoppingDistance, target, Ability);
@@ -174,7 +174,7 @@ namespace wpfTest
         /// <summary>
         /// Moving unit.
         /// </summary>
-        private Unit unit;
+        private Animal unit;
         /// <summary>
         /// Point on the map where the unit should go.
         /// </summary>
@@ -190,7 +190,7 @@ namespace wpfTest
         private IMovementParametrizing movementParametrizing;
         private NoMovementDetection noMovementDetection;
 
-        public MoveToLogic(Unit unit, FlowMap flowMap, float minStoppingDistance, IMovementTarget target, IMovementParametrizing movementParametrizing)
+        public MoveToLogic(Animal unit, FlowMap flowMap, float minStoppingDistance, IMovementTarget target, IMovementParametrizing movementParametrizing)
         {
             this.unit = unit;
             this.flowMap = flowMap;
@@ -247,7 +247,7 @@ namespace wpfTest
             //command is finished if unit reached the goal distance or if it stayed at one
             //place near the target position for a long time
             if (finished //unit is close to the target point
-                || (noMovementDetection.NotMovingMuch(deltaT, unit.MaxSpeed * deltaT / 2) && CanStop())//unit is stuck
+                || (noMovementDetection.NotMovingMuch(deltaT, unit.MaxSpeedLand * deltaT / 2) && CanStop())//unit is stuck
                 /*|| game.Players[unit.Player.PlayerID].MapView
                     .GetObstacleMap(unit.Movement)[(int)TargetPoint.Center.X,(int)TargetPoint.Center.Y]*/)//target point is blocked
             {
@@ -361,7 +361,7 @@ namespace wpfTest
             if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
             {
                 Player newUnitOwner = CommandedEntity.Player;
-                Unit newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Targ);
+                Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Targ);
                 game.Players[newUnitOwner.PlayerID].Entities.Add(newUnit);
                 return true;
             }

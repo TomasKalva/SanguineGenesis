@@ -122,11 +122,11 @@ namespace wpfTest.GameLogic
                 ableToPay = ableToPay.Take(1).ToList();
 
             //move units to the target until the required distance is reached
-            if(typeof(Caster).IsAssignableFrom(typeof(Unit)))
+            if(typeof(Caster).IsAssignableFrom(typeof(Animal)))
                 abilities.MoveToCast(this)
                     .SetCommands(ableToPay
-                    .Where(caster=>caster.GetType()==typeof(Unit))
-                    .Cast<Unit>(), target);
+                    .Where(caster=>caster.GetType()==typeof(Animal))
+                    .Cast<Animal>(), target);
 
             //give command to each caster
             foreach (Caster c in ableToPay)
@@ -138,7 +138,7 @@ namespace wpfTest.GameLogic
         }
     }
 
-    public sealed class MoveTo: TargetAbility<Unit,IMovementTarget>,IMovementParametrizing
+    public sealed class MoveTo: TargetAbility<Animal,IMovementTarget>,IMovementParametrizing
     {
         private static MoveTo ability;
         /// <summary>
@@ -181,7 +181,7 @@ namespace wpfTest.GameLogic
         public bool Interruptable { get; }
         public bool UsesAttackDistance { get; }
 
-        public override void SetCommands(IEnumerable<Unit> casters, IMovementTarget target)
+        public override void SetCommands(IEnumerable<Animal> casters, IMovementTarget target)
         {
             //if there are no casters do nothing
             if (!casters.Any())
@@ -199,14 +199,14 @@ namespace wpfTest.GameLogic
 
             foreach(Movement m in Enum.GetValues(typeof(Movement)))
             {
-                IEnumerable<Unit> castersMov = castersGroups[m];
+                IEnumerable<Animal> castersMov = castersGroups[m];
                 //set commands only if any unit can receive it
                 if (!castersMov.Any())
                     continue;
 
-                MoveToCommandAssignment mtca = new MoveToCommandAssignment(player, castersMov.Cast<Unit>().ToList(), m, target);
+                MoveToCommandAssignment mtca = new MoveToCommandAssignment(player, castersMov.Cast<Animal>().ToList(), m, target);
                 //give command to each caster and set the command's creator
-                foreach (Unit caster in castersMov)
+                foreach (Animal caster in castersMov)
                 {
                     IComputable com = new MoveToPointCommand(caster, target, minStoppingDistance, this);
                     com.Assignment = mtca;
@@ -217,7 +217,7 @@ namespace wpfTest.GameLogic
             }
         }
 
-        public override Command NewCommand(Unit caster, IMovementTarget target)
+        public override Command NewCommand(Animal caster, IMovementTarget target)
         {
             throw new NotImplementedException("This method is not necessary because the virtual method " + nameof(SetCommands) + " was overriden");
         }
@@ -229,7 +229,7 @@ namespace wpfTest.GameLogic
         }
     }
 
-    public sealed class Attack : TargetAbility<Unit, Entity>
+    public sealed class Attack : TargetAbility<Animal, Entity>
     {
         private static Attack ability;
         static Attack()
@@ -238,7 +238,7 @@ namespace wpfTest.GameLogic
         }
         internal Attack():base(0.1f, 0, false) { }
         //public static Attack Get => ability;
-        public override Command NewCommand(Unit caster, Entity target)
+        public override Command NewCommand(Animal caster, Entity target)
         {
             return new AttackCommand(caster, target, this);
         }
@@ -251,22 +251,22 @@ namespace wpfTest.GameLogic
 
     public sealed class Spawn : TargetAbility<Entity, Vector2>
     {
-        private static Dictionary<string,Spawn> unitSpawningAbilities;
+        //private static Dictionary<string,Spawn> unitSpawningAbilities;
         static Spawn()
         {
-            unitSpawningAbilities = new Dictionary<string, Spawn>()
+            /*unitSpawningAbilities = new Dictionary<string, Spawn>()
             {
-                { "TIGER", new Spawn(new UnitFactory("TIGER", 200, 150, 0.5f, true, 30m, 5f, 2f, 4f,Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f))}
-            };
+                { "TIGER", new Spawn(new AnimalFactory("TIGER", 200, 150, 0.5f, true, 30m, 5f, 2f, 4f,Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f))}
+            };*/
         }
-        internal Spawn(UnitFactory spawningUnitFactory)
+        internal Spawn(AnimalFactory spawningUnitFactory)
             : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true)
         {
             SpawningUnitFactory = spawningUnitFactory;
         }
-        public static Spawn GetAbility(string t) => unitSpawningAbilities[t];
+        //public static Spawn GetAbility(string t) => unitSpawningAbilities[t];
         
-        public UnitFactory SpawningUnitFactory { get; }
+        public AnimalFactory SpawningUnitFactory { get; }
 
         public override Command NewCommand(Entity caster, Vector2 target)
         {
@@ -287,7 +287,7 @@ namespace wpfTest.GameLogic
 
     public sealed class PlantBuilding : TargetAbility<Entity, Node>
     {
-        private static Dictionary<string, PlantBuilding> plantingBuildingAbilities;
+        //private static Dictionary<string, PlantBuilding> plantingBuildingAbilities;
         static PlantBuilding()
         {
             /*plantingBuildingAbilities = new Dictionary<string, PlantBuilding>()

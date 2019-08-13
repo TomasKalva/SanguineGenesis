@@ -101,34 +101,94 @@ namespace wpfTest.GameLogic
         }
     }
 
-    public class UnitFactory : EntityFactory
+    public abstract class UnitFactory : EntityFactory
     {
         public float Range { get; }//range of the circle collider
-        public float MaxSpeed { get; }
-        public float Acceleration { get; }
-        public Movement Movement { get; }
-        public float SpawningTime { get; }
-        public decimal AttackDamage { get; }
-        public float AttackPeriod { get; }
-        public float AttackDistance { get; }
-
-        public Unit NewInstance(Player player, Vector2 pos)
-        {
-            return new Unit(player, EntityType, MaxHealth, MaxEnergy, pos, Movement, Range, ViewRange, MaxSpeed, Acceleration, AttackDamage, AttackPeriod, AttackDistance, Abilities.ToList());
-        }
 
         public UnitFactory(string unitType, decimal maxHealth, decimal maxEnergy, float range, bool physical, decimal energyCost,
-            float viewRange, float maxSpeed, float acceleration, Movement movement, float spawningTime, decimal attackDamage, float attackPeriod, float attackDistance)
+            float viewRange)
             : base(unitType, maxHealth, maxEnergy, physical, energyCost, viewRange)
         {
             Range = range;
-            MaxSpeed = maxSpeed;
-            Acceleration = acceleration;
-            Movement = movement;
-            SpawningTime = spawningTime;
+        }
+    }
+
+    public class AnimalFactory : UnitFactory
+    {
+        public decimal FoodEnergyRegen { get; }
+        public float FoodEatingPeriod { get; }
+        public decimal AttackDamage { get; }
+        public float AttackPeriod { get; }
+        public float AttackDistance { get; }
+        public bool MechanicalDamage { get; }
+        public float MaxSpeedLand { get; }
+        public float MaxSpeedWater { get; }
+        public Movement Movement { get; }//where can the unit walk
+        public bool ThickSkin { get; }
+        public Diet Diet { get; }
+        public float SpawningTime { get; }
+
+        public Animal NewInstance(Player player, Vector2 pos)
+        {
+            return new Animal(
+                player: player,
+                position: pos,
+                unitType: EntityType,
+                maxHealth: MaxHealth,
+                maxEnergy:MaxEnergy,
+                foodEnergyRegen:FoodEnergyRegen,
+                foodEatingPeriod:FoodEatingPeriod,
+                range:Range,
+                attackDamage:AttackDamage,
+                attackPeriod:AttackPeriod,
+                attackDistance:AttackDistance,
+                mechanicalDamage:MechanicalDamage,
+                maxSpeedLand:MaxSpeedLand,
+                maxSpeedWater:MaxSpeedWater,
+                movement:Movement,
+                thickSkin:ThickSkin,
+                diet:Diet,
+                spawningTime:SpawningTime,
+                physical:Physical,
+                energyCost:EnergyCost,
+                viewRange:ViewRange,
+                abilities:Abilities.ToList());
+        }
+
+        public AnimalFactory(
+            string unitType,
+            decimal maxHealth,
+            decimal maxEnergy,
+            decimal foodEnergyRegen,
+            float foodEatingPeriod,
+            float range,
+            decimal attackDamage,
+            float attackPeriod,
+            float attackDistance,
+            bool mechanicalDamage,
+            float maxSpeedLand,
+            float maxSpeedWater,
+            Movement movement,
+            bool thickSkin,
+            Diet diet,
+            float spawningTime,
+            bool physical,
+            decimal energyCost,
+            float viewRange)
+            : base(unitType, maxHealth, maxEnergy, range, physical, energyCost, viewRange)
+        {
+            FoodEnergyRegen = foodEnergyRegen;
+            FoodEatingPeriod = foodEatingPeriod;
             AttackDamage = attackDamage;
             AttackPeriod = attackPeriod;
             AttackDistance = attackDistance;
+            MechanicalDamage = mechanicalDamage;
+            MaxSpeedLand = maxSpeedLand;
+            MaxSpeedWater = maxSpeedWater;
+            Movement = movement;
+            ThickSkin = thickSkin;
+            Diet = diet;
+            SpawningTime = spawningTime;
         }
     }
 }

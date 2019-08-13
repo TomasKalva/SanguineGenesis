@@ -24,10 +24,10 @@ namespace wpfTest
                 });
         }
 
-        public List<Unit> SelectRectUnits(Game game, Rect area, Func<Unit, bool> unitProperty)
+        public List<Animal> SelectRectUnits(Game game, Rect area, Func<Animal, bool> unitProperty)
         {
-            List<Unit> selected = new List<Unit>();
-            foreach (Unit unit in SelectRectEntities(game, area, (e)=>e.GetType()==typeof(Unit)))
+            List<Animal> selected = new List<Animal>();
+            foreach (Animal unit in SelectRectEntities(game, area, (e)=>e.GetType()==typeof(Animal)))
             {
                 Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
                 unitRect = ((IRectangle)unit).GetRect();
@@ -54,7 +54,7 @@ namespace wpfTest
         {
             return entities.Where((e) =>
             {
-                if (e is Unit u)
+                if (e is Animal u)
                 {
                     return u.IsVisible(observer.VisibilityMap);
                 }

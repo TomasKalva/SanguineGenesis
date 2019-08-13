@@ -43,9 +43,9 @@ namespace wpfTest
             PushingMaps[Movement.LAND_WATER]= gwPMap;
         }
 
-        public void PushAway(Map map, List<Unit> units, List<Entity> entities, float deltaT)
+        public void PushAway(Map map, List<Animal> units, List<Entity> entities, float deltaT)
         {
-            foreach (Unit u in units)
+            foreach (Animal u in units)
                 foreach (Entity e in entities)
                 {
                     //calculate collisions for each pair of unit and entity only once
@@ -74,7 +74,7 @@ namespace wpfTest
                             }
                             else
                             {
-                                Unit u1 = (Unit)e;
+                                Animal u1 = (Animal)e;
                                 if (u.Player != u1.Player)
                                 {
                                     if (u.WantsToMove && !u1.WantsToMove)
@@ -121,7 +121,7 @@ namespace wpfTest
                 }
         }
 
-        public void PushOutsideOfObstacles(Map map, List<Unit> units, float deltaT)
+        public void PushOutsideOfObstacles(Map map, List<Animal> units, float deltaT)
         {
 
             ObstacleMap gOMap = map.ObstacleMaps[Movement.LAND];
@@ -135,7 +135,7 @@ namespace wpfTest
             FlowMap gPMap = PushingMaps[Movement.LAND];
             FlowMap wPMap = PushingMaps[Movement.WATER];
             FlowMap gwPMap = PushingMaps[Movement.LAND_WATER];
-            foreach (Unit u in units)
+            foreach (Animal u in units)
             {
                 switch (u.Movement)
                 {
@@ -164,9 +164,9 @@ namespace wpfTest
             }
         }
 
-        public void ResetCollision(List<Unit> units)
+        public void ResetCollision(List<Animal> units)
         {
-            foreach (Unit u in units)
+            foreach (Animal u in units)
             {
                 if (!u.WantsToMove && !u.IsInCollision)
                     u.Vel = new Vector2(0f, 0f);
@@ -174,9 +174,9 @@ namespace wpfTest
             }
         }
 
-        public void Step(Map map, List<Unit> units, float deltaT)
+        public void Step(Map map, List<Animal> units, float deltaT)
         {
-            foreach(Unit u in units)
+            foreach(Animal u in units)
             {
                 u.Move(map,deltaT);
             }

@@ -48,6 +48,7 @@ namespace wpfTest
             var vertexShaderSource = ManifestResourceLoader.LoadTextFile("GUI\\Shaders\\AtlasTexShader.vert");
             var fragmentShaderSource = ManifestResourceLoader.LoadTextFile("GUI\\Shaders\\AtlasTexShader.frag");
             shaderProgram.Create(gl, vertexShaderSource, fragmentShaderSource, null);
+            
 
             //set indices for the shader program attributes
             shaderProgram.BindAttributeLocation(gl, attributeIndexPosition, "in_Position");
@@ -68,7 +69,7 @@ namespace wpfTest
             modelMatrix = new mat4(1.0f);
 
             //load image used as atlas and pass it to the shader program
-            InitializeAtlas(gl);
+            InitializeAtlas(gl, shaderProgram);
             
             //bind the shader program and set its parameters
             shaderProgram.Bind(gl);
@@ -116,7 +117,7 @@ namespace wpfTest
         /// Loads the tile map texture, binds it and sets texture drawing parameters.
         /// </summary>
         /// <param name="gl">The OpenGL instance.</param>
-        private static void InitializeAtlas(OpenGL gl)
+        private static void InitializeAtlas(OpenGL gl, ShaderProgram shaderProgram)
         {
             //enable drawing textures
             gl.Enable(OpenGL.GL_TEXTURE_2D);
@@ -124,11 +125,13 @@ namespace wpfTest
             //enable alpha channel for textures
             gl.Enable(OpenGL.GL_BLEND);
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
-            LoadTexture("Images/bigTileMap.png", gl);
+            LoadTexture("Images/bigTileMap.png", gl, shaderProgram);
 
             //set linear filtering
             gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR);
             gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_LINEAR);
+
+
 
         }
 
@@ -137,19 +140,43 @@ namespace wpfTest
         /// </summary>
         /// <param name="fileName">The name of the file from which the texture will be loaded.</param>
         /// <param name="gl">The instance of OpenGL to which the texture will be loaded.</param>
-        private static void LoadTexture(String fileName, OpenGL gl)
+        private static void LoadTexture(String fileName, OpenGL gl, ShaderProgram shaderProgram)
         {
             //load image and flip it vertically
             Bitmap textureImage = new Bitmap(fileName);
+            Bitmap test = (Bitmap)textureImage.Clone();
             textureImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
+
             //generate id for the texture and then bind the image with this id
-            uint[] textureIds = new uint[1];
-            gl.GenTextures(1, textureIds);
+            uint[] textureIds = new uint[2];
+            gl.GenTextures(2, textureIds);
             gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[0]);
+            gl.TexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, test.Width, test.Height, 0, OpenGL.GL_BGRA, OpenGL.GL_UNSIGNED_BYTE,
+                test.LockBits(new Rectangle(0, 0, test.Width, test.Height),
+                ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb).Scan0);
+
+            gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[1]);
             gl.TexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, textureImage.Width, textureImage.Height, 0, OpenGL.GL_BGRA, OpenGL.GL_UNSIGNED_BYTE,
                 textureImage.LockBits(new Rectangle(0, 0, textureImage.Width, textureImage.Height),
                 ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb).Scan0);
+
+            shaderProgram.Bind(gl);
+
+            int atlas0 = shaderProgram.GetUniformLocation(gl, "atlas0");
+            int atlas1 = shaderProgram.GetUniformLocation(gl, "atlas1");
+            gl.Uniform1(atlas0, 0);
+            gl.Uniform1(atlas1, 1);
+
+            gl.ActiveTexture(OpenGL.GL_TEXTURE0);
+            gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[0]);
+            gl.ActiveTexture(OpenGL.GL_TEXTURE1);
+            gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[1]);
+
+            /*shaderProgram.SetUniform1(gl, "atlas0", textureIds[0]);
+            shaderProgram.SetUniform1(gl, "atlas1", textureIds[1]);*/
+
+
         }
 
 
@@ -801,7 +828,7 @@ namespace wpfTest
                     SetColor(colors, 1f, 1f, 1f, index, 6);
 
                     //texture coordinates
-                    if(current is Unit && ((Unit)current).FacingLeft)
+                    if(current is Animal && ((Animal)current).FacingLeft)
                         SetSquareTextureCoordinates(texture, texIndex);
                     else
                         SetHorizFlipSquareTextureCoordinates(texture, texIndex);

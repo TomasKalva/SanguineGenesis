@@ -18,7 +18,7 @@ namespace wpfTest.GameLogic
             TreeFactories = new TreeFactories();
             TreeFactories.InitFactorys("GameLogic/Data/Entities/Trees.csv");
             UnitFactories = new UnitFactories();
-            UnitFactories.InitFactorys("GameLogic/Data/Entities/Units.csv");
+            UnitFactories.InitFactorys("GameLogic/Data/Entities/Animals.csv");
 
             Abilities = new Abilities(this);
 

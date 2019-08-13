@@ -116,11 +116,11 @@ namespace wpfTest.GUI
         /// </summary>
         private Rect GridToCoordinates(float left, float bottom, float width, float height)
         {
-            float l = left * TILE_SIZE + 1;
-            float b = bottom * TILE_SIZE + 1;
+            float l = (int)(left * TILE_SIZE) + 1;
+            float b = (int)(bottom * TILE_SIZE) + 1;
             return new Rect(l, b,
-                            l + width * TILE_SIZE - 2,
-                            b + height * TILE_SIZE - 2);
+                            l + (int)(width * TILE_SIZE) - 2,
+                            b + (int)(height * TILE_SIZE) - 2);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace wpfTest.GUI
                 switch (biome)
                 {
                     case Biome.DEFAULT:
-                        coords = new Rect(5, 0, 6, 1);
+                        coords = new Rect(5, 0, 6f, 1f);
                         break;
                     case Biome.SAVANNA:
                         coords = new Rect(3, 1, 4, 2);

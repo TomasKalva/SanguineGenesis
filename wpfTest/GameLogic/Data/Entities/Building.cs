@@ -45,10 +45,6 @@ namespace wpfTest.GameLogic
         /// </summary>
         public int Size { get; }
         /// <summary>
-        /// True iff units can't walk through this building.
-        /// </summary>
-        public bool Physical { get; }
-        /// <summary>
         /// Biome required under the building. Energy is taken only from nodes with this biome.
         /// </summary>
         public Biome Biome { get; }
@@ -68,13 +64,12 @@ namespace wpfTest.GameLogic
 
         public Building(Player player, string buildingType, Node[,] nodes, Node[,] energySources, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, List<Ability> abilities)
-            : base(player, buildingType, maxHealth, viewRange, maxEnergy, abilities)
+            : base(player, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Nodes = nodes;
             EnergySources = energySources;
             MaxEnergyIntake = maxEnergyIntake;
             Size = size;
-            Physical = physical;
             Biome = biome;
             Terrain = terrain;
             SoilQuality = soilQuality;

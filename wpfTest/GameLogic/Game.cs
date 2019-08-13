@@ -50,7 +50,7 @@ namespace wpfTest
             nextVisibilityPlayer = wpfTest.Players.PLAYER0;
             gameplayOptions = new GameplayOptions();
             gameplayOptions.WholeMapVisible = true;
-            foreach (Unit u in CurrentPlayer.Units)
+            foreach (Animal u in CurrentPlayer.Units)
             {
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("BAOBAB"));
@@ -67,9 +67,9 @@ namespace wpfTest
             return units;
         }
 
-        public List<Unit> GetUnits()
+        public List<Animal> GetUnits()
         {
-            var units = new List<Unit>();
+            var units = new List<Animal>();
             foreach (Players player in Enum.GetValues(typeof(Players)))
             {
                 units = units.Concat(Players[player].Units.Where((u) => !u.IsDead).ToList()).ToList();
@@ -101,7 +101,7 @@ namespace wpfTest
             }*/
 
             List<Entity> entities = GetEntities();
-            List<Unit> units = GetUnits();
+            List<Animal> units = GetUnits();
             List<Building> buildings = GetBuildings();
 
             //update nutrients
@@ -136,7 +136,7 @@ namespace wpfTest
             physics.ResetCollision(units);
 
             //attack nearby enemy if idle
-            foreach(Unit u in units)
+            foreach(Animal u in units)
             {
                 if(!u.CommandQueue.Any())
                 {
