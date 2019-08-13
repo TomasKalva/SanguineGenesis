@@ -6,37 +6,33 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic
 {
-    public abstract class BuildingFactory
+    public abstract class BuildingFactory:EntityFactory
     {
-        public EntityType BuildingType { get; }
-        public float MaxHealth { get; }
-        public float MaxEnergy { get; }
         public decimal MaxEnergyIntake { get; }
         public int Size { get; }
-        public bool Physical { get; }
-        public float EnergyCost { get; }
         public Biome Biome { get; }
         public Terrain Terrain { get; }
         public SoilQuality SoilQuality { get; }
+        public bool Aggressive { get; }
 
-        public BuildingFactory(EntityType buildingType, float maxHealth, float maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality)
+        public BuildingFactory(EntityType buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange)
+            :base(buildingType,maxHealth, maxEnergy, physical, energyCost, viewRange)
         {
-            BuildingType = buildingType;
-            MaxHealth = maxHealth;
-            MaxEnergy = maxEnergy;
             MaxEnergyIntake = maxEnergyIntake;
             Size = size;
-            Physical = physical;
-            EnergyCost = energyCost;
             Biome = biome;
             Terrain = terrain;
             SoilQuality = soilQuality;
+            Aggressive = aggressive;
         }
 
         public abstract Building NewInstance(Player player, Node[,] nodesUnder, Node[,] energySources);
 
-        public bool NodeIsValid(Node node)
+        /// <summary>
+        /// Returns true iff node can be under the building.
+        /// </summary>
+        public bool CanBeUnder(Node node)
         {
             return  node.Terrain == Terrain &&
                 node.Biome == Biome &&

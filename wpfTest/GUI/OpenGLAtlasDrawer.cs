@@ -898,26 +898,19 @@ namespace wpfTest
 
                     //depth is from [2,3]
                     float depth = 2f + current.Center.Y / game.Map.Height;
-
-                    Unit u = current as Unit;
-                    if(u != null)
-                    {
-                        if (u.HasEnergy)
-                        {
-                            //energy
-                            AddRectangle(left, bottom, right, top, indicatorImage, depth, index, vertices,
-                                index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
-                            index += 6 * 3;
-                            texIndex += 6 * 2;
-                            atlasInd += 6 * 4;
-                            float energyRight = Math.Max(left, left + (right - left) * u.Energy / u.MaxEnergy);
-                            AddRectangle(left, bottom, energyRight, top, indicatorImage, depth, index, vertices,
-                                index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 0f, 1f);
-                            index += 6 * 3;
-                            texIndex += 6 * 2;
-                            atlasInd += 6 * 4;
-                        }
-                    }
+                    
+                    //energy
+                    AddRectangle(left, bottom, right, top, indicatorImage, depth, index, vertices,
+                        index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
+                    index += 6 * 3;
+                    texIndex += 6 * 2;
+                    atlasInd += 6 * 4;
+                    float energyRight = Math.Max(left, left + (right - left) * (float)(current.Energy / current.MaxEnergy));
+                    AddRectangle(left, bottom, energyRight, top, indicatorImage, depth, index, vertices,
+                        index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 1f, 0f);
+                    index += 6 * 3;
+                    texIndex += 6 * 2;
+                    atlasInd += 6 * 4;
 
                     //health
                     bottom += indicatorHeight*unitSize;
@@ -927,7 +920,7 @@ namespace wpfTest
                     index += 6 * 3;
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
-                    float healthRight =Math.Max(left, left + (right - left) * current.Health/current.MaxHealth);
+                    float healthRight =Math.Max(left, left + (right - left) * (float)(current.Health/current.MaxHealth));
                     AddRectangle(left, bottom, healthRight, top, indicatorImage, depth, index, vertices,
                         index, colors, texIndex, texture, atlasInd, texAtlas, 1f, 0f, 0f);
                 }

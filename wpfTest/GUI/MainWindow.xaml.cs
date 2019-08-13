@@ -50,7 +50,7 @@ namespace wpfTest
             game = new Game(mapBitmap);
             var MapView = new MapView(0, 0, 60, game.Map, game);
             var MapMovementInput = new MapMovementInput();
-            gameControls = new GameControls(MapView, MapMovementInput);
+            gameControls = new GameControls(MapView, MapMovementInput, game);
             openGLControl1.FrameRate = 30;
 
             Thread t = new Thread(() => {
@@ -139,7 +139,7 @@ namespace wpfTest
         private Button[] unitButtons;
         private List<Ability> selectedUnitsAbilities;
         private Button[] abilityButtons;
-        private Entity selectedUnit;
+        private Entity selectedEntity;
         private Ability selectedAbility;
         private Label[] selUnCommands;
         private object resourceLock=new object();
@@ -161,7 +161,7 @@ namespace wpfTest
                 {
                     if (buttonInd < selectedUnits.Count)
                     {
-                        selectedUnit = selectedUnits[buttonInd];
+                        selectedEntity = selectedUnits[buttonInd];
                         UpdateUnitInfo();
                     }
                 };
@@ -303,10 +303,10 @@ namespace wpfTest
         private void UpdateUnitInfo()
         {
             //dont show info about dead units
-            if (selectedUnit!=null && selectedUnit.IsDead)
-                selectedUnit = null;
+            if (selectedEntity!=null && selectedEntity.IsDead)
+                selectedEntity = null;
 
-            if (selectedUnit == null)
+            if (selectedEntity == null)
             {
                 nameL.Content = "";
                 healthL.Content = "";
@@ -325,7 +325,7 @@ namespace wpfTest
             }
             else
             {
-                Unit u = selectedUnit as Unit;
+                Unit u = selectedEntity as Unit;
                 if (u != null)
                 {
                     nameL.Content = u.EntityType;
@@ -339,7 +339,7 @@ namespace wpfTest
                     atDistanceL.Content = u.AttackDistance;
                 }
                 //commands panel
-                List<Command> commands = selectedUnit.CommandQueue.ToList();
+                List<Command> commands = selectedEntity.CommandQueue.ToList();
                 for (int i = 0; i < selUnCommands.Length; i++)
                 {
                     Label l = selUnCommands[i];
@@ -365,7 +365,6 @@ namespace wpfTest
             {
                 abilityNameL.Content = selectedAbility.ToString();
                 abilityEnergyCostL.Content = selectedAbility.EnergyCost.ToString();
-                abilityResourceCostL.Content = selectedAbility.ResourceCost.ToString();
                 abilityTargetL.Content = selectedAbility.TargetType.Name;
                 abilityDescriptionTB.Text = selectedAbility.Description();
             }
@@ -385,7 +384,7 @@ namespace wpfTest
         private void SelectUnit()
         {
             if (selectedUnits != null && selectedUnits.Any())
-                selectedUnit = selectedUnits.FirstOrDefault();
+                selectedEntity = selectedUnits.FirstOrDefault();
         }
 
         /// <summary>

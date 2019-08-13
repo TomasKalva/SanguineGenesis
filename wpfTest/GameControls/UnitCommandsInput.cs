@@ -19,19 +19,19 @@ namespace wpfTest
         public bool AbilitySelected { get; set; }
         public Ability Ability => SelectedAbility;// AbilityTypeToAbility[SelectedAbility];
 
-        private static UnitCommandsInput unitCommandsInput=new UnitCommandsInput();
-        public static UnitCommandsInput GetUnitCommandsInput() => unitCommandsInput;
+        //private static UnitCommandsInput unitCommandsInput=new UnitCommandsInput();
+        //public static UnitCommandsInput GetUnitCommandsInput() => unitCommandsInput;
 
-        private UnitCommandsInput()
+        internal UnitCommandsInput(Game game)
         {
             State = UnitsCommandInputState.IDLE;
             MapCoordinates = new Vector2();
-            SelectedAbility = MoveTo.Get;
-            AbilitySelected = false;
+            SelectedAbility = game.CurrentPlayer.GameStaticData.Abilities.MoveTo;
+             AbilitySelected = false;
 
             //initialize keyToAbilityType
             keyToAbility = new Dictionary<Key, Ability>();
-            keyToAbility.Add(Key.Escape, MoveTo.Get);
+            keyToAbility.Add(Key.Escape, game.CurrentPlayer.GameStaticData.Abilities.MoveTo);
 
             //initialize abilityTypeToAbility
             /*AbilityTypeToAbility = new Dictionary<Ability, Ability>();

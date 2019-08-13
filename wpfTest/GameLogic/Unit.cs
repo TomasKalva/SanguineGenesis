@@ -23,13 +23,13 @@ namespace wpfTest.GameLogic
         public Vector2 Direction { get; set; }//direction the unit is facing
         public bool FacingLeft => Direction.X <= 0;
         public Movement Movement { get; }//where can the unit walk
-        public float AttackDamage { get; }
+        public decimal AttackDamage { get; }
         public float AttackPeriod { get; }
         public float AttackDistance { get; }
 
-        public Unit(Player player, EntityType unitType, float maxHealth, float maxEnergy, Vector2 pos, Movement movement = Movement.LAND, float range = 0.5f, float viewRange=5.0f, float maxSpeed = 2f, float acceleration = 4f,
-               float attackDamage = 10f, float attackPeriod = 0.9f, float attackDistance = 0.2f)
-            :base(player, unitType, maxHealth, viewRange, maxEnergy)
+        public Unit(Player player, EntityType unitType, decimal maxHealth, decimal maxEnergy, Vector2 pos, Movement movement, float range, float viewRange, float maxSpeed, float acceleration,
+               decimal attackDamage, float attackPeriod, float attackDistance, List<Ability> abilities)
+            :base(player, unitType, maxHealth, viewRange, maxEnergy, abilities)
         {
             Position = pos;
             Vel = new Vector2(0f, 0f);
@@ -46,10 +46,10 @@ namespace wpfTest.GameLogic
             AttackDamage = attackDamage;
             AttackPeriod = attackPeriod;
             AttackDistance = attackDistance;
-            Abilities.Add(MoveTo.Get);
-            Abilities.Add(Attack.Get);
-            Abilities.Add(Spawn.GetAbility(EntityType.TIGER));
-            Abilities.Add(PlantBuilding.GetAbility(EntityType.BAOBAB));
+            //Abilities.Add(MoveTo.Get);
+            //Abilities.Add(Attack.Get);
+            //Abilities.Add(Spawn.GetAbility(EntityType.TIGER));
+            //Abilities.Add(PlantBuilding.GetAbility(EntityType.BAOBAB));
         }
         
         /// <summary>

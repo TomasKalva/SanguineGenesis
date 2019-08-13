@@ -17,11 +17,11 @@ namespace wpfTest
         public CommandsGroup SelectedEntities { get; private set; }
         
 
-        public GameControls(MapView mapView, MapMovementInput mapMovementInput)
+        public GameControls(MapView mapView, MapMovementInput mapMovementInput, Game game)
         {
             MapView = mapView;
             MapMovementInput = mapMovementInput;
-            UnitCommandsInput = UnitCommandsInput.GetUnitCommandsInput();
+            UnitCommandsInput = new UnitCommandsInput(game);
             MapSelectorFrame = null;
             SelectedEntities = new CommandsGroup();
         }
@@ -90,13 +90,13 @@ namespace wpfTest
                         if (enemy == null)
                         {
                             //no enemy selected, move to the clicked coordiantes
-                            MoveTo.Get.SetCommands(SelectedEntities.Entities
+                            game.CurrentPlayer.GameStaticData.Abilities.MoveTo.SetCommands(SelectedEntities.Entities
                                 .Where((e)=>e.GetType()==typeof(Unit)).Cast<Unit>(), clickCoords);
                         }
                         else
                         {
                             //enemy selected => attack it
-                            Attack.Get.SetCommands(SelectedEntities.Entities, enemy);
+                           game.CurrentPlayer.GameStaticData.Abilities.Attack.SetCommands(SelectedEntities.Entities, enemy);
                         }
                     }
                     else

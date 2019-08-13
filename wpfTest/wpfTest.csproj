@@ -67,10 +67,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GameLogic\Abilities.cs" />
     <Compile Include="GameLogic\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
     <Compile Include="GameLogic\Building.cs" />
     <Compile Include="GameLogic\BuildingFactory.cs" />
+    <Compile Include="GameLogic\EntityFactory.cs" />
+    <Compile Include="GameLogic\Factories.cs" />
+    <Compile Include="GameLogic\GameStaticData.cs" />
     <Compile Include="GameLogic\Structure.cs" />
     <Compile Include="GameLogic\TreeFactory.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
@@ -143,7 +147,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="GameLogic\Trees.csv" />
+    <None Include="GameLogic\Trees.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="GameLogic\Units.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

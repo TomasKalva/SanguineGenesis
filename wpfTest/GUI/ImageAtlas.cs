@@ -223,7 +223,10 @@ namespace wpfTest.GUI
         /// </summary>
         public Animation GetAnimation(EntityType unitType)
         {
-            return unitsAnimations[unitType];
+            if (unitsAnimations.TryGetValue(unitType, out Animation anim))
+                return anim;
+            else
+                return GetAnimation(EntityType.BAOBAB);
         }
 
         /// <summary>
@@ -248,6 +251,14 @@ namespace wpfTest.GUI
         public float ChangeTimeS { get; }
         public int Length => Images.Count;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="leftBottom"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="animChangeTimeS"></param>
+        /// <param name="images">First two numbers represent left bottom position of the image, second two represent width and height.</param>
         public Animation(Vector2 leftBottom, float width, float height, float animChangeTimeS, List<Rect> images)
         {
             LeftBottom = leftBottom;

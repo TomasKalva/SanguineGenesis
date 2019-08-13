@@ -8,13 +8,13 @@ namespace wpfTest.GameLogic
 {
     public class Tree:Building
     {
-        public Node[,] RootNodes { get; }
         public int Air { get; }
 
-        public Tree(Player player, EntityType treeType, float maxHealth, float viewRange, float maxEnergy, Node[,] nodes, SoilQuality soilQuality, int size)
-            : base(player, treeType, maxHealth, viewRange, maxEnergy, nodes, soilQuality, size)
+        public Tree(Player player, EntityType treeType, Node[,] nodes, Node[,] rootNodes, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, int air, List<Ability> abilities)
+            : base(player, treeType, nodes, rootNodes, maxHealth, maxEnergy, maxEnergyIntake, size, physical, biome, terrain, soilQuality, aggressive, viewRange, abilities)
         {
-
+            Air = air;
         }
     }
 }

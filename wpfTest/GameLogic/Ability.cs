@@ -24,17 +24,22 @@ namespace wpfTest.GameLogic
     public abstract class Ability
     {
         /// <summary>
+        /// Group of abilities this ability belongs to.
+        /// </summary>
+        protected Abilities abilities;
+        public void SetAbilities(Abilities abilities)
+        {
+            this.abilities = abilities;
+        }
+
+        /// <summary>
         /// Maximal distance from the target where the ability can be cast.
         /// </summary>
         public float Distance { get; }
         /// <summary>
         /// Energy required to use this ability.
         /// </summary>
-        public float EnergyCost { get; }
-        /// <summary>
-        /// Resource required to use this ability.
-        /// </summary>
-        public float ResourceCost { get; }
+        public decimal EnergyCost { get; }
         /// <summary>
         /// True iff this ability should be performed only by one of the selected units.
         /// </summary>
@@ -55,11 +60,10 @@ namespace wpfTest.GameLogic
         {
             return GetType().Name;
         }
-        public Ability(float distance, float energyCost, float resourceCost, bool onlyOne)
+        public Ability(float distance, decimal energyCost, bool onlyOne)
         {
             Distance = distance;
             EnergyCost = energyCost;
-            ResourceCost = resourceCost;
             OnlyOne = onlyOne;
         }
     }
@@ -67,8 +71,8 @@ namespace wpfTest.GameLogic
     public abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
-        public TargetAbility(float distance, float energyCost, float resourceCost, bool onlyOne)
-            :base(distance, energyCost, resourceCost, onlyOne)
+        public TargetAbility(float distance, decimal energyCost, bool onlyOne)
+            :base(distance, energyCost, onlyOne)
         {
         }
 
@@ -105,8 +109,7 @@ namespace wpfTest.GameLogic
             //select only the casters who can pay and put the to list so 
             //they can be enumerated multiple times
             List<Caster> ableToPay = casters
-                .Where((caster) =>(caster.Energy >= EnergyCost &&
-                     caster.Player.Resource >= ResourceCost))
+                .Where((caster) =>caster.Energy >= EnergyCost)
                  .ToList();
             
             
@@ -118,10 +121,11 @@ namespace wpfTest.GameLogic
                 ableToPay = ableToPay.Take(1).ToList();
 
             //move units to the target until the required distance is reached
-            MoveTo.GetMoveTo(this)
-                .SetCommands(ableToPay
-                .Where(caster=>caster.GetType()==typeof(Unit))
-                .Cast<Unit>(), target);
+            if(typeof(Caster).IsAssignableFrom(typeof(Unit)))
+                abilities.MoveToCast(this)
+                    .SetCommands(ableToPay
+                    .Where(caster=>caster.GetType()==typeof(Unit))
+                    .Cast<Unit>(), target);
 
             //give command to each caster
             foreach (Caster c in ableToPay)
@@ -139,37 +143,37 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Movement parameters for each ability other than MoveTo.
         /// </summary>
-        private static Dictionary<Ability, MoveTo> moveToCast;
+        //private static Dictionary<Ability, MoveTo> moveToCast;
         static MoveTo()
         {
             ability = new MoveTo(0.1f, true, false);
             //initialize MoveTo for all abilities
             {
-                moveToCast = new Dictionary<Ability, MoveTo>();
-                moveToCast.Add(Attack.Get, new MoveTo(-1, true, true));
+                //moveToCast = new Dictionary<Ability, MoveTo>();
+                //moveToCast.Add(Attack.Get, new MoveTo(-1, true, true));
                 //spawn abilities
-                foreach (EntityType unit in EntityTypeExtensions.Units)
+                /*foreach (EntityType unit in EntityTypeExtensions.Units)
                 {
                     Ability a = Spawn.GetAbility(unit);
                     moveToCast.Add(a, new MoveTo(a.Distance, false, false));
-                }
-                //build abilities
-                foreach (EntityType building in EntityTypeExtensions.Buildings)
+                }*/
+                //plant abilities
+                /*foreach (EntityType building in EntityTypeExtensions.Buildings)
                 {
                     Ability a = PlantBuilding.GetAbility(building);
                     moveToCast.Add(a, new MoveTo(a.Distance, false, false));
-                }
+                }*/
             }
         }
-        private MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
-            :base(-1, 0, 0, false)
+        internal MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
+            :base(-1, 0, false)
         {
             GoalDistance = goalDistance;
             Interruptable = interruptable;
             UsesAttackDistance = usesAttackDistance;
         }
-        public static MoveTo Get => ability;
-        public static MoveTo GetMoveTo(Ability a) => moveToCast[a];
+        //public static MoveTo Get => ability;
+        //public static MoveTo GetMoveTo(Ability a) => moveToCast[a];
 
         //interface IMovementParametrizing properties
         public float GoalDistance { get; }
@@ -231,8 +235,8 @@ namespace wpfTest.GameLogic
         {
             ability = new Attack();
         }
-        private Attack():base(-1, 0, 0, false) { }
-        public static Attack Get => ability;
+        internal Attack():base(-1, 0, false) { }
+        //public static Attack Get => ability;
         public override Command NewCommand(Unit caster, Entity target)
         {
             return new AttackCommand(caster, target, this);
@@ -251,11 +255,11 @@ namespace wpfTest.GameLogic
         {
             unitSpawningAbilities = new Dictionary<EntityType, Spawn>()
             {
-                { EntityType.TIGER, new Spawn(new UnitFactory(EntityType.TIGER, 0.5f, 2f, 4f, 50f, 20f, Movement.LAND_WATER,4f),0,50)}
+                { EntityType.TIGER, new Spawn(new UnitFactory(EntityType.TIGER, 200, 150, 0.5f, true, 30m, 5f, 2f, 4f,Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f))}
             };
         }
-        private Spawn(UnitFactory spawningUnitFactory, float energyCost, float resourceCost)
-            : base(2 * spawningUnitFactory.Range, energyCost, resourceCost, true)
+        internal Spawn(UnitFactory spawningUnitFactory)
+            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true)
         {
             SpawningUnitFactory = spawningUnitFactory;
         }
@@ -265,12 +269,12 @@ namespace wpfTest.GameLogic
 
         public override Command NewCommand(Entity caster, Vector2 target)
         {
-            return new SpawnCommand(caster, target, this, SpawningUnitFactory.UnitType);
+            return new SpawnCommand(caster, target, this, SpawningUnitFactory.EntityType);
         }
 
         public override string ToString()
         {
-            return base.ToString() + " " + SpawningUnitFactory.UnitType;
+            return base.ToString() + " " + SpawningUnitFactory.EntityType;
         }
 
         public override string Description()
@@ -287,15 +291,15 @@ namespace wpfTest.GameLogic
         {
             plantingBuildingAbilities = new Dictionary<EntityType, PlantBuilding>()
             {
-                { EntityType.BAOBAB, new PlantBuilding(new TreeFactory(EntityType.BAOBAB,  150, 100, 15, 3, true, 50, Biome.SAVANNA, Terrain.LAND, SoilQuality.MEDIUM, 2, 10),0,50)}
+                { EntityType.BAOBAB, new PlantBuilding(new TreeFactory(EntityType.BAOBAB,  150, 100, 0.03m, 3, true, 0, Biome.SAVANNA, Terrain.LAND, SoilQuality.MEDIUM, true, 6f, 2, 10))}
             };
         }
-        private PlantBuilding(TreeFactory buildingFactory, float energyCost, float resourceCost)
-            : base(20f, energyCost, resourceCost, true)
+        internal PlantBuilding(TreeFactory buildingFactory)
+            : base(20f, buildingFactory.EnergyCost, true)
         {
             BuildingFactory = buildingFactory;
         }
-        public static PlantBuilding GetAbility(EntityType t) => plantingBuildingAbilities[t];
+        //public static PlantBuilding GetAbility(EntityType t) => plantingBuildingAbilities[t];
 
         public BuildingFactory BuildingFactory { get; }
 
@@ -306,12 +310,49 @@ namespace wpfTest.GameLogic
 
         public override string ToString()
         {
-            return base.ToString() + " " + BuildingFactory.BuildingType;
+            return base.ToString() + " " + BuildingFactory.EntityType;
         }
 
         public override string Description()
         {
             return "The building is build at the target node.";
         }
+    }
+
+    public sealed class Grow : TargetAbility<Tree, Nothing>
+    {
+        internal Grow()
+            : base(0, 0, true)
+        {
+        }
+        //public static Grow Get {get;}
+        /*static Grow()
+        {
+            Get = new Grow();
+        }*/
+
+        public override Command NewCommand(Tree caster, Nothing target)
+        {
+            return new GrowCommand(caster, this);
+        }
+
+        public override string Description()
+        {
+            return "The tree grows until it is at max energy. The tree can't perform other commands while growing.";
+        }
+    }
+
+    /// <summary>
+    /// Used as generic parameter for abilities without target.
+    /// </summary>
+    public class Nothing : ITargetable
+    {
+        public Vector2 Center => throw new NotImplementedException("Nothing doesn't have a center!");
+        public static Nothing Get { get; }
+        static Nothing()
+        {
+            Get = new Nothing();
+        }
+        private Nothing() { }
     }
 }

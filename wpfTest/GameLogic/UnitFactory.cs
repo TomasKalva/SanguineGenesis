@@ -7,32 +7,34 @@ using wpfTest.GameLogic;
 
 namespace wpfTest
 {
-    public class UnitFactory
+    public class UnitFactory:EntityFactory
     {
-        public EntityType UnitType { get; }
         public float Range { get; }//range of the circle collider
         public float MaxSpeed { get; }
         public float Acceleration { get; }
-        public float MaxHealth { get; }
-        public float MaxEnergy { get; }
         public Movement Movement { get; }
         public float SpawningTime { get; }
+        public decimal AttackDamage { get; }
+        public float AttackPeriod { get; }
+        public float AttackDistance { get; }
 
         public Unit NewInstance(Player player, Vector2 pos)
         {
-            return new Unit(player, UnitType, maxHealth:MaxHealth, maxEnergy:MaxEnergy, pos:pos, range:Range, maxSpeed:MaxSpeed, acceleration:Acceleration,movement:Movement);
+            return new Unit(player, EntityType, MaxHealth, MaxEnergy, pos, Movement, Range, ViewRange, MaxSpeed, Acceleration, AttackDamage, AttackPeriod, AttackDistance, Abilities.ToList());
         }
 
-        public UnitFactory(EntityType unitType, float range, float maxSpeed, float acceleration, float maxHealth, float maxEnergy, Movement movement, float spawningTime)
+        public UnitFactory(EntityType unitType, decimal maxHealth, decimal maxEnergy, float range, bool physical, decimal energyCost,
+            float viewRange, float maxSpeed, float acceleration, Movement movement, float spawningTime, decimal attackDamage, float attackPeriod, float attackDistance)
+            :base(unitType, maxHealth, maxEnergy, physical, energyCost, viewRange)
         {
             Range = range;
             MaxSpeed = maxSpeed;
             Acceleration = acceleration;
-            MaxHealth = maxHealth;
-            MaxEnergy = maxEnergy;
-            UnitType = unitType;
             Movement = movement;
             SpawningTime = spawningTime;
+            AttackDamage = attackDamage;
+            AttackPeriod = attackPeriod;
+            AttackDistance = attackDistance;
         }
     }
 }

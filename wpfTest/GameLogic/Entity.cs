@@ -20,18 +20,18 @@ namespace wpfTest
         public Player Player { get; }
         public EntityType EntityType { get; }
         public AnimationState AnimationState { get; set; }
-        public float MaxHealth { get; set; }
-        public float Health { get; set; }
+        public decimal MaxHealth { get; set; }
+        public decimal Health { get; set; }
         /// <summary>
         /// True iff this entity uses energy.
         /// </summary>
         public bool HasEnergy => MaxEnergy > 0;
-        public float MaxEnergy { get; set; }
-        public float Energy { get; set; }
+        public decimal MaxEnergy { get; set; }
+        public decimal Energy { get; set; }
         public bool IsDead => Health <= 0;
         public List<Ability> Abilities { get; }
 
-        public Entity(Player player, EntityType entityType, float maxHealth, float viewRange, float maxEnergy)
+        public Entity(Player player, EntityType entityType, decimal maxHealth, float viewRange, decimal maxEnergy, List<Ability> abilities)
         {
             Player = player;
             ViewRange = viewRange;
@@ -41,9 +41,12 @@ namespace wpfTest
             MaxHealth = maxHealth;
             Health = maxHealth;
             MaxEnergy = maxEnergy;
-            Energy = maxEnergy;
+            if (this is Unit)
+                Energy = maxEnergy;
+            else
+                Energy = 0;
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(entityType));
-            Abilities = new List<Ability>();
+            Abilities = abilities;
         }
 
         public void PerformCommand(Game game, float deltaT)
@@ -145,7 +148,64 @@ namespace wpfTest
     public enum EntityType
     {
         TIGER,
-        BAOBAB
+        BAOBAB,
+        RHODE_GRASS,
+        CANDELABRA,        ACACIA,
+        KIWI_TREE,
+        WATER_LETTUCE,
+        PANDANI,
+        WHISTLING_THORN,
+        EUCALYPTUS,
+        MIAMBO,
+        SPIKE_THORN,
+        ELEPHANT_GRASS,
+        JACKAL_BERRY_TREE,
+        KAPOC,
+        BANNANA_TREE,
+        COCONUT_TREE,
+        CANNONBALL_TREE,
+        BAMBOO,
+        TEAK,
+        ASHOKA,
+        WALKING_PALM,
+        PITCHER,
+        CYCAD,
+        CYCAD_PALM,
+        TYRANNOSAUR_TREE,
+        FERN,
+        MANGROVE,
+        WATER_LILY,
+        ALGAE,
+        SWORD_PLANT,
+        ZEBRA, 
+        GAZZELE, 
+        RHINO, 	
+        GIRAFFE, 		
+        HIPPO, 		
+        TURTLE, 		
+        MEERCAT, 		
+        TASMANIAN_DEVIL, 		
+        KANGAROO, 		
+        HYENA, 		
+        CHEETAH, 		
+        TARANTULA, 		
+        INDIAN_ELEPHANT, 		
+        ELEPHANT, 		
+        CHIMPANZEE, 		
+        GORILLA, 		
+        PANDA, 
+        OCELOT, 		
+        RAPTOR, 		
+        SAUROPOD, 		
+        TYRANNOSAUR, 		
+        ANACONDA, 		
+        COBRA, 		
+        ALIGATOR, 		
+        CROCODILE, 		
+        PUMA, 		
+        DODO, 		
+        TRICERATOPS, 		
+        BABOON
     }
 
     public static class EntityTypeExtensions
@@ -157,7 +217,64 @@ namespace wpfTest
             isUnit = new Dictionary<EntityType, bool>()
             {
                 {EntityType.TIGER, true },
-                {EntityType.BAOBAB, false }
+                {EntityType.BAOBAB, false },
+                {EntityType.RHODE_GRASS, false },
+                {EntityType.CANDELABRA, false },
+                {EntityType.ACACIA, false },
+                {EntityType.KIWI_TREE, false },
+                {EntityType.WATER_LETTUCE, false },
+                {EntityType.PANDANI, false },
+                {EntityType.WHISTLING_THORN, false },
+                {EntityType.EUCALYPTUS, false },
+                {EntityType.MIAMBO, false },
+                {EntityType.SPIKE_THORN, false },
+                {EntityType.ELEPHANT_GRASS, false },
+                {EntityType.JACKAL_BERRY_TREE, false },
+                {EntityType.KAPOC, false },
+                {EntityType.BANNANA_TREE, false },
+                {EntityType.COCONUT_TREE, false },
+                {EntityType.CANNONBALL_TREE, false },
+                {EntityType.BAMBOO, false },
+                {EntityType.TEAK, false },
+                {EntityType.ASHOKA, false },
+                {EntityType.WALKING_PALM, false },
+                {EntityType.PITCHER, false },
+                {EntityType.CYCAD, false },
+                {EntityType.CYCAD_PALM, false },
+                {EntityType.TYRANNOSAUR_TREE, false },
+                {EntityType.FERN, false },
+                {EntityType.MANGROVE, false },
+                {EntityType.WATER_LILY, false },
+                {EntityType.ALGAE, false },
+                {EntityType.SWORD_PLANT, false },
+                {EntityType.ZEBRA, true },
+                {EntityType.GAZZELE, true },
+                {EntityType.RHINO, true },
+                {EntityType.GIRAFFE, true },
+                {EntityType.HIPPO, true },
+                {EntityType.TURTLE, true },
+                {EntityType.MEERCAT, true },
+                {EntityType.TASMANIAN_DEVIL, true },
+                {EntityType.KANGAROO, true },
+                {EntityType.HYENA, true },
+                {EntityType.CHEETAH, true },
+                {EntityType.TARANTULA, true },
+                {EntityType.INDIAN_ELEPHANT, true },
+                {EntityType.ELEPHANT, true },
+                {EntityType.CHIMPANZEE, true },
+                {EntityType.GORILLA, true },
+                {EntityType.PANDA, true },
+                {EntityType.OCELOT, true },
+                {EntityType.RAPTOR, true },
+                {EntityType.SAUROPOD, true },
+                {EntityType.TYRANNOSAUR, true },
+                {EntityType.ANACONDA, true },
+                {EntityType.ALIGATOR, true },
+                {EntityType.CROCODILE, true },
+                {EntityType.PUMA, true },
+                {EntityType.DODO, true },
+                {EntityType.TRICERATOPS, true },
+                {EntityType.BABOON, true }
             };
         }
 

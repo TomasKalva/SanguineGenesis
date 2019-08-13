@@ -43,6 +43,7 @@ namespace wpfTest
             CommandedEntity = commandedEntity;
             Targ = target;
         }
+        protected Command() { }
         public override string ToString()
         {
             return Ability.ToString();
@@ -57,12 +58,10 @@ namespace wpfTest
                 //the ability was paid already
                 return true;
 
-            if (CommandedEntity.Energy >= Ability.EnergyCost &&
-                CommandedEntity.Player.Resource >= Ability.ResourceCost)
+            if (CommandedEntity.Energy >= Ability.EnergyCost)
             {
                 //pay for the ability
                 CommandedEntity.Energy -= Ability.EnergyCost;
-                CommandedEntity.Player.Resource -= Ability.ResourceCost;
                 Paid = true;
                 return true;
             }
@@ -75,7 +74,7 @@ namespace wpfTest
     {
         private float timeUntilAttack;//time in s until this unit attacks
 
-        private AttackCommand():base(null,null,null) => throw new NotImplementedException();
+        private AttackCommand() => throw new NotImplementedException();
         public AttackCommand(Unit commandedEntity, Entity target, Attack attack)
             : base(commandedEntity, target, attack)
         {
@@ -127,7 +126,7 @@ namespace wpfTest
         private FlowMap flowMap;
         
 
-        private MoveToPointCommand() : base(null, null, null) => throw new NotImplementedException();
+        private MoveToPointCommand()  => throw new NotImplementedException();
         public MoveToPointCommand(Unit commandedEntity, IMovementTarget target, float minStoppingDistance, MoveTo ability)
             : base(commandedEntity, target, ability)
         {
@@ -217,7 +216,7 @@ namespace wpfTest
                     //attack the enemy
                     unit.StopMoving = true;
                     command.RemoveFromAssignment();
-                    unit.SetCommand(new AttackCommand(unit, enemy, Attack.Get));
+                    unit.SetCommand(new AttackCommand(unit, enemy, game.CurrentPlayer.GameStaticData.Abilities.Attack));
                     return false;//new command is already set
                 }
             }
@@ -345,7 +344,7 @@ namespace wpfTest
         /// </summary>
         public float SpawnTimer { get; private set; }
 
-        private SpawnCommand() : base(null, default(Vector2), null) => throw new NotImplementedException();
+        private SpawnCommand() => throw new NotImplementedException();
         public SpawnCommand(Entity commandedEntity, Vector2 target, Spawn spawn, EntityType entityType)
             : base(commandedEntity, target, spawn)
         {
@@ -399,7 +398,7 @@ namespace wpfTest
                         Node ijN = buildNodes[i, j];
                         //the building can't be built if the node is blocked or contains
                         //incompatible terrain
-                        if (ijN.Blocked || !(bf.NodeIsValid(ijN)))
+                        if (ijN.Blocked || !(bf.CanBeUnder(ijN)))
                             canBeBuilt = false;
                     }
             }
@@ -428,13 +427,39 @@ namespace wpfTest
                 }
                 //put the new building on the main map
                 Player newUnitOwner = CommandedEntity.Player;
-                Building newBuilding = Ability.BuildingFactory.NewInstance(newUnitOwner, buildNodes, buildNodes);
+                Building newBuilding = Ability.BuildingFactory.NewInstance(newUnitOwner, buildNodes, energySourceNodes);
                 game.Players[newUnitOwner.PlayerID].Entities.Add(newBuilding);
                 map.AddBuilding(newBuilding);
                 game.Map.MapWasChanged = true;
+
+                //if the new building is a tree, make it grow
+                if(newBuilding.GetType()==typeof(Tree))
+                    newUnitOwner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1){ (Tree)newBuilding}, Nothing.Get);
             }
             //the command always immediately finishes regardless of the success of placing the building
             return true;
+        }
+    }
+
+    public class GrowCommand : Command<Tree, Nothing, Grow>
+    {
+        private GrowCommand() => throw new NotImplementedException();
+        public GrowCommand(Tree commandedEntity, Grow plantBuilding)
+            : base(commandedEntity, Nothing.Get, plantBuilding)
+        {
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            //finish if the tree is at full energy
+            if (CommandedEntity.Energy == CommandedEntity.MaxEnergy)
+            {
+                CommandedEntity.Built = true;
+                return true;
+            }
+            else
+                return false;
+            
         }
     }
 }

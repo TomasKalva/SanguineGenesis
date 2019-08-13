@@ -12,12 +12,10 @@ namespace wpfTest.GameLogic
     {
         public override Vector2 Center { get; }
         public override float Range => Size / 2f;
-        public int Size { get; }
-        public SoilQuality SoilQuality { get; }
         /// <summary>
         /// True iff the building was built.
         /// </summary>
-        public bool Built { get; private set; }
+        public bool Built { get; set; }
         /// <summary>
         /// X coordinate of bottom left node.
         /// </summary>
@@ -26,15 +24,63 @@ namespace wpfTest.GameLogic
         /// Y coordinate of bottom left node.
         /// </summary>
         public int NodeBottom { get; }
+        /// <summary>
+        /// Nodes under the building.
+        /// </summary>
         public Node[,] Nodes { get; }
+        /// <summary>
+        /// Sources from which the building takes energy.
+        /// </summary>
+        public Node[,] EnergySources { get; }
+        /// <summary>
+        /// Type of the building.
+        /// </summary>
+        public EntityType BuildingType { get; }
+        /// <summary>
+        /// Maximum energy taken from one source per second.
+        /// </summary>
+        public decimal MaxEnergyIntake { get; }
+        /// <summary>
+        /// How many nodes horizontally and also vertically it takes.
+        /// </summary>
+        public int Size { get; }
+        /// <summary>
+        /// True iff units can't walk through this building.
+        /// </summary>
+        public bool Physical { get; }
+        /// <summary>
+        /// Biome required under the building. Energy is taken only from nodes with this biome.
+        /// </summary>
+        public Biome Biome { get; }
+        /// <summary>
+        /// Terrain required under the building. Energy is taken only from nodes with this terrain.
+        /// </summary>
+        public Terrain Terrain { get; }
+        /// <summary>
+        /// Minimal soil quality required under the building. Energy is taken only from nodes with
+        /// at least this soil quality.
+        /// </summary>
+        public SoilQuality SoilQuality { get; }
+        /// <summary>
+        /// Can reduce soil quality by taking nutrients.
+        /// </summary>
+        public bool Aggressive { get; }
 
-        public Building(Player player, EntityType bulidingType, float maxHealth, float viewRange, float maxEnergy, Node[,] nodes, SoilQuality soilQuality, int size) 
-            : base(player, bulidingType, maxHealth, viewRange, maxEnergy)
+        public Building(Player player, EntityType buildingType, Node[,] nodes, Node[,] energySources, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, List<Ability> abilities)
+            : base(player, buildingType, maxHealth, viewRange, maxEnergy, abilities)
         {
-            Size = size;
-            Center = new Vector2(nodes[0, 0].X + Range, nodes[0, 0].Y + Range);
-            SoilQuality = soilQuality;
             Nodes = nodes;
+            EnergySources = energySources;
+            MaxEnergyIntake = maxEnergyIntake;
+            Size = size;
+            Physical = physical;
+            Biome = biome;
+            Terrain = terrain;
+            SoilQuality = soilQuality;
+            Aggressive = aggressive;
+            
+            Center = new Vector2(nodes[0, 0].X + Range, nodes[0, 0].Y + Range);
             NodeLeft = nodes[0,0].X;
             NodeBottom = nodes[0,0].Y;
         }
@@ -71,7 +117,31 @@ namespace wpfTest.GameLogic
         /// </summary>
         public void DrainEnergy(float deltaT)
         {
-            throw new NotImplementedException();
+            foreach(Node n in EnergySources)
+            {
+                //check if building can take nutrients from this node
+                if(n.Terrain==Terrain &&
+                    n.Biome==Biome)
+                {
+                    //take nutrients from this node
+                    decimal nutrientsTaken;
+                    if (Aggressive)
+                        //aggressive building can take as much nutrients as it wants to
+                        nutrientsTaken = MaxEnergyIntake * (decimal)(deltaT);
+                    else
+                        //non-aggressive building can't take amount of nutrients that would reduce soil quality
+                        nutrientsTaken = Math.Min(MaxEnergyIntake * (decimal)(deltaT), n.Nutrients - n.Terrain.Nutrients(n.Biome, n.SoilQuality));
+
+                    //nutrients can't drop below zero
+                    nutrientsTaken = Math.Min(nutrientsTaken, n.Nutrients);
+
+                    //building only takes energy it can use
+                    nutrientsTaken = Math.Min(nutrientsTaken, MaxEnergy - Energy);
+
+                    Energy += nutrientsTaken;
+                    n.Nutrients -= nutrientsTaken;
+                }
+            }
         }
     }
 }

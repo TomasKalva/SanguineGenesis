@@ -50,6 +50,11 @@ namespace wpfTest
             nextVisibilityPlayer = wpfTest.Players.PLAYER0;
             gameplayOptions = new GameplayOptions();
             gameplayOptions.WholeMapVisible = true;
+            foreach (Unit u in CurrentPlayer.Units)
+            {
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding(EntityType.BAOBAB));
+            }
         }
 
         public List<Entity> GetEntities()
@@ -97,6 +102,7 @@ namespace wpfTest
 
             List<Entity> entities = GetEntities();
             List<Unit> units = GetUnits();
+            List<Building> buildings = GetBuildings();
 
             //update nutrients
             nutrientUpdateTimer -= deltaT;
@@ -104,7 +110,15 @@ namespace wpfTest
             {
                 nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
                 Map.UpdateNutrients();
+
+                foreach (Building b in buildings)
+                {
+                    b.DrainEnergy(/*deltaT*/1);
+                }
             }
+
+
+            //nutrients biomes and terrain can't be updated in this step after calling this method
             Map.UpdateBiomes();
             foreach (var p in Players)
                 p.Value.UpdateNodesView(Map);
@@ -129,7 +143,7 @@ namespace wpfTest
                     //unit isn't doing anything
                     Entity en = units.Where((v) => v.Player!=u.Player && u.DistanceTo(v) < u.AttackDistance).FirstOrDefault();
                     if(en!=null)
-                        u.CommandQueue.Enqueue(Attack.Get.NewCommand(u, en));
+                        u.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(u, en));
                 }
 
             }

@@ -13,12 +13,13 @@ namespace wpfTest.GameLogic
 
         public override Building NewInstance(Player player, Node[,] nodesUnder, Node[,] roots)
         {
-            return new Tree(player, BuildingType, maxHealth: MaxHealth, viewRange:10, maxEnergy: MaxEnergy, nodes: nodesUnder, size: Size, soilQuality:SoilQuality);
+            return new Tree(player, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake, 
+                Size, Physical, Biome, Terrain, SoilQuality, Aggressive, ViewRange, Air, Abilities.ToList());
         }
 
-        public TreeFactory(EntityType buildingType, float maxHealth, float maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, int rootsDistance, int air)
-            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality)
+        public TreeFactory(EntityType buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, int rootsDistance, int air)
+            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, aggressive, viewRange)
 
         {
             RootsDistance = rootsDistance;
@@ -30,12 +31,13 @@ namespace wpfTest.GameLogic
     {
         public override Building NewInstance(Player player, Node[,] nodesUnder, Node[,] energySources)
         {
-            return new Structure(player, BuildingType, maxHealth: MaxHealth, viewRange: 10, maxEnergy: MaxEnergy, nodes: nodesUnder, size: Size, soilQuality: SoilQuality);
+            return new Structure(player, EntityType, nodesUnder, energySources, MaxHealth, MaxEnergy, MaxEnergyIntake,
+                Size, Physical, Biome, Terrain, SoilQuality, Aggressive, ViewRange, Abilities.ToList());
         }
 
-        public StructureFactory(EntityType buildingType, float maxHealth, float maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality)
-            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality)
+        public StructureFactory(EntityType buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange)
+            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, aggressive, viewRange)
 
         {
         }

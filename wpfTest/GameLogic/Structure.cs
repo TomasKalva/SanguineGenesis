@@ -8,8 +8,9 @@ namespace wpfTest.GameLogic
 {
     public class Structure : Building
     {
-        public Structure(Player player, EntityType bulidingType, float maxHealth, float viewRange, float maxEnergy, Node[,] nodes, SoilQuality soilQuality, int size)
-            : base(player, bulidingType, maxHealth, viewRange, maxEnergy, nodes, soilQuality, size)
+        public Structure(Player player, EntityType buildingType, Node[,] nodes, Node[,] energySources, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, List<Ability> abilities)
+            : base(player, buildingType, nodes, energySources, maxHealth, maxEnergy, maxEnergyIntake, size, physical, biome, terrain, soilQuality, aggressive, viewRange, abilities)
         {
         }
     }
