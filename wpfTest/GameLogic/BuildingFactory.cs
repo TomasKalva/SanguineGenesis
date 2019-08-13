@@ -15,7 +15,7 @@ namespace wpfTest.GameLogic
         public SoilQuality SoilQuality { get; }
         public bool Aggressive { get; }
 
-        public BuildingFactory(EntityType buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+        public BuildingFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange)
             :base(buildingType,maxHealth, maxEnergy, physical, energyCost, viewRange)
         {

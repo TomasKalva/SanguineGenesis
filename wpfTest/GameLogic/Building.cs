@@ -35,7 +35,7 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Type of the building.
         /// </summary>
-        public EntityType BuildingType { get; }
+        public string BuildingType { get; }
         /// <summary>
         /// Maximum energy taken from one source per second.
         /// </summary>
@@ -66,7 +66,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public bool Aggressive { get; }
 
-        public Building(Player player, EntityType buildingType, Node[,] nodes, Node[,] energySources, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+        public Building(Player player, string buildingType, Node[,] nodes, Node[,] energySources, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, List<Ability> abilities)
             : base(player, buildingType, maxHealth, viewRange, maxEnergy, abilities)
         {

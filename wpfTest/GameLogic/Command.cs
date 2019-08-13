@@ -345,7 +345,7 @@ namespace wpfTest
         public float SpawnTimer { get; private set; }
 
         private SpawnCommand() => throw new NotImplementedException();
-        public SpawnCommand(Entity commandedEntity, Vector2 target, Spawn spawn, EntityType entityType)
+        public SpawnCommand(Entity commandedEntity, Vector2 target, Spawn spawn)
             : base(commandedEntity, target, spawn)
         {
             SpawnTimer = 0f;

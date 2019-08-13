@@ -259,7 +259,7 @@ namespace wpfTest
                         selectedUnitsAbilities.Add(at);
             if (selectedUnits == null)
                 return;
-            selectedUnits.Sort((u, v) => u.EntityType - v.EntityType);
+            selectedUnits.Sort((u, v) => u.GetHashCode() - v.GetHashCode());
             //update units panel
             for (int i = 0; i < unitButtons.Length; i++)
             {

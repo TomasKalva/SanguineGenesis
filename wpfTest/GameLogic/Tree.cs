@@ -10,7 +10,7 @@ namespace wpfTest.GameLogic
     {
         public int Air { get; }
 
-        public Tree(Player player, EntityType treeType, Node[,] nodes, Node[,] rootNodes, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+        public Tree(Player player, string treeType, Node[,] nodes, Node[,] rootNodes, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, int air, List<Ability> abilities)
             : base(player, treeType, nodes, rootNodes, maxHealth, maxEnergy, maxEnergyIntake, size, physical, biome, terrain, soilQuality, aggressive, viewRange, abilities)
         {

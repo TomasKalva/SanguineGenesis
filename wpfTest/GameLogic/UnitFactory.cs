@@ -23,7 +23,7 @@ namespace wpfTest
             return new Unit(player, EntityType, MaxHealth, MaxEnergy, pos, Movement, Range, ViewRange, MaxSpeed, Acceleration, AttackDamage, AttackPeriod, AttackDistance, Abilities.ToList());
         }
 
-        public UnitFactory(EntityType unitType, decimal maxHealth, decimal maxEnergy, float range, bool physical, decimal energyCost,
+        public UnitFactory(string unitType, decimal maxHealth, decimal maxEnergy, float range, bool physical, decimal energyCost,
             float viewRange, float maxSpeed, float acceleration, Movement movement, float spawningTime, decimal attackDamage, float attackPeriod, float attackDistance)
             :base(unitType, maxHealth, maxEnergy, physical, energyCost, viewRange)
         {

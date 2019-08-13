@@ -53,7 +53,7 @@ namespace wpfTest
             foreach (Unit u in CurrentPlayer.Units)
             {
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding(EntityType.BAOBAB));
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("BAOBAB"));
             }
         }
 

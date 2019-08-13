@@ -9,13 +9,20 @@ namespace wpfTest.GameLogic
 {
     public abstract class Factories<Factory> where Factory : EntityFactory
     {
-        protected Dictionary<EntityType, Factory> factories;
-        protected Dictionary<EntityType, string> abilitiesList;
-        public Factory this[EntityType entityType] 
+        public Dictionary<string, Factory> Factorys { get; }
+        protected Dictionary<string, string> abilitiesList;
+
+        public Factories()
+        {
+            Factorys = new Dictionary<string, Factory>();
+            abilitiesList = new Dictionary<string, string>();
+        }
+
+        public Factory this[string entityType] 
         {
             get
             {
-                if (factories.TryGetValue(entityType, out Factory factory))
+                if (Factorys.TryGetValue(entityType, out Factory factory))
                     return factory;
                 else
                     throw new ArgumentException("There is no "+ typeof(Factory)+" for " + entityType);
@@ -24,8 +31,6 @@ namespace wpfTest.GameLogic
 
         public void InitFactories(string fileName)
         {
-            factories = new Dictionary<EntityType, Factory>();
-            abilitiesList = new Dictionary<EntityType, string>();
             using (StreamReader fileReader = new StreamReader(fileName))
             {
                 string line = fileReader.ReadLine();//first line is just a description
@@ -66,12 +71,10 @@ namespace wpfTest.GameLogic
                         switch (abName)
                         {
                             case "build":
-                                if (entityAbilities.Key == EntityType.BANNANA_TREE)
-                                    ;
-                                factory.Abilities.Add(abilities.PlantBuilding((EntityType)Enum.Parse(typeof(EntityType), abPar[1])));
+                                factory.Abilities.Add(abilities.PlantBuilding(abPar[1]));
                                 break;
                             /*case "spawn":
-                                factory.Abilities.Add(abilities.UnitSpawn((EntityType)Enum.Parse(typeof(EntityType), abPar[1])));
+                                factory.Abilities.Add(abilities.UnitSpawn((string)Enum.Parse(typeof(string), abPar[1])));
                                 break;*/
                         }
                     }
@@ -85,7 +88,7 @@ namespace wpfTest.GameLogic
         public override void AddNewFactory(string description)
         {
             string[] fields = description.Split(',');
-            EntityType treeType = (EntityType)Enum.Parse(typeof(EntityType), fields[0]);
+            string treeType = fields[0];
             decimal maxHealth=decimal.Parse(fields[1]);
             decimal maxEnergy = decimal.Parse(fields[2]);
             decimal energyRegen = decimal.Parse(fields[3]);
@@ -97,7 +100,7 @@ namespace wpfTest.GameLogic
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain),fields[9]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality),fields[10]);
 
-            factories.Add(treeType, new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
+            Factorys.Add(treeType, new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
                 biome, terrain, soilQuality, false,  10f, rootsDistance, 2  ));
             abilitiesList.Add(treeType, fields[11]);
         }
@@ -108,7 +111,7 @@ namespace wpfTest.GameLogic
         public override void AddNewFactory(string description)
         {
             string[] fields = description.Split(',');
-            EntityType treeType = (EntityType)Enum.Parse(typeof(EntityType), fields[0]);
+            string unitType = fields[0];
             /*decimal maxHealth = decimal.Parse(fields[1]);
             decimal maxEnergy = decimal.Parse(fields[2]);
             decimal energyRegen = decimal.Parse(fields[3]);
@@ -120,7 +123,7 @@ namespace wpfTest.GameLogic
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[9]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[10]);*/
 
-            factories.Add(treeType, new UnitFactory(EntityType.TIGER, 200, 150, 0.5f, true, 30m, 5f, 2f, 4f, Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f));
+            Factorys.Add(unitType, new UnitFactory(unitType , 200, 150, 0.5f, true, 30m, 5f, 2f, 4f, Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f));
             //abilitiesList.Add(treeType, fields[11]);
         }
     }

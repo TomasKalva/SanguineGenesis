@@ -30,6 +30,7 @@ namespace wpfTest.GameLogic
         public void SetAbilities(Abilities abilities)
         {
             this.abilities = abilities;
+            abilities.AllAbilities.Add(this);
         }
 
         /// <summary>
@@ -152,13 +153,13 @@ namespace wpfTest.GameLogic
                 //moveToCast = new Dictionary<Ability, MoveTo>();
                 //moveToCast.Add(Attack.Get, new MoveTo(-1, true, true));
                 //spawn abilities
-                /*foreach (EntityType unit in EntityTypeExtensions.Units)
+                /*foreach (string unit in stringExtensions.Units)
                 {
                     Ability a = Spawn.GetAbility(unit);
                     moveToCast.Add(a, new MoveTo(a.Distance, false, false));
                 }*/
                 //plant abilities
-                /*foreach (EntityType building in EntityTypeExtensions.Buildings)
+                /*foreach (string building in stringExtensions.Buildings)
                 {
                     Ability a = PlantBuilding.GetAbility(building);
                     moveToCast.Add(a, new MoveTo(a.Distance, false, false));
@@ -235,7 +236,7 @@ namespace wpfTest.GameLogic
         {
             ability = new Attack();
         }
-        internal Attack():base(-1, 0, false) { }
+        internal Attack():base(0.1f, 0, false) { }
         //public static Attack Get => ability;
         public override Command NewCommand(Unit caster, Entity target)
         {
@@ -250,12 +251,12 @@ namespace wpfTest.GameLogic
 
     public sealed class Spawn : TargetAbility<Entity, Vector2>
     {
-        private static Dictionary<EntityType,Spawn> unitSpawningAbilities;
+        private static Dictionary<string,Spawn> unitSpawningAbilities;
         static Spawn()
         {
-            unitSpawningAbilities = new Dictionary<EntityType, Spawn>()
+            unitSpawningAbilities = new Dictionary<string, Spawn>()
             {
-                { EntityType.TIGER, new Spawn(new UnitFactory(EntityType.TIGER, 200, 150, 0.5f, true, 30m, 5f, 2f, 4f,Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f))}
+                { "TIGER", new Spawn(new UnitFactory("TIGER", 200, 150, 0.5f, true, 30m, 5f, 2f, 4f,Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f))}
             };
         }
         internal Spawn(UnitFactory spawningUnitFactory)
@@ -263,13 +264,13 @@ namespace wpfTest.GameLogic
         {
             SpawningUnitFactory = spawningUnitFactory;
         }
-        public static Spawn GetAbility(EntityType t) => unitSpawningAbilities[t];
+        public static Spawn GetAbility(string t) => unitSpawningAbilities[t];
         
         public UnitFactory SpawningUnitFactory { get; }
 
         public override Command NewCommand(Entity caster, Vector2 target)
         {
-            return new SpawnCommand(caster, target, this, SpawningUnitFactory.EntityType);
+            return new SpawnCommand(caster, target, this);
         }
 
         public override string ToString()
@@ -286,20 +287,20 @@ namespace wpfTest.GameLogic
 
     public sealed class PlantBuilding : TargetAbility<Entity, Node>
     {
-        private static Dictionary<EntityType, PlantBuilding> plantingBuildingAbilities;
+        private static Dictionary<string, PlantBuilding> plantingBuildingAbilities;
         static PlantBuilding()
         {
-            plantingBuildingAbilities = new Dictionary<EntityType, PlantBuilding>()
+            /*plantingBuildingAbilities = new Dictionary<string, PlantBuilding>()
             {
-                { EntityType.BAOBAB, new PlantBuilding(new TreeFactory(EntityType.BAOBAB,  150, 100, 0.03m, 3, true, 0, Biome.SAVANNA, Terrain.LAND, SoilQuality.MEDIUM, true, 6f, 2, 10))}
-            };
+                { string.BAOBAB, new PlantBuilding(new TreeFactory(string.BAOBAB,  150, 100, 0.03m, 3, true, 0, Biome.SAVANNA, Terrain.LAND, SoilQuality.MEDIUM, true, 6f, 2, 10))}
+            }*/
         }
         internal PlantBuilding(TreeFactory buildingFactory)
             : base(20f, buildingFactory.EnergyCost, true)
         {
             BuildingFactory = buildingFactory;
         }
-        //public static PlantBuilding GetAbility(EntityType t) => plantingBuildingAbilities[t];
+        //public static PlantBuilding GetAbility(string t) => plantingBuildingAbilities[t];
 
         public BuildingFactory BuildingFactory { get; }
 

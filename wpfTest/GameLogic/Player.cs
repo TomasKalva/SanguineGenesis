@@ -38,10 +38,10 @@ namespace wpfTest
             if (PlayerID == Players.PLAYER1)
                 return;
 
-            UnitFactory normalUnits = new UnitFactory(EntityType.TIGER, 200, 150, 0.5f, true, 30m, 5f, 2f, 4f, Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f);
-                //new UnitFactory(EntityType.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
-            /*UnitFactory smallFastUnits = new UnitFactory(EntityType.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
-            UnitFactory bigUnits = new UnitFactory(EntityType.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/
+            UnitFactory normalUnits = new UnitFactory("TIGER" , 200, 150, 0.5f, true, 30m, 5f, 2f, 4f, Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f);
+                //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
+            /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
+            UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/
             for (int i = 0; i < 1; i++)
             {
                 for (int j = 0; j < 3; j++)
@@ -50,10 +50,10 @@ namespace wpfTest
                 }
             }
             /*Entities.Add(bigUnits.NewInstance(this, new Vector2(5f, 6f)));
-            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(5f, 6f)));
-            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(7f, 6f)));
-            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(6.5f, 6f)));
-            Entities.Add(new Unit(this, EntityType.TIGER, 10, 10, new Vector2(4f, 9f)));*/
+            Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(5f, 6f)));
+            Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(7f, 6f)));
+            Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(6.5f, 6f)));
+            Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(4f, 9f)));*/
         }
 
         public void UpdateBuildingsView(List<Building> buildings)

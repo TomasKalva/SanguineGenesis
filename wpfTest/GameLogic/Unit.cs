@@ -27,7 +27,7 @@ namespace wpfTest.GameLogic
         public float AttackPeriod { get; }
         public float AttackDistance { get; }
 
-        public Unit(Player player, EntityType unitType, decimal maxHealth, decimal maxEnergy, Vector2 pos, Movement movement, float range, float viewRange, float maxSpeed, float acceleration,
+        public Unit(Player player, string unitType, decimal maxHealth, decimal maxEnergy, Vector2 pos, Movement movement, float range, float viewRange, float maxSpeed, float acceleration,
                decimal attackDamage, float attackPeriod, float attackDistance, List<Ability> abilities)
             :base(player, unitType, maxHealth, viewRange, maxEnergy, abilities)
         {
@@ -48,8 +48,8 @@ namespace wpfTest.GameLogic
             AttackDistance = attackDistance;
             //Abilities.Add(MoveTo.Get);
             //Abilities.Add(Attack.Get);
-            //Abilities.Add(Spawn.GetAbility(EntityType.TIGER));
-            //Abilities.Add(PlantBuilding.GetAbility(EntityType.BAOBAB));
+            //Abilities.Add(Spawn.GetAbility(string.TIGER));
+            //Abilities.Add(PlantBuilding.GetAbility(string.BAOBAB));
         }
         
         /// <summary>

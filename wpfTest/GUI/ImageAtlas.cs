@@ -16,7 +16,7 @@ namespace wpfTest.GUI
         private const int TILE_SIZE = 64;
         private const int ATLAS_WIDTH = 2048;
         private const int ATLAS_HEIGHT = 2048;
-        private Dictionary<EntityType, Animation> unitsAnimations;
+        private Dictionary<string, Animation> unitsAnimations;
         private Dictionary<int, Rect> glyphs;
 
         public Rect UnitCircle { get; }
@@ -89,14 +89,14 @@ namespace wpfTest.GUI
 
         private void InitializeUnitsAnimations()
         {
-            unitsAnimations = new Dictionary<EntityType, Animation>();
-            AddUnitsAnimation(EntityType.TIGER,
+            unitsAnimations = new Dictionary<string, Animation>();
+            AddUnitsAnimation("TIGER",
                 new Vector2(0.75f, 0.2f),
                 1.5f, 1f, 0.5f,
                 new List<Rect>()
                 { ToRelative(GridToCoordinates(0,2,1.5f,1)),
                   ToRelative(GridToCoordinates(1.5f,2,1.5f,1))});
-            AddUnitsAnimation(EntityType.BAOBAB,
+            AddUnitsAnimation("BAOBAB",
                 new Vector2(2.5f, 1.5f),
                 5, 6, 0.8f,
                 new List<Rect>()
@@ -106,7 +106,7 @@ namespace wpfTest.GUI
                   ToRelative(GridToCoordinates(20,0,5,6)),});
         }
 
-        private void AddUnitsAnimation(EntityType unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
+        private void AddUnitsAnimation(string unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
         {
             unitsAnimations.Add(unit, new Animation(leftBottom,width, height, animChangeTimeS, images));
         }
@@ -221,12 +221,12 @@ namespace wpfTest.GUI
         /// <summary>
         /// Get animation for the unit.
         /// </summary>
-        public Animation GetAnimation(EntityType unitType)
+        public Animation GetAnimation(string unitType)
         {
             if (unitsAnimations.TryGetValue(unitType, out Animation anim))
                 return anim;
             else
-                return GetAnimation(EntityType.BAOBAB);
+                return GetAnimation("BAOBAB");
         }
 
         /// <summary>

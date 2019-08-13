@@ -17,7 +17,7 @@ namespace wpfTest.GameLogic
                 Size, Physical, Biome, Terrain, SoilQuality, Aggressive, ViewRange, Air, Abilities.ToList());
         }
 
-        public TreeFactory(EntityType buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+        public TreeFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, int rootsDistance, int air)
             : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, aggressive, viewRange)
 
@@ -35,7 +35,7 @@ namespace wpfTest.GameLogic
                 Size, Physical, Biome, Terrain, SoilQuality, Aggressive, ViewRange, Abilities.ToList());
         }
 
-        public StructureFactory(EntityType buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+        public StructureFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange)
             : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, aggressive, viewRange)
 

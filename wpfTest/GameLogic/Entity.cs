@@ -18,7 +18,7 @@ namespace wpfTest
         public Queue<Command> CommandQueue { get; }
         public View View => new View(Center, ViewRange);
         public Player Player { get; }
-        public EntityType EntityType { get; }
+        public string EntityType { get; }
         public AnimationState AnimationState { get; set; }
         public decimal MaxHealth { get; set; }
         public decimal Health { get; set; }
@@ -31,7 +31,7 @@ namespace wpfTest
         public bool IsDead => Health <= 0;
         public List<Ability> Abilities { get; }
 
-        public Entity(Player player, EntityType entityType, decimal maxHealth, float viewRange, decimal maxEnergy, List<Ability> abilities)
+        public Entity(Player player, string entityType, decimal maxHealth, float viewRange, decimal maxEnergy, List<Ability> abilities)
         {
             Player = player;
             ViewRange = viewRange;
@@ -144,8 +144,8 @@ namespace wpfTest
         /// </summary>
         public abstract bool IsVisible(VisibilityMap visibilityMap);
     }
-
-    public enum EntityType
+    /*
+    public enum string
     {
         TIGER,
         BAOBAB,
@@ -206,99 +206,99 @@ namespace wpfTest
         DODO, 		
         TRICERATOPS, 		
         BABOON
-    }
-
-    public static class EntityTypeExtensions
+    }*/
+    /*
+    public static class stringExtensions
     {
-        private static Dictionary<EntityType, bool> isUnit;
+        private static Dictionary<string, bool> isUnit;
 
-        static EntityTypeExtensions()
+        static stringExtensions()
         {
-            isUnit = new Dictionary<EntityType, bool>()
+            isUnit = new Dictionary<string, bool>()
             {
-                {EntityType.TIGER, true },
-                {EntityType.BAOBAB, false },
-                {EntityType.RHODE_GRASS, false },
-                {EntityType.CANDELABRA, false },
-                {EntityType.ACACIA, false },
-                {EntityType.KIWI_TREE, false },
-                {EntityType.WATER_LETTUCE, false },
-                {EntityType.PANDANI, false },
-                {EntityType.WHISTLING_THORN, false },
-                {EntityType.EUCALYPTUS, false },
-                {EntityType.MIAMBO, false },
-                {EntityType.SPIKE_THORN, false },
-                {EntityType.ELEPHANT_GRASS, false },
-                {EntityType.JACKAL_BERRY_TREE, false },
-                {EntityType.KAPOC, false },
-                {EntityType.BANNANA_TREE, false },
-                {EntityType.COCONUT_TREE, false },
-                {EntityType.CANNONBALL_TREE, false },
-                {EntityType.BAMBOO, false },
-                {EntityType.TEAK, false },
-                {EntityType.ASHOKA, false },
-                {EntityType.WALKING_PALM, false },
-                {EntityType.PITCHER, false },
-                {EntityType.CYCAD, false },
-                {EntityType.CYCAD_PALM, false },
-                {EntityType.TYRANNOSAUR_TREE, false },
-                {EntityType.FERN, false },
-                {EntityType.MANGROVE, false },
-                {EntityType.WATER_LILY, false },
-                {EntityType.ALGAE, false },
-                {EntityType.SWORD_PLANT, false },
-                {EntityType.ZEBRA, true },
-                {EntityType.GAZZELE, true },
-                {EntityType.RHINO, true },
-                {EntityType.GIRAFFE, true },
-                {EntityType.HIPPO, true },
-                {EntityType.TURTLE, true },
-                {EntityType.MEERCAT, true },
-                {EntityType.TASMANIAN_DEVIL, true },
-                {EntityType.KANGAROO, true },
-                {EntityType.HYENA, true },
-                {EntityType.CHEETAH, true },
-                {EntityType.TARANTULA, true },
-                {EntityType.INDIAN_ELEPHANT, true },
-                {EntityType.ELEPHANT, true },
-                {EntityType.CHIMPANZEE, true },
-                {EntityType.GORILLA, true },
-                {EntityType.PANDA, true },
-                {EntityType.OCELOT, true },
-                {EntityType.RAPTOR, true },
-                {EntityType.SAUROPOD, true },
-                {EntityType.TYRANNOSAUR, true },
-                {EntityType.ANACONDA, true },
-                {EntityType.ALIGATOR, true },
-                {EntityType.CROCODILE, true },
-                {EntityType.PUMA, true },
-                {EntityType.DODO, true },
-                {EntityType.TRICERATOPS, true },
-                {EntityType.BABOON, true }
+                {string.TIGER, true },
+                {string.BAOBAB, false },
+                {string.RHODE_GRASS, false },
+                {string.CANDELABRA, false },
+                {string.ACACIA, false },
+                {string.KIWI_TREE, false },
+                {string.WATER_LETTUCE, false },
+                {string.PANDANI, false },
+                {string.WHISTLING_THORN, false },
+                {string.EUCALYPTUS, false },
+                {string.MIAMBO, false },
+                {string.SPIKE_THORN, false },
+                {string.ELEPHANT_GRASS, false },
+                {string.JACKAL_BERRY_TREE, false },
+                {string.KAPOC, false },
+                {string.BANNANA_TREE, false },
+                {string.COCONUT_TREE, false },
+                {string.CANNONBALL_TREE, false },
+                {string.BAMBOO, false },
+                {string.TEAK, false },
+                {string.ASHOKA, false },
+                {string.WALKING_PALM, false },
+                {string.PITCHER, false },
+                {string.CYCAD, false },
+                {string.CYCAD_PALM, false },
+                {string.TYRANNOSAUR_TREE, false },
+                {string.FERN, false },
+                {string.MANGROVE, false },
+                {string.WATER_LILY, false },
+                {string.ALGAE, false },
+                {string.SWORD_PLANT, false },
+                {string.ZEBRA, true },
+                {string.GAZZELE, true },
+                {string.RHINO, true },
+                {string.GIRAFFE, true },
+                {string.HIPPO, true },
+                {string.TURTLE, true },
+                {string.MEERCAT, true },
+                {string.TASMANIAN_DEVIL, true },
+                {string.KANGAROO, true },
+                {string.HYENA, true },
+                {string.CHEETAH, true },
+                {string.TARANTULA, true },
+                {string.INDIAN_ELEPHANT, true },
+                {string.ELEPHANT, true },
+                {string.CHIMPANZEE, true },
+                {string.GORILLA, true },
+                {string.PANDA, true },
+                {string.OCELOT, true },
+                {string.RAPTOR, true },
+                {string.SAUROPOD, true },
+                {string.TYRANNOSAUR, true },
+                {string.ANACONDA, true },
+                {string.ALIGATOR, true },
+                {string.CROCODILE, true },
+                {string.PUMA, true },
+                {string.DODO, true },
+                {string.TRICERATOPS, true },
+                {string.BABOON, true }
             };
         }
 
         /// <summary>
         /// Returns true iff the entity type is unit.
         /// </summary>
-        public static bool Unit(this EntityType type) => isUnit[type];
+        public static bool Unit(this string type) => isUnit[type];
 
         /// <summary>
         /// Returns true iff the entity type is unit.
         /// </summary>
-        public static bool Building(this EntityType type) => !isUnit[type];
+        public static bool Building(this string type) => !isUnit[type];
 
         /// <summary>
-        /// Returns all EntityTypes representing units.
+        /// Returns all strings representing units.
         /// </summary>
-        public static IEnumerable<EntityType> Units
+        public static IEnumerable<string> Units
             => isUnit.Where((type) => type.Value).Select((type)=>type.Key);
         /// <summary>
-        /// Returns all EntityTypes representing buildings.
+        /// Returns all strings representing buildings.
         /// </summary>
-        public static IEnumerable<EntityType> Buildings
+        public static IEnumerable<string> Buildings
             => isUnit.Where((type) => !type.Value).Select((type) => type.Key);
-    }
+    }*/
 
     public enum Movement
     {

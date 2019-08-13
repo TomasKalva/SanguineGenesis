@@ -8,7 +8,7 @@ namespace wpfTest.GameLogic
 {
     public abstract class EntityFactory
     {
-        public EntityType EntityType { get; }
+        public string EntityType { get; }
         public decimal MaxHealth { get; }
         public decimal MaxEnergy { get; }
         public bool Physical { get; }
@@ -16,7 +16,7 @@ namespace wpfTest.GameLogic
         public float ViewRange { get; }
         public List<Ability> Abilities { get; }
 
-        public EntityFactory(EntityType entityType, decimal maxHealth, decimal maxEnergy,
+        public EntityFactory(string entityType, decimal maxHealth, decimal maxEnergy,
             bool physical, decimal energyCost, float viewRange)
         {
             EntityType = entityType;
