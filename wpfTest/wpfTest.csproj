@@ -67,28 +67,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="GameLogic\Abilities.cs" />
-    <Compile Include="GameLogic\Ability.cs" />
+    <Compile Include="GameLogic\Data\Abilities.cs" />
+    <Compile Include="GameLogic\Data\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
-    <Compile Include="GameLogic\Building.cs" />
-    <Compile Include="GameLogic\BuildingFactory.cs" />
-    <Compile Include="GameLogic\EntityFactory.cs" />
-    <Compile Include="GameLogic\Factories.cs" />
-    <Compile Include="GameLogic\GameStaticData.cs" />
+    <Compile Include="GameLogic\Data\Entities\Building.cs" />
+    <Compile Include="GameLogic\Data\Entities\EntityFactory.cs" />
+    <Compile Include="GameLogic\Data\Entities\Factories.cs" />
+    <Compile Include="GameLogic\Data\GameStaticData.cs" />
     <Compile Include="GameLogic\Structure.cs" />
-    <Compile Include="GameLogic\TreeFactory.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\GameplayOptions.cs" />
     <Compile Include="GameLogic\MovementGenerator.cs" />
     <Compile Include="GameLogic\MovementParameters.cs" />
-    <Compile Include="GameLogic\Tree.cs" />
-    <Compile Include="GameLogic\Unit.cs" />
+    <Compile Include="GameLogic\Data\Entities\Tree.cs" />
+    <Compile Include="GameLogic\Data\Entities\Unit.cs" />
     <Compile Include="GameLogic\UnitView.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />
     <Compile Include="GameLogic\Maps\Pathfinding.cs" />
     <Compile Include="GameLogic\Maps\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityMap.cs" />
-    <Compile Include="GameLogic\UnitFactory.cs" />
     <Compile Include="GUI\BitmapImageExtensions.cs" />
     <Compile Include="GameLogic\Maps\FlowMap.cs" />
     <Compile Include="GameControls\GameControls.cs" />
@@ -112,7 +109,7 @@
     <Compile Include="GameLogic\Rect.cs" />
     <Compile Include="GameControls\UnitCommandsInput.cs" />
     <Compile Include="GameLogic\Terrain.cs" />
-    <Compile Include="GameLogic\Entity.cs" />
+    <Compile Include="GameLogic\Data\Entities\Entity.cs" />
     <Page Include="GUI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -147,10 +144,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="GameLogic\Trees.csv">
+    <None Include="GameLogic\Data\Entities\Trees.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="GameLogic\Units.csv">
+    <None Include="GameLogic\Data\Entities\Units.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
@@ -207,5 +204,6 @@
   <ItemGroup>
     <Resource Include="Images\riverBuildingsMap.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

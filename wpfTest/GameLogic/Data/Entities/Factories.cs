@@ -29,14 +29,13 @@ namespace wpfTest.GameLogic
             }
         }
 
-        public void InitFactories(string fileName)
+        public void InitFactorys(string fileName)
         {
             using (StreamReader fileReader = new StreamReader(fileName))
             {
                 string line = fileReader.ReadLine();//first line is just a description
                 while ((line = fileReader.ReadLine()) != null)
                 {
-                    Console.WriteLine(line);
                     AddNewFactory(line);
                 }
             }
@@ -50,7 +49,6 @@ namespace wpfTest.GameLogic
             {
                 Factory factory = this[entityAbilities.Key];
                 string[] abilitiesDesc = entityAbilities.Value.Split(';');
-                Console.WriteLine(entityAbilities.Key);
                 foreach(string abilityDesc in abilitiesDesc)
                 {
                     string[] abPar = abilityDesc.Split(':');

@@ -22,10 +22,6 @@ namespace wpfTest
         public AnimationState AnimationState { get; set; }
         public decimal MaxHealth { get; set; }
         public decimal Health { get; set; }
-        /// <summary>
-        /// True iff this entity uses energy.
-        /// </summary>
-        public bool HasEnergy => MaxEnergy > 0;
         public decimal MaxEnergy { get; set; }
         public decimal Energy { get; set; }
         public bool IsDead => Health <= 0;
