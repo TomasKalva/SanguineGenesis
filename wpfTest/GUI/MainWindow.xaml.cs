@@ -460,7 +460,7 @@ namespace wpfTest
             OpenGLAtlasDrawer.CreateMap(gl);
             OpenGLAtlasDrawer.CreateNutrientsMap(gl);
             OpenGLAtlasDrawer.CreateUnitCircles(gl);
-            OpenGLAtlasDrawer.CreateUnits(gl);
+            OpenGLAtlasDrawer.CreateEntities(gl);
             OpenGLAtlasDrawer.CreateUnitIndicators(gl);
             OpenGLAtlasDrawer.CreateFlowMap(gl);
             OpenGLAtlasDrawer.CreateSelectionFrame(gl);
@@ -478,7 +478,7 @@ namespace wpfTest
                 OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateUnitsDataBuffers(gl, gameControls.MapView, game);
+                OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitIndicatorsDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, gameControls.MapView, gameControls.MapSelectorFrame);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace wpfTest.GUI
 {
@@ -16,7 +17,7 @@ namespace wpfTest.GUI
         private const int TILE_SIZE = 64;
         private const int ATLAS_WIDTH = 2048;
         private const int ATLAS_HEIGHT = 2048;
-        private Dictionary<string, Animation> unitsAnimations;
+        private Dictionary<string, Animation> entitiesAnimations;
         private Dictionary<int, Rect> glyphs;
 
         public Rect UnitCircle { get; }
@@ -47,7 +48,8 @@ namespace wpfTest.GUI
         private ImageAtlas()
         {
             InitializeDigitImages();
-            InitializeUnitsAnimations();
+            //InitializeUnitsAnimations();
+            LoadEntitiesAnimations("Images/atlas0.xml");
 
             UnitCircle = ToRelative(GridToCoordinates(2, 0, 1, 1));
             UnitsSelector = ToRelative(GridToCoordinates(3, 0, 1, 1));
@@ -89,14 +91,14 @@ namespace wpfTest.GUI
 
         private void InitializeUnitsAnimations()
         {
-            unitsAnimations = new Dictionary<string, Animation>();
-            AddUnitsAnimation("TIGER",
+            entitiesAnimations = new Dictionary<string, Animation>();
+            AddEntitiesAnimation("TIGER",
                 new Vector2(0.75f, 0.2f),
                 1.5f, 1f, 0.5f,
                 new List<Rect>()
                 { ToRelative(GridToCoordinates(0,2,1.5f,1)),
                   ToRelative(GridToCoordinates(1.5f,2,1.5f,1))});
-            AddUnitsAnimation("BAOBAB",
+            AddEntitiesAnimation("BAOBAB",
                 new Vector2(2.5f, 1.5f),
                 5, 6, 0.8f,
                 new List<Rect>()
@@ -106,9 +108,57 @@ namespace wpfTest.GUI
                   ToRelative(GridToCoordinates(20,0,5,6)),});
         }
 
-        private void AddUnitsAnimation(string unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
+        private void LoadEntitiesAnimations(string animationDescriptionFileName)
         {
-            unitsAnimations.Add(unit, new Animation(leftBottom,width, height, animChangeTimeS, images));
+            try
+            {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(animationDescriptionFileName);
+
+            //iterate over all entities
+            entitiesAnimations = new Dictionary<string, Animation>();
+            foreach (XmlElement entity in doc.GetElementsByTagName("Entities")[0].ChildNodes)
+            {
+                string entityType = entity.GetAttribute("EntityType");
+                //iterate over all animations of the entity
+                foreach(XmlElement animation in entity.ChildNodes)
+                {
+                    XmlElement firstImage = (XmlElement)animation.FirstChild;
+                    float centerX = float.Parse(animation.GetAttribute("CenterX"));
+                    float centerY = float.Parse(animation.GetAttribute("CenterY"));
+                    float animWidth = float.Parse(firstImage.GetAttribute("Width"));
+                    float animHeight = float.Parse(firstImage.GetAttribute("Height"));
+                    
+                    //iterate over all images of the animation
+                    var animationImages = new List<Rect>();
+                    foreach (XmlElement image in animation.ChildNodes)
+                    {
+                        float x = float.Parse(image.GetAttribute("X"));
+                        float y = float.Parse(image.GetAttribute("Y"));
+                        float width = float.Parse(image.GetAttribute("Width"));
+                        float height = float.Parse(image.GetAttribute("Height"));
+                        animationImages.Add(
+                            ToRelative(
+                                GridToCoordinates(x, y, width, height)));
+                    }
+
+                    float animChangeTime = 0.5f;
+
+                    //add new animation to the animation dictionary
+                    AddEntitiesAnimation(entityType, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
+                }
+            }
+            }catch(Exception e)
+            {
+                ;
+            }
+
+
+        }
+
+        private void AddEntitiesAnimation(string unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
+        {
+            entitiesAnimations.Add(unit, new Animation(leftBottom,width, height, animChangeTimeS, images));
         }
 
         /// <summary>
@@ -223,7 +273,7 @@ namespace wpfTest.GUI
         /// </summary>
         public Animation GetAnimation(string unitType)
         {
-            if (unitsAnimations.TryGetValue(unitType, out Animation anim))
+            if (entitiesAnimations.TryGetValue(unitType, out Animation anim))
                 return anim;
             else
                 return GetAnimation("BAOBAB");

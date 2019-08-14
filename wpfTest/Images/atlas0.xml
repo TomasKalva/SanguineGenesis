@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Entities xmlns="http://tempuri.org/XMLSchema1.xsd">
+  <Entity EntityType="BAOBAB">
+    <Animation Action="IDLE" CenterX="2.5" CenterY="1.5">
+      <Image X="10" Y="0" Width="5" Height="6"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="RHODE_GRASS">
+    <Animation Action="IDLE" CenterX="1" CenterY="1">
+      <Image X="6" Y="1" Width="2" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="CANDELABRA">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.5">
+      <Image X="4" Y="12" Width="2" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="ACACIA">
+    <Animation Action="IDLE" CenterX="2.5" CenterY="0.2">
+      <Image X="4" Y="9" Width="5" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="KIWI_TREE">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.2">
+      <Image X="5" Y="7" Width="2" Height="2"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="WATER_LETTUCE">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="5" Y="1" Width="1" Height="1"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="PANDANI">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="15" Y="6" Width="1" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="WHISTLING_THORN">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.2">
+      <Image X="2" Y="14" Width="2" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="EUCALYPTUS">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.1">
+      <Image X="0" Y="14" Width="2" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="MIAMBO">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.2">
+      <Image X="2" Y="8" Width="2" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="SPIKE_THORN">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.1">
+      <Image X="0" Y="8" Width="2" Height="2"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="ELEPHANT_GRASS">
+    <Animation Action="IDLE" CenterX="1.5" CenterY="1">
+      <Image X="10" Y="14" Width="3" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="JACKAL_BERRY_TREE">
+    <Animation Action="IDLE" CenterX="2.5" CenterY="0.5">
+      <Image X="0" Y="4" Width="5" Height="4"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="KAPOC">
+    <Animation Action="IDLE" CenterX="2.5" CenterY="1.5">
+      <Image X="10" Y="6" Width="5" Height="5"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="BANNANA_TREE">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.3">
+      <Image X="2" Y="11" Width="2" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="COCONUT_TREE">
+    <Animation Action="IDLE" CenterX="0.8" CenterY="0.3">
+      <Image X="8" Y="12" Width="2" Height="4"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="CANNONBALL_TREE">
+    <Animation Action="IDLE" CenterX="1" CenterY="1.1">
+      <Image X="6" Y="12" Width="2" Height="4"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="BAMBOO">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="9" Y="5" Width="1" Height="2"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="TEAK">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.3">
+      <Image X="8" Y="1" Width="2" Height="4"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="ASHOKA">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.6">
+      <Image X="0" Y="10" Width="2" Height="4"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="WALKING_PALM">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="9" Y="9" Width="1" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="PITCHER">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="3" Y="2" Width="1" Height="1"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="CYCAD">
+    <Animation Action="IDLE" CenterX="1.5" CenterY="0.5">
+      <Image X="10" Y="11" Width="3" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="CYCAD_PALM">
+    <Animation Action="IDLE" CenterX="1.5" CenterY="0.4">
+      <Image X="13" Y="11" Width="3" Height="5"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="TYRANNOSAUR_TREE">
+    <Animation Action="IDLE" CenterX="1.5" CenterY="1.5">
+      <Image X="5" Y="4" Width="3" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="FERN">
+    <Animation Action="IDLE" CenterX="1.5" CenterY="0.5">
+      <Image X="7" Y="7" Width="3" Height="2"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="MANGROVE">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="9" Y="9" Width="1" Height="3"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="WATER_LILY">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="5" Y="2" Width="1" Height="1"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="ALGAE">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="4" Y="8" Width="1" Height="1"></Image>
+    </Animation>
+  </Entity>
+  <Entity EntityType="SWORD_PLANT">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
+      <Image X="4" Y="2"  Width="1" Height="1"></Image>
+    </Animation>
+  </Entity>
+</Entities>

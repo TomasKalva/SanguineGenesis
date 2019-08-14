@@ -97,12 +97,12 @@ namespace wpfTest
             nutrientsMap.VertexBufferArray.Bind(gl);
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 30000);
 
-            if (!unitsEmpty)
+            if (!entitiesEmpty)
             {
                 unitCircles.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
 
-                units.VertexBufferArray.Bind(gl);
+                entities.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
 
                 unitIndicators.VertexBufferArray.Bind(gl);
@@ -281,12 +281,12 @@ namespace wpfTest
         private static MyBufferArray flowMap;
         private static MyBufferArray nutrientsMap;
         private static MyBufferArray unitCircles;
-        private static MyBufferArray units;
+        private static MyBufferArray entities;
         private static MyBufferArray unitIndicators;
         private static MyBufferArray selectionFrame;
 
         //true if there are no units to draw
-        private static bool unitsEmpty;
+        private static bool entitiesEmpty;
 
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
@@ -663,12 +663,12 @@ namespace wpfTest
             int size = visEntity.Count;
             if (size == 0)
             {
-                unitsEmpty = true;
+                entitiesEmpty = true;
                 return;
             }
             else
             {
-                unitsEmpty = false;
+                entitiesEmpty = false;
             }
 
             /*float[] vertices = new float[size * 6 * 3];
@@ -745,9 +745,9 @@ namespace wpfTest
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
         /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateUnits(OpenGL gl)
+        public static void CreateEntities(OpenGL gl)
         {
-            units = new MyBufferArray(gl);
+            entities = new MyBufferArray(gl);
         }
 
         /// <summary>
@@ -756,7 +756,7 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateUnitsDataBuffers(OpenGL gl, MapView mapView, Game game)
+        public static void UpdateEntitiesDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
@@ -764,17 +764,17 @@ namespace wpfTest
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Entity> visUnits = mapView.GetVisibleEntities(game, game.CurrentPlayer);
+            List<Entity> visEntities = mapView.GetVisibleEntities(game, game.CurrentPlayer);
 
-            int size = visUnits.Count;
+            int size = visEntities.Count;
             if (size == 0)
             {
-                unitsEmpty = true;
+                entitiesEmpty = true;
                 return;
             }
             else
             {
-                unitsEmpty = false;
+                entitiesEmpty = false;
             }
 
             /*float[] vertices = new float[size * 6 * 3];
@@ -794,11 +794,11 @@ namespace wpfTest
             float[] texAtlas = map.texAtlas;
 
             //visible units have to be sorted to draw them properly
-            visUnits.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
+            visEntities.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
 
-            for (int i = 0; i < visUnits.Count; i++)
+            for (int i = 0; i < visEntities.Count; i++)
             {
-                Entity current = visUnits[i];
+                Entity current = visEntities[i];
                 //buffer indices
                 int index = i * 6 * 3;
                 int texIndex = i * 6 * 2;
@@ -812,7 +812,7 @@ namespace wpfTest
                 //unit image
                 {
                     Animation anim = current.AnimationState.Animation;
-
+                    
                     //tile position
                     float bottom = (current.Center.Y - anim.LeftBottom.Y - viewBottom) * unitSize;
                     float top = (current.Center.Y - anim.LeftBottom.Y - viewBottom + anim.Height) * unitSize;
@@ -839,7 +839,7 @@ namespace wpfTest
                 }
             }
 
-            units.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            entities.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
         /// <summary>
@@ -870,12 +870,12 @@ namespace wpfTest
             int size = visUnits.Count;
             if (size == 0)
             {
-                unitsEmpty = true;
+                entitiesEmpty = true;
                 return;
             }
             else
             {
-                unitsEmpty = false;
+                entitiesEmpty = false;
             }
 
             /*float[] vertices = new float[size * 24 * 3];

@@ -74,10 +74,10 @@ namespace wpfTest.GameLogic
             Terrain = terrain;
             SoilQuality = soilQuality;
             Aggressive = aggressive;
-            
+
+            NodeLeft = nodes[0, 0].X;
+            NodeBottom = nodes[0, 0].Y;
             Center = new Vector2(nodes[0, 0].X + Range, nodes[0, 0].Y + Range);
-            NodeLeft = nodes[0,0].X;
-            NodeBottom = nodes[0,0].Y;
         }
 
         /// <summary>
