@@ -812,12 +812,17 @@ namespace wpfTest
                 //unit image
                 {
                     Animation anim = current.AnimationState.Animation;
-                    
+
+                    //position of the center of the image
+                    Vector2 imageCenter = anim.LeftBottom;
+                    if (current is Animal && !((Animal)current).FacingLeft)
+                        imageCenter = new Vector2(anim.Width - anim.LeftBottom.X, anim.LeftBottom.Y);
+
                     //tile position
-                    float bottom = (current.Center.Y - anim.LeftBottom.Y - viewBottom) * unitSize;
-                    float top = (current.Center.Y - anim.LeftBottom.Y - viewBottom + anim.Height) * unitSize;
-                    float left = (current.Center.X - anim.LeftBottom.X - viewLeft) * unitSize;
-                    float right = (current.Center.X - anim.LeftBottom.X - viewLeft + anim.Width) * unitSize;
+                    float bottom = (current.Center.Y - imageCenter.Y - viewBottom) * unitSize;
+                    float top = (current.Center.Y - imageCenter.Y - viewBottom + anim.Height) * unitSize;
+                    float left = (current.Center.X - imageCenter.X - viewLeft) * unitSize;
+                    float right = (current.Center.X - imageCenter.X - viewLeft + anim.Width) * unitSize;
 
                     //depth is from [4,5]
                     float depth = 4f + current.Center.Y / game.Map.Height;
@@ -828,10 +833,10 @@ namespace wpfTest
                     SetColor(colors, 1f, 1f, 1f, index, 6);
 
                     //texture coordinates
-                    if(current is Animal && ((Animal)current).FacingLeft)
-                        SetSquareTextureCoordinates(texture, texIndex);
-                    else
+                    if(current is Animal && !((Animal)current).FacingLeft)
                         SetHorizFlipSquareTextureCoordinates(texture, texIndex);
+                    else
+                        SetSquareTextureCoordinates(texture, texIndex);
 
                     //atlas coordinates
                     Rect unitImage = current.AnimationState.CurrentImage;
