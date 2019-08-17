@@ -12,14 +12,18 @@ namespace wpfTest.GameLogic
 
         private Dictionary<Ability, MoveTo> moveToCast;
         private Dictionary<string, Spawn> unitSpawn;
+        private Dictionary<string, CreateUnit> unitCreate;
         private Dictionary<string, PlantBuilding> plantBuilding;
 
         public MoveTo MoveTo { get; }
         public MoveTo MoveToCast(Ability ability) => moveToCast[ability];
         public Attack Attack { get; }
         public Spawn UnitSpawn(string type) => unitSpawn[type];
+        public CreateUnit UnitCreate(string type) => unitCreate[type];
         public PlantBuilding PlantBuilding(string type) => plantBuilding[type];
         public Grow Grow { get; }
+        public SetRallyPoint SetRallyPoint { get; }
+        public HerbivoreEat HerbivoreEat { get; }
 
         internal Abilities(GameStaticData gameStaticData)
         {
@@ -39,6 +43,15 @@ namespace wpfTest.GameLogic
                 unitSpawn.Add(unitFac.Value.EntityType, spawn);
             }
 
+            //unit create
+            unitCreate = new Dictionary<string, CreateUnit>();
+            foreach (var unitFac in gameStaticData.UnitFactories.Factorys)
+            {
+                CreateUnit createUnit = new CreateUnit(unitFac.Value);
+                createUnit.SetAbilities(this);
+                unitCreate.Add(unitFac.Value.EntityType, createUnit);
+            }
+
             //plant buiding
             plantBuilding = new Dictionary<string, GameLogic.PlantBuilding>();
             foreach (var buildingFac in gameStaticData.TreeFactories.Factorys)
@@ -52,6 +65,14 @@ namespace wpfTest.GameLogic
             Grow = new Grow();
             Grow.SetAbilities(this);
 
+            //set rally point
+            SetRallyPoint = new SetRallyPoint();
+            SetRallyPoint.SetAbilities(this);
+
+            //set rally point
+            HerbivoreEat = new HerbivoreEat();
+            HerbivoreEat.SetAbilities(this);
+
             //move to cast has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();
             foreach(Ability a in AllAbilities)
@@ -60,26 +81,6 @@ namespace wpfTest.GameLogic
                 MoveTo moveToAbility = new MoveTo(a.Distance, false, false);
                 moveToCast.Add(a, moveToAbility);
             }
-
-            /*
-            //attack
-            moveToCast.Add(Attack, new MoveTo(-1, true, true));
-            //spawn abilities
-            foreach (var entTypeAbPair in unitSpawn)
-            {
-                Ability a = entTypeAbPair.Value;
-                MoveTo moveToAbility = new MoveTo(a.Distance, false, false);
-                moveToAbility.SetAbilities(this);
-                moveToCast.Add(a, moveToAbility);
-            }
-            //plant abilities
-            foreach (var entTypeAbPair in plantBuilding)
-            {
-                Ability a = entTypeAbPair.Value;
-                MoveTo moveToAbility = new MoveTo(a.Distance, false, false);
-                moveToAbility.SetAbilities(this);
-                moveToCast.Add(a, moveToAbility);
-            }*/
         }
     }
 }

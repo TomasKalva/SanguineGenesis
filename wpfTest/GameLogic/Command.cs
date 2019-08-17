@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
@@ -258,21 +259,25 @@ namespace wpfTest
 
         public bool Finished()
         {
-            Entity e;
-            if ((e=TargetPoint as Entity)==null)
+            if (TargetPoint is Entity entity)
+            {
+                //target is entity
+                //use distance between closest points of the unit and the target
+                if (movementParametrizing.UsesAttackDistance)
+                    return unit.DistanceTo(entity) <= unit.AttackDistance;
+                else
+                    return unit.DistanceTo(entity) <= movementParametrizing.GoalDistance;
+            }
+            else if(TargetPoint is Vector2 vector)
             {
                 //target is vector
                 //use distance between center of the unit and the point
-                return (TargetPoint.Center - unit.Center).Length <= movementParametrizing.GoalDistance;
+                return (vector - unit.Center).Length <= movementParametrizing.GoalDistance;
             }
             else
             {
-                //target is entity
-                //use distance between closest points of the entities
-                if(movementParametrizing.UsesAttackDistance)
-                    return unit.DistanceTo(e) <= unit.AttackDistance;
-                else
-                    return unit.DistanceTo(e) <= movementParametrizing.GoalDistance;
+                Node node = TargetPoint as Node;
+                return unit.DistanceTo(node) <= movementParametrizing.GoalDistance;
             }
         }
 
@@ -363,6 +368,55 @@ namespace wpfTest
                 Player newUnitOwner = CommandedEntity.Player;
                 Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Targ);
                 game.Players[newUnitOwner.PlayerID].Entities.Add(newUnit);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public class SetRallyPointCommand : Command<Building, Vector2, SetRallyPoint>
+    {
+        public SetRallyPointCommand(Building commandedEntity, Vector2 target, SetRallyPoint spawn)
+            : base(commandedEntity, target, spawn)
+        {
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            CommandedEntity.RallyPoint = Targ;
+            return true;
+        }
+    }
+
+    public class CreateUnitCommand : Command<Building, Nothing, CreateUnit>
+    {
+        /// <summary>
+        /// How long the unit was spawning in s.
+        /// </summary>
+        public float SpawnTimer { get; private set; }
+
+        private CreateUnitCommand() => throw new NotImplementedException();
+        public CreateUnitCommand(Building commandedEntity, Nothing target, CreateUnit spawn)
+            : base(commandedEntity, target, spawn)
+        {
+            SpawnTimer = 0f;
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            if (!TryPay())
+                //finish command if paying was unsuccessful
+                return true;
+
+            SpawnTimer += deltaT;
+            if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
+            {
+                Player newUnitOwner = CommandedEntity.Player;
+                Vector2 newUnitPosition = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - Ability.SpawningUnitFactory.Range);
+                Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, newUnitPosition);
+                game.Players[newUnitOwner.PlayerID].Entities.Add(newUnit);
+                //make unit go towards the rally point
+                newUnitOwner.GameStaticData.Abilities.MoveTo.SetCommands(new List<Unit>(1) { newUnit }, CommandedEntity.RallyPoint);
                 return true;
             }
             return false;
@@ -460,6 +514,58 @@ namespace wpfTest
             else
                 return false;
             
+        }
+    }
+
+    public class HerbivoreEatCommand : Command<Animal, IHerbivoreFood, HerbivoreEat>
+    {
+        private float timeUntilEating;//time in s until this unit attacks
+        
+        public HerbivoreEatCommand(Animal commandedEntity, IHerbivoreFood target, HerbivoreEat eat)
+            : base(commandedEntity, target, eat)
+        {
+            this.timeUntilEating = 0f;
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            //dead target cannont be attacked
+            /*if (Targ is Corpse c && c.IsDead)
+            {
+                CommandedEntity.CanBeMoved = true;
+                return true;
+            }*/
+            //all food was already eaten
+            if (!Targ.FoodLeft)
+            {
+                CommandedEntity.CanBeMoved = true;
+                return true;
+            }
+
+            CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
+
+            CommandedEntity.CanBeMoved = false;
+            timeUntilEating += deltaT;
+            if (timeUntilEating >= CommandedEntity.FoodEatingPeriod)
+            {
+                //eat
+                Targ.EatFood(CommandedEntity);
+                //reset timer
+                timeUntilEating -= CommandedEntity.FoodEatingPeriod;
+
+                /*decimal nutrientsToEat = Math.Min(CommandedEntity.FoodEnergyRegen / 10, Targ.Nutrients);
+                Targ.Nutrients -= nutrientsToEat;
+                CommandedEntity.Energy += nutrientsToEat * 10;*/
+            }
+
+            /*bool finished = CommandedEntity.DistanceTo(Targ) >= Ability.Distance ||
+                            Targ.Nutrients==0;
+            if (finished)
+            {
+                CommandedEntity.CanBeMoved = true;
+                return true;
+            }*/
+            return false;
         }
     }
 }

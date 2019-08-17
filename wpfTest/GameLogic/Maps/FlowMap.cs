@@ -109,6 +109,75 @@ namespace wpfTest
         }
 
         public float Length =>(float)Math.Sqrt(X * X + Y * Y);
+    }
 
+    /// <summary>
+    /// Represents decimal range [0,MaxValue].
+    /// </summary>
+    public struct DecRange
+    {
+        /// <summary>
+        /// Maximum value of value.
+        /// </summary>
+        public decimal MaxValue { get; }
+        private decimal value;
+        public decimal Value
+        {
+            get => value;
+            set
+            {
+                value = Math.Max(0, Math.Min(MaxValue, value));
+            }
+        }
+
+        public DecRange(decimal max, decimal value)
+        {
+            MaxValue = max;
+            this.value = Math.Max(0, Math.Min(MaxValue, value));
+        }
+
+        public static DecRange operator +(DecRange decR, decimal dec) 
+            => new DecRange(decR.MaxValue,decR.Value + dec);
+        public static DecRange operator -(DecRange decR, decimal dec)
+            => new DecRange(decR.MaxValue, decR.Value - dec);
+        public static DecRange operator *(DecRange decR, decimal dec)
+            => new DecRange(decR.MaxValue, decR.Value * dec);
+        public static DecRange operator /(DecRange decR, decimal dec)
+            => new DecRange(decR.MaxValue, decR.Value / dec);
+        public static bool operator ==(DecRange decR, decimal dec)
+           => decR.Value == dec;
+        public static bool operator !=(DecRange decR, decimal dec)
+           => decR.Value != dec;
+        public static bool operator ==(DecRange decRa, DecRange decRb)
+           => decRa.Value == decRb.Value;
+        public static bool operator !=(DecRange decRa, DecRange decRb)
+           => decRa.Value != decRb.Value;
+        public static bool operator <(DecRange decR, decimal dec)
+           => decR.Value < dec;
+        public static bool operator >(DecRange decR, decimal dec)
+           => decR.Value > dec;
+        public static bool operator <=(DecRange decR, decimal dec)
+           => decR.Value <= dec;
+        public static bool operator >=(DecRange decR, decimal dec)
+           => decR.Value >= dec;
+        public override bool Equals(object o)
+        {
+            if (o is DecRange)
+                return this == (DecRange)o;
+            else if (o is decimal)
+                return this == (decimal)o;
+            else
+                return false;
+        }
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
+        }
+        public static implicit operator decimal(DecRange decR)
+          => decR.Value;
+
+        public decimal Percentage => Value / MaxValue;
+        public decimal NotFilled => MaxValue - Value;
+        public override string ToString() => Value.ToString();
     }
 }

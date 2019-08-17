@@ -23,6 +23,7 @@ namespace wpfTest.GameLogic
             Abilities = new Abilities(this);
 
             TreeFactories.InitAbilities(Abilities);
+            UnitFactories.InitAbilities(Abilities);
         }
     }
 }

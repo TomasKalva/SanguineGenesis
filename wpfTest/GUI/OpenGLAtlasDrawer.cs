@@ -937,7 +937,7 @@ namespace wpfTest
                     index += 6 * 3;
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
-                    float energyRight = Math.Max(left, left + (right - left) * (float)(current.Energy / current.MaxEnergy));
+                    float energyRight = Math.Max(left, left + (right - left) * (float)(current.Energy.Percentage));
                     AddRectangle(left, bottom, energyRight, top, indicatorImage, depth, index, vertices,
                         index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 1f, 0f);
                     index += 6 * 3;
@@ -952,7 +952,7 @@ namespace wpfTest
                     index += 6 * 3;
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
-                    float healthRight =Math.Max(left, left + (right - left) * (float)(current.Health/current.MaxHealth));
+                    float healthRight =Math.Max(left, left + (right - left) * (float)(current.Health.Percentage));
                     AddRectangle(left, bottom, healthRight, top, indicatorImage, depth, index, vertices,
                         index, colors, texIndex, texture, atlasInd, texAtlas, 1f, 0f, 0f);
                 }

@@ -7,7 +7,7 @@ using wpfTest.GameLogic;
 
 namespace wpfTest
 {
-    public class Node:ITargetable,IMovementTarget
+    public class Node:ITargetable,IMovementTarget, IHerbivoreFood
     {
         public const decimal MAX_NUTRIENTS = 9.9m;
 
@@ -53,7 +53,7 @@ namespace wpfTest
             set { building = value; Blocked = building != null; }
         }
         public List<Tree> Roots { get; }
-        Vector2 ITargetable.Center => new Vector2(X + 0.5f, Y + 0.5f);
+        public Vector2 Center => new Vector2(X + 0.5f, Y + 0.5f);
 
         public Node(int x, int y, decimal nutrients, Biome biome, Terrain terrain)
         {
@@ -74,6 +74,14 @@ namespace wpfTest
         public void GenerateNutrients()
         {
             Nutrients += SoilQuality.NutrientsProduction();
+        }
+
+        bool IFood.FoodLeft => Nutrients > 0;
+        void IFood.EatFood(Animal eater)
+        {
+            decimal nutrientsToEat = Math.Min(eater.FoodEnergyRegen / 10, Nutrients);
+            Nutrients -= nutrientsToEat;
+            eater.Energy += nutrientsToEat * 10;
         }
     }
 }

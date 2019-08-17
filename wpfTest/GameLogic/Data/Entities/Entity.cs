@@ -20,9 +20,8 @@ namespace wpfTest
         public Player Player { get; }
         public AnimationState AnimationState { get; set; }
         public bool IsDead => Health <= 0;
-        public decimal Health { get; set; }
-        public decimal Energy { get; set; }
-
+        public DecRange Health { get; set; }
+        public DecRange Energy { get; set; }
         public string EntityType { get; }
         public decimal MaxHealth { get; set; }
         public decimal MaxEnergy { get; set; }
@@ -37,12 +36,12 @@ namespace wpfTest
             CommandQueue = new Queue<Command>();
             EntityType = entityType;
             MaxHealth = maxHealth;
-            Health = maxHealth;
+            Health = new DecRange(maxHealth, maxHealth);
             MaxEnergy = maxEnergy;
             if (this is Animal)
-                Energy = maxEnergy;
+                Energy = new DecRange(maxEnergy,maxEnergy);
             else
-                Energy = 0;
+                Energy = new DecRange(maxEnergy, maxEnergy);
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(entityType));
             Physical = physical;
             Abilities = abilities;
@@ -132,10 +131,17 @@ namespace wpfTest
         /// <summary>
         /// Distance between closest parts of the entities.
         /// </summary>
-
         public float DistanceTo(Entity e)
         {
             return (this.Center - e.Center).Length - this.Range - e.Range;
+        }
+
+        /// <summary>
+        /// Distance between closest parts of the entities.
+        /// </summary>
+        public float DistanceTo(Node n)
+        {
+            return (this.Center - n.Center).Length - this.Range - 0.5f;
         }
 
         /// <summary>

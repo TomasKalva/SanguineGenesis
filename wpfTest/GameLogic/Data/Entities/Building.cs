@@ -61,6 +61,10 @@ namespace wpfTest.GameLogic
         /// Produces energy for nodes around it.
         /// </summary>
         public bool Producer { get; }
+        /// <summary>
+        /// Point to which created units go after they spawn.
+        /// </summary>
+        public Vector2 RallyPoint { get; set; }
 
         public Building(Player player, string buildingType, Node[,] nodes, Node[,] energySources, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)
@@ -128,7 +132,7 @@ namespace wpfTest.GameLogic
                     nutrientsTaken = Math.Min(nutrientsTaken, n.Nutrients);
 
                     //building only takes energy it can use
-                    nutrientsTaken = Math.Min(nutrientsTaken, MaxEnergy - Energy);
+                    nutrientsTaken = Math.Min(nutrientsTaken, Energy.NotFilled);
 
                     Energy += nutrientsTaken;
                     n.Nutrients -= nutrientsTaken;

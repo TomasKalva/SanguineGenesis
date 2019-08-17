@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic
 {
-    public class Tree:Building
+    public class Tree:Building, IHerbivoreFood
     {
         public int Air { get; }
+
+        bool IFood.FoodLeft => !IsDead;
 
         public Tree(Player player, string treeType, Node[,] nodes, Node[,] rootNodes, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, int air, List<Ability> abilities)
@@ -17,6 +19,13 @@ namespace wpfTest.GameLogic
             Air = air;
             foreach(Node n in rootNodes)
                 n.Roots.Add(this);
+        }
+
+        void IFood.EatFood(Animal eater)
+        {
+            decimal nutrientsToEat = Math.Min(eater.FoodEnergyRegen, Health);
+            Health -= nutrientsToEat;
+            eater.Energy += nutrientsToEat;
         }
     }
 }

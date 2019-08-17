@@ -9,6 +9,9 @@ namespace wpfTest
 {
     public class CommandsGroup
     {
+        /// <summary>
+        /// List of currently selected entities. Shouldn't be set to null.
+        /// </summary>
         public List<Entity> Entities { get; private set; }
 
         public CommandsGroup()

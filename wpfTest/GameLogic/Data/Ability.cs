@@ -231,13 +231,8 @@ namespace wpfTest.GameLogic
 
     public sealed class Attack : TargetAbility<Animal, Entity>
     {
-        private static Attack ability;
-        static Attack()
-        {
-            ability = new Attack();
-        }
         internal Attack():base(0.1f, 0, false) { }
-        //public static Attack Get => ability;
+
         public override Command NewCommand(Animal caster, Entity target)
         {
             return new AttackCommand(caster, target, this);
@@ -251,20 +246,11 @@ namespace wpfTest.GameLogic
 
     public sealed class Spawn : TargetAbility<Entity, Vector2>
     {
-        //private static Dictionary<string,Spawn> unitSpawningAbilities;
-        static Spawn()
-        {
-            /*unitSpawningAbilities = new Dictionary<string, Spawn>()
-            {
-                { "TIGER", new Spawn(new AnimalFactory("TIGER", 200, 150, 0.5f, true, 30m, 5f, 2f, 4f,Movement.LAND_WATER, 15f, 5m, 0.3f, 0.1f))}
-            };*/
-        }
         internal Spawn(AnimalFactory spawningUnitFactory)
             : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true)
         {
             SpawningUnitFactory = spawningUnitFactory;
         }
-        //public static Spawn GetAbility(string t) => unitSpawningAbilities[t];
         
         public AnimalFactory SpawningUnitFactory { get; }
 
@@ -283,24 +269,37 @@ namespace wpfTest.GameLogic
             return "The entity spawns a new unit at the target point.";
         }
     }
+    
+    public sealed class SetRallyPoint : TargetAbility<Building, Vector2>
+    {
+        internal SetRallyPoint()
+            : base(0,0,false)
+        {
+        }
 
+        public override Command NewCommand(Building caster, Vector2 target)
+        {
+            return new SetRallyPointCommand(caster, target, this);
+        }
 
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public override string Description()
+        {
+            return "Sets rally point of this building.";
+        }
+    }
+    
     public sealed class PlantBuilding : TargetAbility<Entity, Node>
     {
-        //private static Dictionary<string, PlantBuilding> plantingBuildingAbilities;
-        static PlantBuilding()
-        {
-            /*plantingBuildingAbilities = new Dictionary<string, PlantBuilding>()
-            {
-                { string.BAOBAB, new PlantBuilding(new TreeFactory(string.BAOBAB,  150, 100, 0.03m, 3, true, 0, Biome.SAVANNA, Terrain.LAND, SoilQuality.MEDIUM, true, 6f, 2, 10))}
-            }*/
-        }
         internal PlantBuilding(TreeFactory buildingFactory)
             : base(20f, buildingFactory.EnergyCost, true)
         {
             BuildingFactory = buildingFactory;
         }
-        //public static PlantBuilding GetAbility(string t) => plantingBuildingAbilities[t];
 
         public BuildingFactory BuildingFactory { get; }
 
@@ -320,17 +319,35 @@ namespace wpfTest.GameLogic
         }
     }
 
+    public sealed class HerbivoreEat : TargetAbility<Animal, IHerbivoreFood>
+    {
+        internal HerbivoreEat()
+            : base(0.1f, 0, false)
+        {
+        }
+
+        public override Command NewCommand(Animal caster, IHerbivoreFood target)
+        {
+            return new HerbivoreEatCommand(caster, target, this);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public override string Description()
+        {
+            return "The commanded herbivore eats tree or node.";
+        }
+    }
+
     public sealed class Grow : TargetAbility<Tree, Nothing>
     {
         internal Grow()
             : base(0, 0, true)
         {
         }
-        //public static Grow Get {get;}
-        /*static Grow()
-        {
-            Get = new Grow();
-        }*/
 
         public override Command NewCommand(Tree caster, Nothing target)
         {
@@ -340,6 +357,32 @@ namespace wpfTest.GameLogic
         public override string Description()
         {
             return "The tree grows until it is at max energy. The tree can't perform other commands while growing.";
+        }
+    }
+
+    public sealed class CreateUnit : TargetAbility<Building, Nothing>
+    {
+        internal CreateUnit(AnimalFactory spawningUnitFactory)
+            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true)
+        {
+            SpawningUnitFactory = spawningUnitFactory;
+        }
+
+        public AnimalFactory SpawningUnitFactory { get; }
+
+        public override Command NewCommand(Building caster, Nothing target)
+        {
+            return new CreateUnitCommand(caster, target, this);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + " " + SpawningUnitFactory.EntityType;
+        }
+
+        public override string Description()
+        {
+            return "The entity spawns a new unit at the target point.";
         }
     }
 
@@ -355,5 +398,22 @@ namespace wpfTest.GameLogic
             Get = new Nothing();
         }
         private Nothing() { }
+    }
+
+    /// <summary>
+    /// Marks classes that can be eaten by animals.
+    /// </summary>
+    public interface IFood:ITargetable
+    {
+        bool FoodLeft { get; }
+        void EatFood(Animal eater);
+    }
+
+    /// <summary>
+    /// Marks classes that can be eaten by herbivores.
+    /// </summary>
+    public interface IHerbivoreFood:IFood
+    {
+
     }
 }

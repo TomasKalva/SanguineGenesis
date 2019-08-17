@@ -63,6 +63,12 @@ namespace wpfTest.GameLogic
                             case "attack":
                                 factory.Abilities.Add(abilities.Attack);
                                 break;
+                            case "rallyPoint":
+                                factory.Abilities.Add(abilities.SetRallyPoint);
+                                break;
+                            case "eat":
+                                factory.Abilities.Add(abilities.HerbivoreEat);
+                                break;
                         }
                     }else if (abPar.Length == 2)
                     {
@@ -73,6 +79,9 @@ namespace wpfTest.GameLogic
                                 break;
                             case "spawn":
                                 factory.Abilities.Add(abilities.UnitSpawn(abPar[1]));
+                                break;
+                            case "create":
+                                factory.Abilities.Add(abilities.UnitCreate(abPar[1]));
                                 break;
                         }
                     }
@@ -153,7 +162,7 @@ namespace wpfTest.GameLogic
                     ));
             //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f););
 
-            //abilitiesList.Add(treeType, fields[11]);
+            abilitiesList.Add(unitType, fields[18]);
         }
     }
 }

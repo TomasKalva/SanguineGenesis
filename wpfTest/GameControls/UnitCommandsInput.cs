@@ -10,6 +10,7 @@ namespace wpfTest
 {
     class UnitCommandsInput
     {
+        public Vector2 INVALID_MAP_COORDINATES => new Vector2(-1, -1);
         private Dictionary<Key, Ability> keyToAbility;
         public UnitsCommandInputState State { get; set; }
         public Vector2 MapCoordinates { get; private set; }

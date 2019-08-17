@@ -58,10 +58,20 @@ namespace wpfTest.GameLogic
             //map used in the pathfinding algorithm
             ObstacleMap forPathfinding = obst;
 
-            if (TargetPoint is Building b)
+            Building targAsBuilding = TargetPoint as Building;
+            Node targAsNode = TargetPoint as Node;
+            if (targAsBuilding!=null || (targAsNode!=null && targAsNode.Building!=null))
             {
+                //remove the building that blocks path to the target from this obstacle map
+                Building blockingBuilding;
+                if (targAsNode != null)
+                    blockingBuilding = targAsNode.Building;
+                else
+                    blockingBuilding = targAsBuilding;
+
+
                 forPathfinding = new ObstacleMap(obst);
-                foreach(Node n in b.Nodes)
+                foreach(Node n in blockingBuilding.Nodes)
                 {
                     forPathfinding[n.X, n.Y] = false;
                 }
