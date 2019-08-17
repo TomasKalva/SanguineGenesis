@@ -58,12 +58,12 @@ namespace wpfTest.GameLogic
         /// </summary>
         public SoilQuality SoilQuality { get; }
         /// <summary>
-        /// Can reduce soil quality by taking nutrients.
+        /// Produces energy for nodes around it.
         /// </summary>
-        public bool Aggressive { get; }
+        public bool Producer { get; }
 
         public Building(Player player, string buildingType, Node[,] nodes, Node[,] energySources, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, List<Ability> abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)
             : base(player, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Nodes = nodes;
@@ -73,7 +73,7 @@ namespace wpfTest.GameLogic
             Biome = biome;
             Terrain = terrain;
             SoilQuality = soilQuality;
-            Aggressive = aggressive;
+            Producer = producer;
 
             NodeLeft = nodes[0, 0].X;
             NodeBottom = nodes[0, 0].Y;
@@ -110,22 +110,19 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Transforms nutrients from energy sources to energy.
         /// </summary>
-        public void DrainEnergy(float deltaT)
+        public void DrainEnergy()
         {
             foreach(Node n in EnergySources)
             {
                 //check if building can take nutrients from this node
-                if(n.Terrain==Terrain &&
-                    n.Biome==Biome)
+                if(n.Terrain == Terrain &&
+                    n.Biome == Biome)
                 {
                     //take nutrients from this node
                     decimal nutrientsTaken;
-                    if (Aggressive)
-                        //aggressive building can take as much nutrients as it wants to
-                        nutrientsTaken = MaxEnergyIntake * (decimal)(deltaT);
-                    else
-                        //non-aggressive building can't take amount of nutrients that would reduce soil quality
-                        nutrientsTaken = Math.Min(MaxEnergyIntake * (decimal)(deltaT), n.Nutrients - n.Terrain.Nutrients(n.Biome, n.SoilQuality));
+
+                    //building can't take amount of nutrients that would reduce soil quality
+                    nutrientsTaken = Math.Min(MaxEnergyIntake, n.Nutrients - n.Terrain.Nutrients(n.Biome, n.SoilQuality));
 
                     //nutrients can't drop below zero
                     nutrientsTaken = Math.Min(nutrientsTaken, n.Nutrients);
@@ -136,6 +133,17 @@ namespace wpfTest.GameLogic
                     Energy += nutrientsTaken;
                     n.Nutrients -= nutrientsTaken;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Puts nutrients to the soil at its roots.
+        /// </summary>
+        public void ProduceNutrients()
+        {
+            foreach (Node n in EnergySources)
+            {
+                n.Nutrients += MaxEnergyIntake * 2;
             }
         }
     }

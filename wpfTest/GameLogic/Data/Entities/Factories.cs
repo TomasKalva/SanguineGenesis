@@ -97,9 +97,10 @@ namespace wpfTest.GameLogic
             Biome biome = (Biome)Enum.Parse(typeof(Biome),fields[8]);
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain),fields[9]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality),fields[10]);
+            bool producer = fields[13] == "yes";
 
             Factorys.Add(treeType, new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
-                biome, terrain, soilQuality, physical,  10f, rootsDistance, 2  ));
+                biome, terrain, soilQuality, producer,  10f, rootsDistance, 2  ));
             abilitiesList.Add(treeType, fields[11]);
         }
     }

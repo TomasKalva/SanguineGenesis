@@ -15,6 +15,8 @@ namespace wpfTest.GameLogic
             : base(player, treeType, nodes, rootNodes, maxHealth, maxEnergy, maxEnergyIntake, size, physical, biome, terrain, soilQuality, aggressive, viewRange, abilities)
         {
             Air = air;
+            foreach(Node n in rootNodes)
+                n.Roots.Add(this);
         }
     }
 }

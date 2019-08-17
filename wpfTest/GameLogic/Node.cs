@@ -52,6 +52,7 @@ namespace wpfTest
             get { return building; }
             set { building = value; Blocked = building != null; }
         }
+        public List<Tree> Roots { get; }
         Vector2 ITargetable.Center => new Vector2(X + 0.5f, Y + 0.5f);
 
         public Node(int x, int y, decimal nutrients, Biome biome, Terrain terrain)
@@ -62,6 +63,7 @@ namespace wpfTest
             X = x;
             Y = y;
             Blocked = false;
+            Roots = new List<Tree>();
         }
 
         public Node Copy(int x, int y)

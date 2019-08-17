@@ -37,10 +37,10 @@ namespace wpfTest.GameLogic
         public Biome Biome { get; }
         public Terrain Terrain { get; }
         public SoilQuality SoilQuality { get; }
-        public bool Aggressive { get; }
+        public bool Producer { get; }
 
         public BuildingFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange)
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange)
             : base(buildingType, maxHealth, maxEnergy, physical, energyCost, viewRange)
         {
             MaxEnergyIntake = maxEnergyIntake;
@@ -48,7 +48,7 @@ namespace wpfTest.GameLogic
             Biome = biome;
             Terrain = terrain;
             SoilQuality = soilQuality;
-            Aggressive = aggressive;
+            Producer = producer;
         }
 
         public abstract Building NewInstance(Player player, Node[,] nodesUnder, Node[,] energySources);
@@ -72,12 +72,12 @@ namespace wpfTest.GameLogic
         public override Building NewInstance(Player player, Node[,] nodesUnder, Node[,] roots)
         {
             return new Tree(player, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake,
-                Size, Physical, Biome, Terrain, SoilQuality, Aggressive, ViewRange, Air, Abilities.ToList());
+                Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Air, Abilities.ToList());
         }
 
         public TreeFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange, int rootsDistance, int air)
-            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, aggressive, viewRange)
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int rootsDistance, int air)
+            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange)
 
         {
             RootsDistance = rootsDistance;
@@ -90,12 +90,12 @@ namespace wpfTest.GameLogic
         public override Building NewInstance(Player player, Node[,] nodesUnder, Node[,] energySources)
         {
             return new Structure(player, EntityType, nodesUnder, energySources, MaxHealth, MaxEnergy, MaxEnergyIntake,
-                Size, Physical, Biome, Terrain, SoilQuality, Aggressive, ViewRange, Abilities.ToList());
+                Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Abilities.ToList());
         }
 
         public StructureFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool aggressive, float viewRange)
-            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, aggressive, viewRange)
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange)
+            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange)
 
         {
         }

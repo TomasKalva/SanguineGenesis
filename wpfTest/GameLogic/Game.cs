@@ -54,6 +54,7 @@ namespace wpfTest
             {
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("KAPOC"));
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("BAOBAB"));
             }
         }
 
@@ -109,11 +110,12 @@ namespace wpfTest
             if (nutrientUpdateTimer <= 0)
             {
                 nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
-                Map.UpdateNutrients();
+                //Map.UpdateNutrients();
+                Map.ProduceNutrients();
 
                 foreach (Building b in buildings)
                 {
-                    b.DrainEnergy(/*deltaT*/1);
+                    b.DrainEnergy();
                 }
             }
 

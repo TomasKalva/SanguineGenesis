@@ -227,9 +227,21 @@ namespace wpfTest
         }
 
         /// <summary>
-        /// Change biome by the amount of nutrients and neighbour biomes.
+        /// Nodes with roots of producers produce nutrients trients.
         /// </summary>
-        public void UpdateBiomes()
+        public void ProduceNutrients()
+        {
+            //generate nutrients
+            for (int i = 0; i < Width; i++)
+                for (int j = 0; j < Height; j++)
+                    if (this[i, j].Roots.Where((t) => t.Producer).Any())
+                        this[i, j].GenerateNutrients();
+        }
+
+            /// <summary>
+            /// Change biome by the amount of nutrients and neighbour biomes.
+            /// </summary>
+            public void UpdateBiomes()
         {
             //spread biome to neighbours
             Biome[,] newBiomes = new Biome[Width, Height];
