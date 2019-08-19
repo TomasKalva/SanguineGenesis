@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest
 {
@@ -71,6 +72,12 @@ namespace wpfTest
                             {
                                 //buildings can't be pushed
                                 u.Position = u.Center - 2 * pushVec;
+                            }
+                            else if(e is Corpse)
+                            {
+                                Corpse c = (Corpse)e;
+                                u.Position = u.Center - pushVec;
+                                c.Position = c.Center + pushVec;
                             }
                             else
                             {

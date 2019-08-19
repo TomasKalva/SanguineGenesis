@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
@@ -11,7 +12,8 @@ namespace wpfTest
     public class Player
     {
         public List<Entity> Entities { get; private set; }
-        public List<Animal> Units => Entities.Where((e) => e.GetType() == typeof(Animal)).Select((u)=>(Animal)u).ToList();
+        public List<Unit> Units => Entities.Where((e) => e is Unit).Select((u)=>(Unit)u).ToList();
+        public List<Animal> Animals => Entities.Where((e) => e is Animal).Select((u) => (Animal)u).ToList();
         public List<Building> Buildings => Entities.Where((e) => e is Building).Select((u) => (Building)u).ToList();
         public VisibilityMap VisibilityMap { get; set; }
         public bool MapChanged => MapView.MapWasChanged;
@@ -122,21 +124,24 @@ namespace wpfTest
         public void RemoveDeadEntities()
         {
             //remove player's dead entities
-            List<Entity> toBeRemoved = new List<Entity>();
+            List<Entity> deadEntities = new List<Entity>();
             foreach(Entity e in Entities)
             {
                 if(e.IsDead)
                 {
-                    toBeRemoved.Add(e);
-                    if(e is Building b)
+                    deadEntities.Add(e);
+                    /*if(e is Building b)
                     {
-                        b.RemoveFromMap();
-                    }
+                        
+                    }*/
                     //CommandsAssignments still have reference to the entity
-                    e.RemoveFromAllCommandsAssignments();
+                    //e.RemoveFromAllCommandsAssignments();
                 }
             }
-            Entities.RemoveAll((unit) => toBeRemoved.Contains(unit));
+            foreach(Entity e in deadEntities)
+                e.Die();
+
+            Entities.RemoveAll((entity) => entity.IsDead);
             
             //remove dead visible buildings
             RemoveDeadVisibleBuildings();

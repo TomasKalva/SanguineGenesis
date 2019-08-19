@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
@@ -68,14 +69,24 @@ namespace wpfTest
             return units;
         }
 
-        public List<Animal> GetUnits()
+        public List<Unit> GetUnits()
         {
-            var units = new List<Animal>();
+            var units = new List<Unit>();
             foreach (Players player in Enum.GetValues(typeof(Players)))
             {
                 units = units.Concat(Players[player].Units.Where((u) => !u.IsDead).ToList()).ToList();
             }
             return units;
+        }
+        
+        public List<Animal> GetAnimals()
+        {
+            var animals = new List<Animal>();
+            foreach (Players player in Enum.GetValues(typeof(Players)))
+            {
+                animals = animals.Concat(Players[player].Animals.Where((u) => !u.IsDead).ToList()).ToList();
+            }
+            return animals;
         }
 
         public List<Building> GetBuildings()
@@ -102,7 +113,8 @@ namespace wpfTest
             }*/
 
             List<Entity> entities = GetEntities();
-            List<Animal> units = GetUnits();
+            List<Unit> units = GetUnits();
+            List<Animal> animals = GetAnimals();
             List<Building> buildings = GetBuildings();
 
             //update nutrients
@@ -132,20 +144,21 @@ namespace wpfTest
                 e.AnimationStep(deltaT);
             }
             //physics
-            physics.PushOutsideOfObstacles(Map, units,deltaT);
-            physics.PushAway(Map, units, entities, deltaT);
-            physics.Step(Map,units,deltaT);
-            physics.ResetCollision(units);
+            List<Entity> physicalEntities = entities.Where((e) => e.Physical).ToList();
+            physics.PushOutsideOfObstacles(Map, animals,deltaT);
+            physics.PushAway(Map, animals, physicalEntities, deltaT);
+            physics.Step(Map, animals, deltaT);
+            physics.ResetCollision(animals);
 
             //attack nearby enemy if idle
-            foreach(Animal u in units)
+            foreach(Animal a in animals)
             {
-                if(!u.CommandQueue.Any())
+                if(!a.CommandQueue.Any())
                 {
                     //unit isn't doing anything
-                    Entity en = units.Where((v) => v.Player!=u.Player && u.DistanceTo(v) < u.AttackDistance).FirstOrDefault();
+                    Entity en = units.Where((v) => v.Player!=a.Player && a.DistanceTo(v) < a.AttackDistance).FirstOrDefault();
                     if(en!=null)
-                        u.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(u, en));
+                        a.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(a, en));
                 }
 
             }

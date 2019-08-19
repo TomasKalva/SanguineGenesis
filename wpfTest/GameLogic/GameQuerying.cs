@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GUI;
 
 namespace wpfTest
@@ -24,10 +25,10 @@ namespace wpfTest
                 });
         }
 
-        public List<Animal> SelectRectUnits(Game game, Rect area, Func<Animal, bool> unitProperty)
+        public List<Unit> SelectRectUnits(Game game, Rect area, Func<Unit, bool> unitProperty)
         {
-            List<Animal> selected = new List<Animal>();
-            foreach (Animal unit in SelectRectEntities(game, area, (e)=>e.GetType()==typeof(Animal)))
+            List<Unit> selected = new List<Unit>();
+            foreach (Unit unit in SelectRectEntities(game, area, (e)=>e is Unit))
             {
                 Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
                 unitRect = ((IRectangle)unit).GetRect();
@@ -54,7 +55,7 @@ namespace wpfTest
         {
             return entities.Where((e) =>
             {
-                if (e is Animal u)
+                if (e is Unit u)
                 {
                     return u.IsVisible(observer.VisibilityMap);
                 }

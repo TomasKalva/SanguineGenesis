@@ -150,5 +150,12 @@ namespace wpfTest.GameLogic
                 n.Nutrients += MaxEnergyIntake * 2;
             }
         }
+
+        public override void Die()
+        {
+            base.Die();
+
+            RemoveFromMap();
+        }
     }
 }

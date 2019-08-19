@@ -27,5 +27,16 @@ namespace wpfTest.GameLogic
             Health -= nutrientsToEat;
             eater.Energy += nutrientsToEat;
         }
+
+        public override void Die()
+        {
+            base.Die();
+
+            //after tree dies and has energy left, spawn a dead tree
+            if(Energy > 0)
+                Player.Entities.Add(
+                    new Structure(Player, "DEAD_TREE", Nodes, EnergySources, MaxEnergy, 0, 0, Size,
+                    Physical, Biome, Terrain, SoilQuality.BAD, false, 0, new List<Ability>()));
+        }
     }
 }

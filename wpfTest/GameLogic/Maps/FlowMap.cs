@@ -176,7 +176,7 @@ namespace wpfTest
         public static implicit operator decimal(DecRange decR)
           => decR.Value;
 
-        public decimal Percentage => Value / MaxValue;
+        public decimal Percentage => MaxValue!=0 ? Value / MaxValue : 0;
         public decimal NotFilled => MaxValue - Value;
         public override string ToString() => Value.ToString();
     }

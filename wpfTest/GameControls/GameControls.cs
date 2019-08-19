@@ -165,6 +165,11 @@ namespace wpfTest
                                 if (targ==null)
                                     targ = game.Map[(int)clickCoords.X, (int)clickCoords.Y];
                             }
+                            else if (targetType == typeof(ICarnivoreFood))
+                            {
+                                //target is a tree or node
+                                targ = SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, typeof(ICarnivoreFood));
+                            }
                             else if (targetType == typeof(Node))
                             {
                                 //target is a node

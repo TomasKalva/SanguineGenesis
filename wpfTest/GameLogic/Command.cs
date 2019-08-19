@@ -519,8 +519,11 @@ namespace wpfTest
 
     public class HerbivoreEatCommand : Command<Animal, IHerbivoreFood, HerbivoreEat>
     {
-        private float timeUntilEating;//time in s until this unit attacks
-        
+        /// <summary>
+        /// Time in s until this animal eats.
+        /// </summary>
+        private float timeUntilEating;
+
         public HerbivoreEatCommand(Animal commandedEntity, IHerbivoreFood target, HerbivoreEat eat)
             : base(commandedEntity, target, eat)
         {
@@ -529,13 +532,6 @@ namespace wpfTest
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            //dead target cannont be attacked
-            /*if (Targ is Corpse c && c.IsDead)
-            {
-                CommandedEntity.CanBeMoved = true;
-                return true;
-            }*/
-            //all food was already eaten
             if (!Targ.FoodLeft)
             {
                 CommandedEntity.CanBeMoved = true;
@@ -552,20 +548,46 @@ namespace wpfTest
                 Targ.EatFood(CommandedEntity);
                 //reset timer
                 timeUntilEating -= CommandedEntity.FoodEatingPeriod;
-
-                /*decimal nutrientsToEat = Math.Min(CommandedEntity.FoodEnergyRegen / 10, Targ.Nutrients);
-                Targ.Nutrients -= nutrientsToEat;
-                CommandedEntity.Energy += nutrientsToEat * 10;*/
             }
 
-            /*bool finished = CommandedEntity.DistanceTo(Targ) >= Ability.Distance ||
-                            Targ.Nutrients==0;
-            if (finished)
-            {
-                CommandedEntity.CanBeMoved = true;
-                return true;
-            }*/
             return false;
+        }
+
+        public class CarnivoreEatCommand : Command<Animal, ICarnivoreFood, CarnivoreEat>
+        {
+            /// <summary>
+            /// Time in s until this animal eats.
+            /// </summary>
+            private float timeUntilEating;
+
+            public CarnivoreEatCommand(Animal commandedEntity, ICarnivoreFood target, CarnivoreEat eat)
+                : base(commandedEntity, target, eat)
+            {
+                this.timeUntilEating = 0f;
+            }
+
+            public override bool PerformCommand(Game game, float deltaT)
+            {
+                if (!Targ.FoodLeft)
+                {
+                    CommandedEntity.CanBeMoved = true;
+                    return true;
+                }
+
+                CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
+
+                CommandedEntity.CanBeMoved = false;
+                timeUntilEating += deltaT;
+                if (timeUntilEating >= CommandedEntity.FoodEatingPeriod)
+                {
+                    //eat
+                    Targ.EatFood(CommandedEntity);
+                    //reset timer
+                    timeUntilEating -= CommandedEntity.FoodEatingPeriod;
+                }
+
+                return false;
+            }
         }
     }
 }

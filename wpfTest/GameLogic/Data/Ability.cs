@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static wpfTest.HerbivoreEatCommand;
 
 namespace wpfTest.GameLogic
 {
@@ -342,6 +343,30 @@ namespace wpfTest.GameLogic
         }
     }
 
+
+    public sealed class CarnivoreEat : TargetAbility<Animal, ICarnivoreFood>
+    {
+        internal CarnivoreEat()
+            : base(0.1f, 0, false)
+        {
+        }
+
+        public override Command NewCommand(Animal caster, ICarnivoreFood target)
+        {
+            return new CarnivoreEatCommand(caster, target, this);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public override string Description()
+        {
+            return "The commanded herbivore eats tree or node.";
+        }
+    }
+
     public sealed class Grow : TargetAbility<Tree, Nothing>
     {
         internal Grow()
@@ -414,6 +439,11 @@ namespace wpfTest.GameLogic
     /// </summary>
     public interface IHerbivoreFood:IFood
     {
-
+    }
+    /// <summary>
+    /// Marks classes that can be eaten by herbivores.
+    /// </summary>
+    public interface ICarnivoreFood : IFood
+    {
     }
 }

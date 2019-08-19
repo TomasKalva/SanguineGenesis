@@ -148,6 +148,14 @@ namespace wpfTest
         /// Returns true if the entity is visible.
         /// </summary>
         public abstract bool IsVisible(VisibilityMap visibilityMap);
+
+        /// <summary>
+        /// Called after entity dies.
+        /// </summary>
+        public virtual void Die()
+        {
+            RemoveFromAllCommandsAssignments();
+        }
     }
 
     public enum Movement

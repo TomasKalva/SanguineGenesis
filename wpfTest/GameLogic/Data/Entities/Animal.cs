@@ -107,6 +107,15 @@ namespace wpfTest.GameLogic
                 Vel = (MaxSpeedLand / l) * Vel;
         }
 
+        public override void Die()
+        {
+            base.Die();
+
+            //spawn a corpse of this animal if the animal has any energy left
+            if(Energy > 0)
+                Player.Entities.Add(
+                    new Corpse(Player, "CORPSE", MaxEnergy, 0, Position, 0.2f));
+        }
     }
 
     public enum Diet

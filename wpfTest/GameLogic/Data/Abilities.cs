@@ -24,6 +24,7 @@ namespace wpfTest.GameLogic
         public Grow Grow { get; }
         public SetRallyPoint SetRallyPoint { get; }
         public HerbivoreEat HerbivoreEat { get; }
+        public CarnivoreEat CarnivoreEat { get; }
 
         internal Abilities(GameStaticData gameStaticData)
         {
@@ -69,9 +70,13 @@ namespace wpfTest.GameLogic
             SetRallyPoint = new SetRallyPoint();
             SetRallyPoint.SetAbilities(this);
 
-            //set rally point
+            //herbivore eating
             HerbivoreEat = new HerbivoreEat();
             HerbivoreEat.SetAbilities(this);
+
+            //carnivore eating
+            CarnivoreEat = new CarnivoreEat();
+            CarnivoreEat.SetAbilities(this);
 
             //move to cast has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 using static wpfTest.MainWindow;
 
@@ -91,7 +92,7 @@ namespace wpfTest
                 .ToList();
         }
 
-        public List<Animal> GetVisibleUnits(Game game)
+        public List<Unit> GetVisibleUnits(Game game)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(
