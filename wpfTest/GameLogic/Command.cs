@@ -66,21 +66,31 @@ namespace wpfTest
                 Paid = true;
                 return true;
             }
-            //not enough resource/energy
+            //not enough energy
             return false;
+        }
+
+        /// <summary>
+        /// Returns if entity can pay this ability.
+        /// </summary>
+        protected bool CanPay()
+        {
+            if (Paid)
+                //the ability was paid already
+                return true;
+            else
+                return CommandedEntity.Energy >= Ability.EnergyCost;
         }
     }
 
     public class AttackCommand : Command<Animal, Entity, Attack>
     {
         private float timeUntilAttack;//time in s until this unit attacks
-
-        private AttackCommand() => throw new NotImplementedException();
+        
         public AttackCommand(Animal commandedEntity, Entity target, Attack attack)
             : base(commandedEntity, target, attack)
         {
             this.timeUntilAttack = 0f;
-
         }
         
         public override bool PerformCommand(Game game, float deltaT)
@@ -91,15 +101,24 @@ namespace wpfTest
                 CommandedEntity.CanBeMoved = true;
                 return true;
             }
-            CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
+            CommandedEntity.TurnToPoint( Targ.Center );
 
             CommandedEntity.CanBeMoved = false;
             timeUntilAttack += deltaT;
             if (timeUntilAttack >= CommandedEntity.AttackPeriod)
             {
-                //damage target
                 timeUntilAttack -= CommandedEntity.AttackPeriod;
-                Targ.Health -= CommandedEntity.AttackDamage;
+
+                if (Targ is Building && !CommandedEntity.MechanicalDamage)
+                {
+                    //deal less damage if animal without mechanical damage attacks a building
+                    Targ.Damage(CommandedEntity.AttackDamage/10);
+                }
+                else
+                {
+                    //damage target
+                    Targ.Damage(CommandedEntity.AttackDamage);
+                }
             }
 
             bool finished = CommandedEntity.DistanceTo(Targ) >= CommandedEntity.AttackDistance;
@@ -108,6 +127,87 @@ namespace wpfTest
                 CommandedEntity.CanBeMoved = true;
                 return true;
             }
+            return false;
+        }
+    }
+
+    public class PoisonousSpitCommand : Command<Animal, Animal, PoisonousSpit>
+    {
+        private float spitTimer;//time in s until this unit attacks
+        
+        public PoisonousSpitCommand(Animal commandedEntity, Animal target, PoisonousSpit attack)
+            : base(commandedEntity, target, attack)
+        {
+            this.spitTimer = 0f;
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            if (!TryPay())
+                //finish command if paying was unsuccessful
+                return true;
+
+            //dead target cannont be attacked
+            if (Targ.IsDead)
+                return true;
+            CommandedEntity.TurnToPoint(CommandedEntity.Center);
+            
+            spitTimer += deltaT;
+            if (spitTimer >= Ability.TimeUntilSpit)
+            {
+                //apply poison to the target and finish the command
+                Ability.PoisonFactory.ApplyToAffected(Targ);
+                return true;
+            }
+
+            //command doesn't finish until it was spat
+            return false;
+        }
+    }
+
+    public class ActivateSprintCommand : Command<Animal, Nothing, ActivateSprint>
+    {
+        public ActivateSprintCommand(Animal commandedEntity, Nothing target, ActivateSprint attack)
+            : base(commandedEntity, target, attack)
+        {
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            if (CanPay())
+            {
+                //if caster can pay, try to apply the status to the caster, if
+                //the application succeeds, caster pays
+                if (Ability.SprintFactory.ApplyToAffected(CommandedEntity))
+                    TryPay();
+
+            }
+             return true;
+        }
+    }
+
+    public class PiercingBiteCommand : Command<Animal, Animal, PiercingBite>
+    {
+        private float timer;
+
+        public PiercingBiteCommand(Animal commandedEntity, Animal target, PiercingBite bite)
+            : base(commandedEntity, target, bite)
+        {
+            timer = 0f;
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            if (!TryPay())
+                return true;
+
+            timer += deltaT;
+            if (timer > Ability.TimeToAttack)
+            {
+                Targ.Damage(Ability.Damage);
+                return true;
+            }
+
             return false;
         }
     }
@@ -230,13 +330,13 @@ namespace wpfTest
             if (dist > FLOWMAP_DISTANCE)
             {
                 //use flowmap
-                unit.Accelerate(flowMap.GetIntensity(unit.Center, unit.Acceleration));
+                unit.Accelerate(flowMap.GetIntensity(unit.Center, unit.Acceleration), game.Map);
             }
             else
             {
                 //go in straight line
                 Vector2 direction = unit.Center.UnitDirectionTo(TargetPoint.Center);
-                unit.Accelerate(unit.Acceleration * direction);
+                unit.Accelerate(unit.Acceleration * direction, game.Map);
             }
             //update last four positions
             noMovementDetection.AddNextPosition(unit.Center);
@@ -452,7 +552,7 @@ namespace wpfTest
                         Node ijN = buildNodes[i, j];
                         //the building can't be built if the node is blocked or contains
                         //incompatible terrain
-                        if (ijN.Blocked || !(bf.CanBeUnder(ijN)))
+                        if (ijN.Blocked || !(bf.CanBeOn(ijN)))
                             canBeBuilt = false;
                     }
             }

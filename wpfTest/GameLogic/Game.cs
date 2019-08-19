@@ -54,6 +54,7 @@ namespace wpfTest
             foreach (Animal u in CurrentPlayer.Units)
             {
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PiercingBite);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("KAPOC"));
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("BAOBAB"));
             }
@@ -137,10 +138,20 @@ namespace wpfTest
             foreach (var p in Players)
                 p.Value.UpdateNodesView(Map);
 
+            //statuses
+            foreach (Entity e in entities)
+            {
+                e.StepStatuses(this, deltaT);
+            }
             //commands
             foreach (Entity e in entities)
             {
                 e.PerformCommand(this, deltaT);
+                e.AnimationStep(deltaT);
+            }
+            //animations
+            foreach (Entity e in entities)
+            {
                 e.AnimationStep(deltaT);
             }
             //physics

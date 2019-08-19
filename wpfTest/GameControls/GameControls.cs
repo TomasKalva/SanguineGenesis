@@ -175,7 +175,7 @@ namespace wpfTest
                                 //target is a node
                                 targ = game.Map[(int)clickCoords.X, (int)clickCoords.Y];
                             }
-                            else if (targetType.IsAssignableFrom(typeof(Entity)))
+                            else if (typeof(Entity).IsAssignableFrom(targetType))
                             {
                                 //target is an entity
                                 targ = SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, targetType);

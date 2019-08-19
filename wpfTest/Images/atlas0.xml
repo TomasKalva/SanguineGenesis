@@ -172,8 +172,13 @@
     </Animation>
   </Entity>
   <Entity EntityType="INDIAN_ELEPHANT">
-    <Animation Action="IDLE" CenterX="1.5" CenterY="0.1">
+    <Animation Action="IDLE" CenterX="1.8" CenterY="0.1">
       <Image X="29" Y="0"  Width="3" Height="2"/>
+    </Animation>
+  </Entity>
+  <Entity EntityType="ELEPHANT">
+    <Animation Action="IDLE" CenterX="1.5" CenterY="0.1">
+      <Image X="29" Y="2"  Width="3" Height="2"/>
     </Animation>
   </Entity>
   <Entity EntityType="RHINO">

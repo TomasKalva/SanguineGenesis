@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Data.Entities;
 using static wpfTest.HerbivoreEatCommand;
 
 namespace wpfTest.GameLogic
@@ -123,7 +124,8 @@ namespace wpfTest.GameLogic
                 ableToPay = ableToPay.Take(1).ToList();
 
             //move units to the target until the required distance is reached
-            if(typeof(Caster).IsAssignableFrom(typeof(Animal)))
+            if(typeof(Animal).IsAssignableFrom(typeof(Caster)) &&
+                !typeof(Nothing).IsAssignableFrom(typeof(Target)))
                 abilities.MoveToCast(this)
                     .SetCommands(ableToPay
                     .Where(caster=>caster.GetType()==typeof(Animal))
@@ -408,6 +410,74 @@ namespace wpfTest.GameLogic
         public override string Description()
         {
             return "The entity spawns a new unit at the target point.";
+        }
+    }
+
+    public sealed class PoisonousSpit : TargetAbility<Animal, Animal>
+    {
+        public float TimeUntilSpit { get; }
+        public PoisonFactory PoisonFactory { get; }
+
+        internal PoisonousSpit(float distance, float timeUntilSpit, decimal energyCost, PoisonFactory poisonFactory) 
+            : base(distance, energyCost, false)
+        {
+            TimeUntilSpit = timeUntilSpit;
+            PoisonFactory = poisonFactory;
+        }
+
+        public override Command NewCommand(Animal caster, Animal target)
+        {
+            return new PoisonousSpitCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The unit applies poison to the target after short period of time.";
+        }
+    }
+
+
+    public sealed class ActivateSprint : TargetAbility<Animal, Nothing>
+    {
+        public SprintFactory SprintFactory { get; }
+
+        internal ActivateSprint(decimal energyCost, SprintFactory sprintFactory) 
+            : base(0, energyCost, false)
+        {
+            SprintFactory = sprintFactory;
+        }
+
+        public override Command NewCommand(Animal caster, Nothing target)
+        {
+            return new ActivateSprintCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The unit gains speed bonus for a short time.";
+        }
+    }
+
+    public sealed class PiercingBite : TargetAbility<Animal, Animal>
+    {
+        public decimal Damage { get; }
+        public float TimeToAttack { get; }
+
+        internal PiercingBite(decimal energyCost, decimal damage, float timeToAttack)
+            : base(0.1f, energyCost, false)
+        {
+            Damage = damage;
+            TimeToAttack = timeToAttack;
+        }
+
+        public override Command NewCommand(Animal caster, Animal target)
+        {
+            return new PiercingBiteCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal deals a large amount of damage to the target.";
         }
     }
 

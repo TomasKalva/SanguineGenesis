@@ -45,7 +45,14 @@ namespace wpfTest
             }
         }
         public SoilQuality SoilQuality { get; set; }
+        /// <summary>
+        /// True iff a building or structure is standing on this node.
+        /// </summary>
         public bool Blocked { get; private set; }
+        /// <summary>
+        /// True iff physical building is standing on this node.
+        /// </summary>
+        public bool MovementBlocked => Building != null && Building.Physical;
         private Building building;
         public Building Building
         {

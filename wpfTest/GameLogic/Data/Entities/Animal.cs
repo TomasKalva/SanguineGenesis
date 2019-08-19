@@ -27,9 +27,12 @@ namespace wpfTest.GameLogic
         public float AttackPeriod { get; }
         public float AttackDistance { get; }
         public bool MechanicalDamage { get; }
-        public float MaxSpeedLand { get; }
+        public float MaxSpeedLand { get; set; }
         public float MaxSpeedWater { get; }
         public Movement Movement { get; }//where can the unit walk
+        /// <summary>
+        /// Animals with thick skin take less damage.
+        /// </summary>
         public bool ThickSkin { get; }
         public Diet Diet { get; }
         public float SpawningTime { get; }
@@ -99,12 +102,23 @@ namespace wpfTest.GameLogic
         /// Add acceleration to units velocity.
         /// </summary>
         /// <param name="acc"></param>
-        public void Accelerate(Vector2 acc)
+        public void Accelerate(Vector2 acc, Map map)
         {
+            //add acceleration to the velocity
             Vel += acc;
+
+            //determine current max speed
+            float maxSpeed;
+            Terrain underAnimal = map[(int)Position.X, (int)Position.Y].Terrain;
+            if (underAnimal == Terrain.LAND)
+                maxSpeed = MaxSpeedLand;
+            else
+                maxSpeed = MaxSpeedWater;
+
+            //scale the velocity down if it exceeds max speed
             float l = Vel.Length;
-            if (l > MaxSpeedLand && l != 0)
-                Vel = (MaxSpeedLand / l) * Vel;
+            if (l > maxSpeed && l != 0)
+                Vel = (maxSpeed / l) * Vel;
         }
 
         public override void Die()
@@ -115,6 +129,23 @@ namespace wpfTest.GameLogic
             if(Energy > 0)
                 Player.Entities.Add(
                     new Corpse(Player, "CORPSE", MaxEnergy, 0, Position, 0.2f));
+        }
+
+        /// <summary>
+        /// Turns the animal to the point.
+        /// </summary>
+        public void TurnToPoint(Vector2 point)
+        {
+            Direction = point - Center;
+        }
+
+        public override void Damage(decimal damage)
+        {
+            //thick skin prevents some damage
+            if (ThickSkin)
+                damage -= 1;
+
+            base.Damage(damage);
         }
     }
 

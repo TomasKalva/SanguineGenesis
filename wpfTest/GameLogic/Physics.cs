@@ -117,10 +117,6 @@ namespace wpfTest
                                         u.Position = u.Center - pushVec;
                                         u1.Position = u1.Center + pushVec;
                                     }
-                                    //u1.Accelerate((-unitAcc * deltaT) * dir12);
-                                    //u2.Accelerate((unitAcc * deltaT) * dir12);
-                                    //u1.IsInCollision = true;
-                                    //u2.IsInCollision = true;}
                                 }
                             }
                         }
@@ -148,21 +144,21 @@ namespace wpfTest
                 {
                     case Movement.LAND:
                         u.Accelerate(
-                            deltaT * gPMap.GetIntensity(u.Center, terrainAcc)
+                            deltaT * gPMap.GetIntensity(u.Center, terrainAcc), map
                             );
                         if (gOMap.CollidingWithObstacle(u.Center))
                             u.IsInCollision = true;
                         break;
                     case Movement.WATER:
                         u.Accelerate(
-                            deltaT * wPMap.GetIntensity(u.Center, terrainAcc)
+                            deltaT * wPMap.GetIntensity(u.Center, terrainAcc), map
                             );
                         if (wOMap.CollidingWithObstacle(u.Center))
                             u.IsInCollision = true;
                         break;
                     case Movement.LAND_WATER:
                         u.Accelerate(
-                            deltaT * gwPMap.GetIntensity(u.Center, terrainAcc)
+                            deltaT * gwPMap.GetIntensity(u.Center, terrainAcc), map
                             );
                         if (gwOMap.CollidingWithObstacle(u.Center))
                             u.IsInCollision = true;

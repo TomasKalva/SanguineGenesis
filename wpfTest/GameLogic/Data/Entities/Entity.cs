@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
 
@@ -27,6 +28,7 @@ namespace wpfTest
         public decimal MaxEnergy { get; set; }
         public bool Physical { get; }
         public List<Ability> Abilities { get; }
+        public List<Status> Statuses { get; }
 
         public Entity(Player player, string entityType, decimal maxHealth, float viewRange, decimal maxEnergy, bool physical, List<Ability> abilities)
         {
@@ -45,6 +47,7 @@ namespace wpfTest
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(entityType));
             Physical = physical;
             Abilities = abilities;
+            Statuses = new List<Status>();
         }
 
         public void PerformCommand(Game game, float deltaT)
@@ -62,6 +65,42 @@ namespace wpfTest
                     CommandQueue.Dequeue();
                 }
             }
+        }
+
+        public void AddStatus(Status status)
+        {
+            Statuses.Add(status);
+            status.Added();
+        }
+
+        public void RemoveStatus(Status status)
+        {
+            Statuses.Add(status);
+            status.Added();
+        }
+
+        public void StepStatuses(Game game, float deltaT)
+        {
+            var toRemove = new List<Status>();
+            foreach (Status s in Statuses)
+                if (s.Step(game, deltaT))
+                {
+                    //status is finished
+                    toRemove.Add(s);
+                    s.Removed();
+                }
+            //remove all finished statuses
+            Statuses.RemoveAll((s) => toRemove.Contains(s));
+        }
+
+        /// <summary>
+        /// Deals damage to the entity, equal to the damage.
+        /// </summary>
+        public virtual void Damage(decimal damage)
+        {
+            //only damage entity if the damage is positive
+            if(damage > 0)
+                Health -= damage;
         }
 
         public float GetActualBottom(float imageBottom)

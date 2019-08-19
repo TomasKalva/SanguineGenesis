@@ -54,9 +54,9 @@ namespace wpfTest.GameLogic
         public abstract Building NewInstance(Player player, Node[,] nodesUnder, Node[,] energySources);
 
         /// <summary>
-        /// Returns true iff node can be under the building.
+        /// Returns true iff this building can be on the node.
         /// </summary>
-        public bool CanBeUnder(Node node)
+        public bool CanBeOn(Node node)
         {
             return node.Terrain == Terrain &&
                 node.Biome == Biome &&

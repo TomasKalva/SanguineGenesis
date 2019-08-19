@@ -77,6 +77,15 @@ namespace wpfTest.GameLogic
                                         factory.Abilities.Add(abilities.CarnivoreEat);
                                 }
                                 break;
+                            case "poisonousSpit":
+                                factory.Abilities.Add(abilities.PoisonousSpit);
+                                break;
+                            case "activateSprint":
+                                factory.Abilities.Add(abilities.ActivateSprint);
+                                break;
+                            case "piercingBite":
+                                factory.Abilities.Add(abilities.PiercingBite);
+                                break;
                         }
                     }else if (abPar.Length == 2)
                     {

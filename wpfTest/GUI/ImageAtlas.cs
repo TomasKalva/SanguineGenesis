@@ -110,6 +110,7 @@ namespace wpfTest.GUI
 
         private void LoadEntitiesAnimations(string animationDescriptionFileName)
         {
+            //try block used ONLY for easier debugging
             try
             {
             XmlDocument doc = new XmlDocument();

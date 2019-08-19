@@ -25,6 +25,9 @@ namespace wpfTest.GameLogic
         public SetRallyPoint SetRallyPoint { get; }
         public HerbivoreEat HerbivoreEat { get; }
         public CarnivoreEat CarnivoreEat { get; }
+        public PoisonousSpit PoisonousSpit { get; }
+        public ActivateSprint ActivateSprint { get; }
+        public PiercingBite PiercingBite { get; }
 
         internal Abilities(GameStaticData gameStaticData)
         {
@@ -77,6 +80,18 @@ namespace wpfTest.GameLogic
             //carnivore eating
             CarnivoreEat = new CarnivoreEat();
             CarnivoreEat.SetAbilities(this);
+
+            //poisonous spit
+            PoisonousSpit = new PoisonousSpit(4f, 0.2f, 10m, new Data.Entities.PoisonFactory(tickDamage:6, totalNumberOfTicks:4, tickTime:1.2f));
+            PoisonousSpit.SetAbilities(this);
+
+            //sprint
+            ActivateSprint = new ActivateSprint(10, new Data.Entities.SprintFactory(speedBonus:1f, energyPerS:10m));
+            ActivateSprint.SetAbilities(this);
+
+            //piercing bite
+            PiercingBite = new PiercingBite(25, 100m, 1.2f);
+            PiercingBite.SetAbilities(this);
 
             //move to cast has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();

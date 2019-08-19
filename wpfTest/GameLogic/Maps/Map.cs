@@ -119,15 +119,15 @@ namespace wpfTest
                     {
                         case Movement.LAND:
                             om[i, j] = ter == Terrain.DEEP_WATER ||
-                                        this[i,j].Blocked;
+                                        this[i,j].MovementBlocked;
                             break;
                         case Movement.WATER:
                             om[i, j] = (ter != Terrain.DEEP_WATER &&
                                         ter != Terrain.SHALLOW_WATER) ||
-                                        this[i,j].Blocked;
+                                        this[i,j].MovementBlocked;
                             break;
                         case Movement.LAND_WATER:
-                            om[i, j] = this[i,j].Blocked;
+                            om[i, j] = this[i,j].MovementBlocked;
                             break;
                     }
                 }
