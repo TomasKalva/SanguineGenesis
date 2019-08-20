@@ -60,9 +60,53 @@ namespace wpfTest.GameLogic.Data.Entities
 
         public override bool Step(Game game, float deltaT)
         {
-            //remove the command if the unit doesn't have enough energy
+            //remove the status if the animal doesn't have enough energy
             AffectedEntity.Energy -= StatusInfo.EnergyCostPerS * (decimal)deltaT;
             if (AffectedEntity.Energy <= 0)
+                return true;
+            return false;
+        }
+    }
+
+    public class ConsumedAnimal : Status<Animal, ConsumedAnimalFactory>
+    {
+        /// <summary>
+        /// Animal that is consumed.
+        /// </summary>
+        public Animal AnimalConsumed { get; }
+        /// <summary>
+        /// Time the animal has been consumed in s.
+        /// </summary>
+        private float timeElapsed;
+
+        public ConsumedAnimal(Animal affectedEntity, ConsumedAnimalFactory consumeInfo, Animal animalConsumed)
+            : base(affectedEntity, consumeInfo)
+        {
+            AnimalConsumed = animalConsumed;
+            timeElapsed = 0;
+        }
+
+        public override void Added()
+        {
+            //temporarily remove the animal from list of entities
+            AnimalConsumed.Player.Entities.Remove(AnimalConsumed);
+            AnimalConsumed.CanBeTarget = false;
+        }
+
+        public override void Removed()
+        {
+            //add the consumed unit back to the list of entities
+            //it spawns in front of the affected animal
+            AnimalConsumed.Position = AffectedEntity.Position + (AffectedEntity.Range + AnimalConsumed.Range) * AffectedEntity.Direction;
+            AnimalConsumed.Player.Entities.Add(AnimalConsumed);
+            AnimalConsumed.CanBeTarget = true;
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            //remove the command if the whole duration elapsed
+            timeElapsed += deltaT;
+            if (timeElapsed>=StatusInfo.Duration)
                 return true;
             return false;
         }
@@ -111,6 +155,62 @@ namespace wpfTest.GameLogic.Data.Entities
 
             //finish if all ticks have been performed
             return ticksPerformed > StatusInfo.TotalNumberOfTicks;
+        }
+    }
+
+    public class Shell : Status<Animal, ShellFactory>
+    {
+        private float timer;
+
+        public Shell(Animal affectedEntity, ShellFactory shellInfo)
+            : base(affectedEntity, shellInfo)
+        {
+            timer = 0f;
+        }
+
+        public override void Added()
+        {
+            AffectedEntity.ThickSkin = true;
+        }
+
+        public override void Removed()
+        {
+            AffectedEntity.ThickSkin = false;
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            //remove the staus if the duration is over
+            timer += deltaT;
+            if (timer > StatusInfo.Duration)
+                return true;
+            return false;
+        }
+    }
+
+    public class FarSight : Status<Animal, FarSightFactory>
+    {
+        public FarSight(Animal affectedEntity, FarSightFactory farSightInfo)
+            : base(affectedEntity, farSightInfo)
+        {
+        }
+
+        public override void Added()
+        {
+            AffectedEntity.ViewRange += StatusInfo.RangeExtension;
+        }
+
+        public override void Removed()
+        {
+            AffectedEntity.ViewRange -= StatusInfo.RangeExtension;
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            //remove the staus if the unit moves
+            if (AffectedEntity.WantsToMove)
+                return true;
+            return false;
         }
     }
 }

@@ -101,4 +101,62 @@ namespace wpfTest.GameLogic.Data.Entities
             return new Sprint(affectedEntity, this);
         }
     }
+
+    public class ConsumedAnimalFactory : StatusFactory<Animal>
+    {
+        /// <summary>
+        /// Duration of the unit being consumed.
+        /// </summary>
+        public float Duration { get; }
+        /// <summary>
+        /// Animal that is consumed. Should be set right before using this factory to apply status.
+        /// </summary>
+        public Animal AnimalConsumed { get; set; }
+
+        public ConsumedAnimalFactory(float duration)
+            : base(true)
+        {
+            Duration = duration;
+        }
+        protected override Status NewInstance(Animal affectedEntity)
+        {
+            return new ConsumedAnimal(affectedEntity, this, AnimalConsumed);
+        }
+    }
+
+    public class ShellFactory : StatusFactory<Animal>
+    {
+        /// <summary>
+        /// Length of the time interval this staus will be active for in s.
+        /// </summary>
+        public float Duration { get; }
+
+        public ShellFactory(float duration)
+            : base(true)
+        {
+            Duration = duration;
+        }
+        protected override Status NewInstance(Animal affectedEntity)
+        {
+            return new Shell(affectedEntity, this);
+        }
+    }
+
+    public class FarSightFactory : StatusFactory<Animal>
+    {
+        /// <summary>
+        /// View range increase.
+        /// </summary>
+        public float RangeExtension { get; }
+
+        public FarSightFactory(float rangeExtension)
+            : base(true)
+        {
+            RangeExtension = rangeExtension;
+        }
+        protected override Status NewInstance(Animal affectedEntity)
+        {
+            return new FarSight(affectedEntity, this);
+        }
+    }
 }

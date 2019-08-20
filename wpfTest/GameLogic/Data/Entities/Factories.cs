@@ -86,6 +86,21 @@ namespace wpfTest.GameLogic
                             case "piercingBite":
                                 factory.Abilities.Add(abilities.PiercingBite);
                                 break;
+                            case "consumeAnimal":
+                                factory.Abilities.Add(abilities.ConsumeAnimal);
+                                break;
+                            case "jump":
+                                factory.Abilities.Add(abilities.Jump);
+                                break;
+                            case "activateShell":
+                                factory.Abilities.Add(abilities.ActivateShell);
+                                break;
+                            case "pull":
+                                factory.Abilities.Add(abilities.Pull);
+                                break;
+                            case "bigPull":
+                                factory.Abilities.Add(abilities.BigPull);
+                                break;
                         }
                     }else if (abPar.Length == 2)
                     {

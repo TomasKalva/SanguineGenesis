@@ -11,7 +11,7 @@ namespace wpfTest.GameLogic
 {
     public class Animal : Unit
     {
-        public Vector2 Vel { get; set; }
+        public Vector2 Velocity { get; set; }
         public bool CanBeMoved { get; set; }//false if the unit has to stand still
         public bool StopMoving { get; set; }//set to true to set WantsToMove to false after Move
         public bool WantsToMove { get; set; }//true if the unit has a target destination
@@ -33,7 +33,7 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Animals with thick skin take less damage.
         /// </summary>
-        public bool ThickSkin { get; }
+        public bool ThickSkin { get; set; }
         public Diet Diet { get; }
         public float SpawningTime { get; }
 
@@ -62,7 +62,7 @@ namespace wpfTest.GameLogic
             List<Ability> abilities)
             :base(player, unitType, maxHealth, viewRange, maxEnergy, abilities, position, range, physical)
         {
-            Vel = new Vector2(0f, 0f);
+            Velocity = new Vector2(0f, 0f);
             CanBeMoved = true;
             IsInCollision = false;
             Direction = new Vector2(1f, 0f);
@@ -87,10 +87,10 @@ namespace wpfTest.GameLogic
         public void Move(Map map, float deltaT)
         {
             Position = new Vector2(
-                Math.Max(Range, Math.Min(Center.X + deltaT * Vel.X, map.Width - Range)),
-                Math.Max(Range, Math.Min(Center.Y + deltaT * Vel.Y, map.Height - Range)));
-            if (WantsToMove && Vel.Length != 0)
-                Direction = Vel;
+                Math.Max(Range, Math.Min(Center.X + deltaT * Velocity.X, map.Width - Range)),
+                Math.Max(Range, Math.Min(Center.Y + deltaT * Velocity.Y, map.Height - Range)));
+            if (WantsToMove && Velocity.Length != 0)
+                Direction = Velocity.UnitVector();
             if (StopMoving)
             {
                 StopMoving = false;
@@ -105,7 +105,7 @@ namespace wpfTest.GameLogic
         public void Accelerate(Vector2 acc, Map map)
         {
             //add acceleration to the velocity
-            Vel += acc;
+            Velocity += acc;
 
             //determine current max speed
             float maxSpeed;
@@ -116,9 +116,9 @@ namespace wpfTest.GameLogic
                 maxSpeed = MaxSpeedWater;
 
             //scale the velocity down if it exceeds max speed
-            float l = Vel.Length;
+            float l = Velocity.Length;
             if (l > maxSpeed && l != 0)
-                Vel = (maxSpeed / l) * Vel;
+                Velocity = (maxSpeed / l) * Velocity;
         }
 
         public override void Die()
@@ -136,7 +136,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public void TurnToPoint(Vector2 point)
         {
-            Direction = point - Center;
+            Direction = Center.UnitDirectionTo(point);
         }
 
         public override void Damage(decimal damage)

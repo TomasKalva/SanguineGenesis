@@ -81,6 +81,32 @@ namespace wpfTest
             else
                 return CommandedEntity.Energy >= Ability.EnergyCost;
         }
+        
+        /// <summary>
+        /// Returns true iff the target can be used as target.
+        /// </summary>
+        protected bool ValidTarget()
+        {
+            Entity e = Targ as Entity;
+            if (e != null)
+                return e.CanBeTarget && !e.IsDead;
+            return true;
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            if (!ValidTarget())
+                //finish if the target is invalid
+                return true;
+
+            if (!TryPay())
+                //finish command if paying was unsuccessful
+                return true;
+
+            return PerformCommandLogic(game, deltaT);
+        }
+
+        public abstract bool PerformCommandLogic(Game game, float deltaT);
     }
 
     public class AttackCommand : Command<Animal, Entity, Attack>
@@ -93,14 +119,8 @@ namespace wpfTest
             this.timeUntilAttack = 0f;
         }
         
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            //dead target cannont be attacked
-            if (Targ.IsDead)
-            {
-                CommandedEntity.CanBeMoved = true;
-                return true;
-            }
             CommandedEntity.TurnToPoint( Targ.Center );
 
             CommandedEntity.CanBeMoved = false;
@@ -124,7 +144,6 @@ namespace wpfTest
             bool finished = CommandedEntity.DistanceTo(Targ) >= CommandedEntity.AttackDistance;
             if (finished)
             {
-                CommandedEntity.CanBeMoved = true;
                 return true;
             }
             return false;
@@ -141,15 +160,8 @@ namespace wpfTest
             this.spitTimer = 0f;
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!TryPay())
-                //finish command if paying was unsuccessful
-                return true;
-
-            //dead target cannont be attacked
-            if (Targ.IsDead)
-                return true;
             CommandedEntity.TurnToPoint(CommandedEntity.Center);
             
             spitTimer += deltaT;
@@ -165,10 +177,10 @@ namespace wpfTest
         }
     }
 
-    public class ActivateSprintCommand : Command<Animal, Nothing, ActivateSprint>
+    public class ApplyStatusCommand : Command<Animal, Nothing, ApplyStatus>
     {
-        public ActivateSprintCommand(Animal commandedEntity, Nothing target, ActivateSprint attack)
-            : base(commandedEntity, target, attack)
+        public ApplyStatusCommand(Animal commandedEntity, Nothing target, ApplyStatus applyStatus)
+            : base(commandedEntity, target, applyStatus)
         {
         }
 
@@ -178,12 +190,16 @@ namespace wpfTest
             {
                 //if caster can pay, try to apply the status to the caster, if
                 //the application succeeds, caster pays
-                if (Ability.SprintFactory.ApplyToAffected(CommandedEntity))
+                if (Ability.StatusFactory.ApplyToEntity(CommandedEntity))
                     TryPay();
 
             }
-             return true;
+            return true;
         }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+            => throw new NotImplementedException("This method is never used.");
+
     }
 
     public class PiercingBiteCommand : Command<Animal, Animal, PiercingBite>
@@ -196,15 +212,37 @@ namespace wpfTest
             timer = 0f;
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!TryPay())
-                return true;
-
             timer += deltaT;
             if (timer > Ability.TimeToAttack)
             {
                 Targ.Damage(Ability.Damage);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public class ConsumeAnimalCommand : Command<Animal, Animal, ConsumeAnimal>
+    {
+        private float timer;
+
+        public ConsumeAnimalCommand(Animal commandedEntity, Animal target, ConsumeAnimal bite)
+            : base(commandedEntity, target, bite)
+        {
+            timer = 0f;
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            timer += deltaT;
+            if (timer > Ability.TimeToConsume)
+            {
+                ConsumedAnimalFactory consumedFact = Ability.ConsumedAnimalFactory;
+                consumedFact.AnimalConsumed = Targ;
+                consumedFact.ApplyToAffected(CommandedEntity);
                 return true;
             }
 
@@ -236,6 +274,13 @@ namespace wpfTest
 
         public override bool PerformCommand(Game game, float deltaT)
         {
+            if (!ValidTarget())
+            {
+                //finish if the target is invalid
+                CommandedEntity.StopMoving = true;
+                return true;
+            }
+
             bool finished = false;
             //command immediately finishes if the assignment was invalidated
             if (Assignment != null && Assignment.Invalid)
@@ -251,6 +296,9 @@ namespace wpfTest
             }
             return finished;
         }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+            => throw new NotImplementedException("This method is never used.");
 
 
         public void UpdateFlowMap(FlowMap flowMap)
@@ -456,12 +504,8 @@ namespace wpfTest
             SpawnTimer = 0f;
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!TryPay())
-                //finish command if paying was unsuccessful
-                return true;
-
             SpawnTimer += deltaT;
             if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
             {
@@ -481,7 +525,7 @@ namespace wpfTest
         {
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
             CommandedEntity.RallyPoint = Targ;
             return true;
@@ -502,12 +546,8 @@ namespace wpfTest
             SpawnTimer = 0f;
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!TryPay())
-                //finish command if paying was unsuccessful
-                return true;
-
             SpawnTimer += deltaT;
             if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
             {
@@ -593,6 +633,9 @@ namespace wpfTest
             //the command always immediately finishes regardless of the success of placing the building
             return true;
         }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+            => throw new NotImplementedException("This method is never used.");
     }
 
     public class GrowCommand : Command<Tree, Nothing, Grow>
@@ -603,7 +646,7 @@ namespace wpfTest
         {
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
             //finish if the tree is at full energy
             if (CommandedEntity.Energy == CommandedEntity.MaxEnergy)
@@ -630,7 +673,7 @@ namespace wpfTest
             this.timeUntilEating = 0f;
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
             if (!Targ.FoodLeft)
             {
@@ -652,42 +695,194 @@ namespace wpfTest
 
             return false;
         }
+    }
 
-        public class CarnivoreEatCommand : Command<Animal, ICarnivoreFood, CarnivoreEat>
+    public class CarnivoreEatCommand : Command<Animal, ICarnivoreFood, CarnivoreEat>
+    {
+        /// <summary>
+        /// Time in s until this animal eats.
+        /// </summary>
+        private float timeUntilEating;
+
+        public CarnivoreEatCommand(Animal commandedEntity, ICarnivoreFood target, CarnivoreEat eat)
+            : base(commandedEntity, target, eat)
         {
-            /// <summary>
-            /// Time in s until this animal eats.
-            /// </summary>
-            private float timeUntilEating;
+            this.timeUntilEating = 0f;
+        }
 
-            public CarnivoreEatCommand(Animal commandedEntity, ICarnivoreFood target, CarnivoreEat eat)
-                : base(commandedEntity, target, eat)
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            if (!Targ.FoodLeft)
             {
-                this.timeUntilEating = 0f;
+                CommandedEntity.CanBeMoved = true;
+                return true;
             }
 
-            public override bool PerformCommand(Game game, float deltaT)
+            CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
+
+            CommandedEntity.CanBeMoved = false;
+            timeUntilEating += deltaT;
+            if (timeUntilEating >= CommandedEntity.FoodEatingPeriod)
             {
-                if (!Targ.FoodLeft)
-                {
-                    CommandedEntity.CanBeMoved = true;
-                    return true;
-                }
-
-                CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
-
-                CommandedEntity.CanBeMoved = false;
-                timeUntilEating += deltaT;
-                if (timeUntilEating >= CommandedEntity.FoodEatingPeriod)
-                {
-                    //eat
-                    Targ.EatFood(CommandedEntity);
-                    //reset timer
-                    timeUntilEating -= CommandedEntity.FoodEatingPeriod;
-                }
-
-                return false;
+                //eat
+                Targ.EatFood(CommandedEntity);
+                //reset timer
+                timeUntilEating -= CommandedEntity.FoodEatingPeriod;
             }
+
+            return false;
+        }
+    }
+
+    public class JumpCommand : Command<Animal, Vector2, Jump>
+    {
+        private float timer;
+        /// <summary>
+        /// The unit is jumping.
+        /// </summary>
+        private bool jumping;
+        private MoveAnimalToPoint moveAnimalToPoint;
+
+        public JumpCommand(Animal commandedEntity, Vector2 target, Jump jump)
+            : base(commandedEntity, target, jump)
+        {
+            timer = 0f;
+            jumping = false;
+            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.JumpTime);
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            CommandedEntity.TurnToPoint(Targ);
+
+            timer += deltaT;
+            if (!jumping)
+            { 
+                //animal is preparing to jump
+                if (timer >= Ability.PreparationTime)
+                {
+                    jumping = true;
+                    timer -= Ability.PreparationTime;
+                }
+            }
+            
+            if(jumping)
+            {
+                return moveAnimalToPoint.Step(deltaT);
+            }
+
+            //command doesn't finish until the animal jumps
+            return false;
+        }
+    }
+
+    public class PullCommand : Command<Animal, Animal, Pull>
+    {
+        private float timer;
+        /// <summary>
+        /// The unit is jumping.
+        /// </summary>
+        private bool pulling;
+        private MoveAnimalToPoint moveAnimalToPoint;
+        private bool firstPullingStep;
+
+        public PullCommand(Animal commandedEntity, Animal target, Pull pull)
+            : base(commandedEntity, target, pull)
+        {
+            timer = 0f;
+            pulling = false;
+            CommandedEntity.TurnToPoint(Targ.Position);
+            Vector2 frontOfAnimal = commandedEntity.Position + (commandedEntity.Range + target.Range) * commandedEntity.Direction;
+            moveAnimalToPoint = new MoveAnimalToPoint(target, frontOfAnimal, Ability.PullTime);
+            firstPullingStep = true;
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            if (!TryPay())
+                return true;
+
+            CommandedEntity.TurnToPoint(Targ.Position);
+
+            timer += deltaT;
+            if (!pulling)
+            {
+                //animal is preparing to jump
+                if (timer >= Ability.PreparationTime)
+                {
+                    pulling = true;
+                    timer -= Ability.PreparationTime;
+                }
+            }
+
+            if (pulling)
+            {
+                if (firstPullingStep)
+                { 
+                    if(!Targ.CanBeTarget)
+                        //target can't be used as target => fail the ability
+                        return true;
+
+                    firstPullingStep = false;
+                }
+                return moveAnimalToPoint.Step(deltaT);
+            }
+
+            //command doesn't finish until the animal pulls the target animal
+            return false;
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+            => throw new NotImplementedException("This method is never used.");
+    }
+
+    /// <summary>
+    /// Moves animal to point on the map with even movement in given time. During the movement
+    /// the animal doesn't check for collisions and can't be used as a target for a command.
+    /// </summary>
+    public class MoveAnimalToPoint
+    {
+        public Animal Animal { get; }
+        public Vector2 Point { get; }
+        public float Time { get; }
+        public float Speed { get; }
+        private float timer;
+
+        public MoveAnimalToPoint(Animal animal, Vector2 point, float time)
+        {
+            Animal = animal;
+            Point = point;
+            Time = time;
+            timer = 0f;
+            Speed = (animal.Position - point).Length / time;
+        }
+
+        /// <summary>
+        /// Returns true if the unit reached its destination.
+        /// </summary>
+        public bool Step(float deltaT)
+        {
+            //animal can jump over all obstacles
+            Animal.Physical = false;
+            Animal.CanBeTarget = false;
+            //the animal can't move naturally
+            Animal.Velocity = new Vector2(0, 0);
+            //calculate maximal displacement of Animal
+            float posChange = deltaT * Speed;
+            float distanceToPoint = (Animal.Position - Point).Length;
+            float speed = Math.Min(posChange, distanceToPoint);
+            //change Animal's position
+            Animal.Position += speed * Animal.Position.UnitDirectionTo(Point);
+
+            //finish command if Animal is close enough or the time is over
+            if (timer >= Time || posChange >= distanceToPoint)
+            {
+                Animal.Physical = true;
+                Animal.CanBeTarget = true;
+                return true;
+            }
+
+            return false;
         }
     }
 }

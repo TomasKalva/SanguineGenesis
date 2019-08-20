@@ -26,8 +26,14 @@ namespace wpfTest.GameLogic
         public HerbivoreEat HerbivoreEat { get; }
         public CarnivoreEat CarnivoreEat { get; }
         public PoisonousSpit PoisonousSpit { get; }
-        public ActivateSprint ActivateSprint { get; }
+        public ApplyStatus ActivateSprint { get; }
         public PiercingBite PiercingBite { get; }
+        public ConsumeAnimal ConsumeAnimal { get; }
+        public Jump Jump { get; }
+        public ApplyStatus ActivateShell { get; }
+        public Pull Pull { get; }
+        public Pull BigPull { get; }
+        public ApplyStatus ActivateFarSight { get; }
 
         internal Abilities(GameStaticData gameStaticData)
         {
@@ -86,13 +92,37 @@ namespace wpfTest.GameLogic
             PoisonousSpit.SetAbilities(this);
 
             //sprint
-            ActivateSprint = new ActivateSprint(10, new Data.Entities.SprintFactory(speedBonus:1f, energyPerS:10m));
+            ActivateSprint = new ApplyStatus(10, new Data.Entities.SprintFactory(speedBonus:1f, energyPerS:10m));
             ActivateSprint.SetAbilities(this);
 
             //piercing bite
             PiercingBite = new PiercingBite(25, 100m, 1.2f);
             PiercingBite.SetAbilities(this);
 
+            //consume animal
+            ConsumeAnimal = new ConsumeAnimal(25, 1.2f, new Data.Entities.ConsumedAnimalFactory(3f));
+            ConsumeAnimal.SetAbilities(this);
+            
+            //shell
+            ActivateShell = new ApplyStatus(20, new Data.Entities.ShellFactory(duration:6f));
+            ActivateShell.SetAbilities(this);
+
+            //jump
+            Jump = new Jump(25, 4f, 0.1f, 0.2f );
+            Jump.SetAbilities(this);
+
+            //pull
+            Pull = new Pull(25, 4f, 0.5f, 0.2f);
+            Pull.SetAbilities(this);
+
+            //pull
+            BigPull = new Pull(40, 6f, 0.6f, 0.3f);
+            BigPull.SetAbilities(this);
+
+            //activate far sight
+            ActivateFarSight = new ApplyStatus(20, new Data.Entities.FarSightFactory(rangeExtension: 6f));
+            ActivateFarSight.SetAbilities(this);
+            
             //move to cast has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();
             foreach(Ability a in AllAbilities)

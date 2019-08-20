@@ -44,11 +44,20 @@ namespace wpfTest
             PushingMaps[Movement.LAND_WATER]= gwPMap;
         }
 
-        public void PushAway(Map map, List<Animal> units, List<Entity> entities, float deltaT)
+        public void PushAway(Map map, List<Animal> animals, List<Entity> entities, float deltaT)
         {
-            foreach (Animal u in units)
+            foreach (Animal u in animals)
+            {
+                //animals that aren't physical don't need to check for collisions
+                if (!u.Physical)
+                    continue;
+
                 foreach (Entity e in entities)
                 {
+                    //entities that aren't physical don't need to check for collisions
+                    if (!e.Physical)
+                        continue;
+
                     //calculate collisions for each pair of unit and entity only once
                     if (u.GetHashCode() < e.GetHashCode() || e is Building)
                     {
@@ -73,7 +82,7 @@ namespace wpfTest
                                 //buildings can't be pushed
                                 u.Position = u.Center - 2 * pushVec;
                             }
-                            else if(e is Corpse)
+                            else if (e is Corpse)
                             {
                                 Corpse c = (Corpse)e;
                                 u.Position = u.Center - pushVec;
@@ -122,9 +131,10 @@ namespace wpfTest
                         }
                     }
                 }
+            }
         }
 
-        public void PushOutsideOfObstacles(Map map, List<Animal> units, float deltaT)
+        public void PushOutsideOfObstacles(Map map, List<Animal> animals, float deltaT)
         {
 
             ObstacleMap gOMap = map.ObstacleMaps[Movement.LAND];
@@ -138,8 +148,12 @@ namespace wpfTest
             FlowMap gPMap = PushingMaps[Movement.LAND];
             FlowMap wPMap = PushingMaps[Movement.WATER];
             FlowMap gwPMap = PushingMaps[Movement.LAND_WATER];
-            foreach (Animal u in units)
+            foreach (Animal u in animals)
             {
+                //non-physical animals don't need to check for collisions
+                if (!u.Physical)
+                    continue;
+
                 switch (u.Movement)
                 {
                     case Movement.LAND:
@@ -172,7 +186,7 @@ namespace wpfTest
             foreach (Animal u in units)
             {
                 if (!u.WantsToMove && !u.IsInCollision)
-                    u.Vel = new Vector2(0f, 0f);
+                    u.Velocity = new Vector2(0f, 0f);
                 u.IsInCollision = false;
             }
         }

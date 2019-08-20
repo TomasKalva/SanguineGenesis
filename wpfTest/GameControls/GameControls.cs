@@ -123,7 +123,7 @@ namespace wpfTest
                         //ability wasn't selected => use default abilities
                         {
                             //determine target
-                            ITargetable enemy = SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, 
+                            ITargetable enemy = SelectClickedTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, 
                                 (entity) => entity.Player.PlayerID != game.CurrentPlayer.PlayerID, typeof(Entity));
 
                             if (enemy == null)
@@ -153,14 +153,14 @@ namespace wpfTest
                             else if(targetType == typeof(IMovementTarget))
                             {
                                 //target is a movement target
-                                targ= SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, targetType);
+                                targ= SelectClickedTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, targetType);
                                 if (targ == null)
                                     targ = clickCoords;
                             }
                             else if (targetType == typeof(IHerbivoreFood))
                             {
                                 //target is a tree or node
-                                targ = SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, typeof(Tree));
+                                targ = SelectClickedTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, typeof(Tree));
                                 //there is no tree clicked, so use node
                                 if (targ==null)
                                     targ = game.Map[(int)clickCoords.X, (int)clickCoords.Y];
@@ -168,7 +168,7 @@ namespace wpfTest
                             else if (targetType == typeof(ICarnivoreFood))
                             {
                                 //target is a tree or node
-                                targ = SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, typeof(ICarnivoreFood));
+                                targ = SelectClickedTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, typeof(ICarnivoreFood));
                             }
                             else if (targetType == typeof(Node))
                             {
@@ -178,7 +178,7 @@ namespace wpfTest
                             else if (typeof(Entity).IsAssignableFrom(targetType))
                             {
                                 //target is an entity
-                                targ = SelectClickedEntityTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, targetType);
+                                targ = SelectClickedTarget(game, clickCoords.X, clickCoords.Y, game.CurrentPlayer, (e) => true, targetType);
                             }
 
                             if (targ != null)
@@ -205,7 +205,7 @@ namespace wpfTest
         /// ITargetable.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if instances of type don't implement ITargetable.</exception>
-        private ITargetable SelectClickedEntityTarget(Game game, float x, float y, Player selectingPlayer, Func<Entity,bool> condition, Type type)
+        private ITargetable SelectClickedTarget(Game game, float x, float y, Player selectingPlayer, Func<Entity,bool> condition, Type type)
         {
             if (!typeof(ITargetable).IsAssignableFrom(type))
                 throw new ArgumentException("The type has to inherit from ITargetable!");

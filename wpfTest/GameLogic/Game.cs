@@ -50,11 +50,13 @@ namespace wpfTest
             visibilityGenerator = new VisibilityGenerator();
             nextVisibilityPlayer = wpfTest.Players.PLAYER0;
             gameplayOptions = new GameplayOptions();
-            gameplayOptions.WholeMapVisible = true;
+            gameplayOptions.WholeMapVisible = false;
             foreach (Animal u in CurrentPlayer.Units)
             {
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PiercingBite);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Jump);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Pull);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ActivateFarSight);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("KAPOC"));
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("BAOBAB"));
             }

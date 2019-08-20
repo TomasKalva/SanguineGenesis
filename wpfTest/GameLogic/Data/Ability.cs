@@ -47,6 +47,10 @@ namespace wpfTest.GameLogic
         /// True iff this ability should be performed only by one of the selected units.
         /// </summary>
         public bool OnlyOne { get; }
+        /// <summary>
+        /// True iff the target of the ability can be its caster.
+        /// </summary>
+        public bool SelfCastable { get; }
 
         public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target);
         /// <summary>
@@ -63,19 +67,20 @@ namespace wpfTest.GameLogic
         {
             return GetType().Name;
         }
-        public Ability(float distance, decimal energyCost, bool onlyOne)
+        public Ability(float distance, decimal energyCost, bool onlyOne, bool selfCastable)
         {
             Distance = distance;
             EnergyCost = energyCost;
             OnlyOne = onlyOne;
+            SelfCastable = selfCastable;
         }
     }
 
     public abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
-        public TargetAbility(float distance, decimal energyCost, bool onlyOne)
-            :base(distance, energyCost, onlyOne)
+        public TargetAbility(float distance, decimal energyCost, bool onlyOne, bool selfCastable)
+            :base(distance, energyCost, onlyOne, selfCastable)
         {
         }
 
@@ -114,7 +119,11 @@ namespace wpfTest.GameLogic
             List<Caster> ableToPay = casters
                 .Where((caster) =>caster.Energy >= EnergyCost)
                  .ToList();
-            
+
+            //remove caster that is also target if the ability can't be self casted
+            Caster self= target as Caster;
+            if (!SelfCastable && self !=null)
+                ableToPay.Remove(self);
             
             //if there are no casters that can pay do nothing
             if (!ableToPay.Any())
@@ -170,7 +179,7 @@ namespace wpfTest.GameLogic
             }
         }
         internal MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
-            :base(-1, 0, false)
+            :base(-1, 0, false, false)
         {
             GoalDistance = goalDistance;
             Interruptable = interruptable;
@@ -234,7 +243,7 @@ namespace wpfTest.GameLogic
 
     public sealed class Attack : TargetAbility<Animal, Entity>
     {
-        internal Attack():base(0.1f, 0, false) { }
+        internal Attack():base(0.1f, 0, false, false) { }
 
         public override Command NewCommand(Animal caster, Entity target)
         {
@@ -250,7 +259,7 @@ namespace wpfTest.GameLogic
     public sealed class Spawn : TargetAbility<Entity, Vector2>
     {
         internal Spawn(AnimalFactory spawningUnitFactory)
-            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true)
+            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false)
         {
             SpawningUnitFactory = spawningUnitFactory;
         }
@@ -276,7 +285,7 @@ namespace wpfTest.GameLogic
     public sealed class SetRallyPoint : TargetAbility<Building, Vector2>
     {
         internal SetRallyPoint()
-            : base(0,0,false)
+            : base(0,0,false, false)
         {
         }
 
@@ -299,7 +308,7 @@ namespace wpfTest.GameLogic
     public sealed class PlantBuilding : TargetAbility<Entity, Node>
     {
         internal PlantBuilding(TreeFactory buildingFactory)
-            : base(20f, buildingFactory.EnergyCost, true)
+            : base(20f, buildingFactory.EnergyCost, true, false)
         {
             BuildingFactory = buildingFactory;
         }
@@ -325,7 +334,7 @@ namespace wpfTest.GameLogic
     public sealed class HerbivoreEat : TargetAbility<Animal, IHerbivoreFood>
     {
         internal HerbivoreEat()
-            : base(0.1f, 0, false)
+            : base(0.1f, 0, false, false)
         {
         }
 
@@ -349,7 +358,7 @@ namespace wpfTest.GameLogic
     public sealed class CarnivoreEat : TargetAbility<Animal, ICarnivoreFood>
     {
         internal CarnivoreEat()
-            : base(0.1f, 0, false)
+            : base(0.1f, 0, false, false)
         {
         }
 
@@ -372,7 +381,7 @@ namespace wpfTest.GameLogic
     public sealed class Grow : TargetAbility<Tree, Nothing>
     {
         internal Grow()
-            : base(0, 0, true)
+            : base(0, 0, true, false)
         {
         }
 
@@ -390,7 +399,7 @@ namespace wpfTest.GameLogic
     public sealed class CreateUnit : TargetAbility<Building, Nothing>
     {
         internal CreateUnit(AnimalFactory spawningUnitFactory)
-            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true)
+            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false)
         {
             SpawningUnitFactory = spawningUnitFactory;
         }
@@ -419,7 +428,7 @@ namespace wpfTest.GameLogic
         public PoisonFactory PoisonFactory { get; }
 
         internal PoisonousSpit(float distance, float timeUntilSpit, decimal energyCost, PoisonFactory poisonFactory) 
-            : base(distance, energyCost, false)
+            : base(distance, energyCost, false, false)
         {
             TimeUntilSpit = timeUntilSpit;
             PoisonFactory = poisonFactory;
@@ -436,25 +445,24 @@ namespace wpfTest.GameLogic
         }
     }
 
-
-    public sealed class ActivateSprint : TargetAbility<Animal, Nothing>
+    public sealed class ApplyStatus : TargetAbility<Animal, Nothing>
     {
-        public SprintFactory SprintFactory { get; }
+        public StatusFactory StatusFactory { get; }
 
-        internal ActivateSprint(decimal energyCost, SprintFactory sprintFactory) 
-            : base(0, energyCost, false)
+        internal ApplyStatus(decimal energyCost, StatusFactory statusFactory)
+            : base(0, energyCost, false, false)
         {
-            SprintFactory = sprintFactory;
+            StatusFactory = statusFactory;
         }
 
         public override Command NewCommand(Animal caster, Nothing target)
         {
-            return new ActivateSprintCommand(caster, target, this);
+            return new ApplyStatusCommand(caster, target, this);
         }
 
         public override string Description()
         {
-            return "The unit gains speed bonus for a short time.";
+            return "The unit gain status from "+nameof(StatusFactory)+".";
         }
     }
 
@@ -464,7 +472,7 @@ namespace wpfTest.GameLogic
         public float TimeToAttack { get; }
 
         internal PiercingBite(decimal energyCost, decimal damage, float timeToAttack)
-            : base(0.1f, energyCost, false)
+            : base(0.1f, energyCost, false, true)
         {
             Damage = damage;
             TimeToAttack = timeToAttack;
@@ -478,6 +486,75 @@ namespace wpfTest.GameLogic
         public override string Description()
         {
             return "The animal deals a large amount of damage to the target.";
+        }
+    }
+
+    public sealed class ConsumeAnimal : TargetAbility<Animal, Animal>
+    {
+        public float TimeToConsume { get; }
+        public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
+
+        internal ConsumeAnimal(decimal energyCost, float timeToConsume, ConsumedAnimalFactory consumedAnimalFactory)
+            : base(0.1f, energyCost, false, false)
+        {
+            TimeToConsume = timeToConsume;
+            ConsumedAnimalFactory = consumedAnimalFactory;
+        }
+
+        public override Command NewCommand(Animal caster, Animal target)
+        {
+            return new ConsumeAnimalCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The target animal is tepmorarily removed from the map and then put back on the map.";
+        }
+    }
+
+    public sealed class Jump : TargetAbility<Animal, Vector2>
+    {
+        public float PreparationTime { get; }
+        public float JumpTime { get; }
+
+        internal Jump(decimal energyCost, float distance, float preparationTime, float jumpTime)
+            : base(distance, energyCost, false, false)
+        {
+            PreparationTime = preparationTime;
+            JumpTime = jumpTime;
+        }
+
+        public override Command NewCommand(Animal caster, Vector2 target)
+        {
+            return new JumpCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal jumps to the target location.";
+        }
+    }
+
+    public sealed class Pull : TargetAbility<Animal, Animal>
+    {
+        public float PreparationTime { get; }
+        public float PullTime { get; }
+
+        internal Pull(decimal energyCost, float distance, float preparationTime, float pullTime)
+            : base(distance, energyCost, false, false)
+        {
+            PreparationTime = preparationTime;
+            PullTime = pullTime;
+        }
+
+        public override Command NewCommand(Animal caster, Animal target)
+        {
+            return new PullCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal pulls the other animal to itself.";
         }
     }
 

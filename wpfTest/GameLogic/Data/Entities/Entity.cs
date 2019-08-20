@@ -14,7 +14,7 @@ namespace wpfTest
     {
         public virtual Vector2 Center { get; }
         public abstract float Range { get; }//range of the circle collider
-        public float ViewRange { get; }//how far the unit sees
+        public float ViewRange { get; set; }//how far the unit sees
         public CommandsGroup Group { get; set; }
         public Queue<Command> CommandQueue { get; }
         public View View => new View(Center, ViewRange);
@@ -26,7 +26,11 @@ namespace wpfTest
         public string EntityType { get; }
         public decimal MaxHealth { get; set; }
         public decimal MaxEnergy { get; set; }
-        public bool Physical { get; }
+        public bool Physical { get; set; }
+        /// <summary>
+        /// True iff the entity can be used as a target for ability. 
+        /// </summary>
+        public bool CanBeTarget { get; set; }
         public List<Ability> Abilities { get; }
         public List<Status> Statuses { get; }
 
@@ -46,6 +50,7 @@ namespace wpfTest
                 Energy = new DecRange(maxEnergy, maxEnergy);
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(entityType));
             Physical = physical;
+            CanBeTarget = true;
             Abilities = abilities;
             Statuses = new List<Status>();
         }
