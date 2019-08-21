@@ -83,20 +83,32 @@ namespace wpfTest
         }
         
         /// <summary>
-        /// Returns true iff the target can be used as target.
+        /// Returns true iff the commanded entity and target can be used by this command.
         /// </summary>
-        protected bool ValidTarget()
+        protected bool CanBeUsed()
         {
-            Entity e = Targ as Entity;
-            if (e != null)
-                return e.CanBeTarget && !e.IsDead;
-            return true;
+            bool canBeUsed = true;
+            Animal commandedA = CommandedEntity as Animal;
+            if (commandedA != null)
+            {
+                if (((commandedA.StateChangeLock != null && commandedA.StateChangeLock != this)
+                    || commandedA.IsDead))
+                    canBeUsed = false;
+            }
+            Animal targA = Targ as Animal;
+            if (targA != null)
+            {
+                if (((targA.StateChangeLock != null && targA.StateChangeLock != this)
+                    || targA.IsDead))
+                    canBeUsed = false;
+            }
+            return canBeUsed;
         }
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            if (!ValidTarget())
-                //finish if the target is invalid
+            if (!CanBeUsed())
+                //finish if the target or commanded entity is invalid
                 return true;
 
             if (!TryPay())
@@ -274,7 +286,7 @@ namespace wpfTest
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            if (!ValidTarget())
+            if (!CanBeUsed())
             {
                 //finish if the target is invalid
                 CommandedEntity.StopMoving = true;
@@ -734,7 +746,7 @@ namespace wpfTest
         }
     }
 
-    public class JumpCommand : Command<Animal, Vector2, Jump>
+    public class JumpCommand : Command<Animal, Vector2, Jump>,IAnimalStateManipulator
     {
         private float timer;
         /// <summary>
@@ -748,11 +760,12 @@ namespace wpfTest
         {
             timer = 0f;
             jumping = false;
-            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.JumpTime);
+            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.JumpSpeed);
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
+            CommandedEntity.StateChangeLock = this;
             CommandedEntity.TurnToPoint(Targ);
 
             timer += deltaT;
@@ -768,7 +781,11 @@ namespace wpfTest
             
             if(jumping)
             {
-                return moveAnimalToPoint.Step(deltaT);
+                if (moveAnimalToPoint.Step(deltaT))
+                {
+                    CommandedEntity.StateChangeLock = null;
+                    return true;
+                }
             }
 
             //command doesn't finish until the animal jumps
@@ -776,7 +793,7 @@ namespace wpfTest
         }
     }
 
-    public class PullCommand : Command<Animal, Animal, Pull>
+    public class PullCommand : Command<Animal, Animal, Pull>, IAnimalStateManipulator
     {
         private float timer;
         /// <summary>
@@ -793,14 +810,14 @@ namespace wpfTest
             pulling = false;
             CommandedEntity.TurnToPoint(Targ.Position);
             Vector2 frontOfAnimal = commandedEntity.Position + (commandedEntity.Range + target.Range) * commandedEntity.Direction;
-            moveAnimalToPoint = new MoveAnimalToPoint(target, frontOfAnimal, Ability.PullTime);
+            moveAnimalToPoint = new MoveAnimalToPoint(target, frontOfAnimal, Ability.PullSpeed);
             firstPullingStep = true;
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!TryPay())
-                return true;
+            CommandedEntity.StateChangeLock = this;
+            Targ.StateChangeLock = this;
 
             CommandedEntity.TurnToPoint(Targ.Position);
 
@@ -819,21 +836,49 @@ namespace wpfTest
             {
                 if (firstPullingStep)
                 { 
-                    if(!Targ.CanBeTarget)
+                    //if(!Targ.CanBeTarget)
                         //target can't be used as target => fail the ability
-                        return true;
+                      //  return true;
 
                     firstPullingStep = false;
                 }
-                return moveAnimalToPoint.Step(deltaT);
+                if (moveAnimalToPoint.Step(deltaT))
+                {
+                    CommandedEntity.StateChangeLock = null;
+                    Targ.StateChangeLock = null;
+                    return true;
+                }
             }
 
             //command doesn't finish until the animal pulls the target animal
             return false;
         }
+    }
+
+    public class KnockBackCommand : Command<Animal, Animal, KnockBack>
+    {
+        public KnockBackCommand(Animal commandedEntity, Animal target, KnockBack knockBack)
+            : base(commandedEntity, target, knockBack)
+        {
+        }
+
+        public override bool PerformCommand(Game game, float deltaT)
+        {
+            if (CanPay() && CanBeUsed())
+            {
+
+                //if caster can pay, try to apply the status to the caster, if
+                //the application succeeds, caster pays
+                Ability.KnockAwayFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Targ.Position);
+                if (Ability.KnockAwayFactory.ApplyToEntity(Targ))
+                    TryPay();
+            }
+            return true;
+        }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
             => throw new NotImplementedException("This method is never used.");
+
     }
 
     /// <summary>
@@ -844,17 +889,17 @@ namespace wpfTest
     {
         public Animal Animal { get; }
         public Vector2 Point { get; }
-        public float Time { get; }
+        public float MaxWaitTime { get; }
         public float Speed { get; }
         private float timer;
 
-        public MoveAnimalToPoint(Animal animal, Vector2 point, float time)
+        public MoveAnimalToPoint(Animal animal, Vector2 point, float speed)
         {
             Animal = animal;
             Point = point;
-            Time = time;
+            Speed = speed;
+            MaxWaitTime = (Animal.Position - point).Length / speed;
             timer = 0f;
-            Speed = (animal.Position - point).Length / time;
         }
 
         /// <summary>
@@ -864,7 +909,7 @@ namespace wpfTest
         {
             //animal can jump over all obstacles
             Animal.Physical = false;
-            Animal.CanBeTarget = false;
+            //Animal.CanBeTarget = false;
             //the animal can't move naturally
             Animal.Velocity = new Vector2(0, 0);
             //calculate maximal displacement of Animal
@@ -874,11 +919,12 @@ namespace wpfTest
             //change Animal's position
             Animal.Position += speed * Animal.Position.UnitDirectionTo(Point);
 
+            timer += deltaT;
             //finish command if Animal is close enough or the time is over
-            if (timer >= Time || posChange >= distanceToPoint)
+            if (timer >= MaxWaitTime || posChange >= distanceToPoint)
             {
                 Animal.Physical = true;
-                Animal.CanBeTarget = true;
+                //Animal.CanBeTarget = true;
                 return true;
             }
 

@@ -159,4 +159,32 @@ namespace wpfTest.GameLogic.Data.Entities
             return new FarSight(affectedEntity, this);
         }
     }
+
+    public class KnockAwayFactory : StatusFactory<Animal>
+    {
+        /// <summary>
+        /// How far the animal is knocked away.
+        /// </summary>
+        public float Distance { get; }
+        /// <summary>
+        /// How fast the animal travels.
+        /// </summary>
+        public float Speed { get; }
+        /// <summary>
+        /// In which direction the animal is knocked away. Should be unit vector.
+        /// Is set before using this factory.
+        /// </summary>
+        public Vector2 Direction { get; set; }
+
+        public KnockAwayFactory(float distance, float speed)
+            : base(true)
+        {
+            Distance=distance;
+            Speed = speed;
+        }
+        protected override Status NewInstance(Animal affectedEntity)
+        {
+            return new KnockAway(affectedEntity, this);
+        }
+    }
 }

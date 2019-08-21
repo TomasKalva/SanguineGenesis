@@ -515,13 +515,13 @@ namespace wpfTest.GameLogic
     public sealed class Jump : TargetAbility<Animal, Vector2>
     {
         public float PreparationTime { get; }
-        public float JumpTime { get; }
+        public float JumpSpeed { get; }
 
-        internal Jump(decimal energyCost, float distance, float preparationTime, float jumpTime)
+        internal Jump(decimal energyCost, float distance, float preparationTime, float jumpSpeed)
             : base(distance, energyCost, false, false)
         {
             PreparationTime = preparationTime;
-            JumpTime = jumpTime;
+            JumpSpeed = jumpSpeed;
         }
 
         public override Command NewCommand(Animal caster, Vector2 target)
@@ -538,18 +538,41 @@ namespace wpfTest.GameLogic
     public sealed class Pull : TargetAbility<Animal, Animal>
     {
         public float PreparationTime { get; }
-        public float PullTime { get; }
+        public float PullSpeed { get; }
 
-        internal Pull(decimal energyCost, float distance, float preparationTime, float pullTime)
+        internal Pull(decimal energyCost, float distance, float preparationTime, float pullSpeed)
             : base(distance, energyCost, false, false)
         {
             PreparationTime = preparationTime;
-            PullTime = pullTime;
+            PullSpeed = pullSpeed;
         }
 
         public override Command NewCommand(Animal caster, Animal target)
         {
             return new PullCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal pulls the other animal to itself.";
+        }
+    }
+
+    public sealed class KnockBack : TargetAbility<Animal, Animal>
+    {
+        public float PreparationTime { get; }
+        public KnockAwayFactory KnockAwayFactory { get; }
+
+        internal KnockBack(decimal energyCost, float distance, float preparationTime, KnockAwayFactory knockAwayFactory)
+            : base(distance, energyCost, false, false)
+        {
+            PreparationTime = preparationTime;
+            KnockAwayFactory = knockAwayFactory;
+        }
+
+        public override Command NewCommand(Animal caster, Animal target)
+        {
+            return new KnockBackCommand(caster, target, this);
         }
 
         public override string Description()
@@ -592,5 +615,11 @@ namespace wpfTest.GameLogic
     /// </summary>
     public interface ICarnivoreFood : IFood
     {
+    }
+
+    //Marks classes that can manipulate animal's movement.
+    public interface IAnimalStateManipulator
+    {
+
     }
 }

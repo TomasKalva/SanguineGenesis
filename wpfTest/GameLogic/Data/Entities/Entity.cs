@@ -27,10 +27,6 @@ namespace wpfTest
         public decimal MaxHealth { get; set; }
         public decimal MaxEnergy { get; set; }
         public bool Physical { get; set; }
-        /// <summary>
-        /// True iff the entity can be used as a target for ability. 
-        /// </summary>
-        public bool CanBeTarget { get; set; }
         public List<Ability> Abilities { get; }
         public List<Status> Statuses { get; }
 
@@ -50,7 +46,6 @@ namespace wpfTest
                 Energy = new DecRange(maxEnergy, maxEnergy);
             AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(entityType));
             Physical = physical;
-            CanBeTarget = true;
             Abilities = abilities;
             Statuses = new List<Status>();
         }

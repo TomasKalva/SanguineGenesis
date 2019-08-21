@@ -57,6 +57,7 @@ namespace wpfTest
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Jump);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Pull);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ActivateFarSight);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.KnockBack);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("KAPOC"));
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("BAOBAB"));
             }

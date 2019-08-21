@@ -34,6 +34,7 @@ namespace wpfTest.GameLogic
         public Pull Pull { get; }
         public Pull BigPull { get; }
         public ApplyStatus ActivateFarSight { get; }
+        public KnockBack KnockBack { get; }
 
         internal Abilities(GameStaticData gameStaticData)
         {
@@ -108,21 +109,25 @@ namespace wpfTest.GameLogic
             ActivateShell.SetAbilities(this);
 
             //jump
-            Jump = new Jump(25, 4f, 0.1f, 0.2f );
+            Jump = new Jump(25, 4f, 0.1f, 10f );
             Jump.SetAbilities(this);
 
             //pull
-            Pull = new Pull(25, 4f, 0.5f, 0.2f);
+            Pull = new Pull(25, 4f, 0.5f, 8f);
             Pull.SetAbilities(this);
 
-            //pull
-            BigPull = new Pull(40, 6f, 0.6f, 0.3f);
+            //big pull
+            BigPull = new Pull(40, 6f, 0.6f, 8f);
             BigPull.SetAbilities(this);
 
             //activate far sight
             ActivateFarSight = new ApplyStatus(20, new Data.Entities.FarSightFactory(rangeExtension: 6f));
             ActivateFarSight.SetAbilities(this);
-            
+
+            //shell
+            KnockBack = new KnockBack(20, 0.1f, 0.3f, new Data.Entities.KnockAwayFactory(distance:2f, speed: 6f));
+            KnockBack.SetAbilities(this);
+
             //move to cast has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();
             foreach(Ability a in AllAbilities)

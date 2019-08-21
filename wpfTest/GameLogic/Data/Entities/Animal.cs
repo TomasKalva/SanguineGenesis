@@ -34,6 +34,11 @@ namespace wpfTest.GameLogic
         /// Animals with thick skin take less damage.
         /// </summary>
         public bool ThickSkin { get; set; }
+        /// <summary>
+        /// Command or status that is manipulating the animal's physical state - changing position,
+        /// removing it from the map...
+        /// </summary>
+        public IAnimalStateManipulator StateChangeLock { get; set; }
         public Diet Diet { get; }
         public float SpawningTime { get; }
 
@@ -96,6 +101,7 @@ namespace wpfTest.GameLogic
                 StopMoving = false;
                 WantsToMove = false;
             }
+            //StateChangeLock = null;
         }
 
         /// <summary>

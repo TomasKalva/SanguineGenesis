@@ -68,7 +68,7 @@ namespace wpfTest.GameLogic.Data.Entities
         }
     }
 
-    public class ConsumedAnimal : Status<Animal, ConsumedAnimalFactory>
+    public class ConsumedAnimal : Status<Animal, ConsumedAnimalFactory>, IAnimalStateManipulator
     {
         /// <summary>
         /// Animal that is consumed.
@@ -83,6 +83,7 @@ namespace wpfTest.GameLogic.Data.Entities
             : base(affectedEntity, consumeInfo)
         {
             AnimalConsumed = animalConsumed;
+            AnimalConsumed.StateChangeLock = this;
             timeElapsed = 0;
         }
 
@@ -90,7 +91,7 @@ namespace wpfTest.GameLogic.Data.Entities
         {
             //temporarily remove the animal from list of entities
             AnimalConsumed.Player.Entities.Remove(AnimalConsumed);
-            AnimalConsumed.CanBeTarget = false;
+            AnimalConsumed.StateChangeLock = this;
         }
 
         public override void Removed()
@@ -99,7 +100,7 @@ namespace wpfTest.GameLogic.Data.Entities
             //it spawns in front of the affected animal
             AnimalConsumed.Position = AffectedEntity.Position + (AffectedEntity.Range + AnimalConsumed.Range) * AffectedEntity.Direction;
             AnimalConsumed.Player.Entities.Add(AnimalConsumed);
-            AnimalConsumed.CanBeTarget = true;
+            AnimalConsumed.StateChangeLock = null;
         }
 
         public override bool Step(Game game, float deltaT)
@@ -211,6 +212,33 @@ namespace wpfTest.GameLogic.Data.Entities
             if (AffectedEntity.WantsToMove)
                 return true;
             return false;
+        }
+    }
+
+    public class KnockAway : Status<Animal, KnockAwayFactory>, IAnimalStateManipulator
+    {
+        private MoveAnimalToPoint moveAnimalToPoint;
+
+        public KnockAway(Animal affectedEntity, KnockAwayFactory knockBackInfo)
+            : base(affectedEntity, knockBackInfo)
+        {
+            Vector2 targetPoint = affectedEntity.Position + StatusInfo.Distance * StatusInfo.Direction;
+            moveAnimalToPoint = new MoveAnimalToPoint(affectedEntity, targetPoint, StatusInfo.Speed);
+        }
+
+        public override void Added()
+        {
+            AffectedEntity.StateChangeLock = this;
+        }
+
+        public override void Removed()
+        {
+            AffectedEntity.StateChangeLock = null;
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            return moveAnimalToPoint.Step(deltaT);
         }
     }
 }
