@@ -13,6 +13,11 @@ namespace wpfTest
     public abstract class Command
     {
         /// <summary>
+        /// True iff the command can be removed from the first place in the command queue.
+        /// </summary>
+        public abstract bool Interruptable { get; }
+
+        /// <summary>
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
         public abstract bool PerformCommand(Game game, float deltaT);
@@ -38,6 +43,7 @@ namespace wpfTest
         /// True iff the ability was paid.
         /// </summary>
         private bool Paid { get; set; }
+        public override bool Interruptable => Ability.Interruptable;
 
         protected Command(Caster commandedEntity, Target target, Abil ability)
         {

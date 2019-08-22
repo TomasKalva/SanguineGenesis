@@ -185,9 +185,10 @@ namespace wpfTest.GameLogic
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality),fields[10]);
             List<StatusFactory> statusFactories = ParseStatuses(fields[12], statuses);
             bool producer = fields[13] == "yes";
+            int air = int.Parse(fields[14]);
 
             TreeFactory newFactory = new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
-                biome, terrain, soilQuality, producer, 10f, rootsDistance, 2, statusFactories);
+                biome, terrain, soilQuality, producer, 10f, rootsDistance, air, statusFactories);
             Factorys.Add(treeType, newFactory);
             abilitiesList.Add(treeType, fields[11]);
         }
@@ -241,6 +242,7 @@ namespace wpfTest.GameLogic
             Diet diet = (Diet)Enum.Parse(typeof(Diet), fields[16]);
             float spawningTime = float.Parse(fields[17]);
             List<StatusFactory> statusFactories = ParseStatuses(fields[19], statuses);
+            int air = int.Parse(fields[20]);
 
             Factorys.Add(unitType, 
                 new AnimalFactory(
@@ -263,7 +265,8 @@ namespace wpfTest.GameLogic
                     physical: true,
                     energyCost: energyCost,
                     viewRange: 5,
-                    statusFactories: statusFactories));
+                    statusFactories: statusFactories,
+                    air:air));
             //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f););
 
             abilitiesList.Add(unitType, fields[18]);

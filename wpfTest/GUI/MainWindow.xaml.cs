@@ -66,7 +66,7 @@ namespace wpfTest
             t.Start();
         }
 
-        private int wantedGameFps=100;
+        private int wantedGameFps=50;
         private int StepLength => 1000 / wantedGameFps;
 
         private Stopwatch totalStopwatch = new Stopwatch();
@@ -482,9 +482,9 @@ namespace wpfTest
                 OpenGLAtlasDrawer.UpdateUnitIndicatorsDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, gameControls.MapView, gameControls.MapSelectorFrame);
-                OpenGLAtlasDrawer.Draw(gl);
                 UpdateBottomPanel();
             }
+            OpenGLAtlasDrawer.Draw(gl);
             sw.Stop();
             //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
         }

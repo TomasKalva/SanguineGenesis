@@ -134,6 +134,7 @@ namespace wpfTest.GameLogic
         public bool ThickSkin { get; }
         public Diet Diet { get; }
         public float SpawningTime { get; }
+        public int Air { get; }
 
         public Animal NewInstance(Player player, Vector2 pos)
         {
@@ -159,7 +160,8 @@ namespace wpfTest.GameLogic
                 physical:Physical,
                 energyCost:EnergyCost,
                 viewRange:ViewRange,
-                abilities:Abilities.ToList()));
+                abilities:Abilities.ToList(),
+                air:Air));
         }
 
         public AnimalFactory(
@@ -182,7 +184,8 @@ namespace wpfTest.GameLogic
             bool physical,
             decimal energyCost,
             float viewRange,
-            List<StatusFactory> statusFactories)
+            List<StatusFactory> statusFactories,
+            int air)
             : base(unitType, maxHealth, maxEnergy, range, physical, energyCost, viewRange, statusFactories)
         {
             FoodEnergyRegen = foodEnergyRegen;
@@ -197,6 +200,7 @@ namespace wpfTest.GameLogic
             ThickSkin = thickSkin;
             Diet = diet;
             SpawningTime = spawningTime;
+            Air = air;
         }
     }
 }

@@ -277,7 +277,7 @@ namespace wpfTest.GUI
             if (entitiesAnimations.TryGetValue(unitType, out Animation anim))
                 return anim;
             else
-                return GetAnimation("BAOBAB");
+                return GetAnimation("WHISTLING_THORN");
         }
 
         /// <summary>

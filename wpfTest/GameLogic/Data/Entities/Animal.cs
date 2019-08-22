@@ -41,6 +41,10 @@ namespace wpfTest.GameLogic
         public IAnimalStateManipulator StateChangeLock { get; set; }
         public Diet Diet { get; }
         public float SpawningTime { get; }
+        /// <summary>
+        /// Amount of air taken by this animal.
+        /// </summary>
+        public int Air { get; }
 
         public Animal(
             Player player, 
@@ -64,7 +68,8 @@ namespace wpfTest.GameLogic
             bool physical,
             decimal energyCost,
             float viewRange,
-            List<Ability> abilities)
+            List<Ability> abilities,
+            int air)
             :base(player, unitType, maxHealth, viewRange, maxEnergy, abilities, position, range, physical)
         {
             Velocity = new Vector2(0f, 0f);
@@ -84,6 +89,7 @@ namespace wpfTest.GameLogic
             ThickSkin = thickSkin;
             Diet = diet;
             SpawningTime = spawningTime;
+            Air = air;
         }
         
         /// <summary>
@@ -101,13 +107,11 @@ namespace wpfTest.GameLogic
                 StopMoving = false;
                 WantsToMove = false;
             }
-            //StateChangeLock = null;
         }
 
         /// <summary>
         /// Add acceleration to units velocity.
         /// </summary>
-        /// <param name="acc"></param>
         public void Accelerate(Vector2 acc, Map map)
         {
             //add acceleration to the velocity

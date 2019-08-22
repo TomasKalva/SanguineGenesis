@@ -15,7 +15,7 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// If enemy in range, cancel commands and attack the enemy.
         /// </summary>
-        bool Interruptable { get; }
+        bool AttackEnemyInstead { get; }
         /// <summary>
         /// True if the goal distance should be attack distance of the moving unit.
         /// </summary>

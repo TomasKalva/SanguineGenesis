@@ -10,7 +10,7 @@ namespace wpfTest.GameLogic.Data.Abilities
     public sealed class Grow : TargetAbility<Tree, Nothing>
     {
         internal Grow()
-            : base(0, 0, true, false)
+            : base(0, 0, true, false, false)
         {
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ namespace wpfTest
         public abstract float Range { get; }//range of the circle collider
         public float ViewRange { get; set; }//how far the unit sees
         public CommandsGroup Group { get; set; }
-        public Queue<Command> CommandQueue { get; }
+        public CommandQueue CommandQueue { get; }
         public View View => new View(Center, ViewRange);
         public Player Player { get; }
         public AnimationState AnimationState { get; set; }
@@ -36,7 +37,7 @@ namespace wpfTest
             Player = player;
             ViewRange = viewRange;
             Group = null;
-            CommandQueue = new Queue<Command>();
+            CommandQueue = new CommandQueue();
             EntityType = entityType;
             MaxHealth = maxHealth;
             Health = new DecRange(maxHealth, maxHealth);
@@ -55,7 +56,7 @@ namespace wpfTest
         {
             if(CommandQueue.Any())
             {
-                Command command = CommandQueue.Peek();
+                Command command = CommandQueue.First();
                 if (command.PerformCommand(game, deltaT))
                 {
                     //if command is finished, remove it from the queue
@@ -200,6 +201,59 @@ namespace wpfTest
         float IMovementTarget.DistanceTo(Animal animal)
         {
             return (animal.Position - Center).Length - animal.Range - Range;
+        }
+    }
+
+    public class CommandQueue:IEnumerable<Command>
+    {
+        private List<Command> queue;
+
+        public CommandQueue()
+        {
+            queue = new List<Command>();
+        }
+
+        public void Enqueue(Command command)
+        {
+            queue.Add(command);
+        }
+
+        public Command First()
+        {
+            if (queue.Any())
+                return queue[0];
+            else
+                return null;
+        }
+
+        public void Dequeue()
+        {
+            queue.RemoveAt(0);
+        }
+
+        /// <summary>
+        /// Removes all commands. Leaves the first one if it is not interruptable.
+        /// </summary>
+        public void Clear()
+        {
+            Command first = First();
+            if (first != null && !first.Interruptable)
+                queue.RemoveAll(comm => comm != first);
+            else
+                queue.Clear();
+        }
+
+        public List<Command> ToList() => queue.ToList();
+        public bool Any() => queue.Any();
+
+        public IEnumerator<Command> GetEnumerator()
+        {
+            return queue.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 

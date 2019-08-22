@@ -31,7 +31,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         }
     }
 
-    public class ConsumeAnimalCommand : Command<Animal, Animal, ConsumeAnimal>, IAnimalStateManipulator
+    public class ConsumeAnimalCommand : Command<Animal, Animal, ConsumeAnimal>
     {
         private float timer;
 
@@ -43,16 +43,12 @@ namespace wpfTest.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            CommandedEntity.StateChangeLock = this;
-            Targ.StateChangeLock = this;
-
             timer += deltaT;
             if (timer > Ability.TimeToConsume)
             {
                 ConsumedAnimalFactory consumedFact = Ability.ConsumedAnimalFactory;
                 consumedFact.AnimalConsumed = Targ;
                 consumedFact.ApplyToAffected(CommandedEntity);
-                CommandedEntity.StateChangeLock = null;
                 return true;
             }
 

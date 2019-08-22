@@ -36,6 +36,10 @@ namespace wpfTest.GameLogic
         /// True iff the target of the ability can be its caster.
         /// </summary>
         public bool SelfCastable { get; }
+        /// <summary>
+        /// True iff the command can be removed from the first place in the command queue.
+        /// </summary>
+        public bool Interruptable { get; }
 
         public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target);
         /// <summary>
@@ -52,20 +56,21 @@ namespace wpfTest.GameLogic
         {
             return GetType().Name;
         }
-        public Ability(float distance, decimal energyCost, bool onlyOne, bool selfCastable)
+        public Ability(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable)
         {
             Distance = distance;
             EnergyCost = energyCost;
             OnlyOne = onlyOne;
             SelfCastable = selfCastable;
+            Interruptable = interruptable;
         }
     }
 
     public abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
-        public TargetAbility(float distance, decimal energyCost, bool onlyOne, bool selfCastable)
-            :base(distance, energyCost, onlyOne, selfCastable)
+        public TargetAbility(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable=true)
+            :base(distance, energyCost, onlyOne, selfCastable, interruptable)
         {
         }
 

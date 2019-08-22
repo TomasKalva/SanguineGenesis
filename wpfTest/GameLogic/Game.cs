@@ -135,6 +135,10 @@ namespace wpfTest
             List<Building> buildings = GetBuildings();
             List<Tree> trees = GetTrees();
 
+            //update air values
+            foreach (var kvp in Players)
+                kvp.Value.CalulateAir();
+
             //update nutrients
             nutrientUpdateTimer -= deltaT;
             if (nutrientUpdateTimer <= 0)

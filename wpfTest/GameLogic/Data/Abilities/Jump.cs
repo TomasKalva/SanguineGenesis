@@ -13,7 +13,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         public float JumpSpeed { get; }
 
         internal Jump(decimal energyCost, float distance, float preparationTime, float jumpSpeed)
-            : base(distance, energyCost, false, false)
+            : base(distance, energyCost, false, false, false)
         {
             PreparationTime = preparationTime;
             JumpSpeed = jumpSpeed;

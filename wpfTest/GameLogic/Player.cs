@@ -11,6 +11,8 @@ namespace wpfTest
 {
     public class Player
     {
+        public const int MAX_AIR_TAKEN = 100;
+
         public List<Entity> Entities { get; private set; }
         public List<Unit> Units => Entities.Where((e) => e is Unit).Select((u)=>(Unit)u).ToList();
         public List<Animal> Animals => Entities.Where((e) => e is Animal).Select((u) => (Animal)u).ToList();
@@ -23,6 +25,8 @@ namespace wpfTest
         public float Resource { get; set; }
         public List<Building> VisibleBuildings { get; }
         public GameStaticData GameStaticData { get; }
+        public int MaxAirTaken { get; private set; }
+        public int AirTaken { get; private set; }
 
         public Player(Players playerID)
         {
@@ -31,6 +35,8 @@ namespace wpfTest
             Resource = 1000;
             VisibleBuildings = new List<Building>();
             GameStaticData = new GameStaticData();
+            MaxAirTaken = 10;
+            AirTaken = 0;
         }
 
         public void InitUnits()
@@ -41,7 +47,7 @@ namespace wpfTest
             if (PlayerID == Players.PLAYER1)
                 return;
 
-            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.4f, 5m, 0.5f, 0.1f, false, 4f, 2f, Movement.LAND_WATER, false, Diet.CARNIVORE, 5f, true, 20m, 5f, new List<StatusFactory>());
+            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.4f, 5m, 0.5f, 0.1f, false, 4f, 2f, Movement.LAND_WATER, false, Diet.CARNIVORE, 5f, true, 20m, 5f, new List<StatusFactory>(), 1);
                 //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
             UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/
@@ -57,6 +63,12 @@ namespace wpfTest
             Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(7f, 6f)));
             Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(6.5f, 6f)));
             Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(4f, 9f)));*/
+        }
+
+        public void CalulateAir()
+        {
+            MaxAirTaken = Math.Min(MAX_AIR_TAKEN, Trees.Sum((t) => t.Air));
+            AirTaken = Animals.Sum((a) => a.Air);
         }
 
         public void UpdateBuildingsView(List<Building> buildings)

@@ -52,6 +52,10 @@ namespace wpfTest.GameLogic.Data.Abilities
             SpawnTimer += deltaT;
             if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
             {
+                //if the player doesn't have enough air, wait until he does
+                if (CommandedEntity.Player.AirTaken + Ability.SpawningUnitFactory.Air > CommandedEntity.Player.MaxAirTaken)
+                    return false;
+
                 Player newUnitOwner = CommandedEntity.Player;
                 Vector2 newUnitPosition = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - Ability.SpawningUnitFactory.Range);
                 Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, newUnitPosition);

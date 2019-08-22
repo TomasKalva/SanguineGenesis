@@ -13,7 +13,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         public float ChargeSpeed { get; }
 
         internal ChargeTo(decimal energyCost, float distance, decimal attackDamageMultiplier, float charageSpeed)
-            : base(distance, energyCost, false, false)
+            : base(distance, energyCost, false, false, false)
         {
             AttackDamageMultiplier = attackDamageMultiplier;
             ChargeSpeed = charageSpeed;

@@ -38,7 +38,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             : base(-1, 0, false, false)
         {
             GoalDistance = goalDistance;
-            Interruptable = interruptable;
+            AttackEnemyInstead = interruptable;
             UsesAttackDistance = usesAttackDistance;
         }
         //public static MoveTo Get => ability;
@@ -46,7 +46,7 @@ namespace wpfTest.GameLogic.Data.Abilities
 
         //interface IMovementParametrizing properties
         public float GoalDistance { get; }
-        public bool Interruptable { get; }
+        public bool AttackEnemyInstead { get; }
         public bool UsesAttackDistance { get; }
 
         public override void SetCommands(IEnumerable<Animal> casters, IMovementTarget target)
@@ -198,7 +198,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             command.Assignment.Active = true;
 
             //if an enemy is in attack range, attack it instead of other commands
-            if (movementParametrizing.Interruptable)
+            if (movementParametrizing.AttackEnemyInstead)
             {
                 Entity enemy = GameQuerying.GetGameQuerying().SelectUnits(game,
                     (u) => u.Player != unit.Player
