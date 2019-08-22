@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Data.Abilities;
 using wpfTest.GameLogic.Maps;
 
 namespace wpfTest.GameLogic.Data.Entities

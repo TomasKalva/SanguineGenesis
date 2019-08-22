@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Abilities;
 using static wpfTest.MainWindow;
 
 namespace wpfTest

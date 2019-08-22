@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Abilities;
 using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
@@ -58,9 +59,9 @@ namespace wpfTest
                 if (command.PerformCommand(game, deltaT))
                 {
                     //if command is finished, remove it from the queue
-                    if(command is MoveToPointCommand)
+                    if(command is MoveToCommand)
                     {
-                        ((MoveToPointCommand)command).RemoveFromAssignment();
+                        ((MoveToCommand)command).RemoveFromAssignment();
                     }
                     CommandQueue.Dequeue();
                 }

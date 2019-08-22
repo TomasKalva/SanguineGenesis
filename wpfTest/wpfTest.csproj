@@ -68,6 +68,26 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="GameLogic\Data\Abilities.cs" />
+    <Compile Include="GameLogic\Data\Abilities\ApplyStatus.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Attack.cs" />
+    <Compile Include="GameLogic\Data\Abilities\BuildBuilding.cs" />
+    <Compile Include="GameLogic\Data\Abilities\ChargeTo.cs" />
+    <Compile Include="GameLogic\Data\Abilities\ClimbTree.cs" />
+    <Compile Include="GameLogic\Data\Abilities\ConsumeAnimal.cs" />
+    <Compile Include="GameLogic\Data\Abilities\CreateUnit.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Eat.cs" />
+    <Compile Include="GameLogic\Data\Abilities\EnterExitHole.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Growcs.cs" />
+    <Compile Include="GameLogic\Data\Abilities\ImproveStructure.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Jump.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Kick.cs" />
+    <Compile Include="GameLogic\Data\Abilities\KnockBack.cs" />
+    <Compile Include="GameLogic\Data\Abilities\MoveTo.cs" />
+    <Compile Include="GameLogic\Data\Abilities\PiercingBite.cs" />
+    <Compile Include="GameLogic\Data\Abilities\PoisonousSpit.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Pull.cs" />
+    <Compile Include="GameLogic\Data\Abilities\SetRallyPoint.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Spawn.cs" />
     <Compile Include="GameLogic\Data\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
     <Compile Include="GameLogic\Data\Entities\Building.cs" />

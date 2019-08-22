@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Data.Abilities;
 using wpfTest.GameLogic.Maps;
 
 namespace wpfTest.GameLogic
@@ -104,7 +105,7 @@ namespace wpfTest.GameLogic
                 //find command from this assignment
                 foreach(Command c in u.CommandQueue)
                 {
-                    if (c is MoveToPointCommand mtpc)
+                    if (c is MoveToCommand mtpc)
                         //update its flowmap
                         if (mtpc.Assignment == this)
                             mtpc.UpdateFlowMap(flowMap);

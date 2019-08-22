@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Data.Abilities;
 
 namespace wpfTest.GameLogic
 {
@@ -72,7 +73,7 @@ namespace wpfTest.GameLogic
             }
 
             //build buiding
-            buildBuilding = new Dictionary<string, GameLogic.BuildBuilding>();
+            buildBuilding = new Dictionary<string, BuildBuilding>();
             foreach (var treeFac in gameStaticData.TreeFactories.Factorys)
             {
                 BuildBuilding plant = new BuildBuilding(treeFac.Value);
