@@ -189,6 +189,89 @@ namespace wpfTest.GameLogic.Data.Entities
         }
     }
 
+    public class FastStrikes : Status<Animal, FastStrikesFactory>
+    {
+        private float timer;
+
+        public FastStrikes(Animal affectedEntity, FastStrikesFactory fastStrikesInfo)
+            : base(affectedEntity, fastStrikesInfo)
+        {
+            timer = 0f;
+        }
+
+        public override void Added()
+        {
+            AffectedEntity.AttackPeriod -= 0.1f;
+        }
+
+        public override void Removed()
+        {
+            AffectedEntity.AttackPeriod += 0.1f;
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            //remove the staus if the duration is over
+            timer += deltaT;
+            if (timer > StatusInfo.Duration)
+                return true;
+            return false;
+        }
+    }
+
+    public class AnimalsOnTree : Status<Tree, AnimalsOnTreeFactory>, IAnimalStateManipulator
+    {
+        public List<Animal> Animals { get; }
+
+        public AnimalsOnTree(Tree affectedEntity, AnimalsOnTreeFactory animalsOnTreenfo, Animal putOnTree)
+            : base(affectedEntity, animalsOnTreenfo)
+        {
+            Animals = new List<Animal>(1) { putOnTree };
+        }
+
+        public override void Added()
+        {
+            //add ability for animals climbing down from the tree
+            AffectedEntity.Abilities.Add(AffectedEntity.Player.GameStaticData.Abilities.ClimbDownTree);
+        }
+
+        public override void Removed()
+        {
+            //remove ability for animals climbing down from the tree
+            AffectedEntity.Abilities.Remove(AffectedEntity.Player.GameStaticData.Abilities.ClimbDownTree);
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            return false;
+        }
+    }
+
+    public class Underground : Status<Structure, UndergroundFactory>, IAnimalStateManipulator
+    {
+        public List<Animal> AnimalsUnderGround => StatusInfo.AnimalsUnderGround;
+
+        public Underground(Structure affectedEntity, UndergroundFactory undergroundInfo)
+            : base(affectedEntity, undergroundInfo)
+        {
+        }
+
+        public override void Added()
+        {
+            //do nothing
+        }
+
+        public override void Removed()
+        {
+            //do nothing
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            return false;
+        }
+    }
+
     public class FarSight : Status<Animal, FarSightFactory>
     {
         public FarSight(Animal affectedEntity, FarSightFactory farSightInfo)

@@ -75,8 +75,8 @@ namespace wpfTest
 
         public void RemoveStatus(Status status)
         {
-            Statuses.Add(status);
-            status.Added();
+            Statuses.Remove(status);
+            status.Removed();
         }
 
         public void StepStatuses(Game game, float deltaT)
@@ -194,6 +194,11 @@ namespace wpfTest
         public virtual void Die()
         {
             RemoveFromAllCommandsAssignments();
+        }
+
+        float IMovementTarget.DistanceTo(Animal animal)
+        {
+            return (animal.Position - Center).Length - animal.Range - Range;
         }
     }
 

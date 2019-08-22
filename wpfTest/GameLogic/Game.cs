@@ -58,8 +58,11 @@ namespace wpfTest
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Pull);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ActivateFarSight);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.KnockBack);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("KAPOC"));
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.PlantBuilding("BAOBAB"));
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ConsumeAnimal);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ClimbTree);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ChargeTo);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.BuildBuilding("KAPOC"));
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.BuildBuilding("BAOBAB"));
             }
         }
 
@@ -103,6 +106,16 @@ namespace wpfTest
             return buildings;
         }
 
+        public List<Tree> GetTrees()
+        {
+            var trees = new List<Tree>();
+            foreach (Players player in Enum.GetValues(typeof(Players)))
+            {
+                trees = trees.Concat(Players[player].Trees.Where((b) => !b.IsDead).ToList()).ToList();
+            }
+            return trees;
+        }
+
         private const float NUTRIENT_UPDATE_TIME = 1f;
         private float nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
 
@@ -120,6 +133,7 @@ namespace wpfTest
             List<Unit> units = GetUnits();
             List<Animal> animals = GetAnimals();
             List<Building> buildings = GetBuildings();
+            List<Tree> trees = GetTrees();
 
             //update nutrients
             nutrientUpdateTimer -= deltaT;
@@ -129,9 +143,9 @@ namespace wpfTest
                 //Map.UpdateNutrients();
                 Map.ProduceNutrients();
 
-                foreach (Building b in buildings)
+                foreach (Tree t in trees)
                 {
-                    b.DrainEnergy();
+                    t.DrainEnergy();
                 }
             }
 

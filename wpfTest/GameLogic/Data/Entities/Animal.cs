@@ -24,7 +24,7 @@ namespace wpfTest.GameLogic
         public float FoodEatingPeriod { get; }
         public decimal EnergyCost { get; }
         public decimal AttackDamage { get; }
-        public float AttackPeriod { get; }
+        public float AttackPeriod { get; set; }
         public float AttackDistance { get; }
         public bool MechanicalDamage { get; }
         public float MaxSpeedLand { get; set; }

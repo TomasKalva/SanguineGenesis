@@ -36,7 +36,7 @@ namespace wpfTest.GameLogic.Data.Entities
         public sealed override bool ApplyToEntity(Entity affectedEntity)
             => ApplyToAffected((Affected)affectedEntity);
 
-        public bool ApplyToAffected(Affected affectedEntity)
+        public virtual bool ApplyToAffected(Affected affectedEntity)
         {
             Status newStatus = NewInstance(affectedEntity);
 
@@ -124,6 +124,66 @@ namespace wpfTest.GameLogic.Data.Entities
         }
     }
 
+    public class AnimalsOnTreeFactory : StatusFactory<Tree>
+    {
+        /// <summary>
+        /// Animal that will be put on the tree. Should be set right before using this factory to apply status.
+        /// </summary>
+        public Animal PutOnTree { get; set; }
+
+        public AnimalsOnTreeFactory()
+            : base(true)
+        {
+        }
+        protected override Status NewInstance(Tree affectedEntity)
+        {
+            return new AnimalsOnTree(affectedEntity, this, PutOnTree);
+        }
+
+
+        public override bool ApplyToAffected(Tree affectedEntity)
+        {
+            AnimalsOnTree alreadyApplied = (AnimalsOnTree)affectedEntity.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
+            if(alreadyApplied!=null)
+            {
+                if (PutOnTree != null)
+                {
+                    alreadyApplied.Animals.Add(PutOnTree);
+                    PutOnTree.Player.Entities.Remove(PutOnTree);
+                    PutOnTree.StateChangeLock = alreadyApplied;
+                }
+            }
+            else
+            {
+                AnimalsOnTree newStatus = (AnimalsOnTree)NewInstance(affectedEntity);
+                affectedEntity.AddStatus(newStatus);
+            }
+            return true;
+        }
+    }
+
+
+    public class UndergroundFactory : StatusFactory<Structure>
+    {
+        /// <summary>
+        /// Animal that will be put under ground. Should be set right before using this factory to apply status.
+        /// </summary>
+        public Animal PutUnderground { get; set; }
+
+        public List<Animal> AnimalsUnderGround { get; }
+
+        public UndergroundFactory()
+            : base(true)
+        {
+            AnimalsUnderGround = new List<Animal>();
+        }
+
+        protected override Status NewInstance(Structure affectedEntity)
+        {
+            return new Underground(affectedEntity, this);
+        }
+    }
+
     public class ShellFactory : StatusFactory<Animal>
     {
         /// <summary>
@@ -139,6 +199,25 @@ namespace wpfTest.GameLogic.Data.Entities
         protected override Status NewInstance(Animal affectedEntity)
         {
             return new Shell(affectedEntity, this);
+        }
+    }
+
+
+    public class FastStrikesFactory : StatusFactory<Animal>
+    {
+        /// <summary>
+        /// Length of the time interval this staus will be active for in s.
+        /// </summary>
+        public float Duration { get; }
+
+        public FastStrikesFactory(float duration)
+            : base(true)
+        {
+            Duration = duration;
+        }
+        protected override Status NewInstance(Animal affectedEntity)
+        {
+            return new FastStrikes(affectedEntity, this);
         }
     }
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic
 {
@@ -29,19 +30,36 @@ namespace wpfTest.GameLogic
             }
         }
 
-        public void InitFactorys(string fileName)
+        public void InitFactorys(string fileName, Statuses statuses)
         {
             using (StreamReader fileReader = new StreamReader(fileName))
             {
-                string line = fileReader.ReadLine();//first line is just a description
+                //first line is just a description of the format
+                string line = fileReader.ReadLine();
                 while ((line = fileReader.ReadLine()) != null)
                 {
-                    AddNewFactory(line);
+                    AddNewFactory(line, statuses);
                 }
             }
         }
 
-        public abstract void AddNewFactory(string description);
+        public abstract void AddNewFactory(string description, Statuses statuses);
+
+        public List<StatusFactory> ParseStatuses(string listOfStatuses, Statuses statuses)
+        {
+            List<StatusFactory> statusFactories = new List<StatusFactory>();
+            string[] statusesNames = listOfStatuses.Split(';');
+            foreach(string stName in statusesNames)
+            {
+                switch (stName)
+                {
+                    case "underground":
+                        statusFactories.Add(statuses.UndergroundFactory);
+                        break;
+                }
+            }
+            return statusFactories;
+        }
 
         public void InitAbilities(Abilities abilities)
         {
@@ -101,13 +119,40 @@ namespace wpfTest.GameLogic
                             case "bigPull":
                                 factory.Abilities.Add(abilities.BigPull);
                                 break;
+                            case "farSight":
+                                factory.Abilities.Add(abilities.ActivateFarSight);
+                                break;
+                            case "knockBack":
+                                factory.Abilities.Add(abilities.KnockBack);
+                                break;
+                            case "climbTree":
+                                factory.Abilities.Add(abilities.ClimbTree);
+                                break;
+                            case "enterHole":
+                                factory.Abilities.Add(abilities.EnterHole);
+                                break;
+                            case "exitHole":
+                                factory.Abilities.Add(abilities.ExitHole);
+                                break;
+                            case "fastStrikes":
+                                factory.Abilities.Add(abilities.ActivateFastStrikes);
+                                break;
+                            case "improveStructure":
+                                factory.Abilities.Add(abilities.ImproveStructure);
+                                break;
+                            case "chargeTo":
+                                factory.Abilities.Add(abilities.ChargeTo);
+                                break;
+                            case "kick":
+                                factory.Abilities.Add(abilities.Kick);
+                                break;
                         }
                     }else if (abPar.Length == 2)
                     {
                         switch (abName)
                         {
                             case "build":
-                                factory.Abilities.Add(abilities.PlantBuilding(abPar[1]));
+                                factory.Abilities.Add(abilities.BuildBuilding(abPar[1]));
                                 break;
                             case "spawn":
                                 factory.Abilities.Add(abilities.UnitSpawn(abPar[1]));
@@ -124,7 +169,7 @@ namespace wpfTest.GameLogic
 
     public class TreeFactories : Factories<TreeFactory>
     {
-        public override void AddNewFactory(string description)
+        public override void AddNewFactory(string description, Statuses statuses)
         {
             string[] fields = description.Split(',');
             string treeType = fields[0];
@@ -138,17 +183,43 @@ namespace wpfTest.GameLogic
             Biome biome = (Biome)Enum.Parse(typeof(Biome),fields[8]);
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain),fields[9]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality),fields[10]);
+            List<StatusFactory> statusFactories = ParseStatuses(fields[12], statuses);
             bool producer = fields[13] == "yes";
 
-            Factorys.Add(treeType, new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
-                biome, terrain, soilQuality, producer,  10f, rootsDistance, 2  ));
+            TreeFactory newFactory = new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
+                biome, terrain, soilQuality, producer, 10f, rootsDistance, 2, statusFactories);
+            Factorys.Add(treeType, newFactory);
             abilitiesList.Add(treeType, fields[11]);
+        }
+    }
+
+    public class StructureFactories : Factories<StructureFactory>
+    {
+        public override void AddNewFactory(string description, Statuses statuses)
+        {
+            string[] fields = description.Split(',');
+            string structureType = fields[0];
+            decimal maxHealth = decimal.Parse(fields[1]);
+            decimal maxEnergy = decimal.Parse(fields[2]);
+            bool physical = fields[3] == "yes";
+            int size = int.Parse(fields[4]);
+            decimal energyCost = decimal.Parse(fields[5]);
+            Biome biome = (Biome)Enum.Parse(typeof(Biome), fields[6]);
+            Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[7]);
+            SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[8]);
+            List<StatusFactory> statusFactories = ParseStatuses(fields[10], statuses);
+            bool producer = fields[11] == "yes";
+
+            StructureFactory newFactory = new StructureFactory(structureType, maxHealth, maxEnergy, size, physical, energyCost,
+                biome, terrain, soilQuality,  producer, 10f, statusFactories);
+            Factorys.Add(structureType, newFactory);
+            abilitiesList.Add(structureType, fields[9]);
         }
     }
 
     public class UnitFactories : Factories<AnimalFactory>
     {
-        public override void AddNewFactory(string description)
+        public override void AddNewFactory(string description, Statuses statuses)
         {
             string[] fields = description.Split(',');
             string unitType = fields[0];
@@ -169,7 +240,8 @@ namespace wpfTest.GameLogic
             bool thickSkin = fields[15] == "yes";
             Diet diet = (Diet)Enum.Parse(typeof(Diet), fields[16]);
             float spawningTime = float.Parse(fields[17]);
-            
+            List<StatusFactory> statusFactories = ParseStatuses(fields[19], statuses);
+
             Factorys.Add(unitType, 
                 new AnimalFactory(
                     unitType: unitType,
@@ -190,8 +262,8 @@ namespace wpfTest.GameLogic
                     spawningTime: spawningTime,
                     physical: true,
                     energyCost: energyCost,
-                    viewRange: 5
-                    ));
+                    viewRange: 5,
+                    statusFactories: statusFactories));
             //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f););
 
             abilitiesList.Add(unitType, fields[18]);

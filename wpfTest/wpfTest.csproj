@@ -75,6 +75,7 @@
     <Compile Include="GameLogic\Data\Entities\EntityFactory.cs" />
     <Compile Include="GameLogic\Data\Entities\Factories.cs" />
     <Compile Include="GameLogic\Data\Entities\Status.cs" />
+    <Compile Include="GameLogic\Data\Entities\Statuses.cs" />
     <Compile Include="GameLogic\Data\Entities\StatusFactory.cs" />
     <Compile Include="GameLogic\Data\Entities\Unit.cs" />
     <Compile Include="GameLogic\Data\GameStaticData.cs" />
@@ -148,6 +149,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="GameLogic\Data\Entities\Structures.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="GameLogic\Data\Entities\Trees.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

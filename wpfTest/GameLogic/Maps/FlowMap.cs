@@ -62,7 +62,7 @@ namespace wpfTest
         public static bool IsValidValue(float val) => val >= MIN_VALID_VALUE;
     }
 
-    public struct Vector2: ITargetable, IMovementTarget
+    public struct Vector2 : ITargetable, IMovementTarget
     {
         Vector2 ITargetable.Center => this;
 
@@ -75,12 +75,12 @@ namespace wpfTest
             Y = y;
         }
 
-        public static Vector2 operator +(Vector2 u, Vector2 v)=>
+        public static Vector2 operator +(Vector2 u, Vector2 v) =>
             new Vector2(u.X + v.X, u.Y + v.Y);
         public static Vector2 operator -(Vector2 u, Vector2 v) =>
             new Vector2(u.X - v.X, u.Y - v.Y);
         public static Vector2 operator /(Vector2 v, float a) =>
-            new Vector2(v.X/a,v.Y/a);
+            new Vector2(v.X / a, v.Y / a);
         public static Vector2 operator *(float a, Vector2 v) =>
             new Vector2(v.X * a, v.Y * a);
         public static bool operator ==(Vector2 u, Vector2 v) =>
@@ -117,7 +117,12 @@ namespace wpfTest
                 return this / Length;
         }
 
-        public float Length =>(float)Math.Sqrt(X * X + Y * Y);
+        public float Length => (float)Math.Sqrt(X * X + Y * Y);
+
+        float IMovementTarget.DistanceTo(Animal animal)
+        {
+            return (animal.Position - this).Length;
+        }
     }
 
     /// <summary>

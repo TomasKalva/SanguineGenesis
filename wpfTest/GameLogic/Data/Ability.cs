@@ -21,6 +21,7 @@ namespace wpfTest.GameLogic
     /// </summary>
     public interface IMovementTarget:ITargetable
     {
+        float DistanceTo(Animal animal);
     }
 
     public abstract class Ability
@@ -96,6 +97,8 @@ namespace wpfTest.GameLogic
 
         public abstract Command NewCommand(Caster caster, Target target);
 
+        public virtual bool ValidArguments(Caster caster, Target target) => true;
+
         /// <summary>
         /// Assigns commands to the units.
         /// </summary>
@@ -114,34 +117,34 @@ namespace wpfTest.GameLogic
 
         public virtual void SetCommands(IEnumerable<Caster> casters, Target target)
         {
-            //select only the casters who can pay and put the to list so 
-            //they can be enumerated multiple times
-            List<Caster> ableToPay = casters
-                .Where((caster) =>caster.Energy >= EnergyCost)
+            //casters are put to a list so that they can be enumerated multiple times
+            List<Caster> validCasters = casters
+                .Where((caster) =>caster.Energy >= EnergyCost)//select only the casters who can pay
+                .Where((caster) => ValidArguments(caster, target))//select only casters who are valid for this target
                  .ToList();
 
             //remove caster that is also target if the ability can't be self casted
             Caster self= target as Caster;
             if (!SelfCastable && self !=null)
-                ableToPay.Remove(self);
+                validCasters.Remove(self);
             
             //if there are no casters that can pay do nothing
-            if (!ableToPay.Any())
+            if (!validCasters.Any())
                 return;
 
             if (OnlyOne)
-                ableToPay = ableToPay.Take(1).ToList();
+                validCasters = validCasters.Take(1).ToList();
 
             //move units to the target until the required distance is reached
             if(typeof(Animal).IsAssignableFrom(typeof(Caster)) &&
                 !typeof(Nothing).IsAssignableFrom(typeof(Target)))
                 abilities.MoveToCast(this)
-                    .SetCommands(ableToPay
+                    .SetCommands(validCasters
                     .Where(caster=>caster.GetType()==typeof(Animal))
                     .Cast<Animal>(), target);
 
             //give command to each caster
-            foreach (Caster c in ableToPay)
+            foreach (Caster c in validCasters)
             {
                 //create new command and assign it to c
                 Command com = NewCommand(c, target);
@@ -305,9 +308,9 @@ namespace wpfTest.GameLogic
         }
     }
     
-    public sealed class PlantBuilding : TargetAbility<Entity, Node>
+    public sealed class BuildBuilding : TargetAbility<Entity, Node>
     {
-        internal PlantBuilding(TreeFactory buildingFactory)
+        internal BuildBuilding(BuildingFactory buildingFactory)
             : base(20f, buildingFactory.EnergyCost, true, false)
         {
             BuildingFactory = buildingFactory;
@@ -317,7 +320,7 @@ namespace wpfTest.GameLogic
 
         public override Command NewCommand(Entity caster, Node target)
         {
-            return new PlantBuildingCommand(caster, target, this);
+            return new BuildBuildingCommand(caster, target, this);
         }
 
         public override string ToString()
@@ -535,6 +538,29 @@ namespace wpfTest.GameLogic
         }
     }
 
+    public sealed class ChargeTo : TargetAbility<Animal, Entity>
+    {
+        public decimal AttackDamageMultiplier { get; }
+        public float ChargeSpeed { get; }
+
+        internal ChargeTo(decimal energyCost, float distance, decimal attackDamageMultiplier, float charageSpeed)
+            : base(distance, energyCost, false, false)
+        {
+            AttackDamageMultiplier = attackDamageMultiplier;
+            ChargeSpeed = charageSpeed;
+        }
+
+        public override Command NewCommand(Animal caster, Entity target)
+        {
+            return new ChargeToCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal charges to the entity and deals it damage.";
+        }
+    }
+
     public sealed class Pull : TargetAbility<Animal, Animal>
     {
         public float PreparationTime { get; }
@@ -558,13 +584,150 @@ namespace wpfTest.GameLogic
         }
     }
 
+    public sealed class Kick : TargetAbility<Animal, Animal>
+    {
+        public float PreparationTime { get; }
+        public decimal EnergyDamage { get; }
+
+        internal Kick(decimal energyCost, float distance, float preparationTime, decimal energyDamage)
+            : base(distance, energyCost, false, false)
+        {
+            PreparationTime = preparationTime;
+            EnergyDamage = energyDamage;
+        }
+
+        public override Command NewCommand(Animal caster, Animal target)
+        {
+            return new KickCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal kicks the target animal removing some of its energy.";
+        }
+    }
+
+    public sealed class ClimbTree : TargetAbility<Animal, Tree>
+    {
+        public float ClimbingTime { get; }
+        public AnimalsOnTreeFactory AnimalsOnTreeFactory { get; }
+
+        internal ClimbTree(decimal energyCost, float climbingTime)
+            : base(0.1f, energyCost, false, false)
+        {
+            ClimbingTime = climbingTime;
+            AnimalsOnTreeFactory = new AnimalsOnTreeFactory();
+        }
+
+        public override Command NewCommand(Animal caster, Tree target)
+        {
+            return new ClimbTreeCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal climbs on the tree.";
+        }
+    }
+
+    public sealed class ClimbDownTree : TargetAbility<Tree, Nothing>
+    {
+        public float ClimbingTime { get; }
+
+        internal ClimbDownTree(decimal energyCost, float climbingTime)
+            : base(0.1f, energyCost, false, false)
+        {
+            ClimbingTime = climbingTime;
+        }
+
+        public override Command NewCommand(Tree caster, Nothing target)
+        {
+            return new ClimbDownTreeCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal climbs down the tree.";
+        }
+    }
+
+
+    public sealed class EnterHole : TargetAbility<Animal, Structure>
+    {
+        public float EnteringTime { get; }
+
+        internal EnterHole(decimal energyCost, float enteringTime)
+            : base(0.1f, energyCost, false, false)
+        {
+            EnteringTime = enteringTime;
+        }
+
+        public override bool ValidArguments(Animal caster, Structure target)
+        {
+            //target has to have underground status
+            return target.Statuses.Where((s) => s is Underground).Any();
+        }
+
+        public override Command NewCommand(Animal caster, Structure target)
+        {
+            return new EnterHoleCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal enters the hole.";
+        }
+    }
+
+    public sealed class ImproveStructure : TargetAbility<Animal, Structure>
+    {
+        public decimal EnergyPerS { get; }
+
+        internal ImproveStructure(decimal energyPerS)
+            : base(0.1f, 0, false, false)
+        {
+            EnergyPerS = energyPerS;
+        }
+
+        public override Command NewCommand(Animal caster, Structure target)
+        {
+            return new ImproveStructureCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "The animal gives its energy to the structure.";
+        }
+    }
+
+    public sealed class ExitHole : TargetAbility<Structure, Nothing>
+    {
+        public float ExitingTime { get; }
+
+        internal ExitHole(decimal energyCost, float exitingTime)
+            : base(0.1f, energyCost, false, false)
+        {
+            ExitingTime = exitingTime;
+        }
+
+        public override Command NewCommand(Structure caster, Nothing target)
+        {
+            return new ExitHoleCommand(caster, target, this);
+        }
+
+        public override string Description()
+        {
+            return "All animals exit the hole the hole.";
+        }
+    }
+
     public sealed class KnockBack : TargetAbility<Animal, Animal>
     {
         public float PreparationTime { get; }
         public KnockAwayFactory KnockAwayFactory { get; }
 
         internal KnockBack(decimal energyCost, float distance, float preparationTime, KnockAwayFactory knockAwayFactory)
-            : base(distance, energyCost, false, false)
+            : base(distance, energyCost, false, true)
         {
             PreparationTime = preparationTime;
             KnockAwayFactory = knockAwayFactory;

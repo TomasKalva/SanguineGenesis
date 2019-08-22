@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic
 {
@@ -15,9 +16,10 @@ namespace wpfTest.GameLogic
         public decimal EnergyCost { get; }
         public float ViewRange { get; }
         public List<Ability> Abilities { get; }
+        public List<StatusFactory> StatusFactories { get; }
 
         public EntityFactory(string entityType, decimal maxHealth, decimal maxEnergy,
-            bool physical, decimal energyCost, float viewRange)
+            bool physical, decimal energyCost, float viewRange, List<StatusFactory> statusFactories)
         {
             EntityType = entityType;
             MaxHealth = maxHealth;
@@ -26,32 +28,35 @@ namespace wpfTest.GameLogic
             EnergyCost = energyCost;
             ViewRange = viewRange;
             Abilities = new List<Ability>();
+            StatusFactories = statusFactories;
         }
 
+        public Entity SetStatuses(Entity entity)
+        {
+            foreach(StatusFactory statFac in StatusFactories)
+                statFac.ApplyToEntity(entity);
+            return entity;
+        }
     }
 
     public abstract class BuildingFactory : EntityFactory
     {
-        public decimal MaxEnergyIntake { get; }
         public int Size { get; }
         public Biome Biome { get; }
         public Terrain Terrain { get; }
         public SoilQuality SoilQuality { get; }
         public bool Producer { get; }
 
-        public BuildingFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange)
-            : base(buildingType, maxHealth, maxEnergy, physical, energyCost, viewRange)
+        public BuildingFactory(string buildingType, decimal maxHealth, decimal maxEnergy, int size,
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<StatusFactory> statusFactories)
+            : base(buildingType, maxHealth, maxEnergy, physical, energyCost, viewRange, statusFactories)
         {
-            MaxEnergyIntake = maxEnergyIntake;
             Size = size;
             Biome = biome;
             Terrain = terrain;
             SoilQuality = soilQuality;
             Producer = producer;
         }
-
-        public abstract Building NewInstance(Player player, Node[,] nodesUnder, Node[,] energySources);
 
         /// <summary>
         /// Returns true iff this building can be on the node.
@@ -66,20 +71,22 @@ namespace wpfTest.GameLogic
 
     public class TreeFactory : BuildingFactory
     {
+        public decimal MaxEnergyIntake { get; }
         public int RootsDistance { get; }
         public int Air { get; }
 
-        public override Building NewInstance(Player player, Node[,] nodesUnder, Node[,] roots)
+        public Tree NewInstance(Player player, Node[,] nodesUnder, Node[,] roots)
         {
-            return new Tree(player, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake,
-                Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Air, Abilities.ToList());
+            return (Tree)SetStatuses(new Tree(player, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake,
+                Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Air, Abilities.ToList()));
         }
 
         public TreeFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int rootsDistance, int air)
-            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange)
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int rootsDistance, int air, List<StatusFactory> statusFactories)
+            : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange, statusFactories)
 
         {
+            MaxEnergyIntake = maxEnergyIntake;
             RootsDistance = rootsDistance;
             Air = air;
         }
@@ -87,15 +94,15 @@ namespace wpfTest.GameLogic
 
     public class StructureFactory : BuildingFactory
     {
-        public override Building NewInstance(Player player, Node[,] nodesUnder, Node[,] energySources)
+        public Structure NewInstance(Player player, Node[,] nodesUnder)
         {
-            return new Structure(player, EntityType, nodesUnder, energySources, MaxHealth, MaxEnergy, MaxEnergyIntake,
-                Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Abilities.ToList());
+            return (Structure)SetStatuses(new Structure(player, EntityType, nodesUnder, MaxHealth, MaxEnergy,
+                Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Abilities.ToList()));
         }
 
-        public StructureFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange)
-            : base(buildingType, maxHealth, maxEnergy, maxEnergyIntake, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange)
+        public StructureFactory(string buildingType, decimal maxHealth, decimal maxEnergy, int size,
+            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<StatusFactory> statusFactories)
+            : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange, statusFactories)
 
         {
         }
@@ -106,8 +113,8 @@ namespace wpfTest.GameLogic
         public float Range { get; }//range of the circle collider
 
         public UnitFactory(string unitType, decimal maxHealth, decimal maxEnergy, float range, bool physical, decimal energyCost,
-            float viewRange)
-            : base(unitType, maxHealth, maxEnergy, physical, energyCost, viewRange)
+            float viewRange, List<StatusFactory> statusFactories)
+            : base(unitType, maxHealth, maxEnergy, physical, energyCost, viewRange, statusFactories)
         {
             Range = range;
         }
@@ -130,7 +137,7 @@ namespace wpfTest.GameLogic
 
         public Animal NewInstance(Player player, Vector2 pos)
         {
-            return new Animal(
+            return (Animal)SetStatuses(new Animal(
                 player: player,
                 position: pos,
                 unitType: EntityType,
@@ -152,7 +159,7 @@ namespace wpfTest.GameLogic
                 physical:Physical,
                 energyCost:EnergyCost,
                 viewRange:ViewRange,
-                abilities:Abilities.ToList());
+                abilities:Abilities.ToList()));
         }
 
         public AnimalFactory(
@@ -174,8 +181,9 @@ namespace wpfTest.GameLogic
             float spawningTime,
             bool physical,
             decimal energyCost,
-            float viewRange)
-            : base(unitType, maxHealth, maxEnergy, range, physical, energyCost, viewRange)
+            float viewRange,
+            List<StatusFactory> statusFactories)
+            : base(unitType, maxHealth, maxEnergy, range, physical, energyCost, viewRange, statusFactories)
         {
             FoodEnergyRegen = foodEnergyRegen;
             FoodEatingPeriod = foodEatingPeriod;

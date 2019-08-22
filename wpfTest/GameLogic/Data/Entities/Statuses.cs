@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Entities
 {
-    class Statuses
+    public class Statuses
     {
+        public UndergroundFactory UndergroundFactory { get; }
+
+        public Statuses()
+        {
+            UndergroundFactory = new UndergroundFactory();
+        }
+
     }
 }

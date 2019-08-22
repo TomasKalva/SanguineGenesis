@@ -29,17 +29,9 @@ namespace wpfTest.GameLogic
         /// </summary>
         public Node[,] Nodes { get; }
         /// <summary>
-        /// Sources from which the building takes energy.
-        /// </summary>
-        public Node[,] EnergySources { get; }
-        /// <summary>
         /// Type of the building.
         /// </summary>
         public string BuildingType { get; }
-        /// <summary>
-        /// Maximum energy taken from one source per second.
-        /// </summary>
-        public decimal MaxEnergyIntake { get; }
         /// <summary>
         /// How many nodes horizontally and also vertically it takes.
         /// </summary>
@@ -66,13 +58,11 @@ namespace wpfTest.GameLogic
         /// </summary>
         public Vector2 RallyPoint { get; set; }
 
-        public Building(Player player, string buildingType, Node[,] nodes, Node[,] energySources, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+        public Building(Player player, string buildingType, Node[,] nodes, decimal maxHealth, decimal maxEnergy, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)
             : base(player, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Nodes = nodes;
-            EnergySources = energySources;
-            MaxEnergyIntake = maxEnergyIntake;
             Size = size;
             Biome = biome;
             Terrain = terrain;
@@ -111,45 +101,6 @@ namespace wpfTest.GameLogic
             }
         }
 
-        /// <summary>
-        /// Transforms nutrients from energy sources to energy.
-        /// </summary>
-        public void DrainEnergy()
-        {
-            foreach(Node n in EnergySources)
-            {
-                //check if building can take nutrients from this node
-                if(n.Terrain == Terrain &&
-                    n.Biome == Biome)
-                {
-                    //take nutrients from this node
-                    decimal nutrientsTaken;
-
-                    //building can't take amount of nutrients that would reduce soil quality
-                    nutrientsTaken = Math.Min(MaxEnergyIntake, n.Nutrients - n.Terrain.Nutrients(n.Biome, n.SoilQuality));
-
-                    //nutrients can't drop below zero
-                    nutrientsTaken = Math.Min(nutrientsTaken, n.Nutrients);
-
-                    //building only takes energy it can use
-                    nutrientsTaken = Math.Min(nutrientsTaken, Energy.NotFilled);
-
-                    Energy += nutrientsTaken;
-                    n.Nutrients -= nutrientsTaken;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Puts nutrients to the soil at its roots.
-        /// </summary>
-        public void ProduceNutrients()
-        {
-            foreach (Node n in EnergySources)
-            {
-                n.Nutrients += MaxEnergyIntake * 2;
-            }
-        }
 
         public override void Die()
         {

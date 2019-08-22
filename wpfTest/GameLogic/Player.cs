@@ -15,6 +15,7 @@ namespace wpfTest
         public List<Unit> Units => Entities.Where((e) => e is Unit).Select((u)=>(Unit)u).ToList();
         public List<Animal> Animals => Entities.Where((e) => e is Animal).Select((u) => (Animal)u).ToList();
         public List<Building> Buildings => Entities.Where((e) => e is Building).Select((u) => (Building)u).ToList();
+        public List<Tree> Trees => Entities.Where((e) => e is Tree).Select((u) => (Tree)u).ToList();
         public VisibilityMap VisibilityMap { get; set; }
         public bool MapChanged => MapView.MapWasChanged;
         public Map MapView { get; private set; }
@@ -40,7 +41,7 @@ namespace wpfTest
             if (PlayerID == Players.PLAYER1)
                 return;
 
-            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.4f, 5m, 0.5f, 0.1f, false, 4f, 2f, Movement.LAND_WATER, false, Diet.CARNIVORE, 5f, true, 20m, 5f);
+            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.4f, 5m, 0.5f, 0.1f, false, 4f, 2f, Movement.LAND_WATER, false, Diet.CARNIVORE, 5f, true, 20m, 5f, new List<StatusFactory>());
                 //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
             UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/

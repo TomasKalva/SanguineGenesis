@@ -90,5 +90,10 @@ namespace wpfTest
             Nutrients -= nutrientsToEat;
             eater.Energy += nutrientsToEat * 10;
         }
+
+        float IMovementTarget.DistanceTo(Animal animal)
+        {
+            return (animal.Position - Center).Length;
+        }
     }
 }

@@ -13,14 +13,14 @@ namespace wpfTest.GameLogic
         private Dictionary<Ability, MoveTo> moveToCast;
         private Dictionary<string, Spawn> unitSpawn;
         private Dictionary<string, CreateUnit> unitCreate;
-        private Dictionary<string, PlantBuilding> plantBuilding;
+        private Dictionary<string, BuildBuilding> buildBuilding;
 
         public MoveTo MoveTo { get; }
         public MoveTo MoveToCast(Ability ability) => moveToCast[ability];
         public Attack Attack { get; }
         public Spawn UnitSpawn(string type) => unitSpawn[type];
         public CreateUnit UnitCreate(string type) => unitCreate[type];
-        public PlantBuilding PlantBuilding(string type) => plantBuilding[type];
+        public BuildBuilding BuildBuilding(string type) => buildBuilding[type];
         public Grow Grow { get; }
         public SetRallyPoint SetRallyPoint { get; }
         public HerbivoreEat HerbivoreEat { get; }
@@ -35,6 +35,14 @@ namespace wpfTest.GameLogic
         public Pull BigPull { get; }
         public ApplyStatus ActivateFarSight { get; }
         public KnockBack KnockBack { get; }
+        public ClimbTree ClimbTree { get; }
+        public ClimbDownTree ClimbDownTree { get; }
+        public EnterHole EnterHole { get; }
+        public ExitHole ExitHole { get; }
+        public ApplyStatus ActivateFastStrikes { get; }
+        public ImproveStructure ImproveStructure { get; }
+        public ChargeTo ChargeTo { get; }
+        public Kick Kick { get; }
 
         internal Abilities(GameStaticData gameStaticData)
         {
@@ -63,13 +71,19 @@ namespace wpfTest.GameLogic
                 unitCreate.Add(unitFac.Value.EntityType, createUnit);
             }
 
-            //plant buiding
-            plantBuilding = new Dictionary<string, GameLogic.PlantBuilding>();
-            foreach (var buildingFac in gameStaticData.TreeFactories.Factorys)
+            //build buiding
+            buildBuilding = new Dictionary<string, GameLogic.BuildBuilding>();
+            foreach (var treeFac in gameStaticData.TreeFactories.Factorys)
             {
-                PlantBuilding plant = new PlantBuilding(buildingFac.Value);
+                BuildBuilding plant = new BuildBuilding(treeFac.Value);
                 plant.SetAbilities(this);
-                plantBuilding.Add(buildingFac.Value.EntityType, plant);
+                buildBuilding.Add(treeFac.Value.EntityType, plant);
+            }
+            foreach (var structureFac in gameStaticData.StructureFactories.Factorys)
+            {
+                BuildBuilding plant = new BuildBuilding(structureFac.Value);
+                plant.SetAbilities(this);
+                buildBuilding.Add(structureFac.Value.EntityType, plant);
             }
 
             //grow
@@ -124,9 +138,41 @@ namespace wpfTest.GameLogic
             ActivateFarSight = new ApplyStatus(20, new Data.Entities.FarSightFactory(rangeExtension: 6f));
             ActivateFarSight.SetAbilities(this);
 
-            //shell
+            //knockback
             KnockBack = new KnockBack(20, 0.1f, 0.3f, new Data.Entities.KnockAwayFactory(distance:2f, speed: 6f));
             KnockBack.SetAbilities(this);
+
+            //climb tree
+            ClimbTree = new ClimbTree(20, 0.3f);
+            ClimbTree.SetAbilities(this);
+
+            //climb down tree
+            ClimbDownTree = new ClimbDownTree(0, 0.3f);
+            ClimbDownTree.SetAbilities(this);
+
+            //enter hole
+            EnterHole = new EnterHole(0, 0.3f);
+            EnterHole.SetAbilities(this);
+
+            //enter hole
+            ExitHole = new ExitHole(0, 0.3f);
+            ExitHole.SetAbilities(this);
+
+            //fast strikes
+            ActivateFastStrikes = new ApplyStatus(20, new Data.Entities.FastStrikesFactory(duration: 4f));
+            ActivateFastStrikes.SetAbilities(this);
+
+            //improve structure
+            ImproveStructure = new ImproveStructure(3m);
+            ImproveStructure.SetAbilities(this);
+
+            //charge to
+            ChargeTo = new ChargeTo(20m, 3f, 2.5m, 10f);
+            ChargeTo.SetAbilities(this);
+
+            //kick
+            Kick = new Kick(20m, 0.1f, 0.2f, 30m);
+            Kick.SetAbilities(this);
 
             //move to cast has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();

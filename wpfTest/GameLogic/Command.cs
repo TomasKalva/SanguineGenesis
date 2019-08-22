@@ -87,22 +87,25 @@ namespace wpfTest
         /// </summary>
         protected bool CanBeUsed()
         {
-            bool canBeUsed = true;
+            if (CommandedEntity.IsDead)
+                return false;
+            Entity targEnt = Targ as Entity;
+            if (targEnt!=null && targEnt.IsDead)
+                return false;
+
             Animal commandedA = CommandedEntity as Animal;
             if (commandedA != null)
             {
-                if (((commandedA.StateChangeLock != null && commandedA.StateChangeLock != this)
-                    || commandedA.IsDead))
-                    canBeUsed = false;
+                if (commandedA.StateChangeLock != null && commandedA.StateChangeLock != this)
+                    return false;
             }
             Animal targA = Targ as Animal;
             if (targA != null)
             {
-                if (((targA.StateChangeLock != null && targA.StateChangeLock != this)
-                    || targA.IsDead))
-                    canBeUsed = false;
+                if (targA.StateChangeLock != null && targA.StateChangeLock != this)
+                    return false;
             }
-            return canBeUsed;
+            return true;
         }
 
         public override bool PerformCommand(Game game, float deltaT)
@@ -237,7 +240,7 @@ namespace wpfTest
         }
     }
 
-    public class ConsumeAnimalCommand : Command<Animal, Animal, ConsumeAnimal>
+    public class ConsumeAnimalCommand : Command<Animal, Animal, ConsumeAnimal>, IAnimalStateManipulator
     {
         private float timer;
 
@@ -249,13 +252,184 @@ namespace wpfTest
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
+            CommandedEntity.StateChangeLock = this;
+            Targ.StateChangeLock = this;
+
             timer += deltaT;
             if (timer > Ability.TimeToConsume)
             {
                 ConsumedAnimalFactory consumedFact = Ability.ConsumedAnimalFactory;
                 consumedFact.AnimalConsumed = Targ;
                 consumedFact.ApplyToAffected(CommandedEntity);
+                CommandedEntity.StateChangeLock = null;
                 return true;
+            }
+
+            return false;
+        }
+    }
+
+    public class ClimbTreeCommand : Command<Animal, Tree, ClimbTree>, IAnimalStateManipulator
+    {
+        private float timer;
+
+        public ClimbTreeCommand(Animal commandedEntity, Tree target, ClimbTree climbTree)
+            : base(commandedEntity, target, climbTree)
+        {
+            timer = 0f;
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            timer += deltaT;
+            if (timer >= Ability.ClimbingTime)
+            {
+                //put the animal on the target tree
+                CommandedEntity.Player.Entities.Remove(CommandedEntity);
+
+                AnimalsOnTreeFactory anOnTreeFact = Ability.AnimalsOnTreeFactory;
+                anOnTreeFact.PutOnTree = CommandedEntity;
+                anOnTreeFact.ApplyToAffected(Targ);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public class EnterHoleCommand : Command<Animal, Structure, EnterHole>, IAnimalStateManipulator
+    {
+        private float timer;
+
+        public EnterHoleCommand(Animal commandedEntity, Structure target, EnterHole enterHole)
+            : base(commandedEntity, target, enterHole)
+        {
+            timer = 0f;
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            timer += deltaT;
+            if (timer >= Ability.EnteringTime)
+            {
+                Underground underground = (Underground)Targ.Statuses.Where((s) => s is Underground).FirstOrDefault();
+                if(underground!=null)
+                {
+                    //put the animal in the target hole
+                    CommandedEntity.Player.Entities.Remove(CommandedEntity);
+                    underground.AnimalsUnderGround.Add(CommandedEntity);
+                    CommandedEntity.StateChangeLock = underground;
+                }
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    public class ImproveStructureCommand : Command<Animal, Structure, ImproveStructure>, IAnimalStateManipulator
+    {
+        public ImproveStructureCommand(Animal commandedEntity, Structure target, ImproveStructure improveStructure)
+            : base(commandedEntity, target, improveStructure)
+        {
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            //calculate transfered energy so that no energy is gained or lost during the transfer
+            decimal transferedEn = Math.Min(((decimal)deltaT) * Ability.EnergyPerS, CommandedEntity.Energy);
+            transferedEn = Math.Min(transferedEn, Targ.Energy.NotFilled);
+
+            //transfer the energy
+            CommandedEntity.Energy -= transferedEn;
+            Targ.Energy += transferedEn;
+
+            //if the commanded entity doesn't have energy anymore, it can't give energy to the structure
+            if (CommandedEntity.Energy == 0)
+                return true;
+
+            return false;
+        }
+    }
+
+    public class ExitHoleCommand : Command<Structure, Nothing, ExitHole>, IAnimalStateManipulator
+    {
+        private float timer;
+
+        public ExitHoleCommand(Structure commandedEntity, Nothing target, ExitHole exitHole)
+            : base(commandedEntity, target, exitHole)
+        {
+            timer = 0f;
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            timer += deltaT;
+            if (timer >= Ability.ExitingTime)
+            {
+                timer -= Ability.ExitingTime;
+                Underground underground = (Underground)CommandedEntity.Statuses.Where((s) => s is Underground).FirstOrDefault();
+                if (underground != null)
+                {
+                    //put an animal out of the hole
+                    Animal animalInHole = underground.AnimalsUnderGround.FirstOrDefault();
+                    if (animalInHole != null)
+                    {
+                        animalInHole.Player.Entities.Add(animalInHole);
+                        animalInHole.Position = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - animalInHole.Range);
+                        underground.AnimalsUnderGround.Remove(animalInHole);
+                        animalInHole.StateChangeLock = null;
+                        return false;
+                    }
+                    else
+                        //no more animals to put out of holes
+                        return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    public class ClimbDownTreeCommand : Command<Tree, Nothing, ClimbDownTree>, IAnimalStateManipulator
+    {
+        private float timer;
+
+        public ClimbDownTreeCommand(Tree commandedEntity, Nothing target, ClimbDownTree climbDownTree)
+            : base(commandedEntity, target, climbDownTree)
+        {
+            timer = 0f;
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            var status = (AnimalsOnTree)CommandedEntity.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
+            //finish command if the status isn't on the tree anymore
+            if (status == null)
+                return true;
+
+            timer += deltaT;
+            if (timer >= Ability.ClimbingTime)
+            {
+                timer -= Ability.ClimbingTime;
+                //put the animals from the tree back to the ground
+                Animal anOnTree = status.Animals.FirstOrDefault();
+                if (anOnTree == null)
+                    //all animals already climbed down
+                    return true;
+                else
+                {
+                    anOnTree.StateChangeLock = null;
+                    CommandedEntity.Player.Entities.Add(anOnTree);
+                    status.Animals.Remove(anOnTree);
+
+                    //if there are no animals left, remove the status
+                    if (!status.Animals.Any())
+                    {
+                        CommandedEntity.RemoveStatus(status);
+                        return true;
+                    }
+                }
             }
 
             return false;
@@ -575,16 +749,19 @@ namespace wpfTest
         }
     }
 
-    public class PlantBuildingCommand : Command<Entity, Node, PlantBuilding>
+    public class BuildBuildingCommand : Command<Entity, Node, BuildBuilding>
     {
-        private PlantBuildingCommand() : base(null, null, null) => throw new NotImplementedException();
-        public PlantBuildingCommand(Entity commandedEntity, Node target, PlantBuilding plantBuilding)
+        private BuildBuildingCommand() : base(null, null, null) => throw new NotImplementedException();
+        public BuildBuildingCommand(Entity commandedEntity, Node target, BuildBuilding plantBuilding)
             : base(commandedEntity, target, plantBuilding)
         {
         }
 
         public override bool PerformCommand(Game game, float deltaT)
         {
+            if (!CanBeUsed())
+                //finish if the command can't be used
+                return true;
 
             Map map = game.Map;
             BuildingFactory bf = Ability.BuildingFactory;
@@ -617,35 +794,35 @@ namespace wpfTest
             if (canBeBuilt)
             {
                 if (!TryPay())
-                    //finish command if paying was unsuccessful
+                    //entity doesn't have enough energy
                     return true;
 
-                //find energy source nodes
-                Node[,] energySourceNodes;
+                Player newUnitOwner = CommandedEntity.Player;
+                Building newBuilding;
                 if (bf is TreeFactory trF)
-                { 
+                {
+                    //find energy source nodes
+                    Node[,] rootNodes;
                     int rDist = trF.RootsDistance;
-                    energySourceNodes = GameQuerying.GetGameQuerying().SelectNodes(map, nX - rDist, nY - rDist, nX + (size + rDist - 1), nY + (size + rDist - 1));
+                    rootNodes = GameQuerying.GetGameQuerying().SelectNodes(map, nX - rDist, nY - rDist, nX + (size + rDist - 1), nY + (size + rDist - 1));
+                    newBuilding = trF.NewInstance(newUnitOwner, buildNodes, rootNodes);
+                    //make the tree grow
+                    newUnitOwner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get);
                 }
                 else
                 {
-                    energySourceNodes = buildNodes;
+                    StructureFactory stF = bf as StructureFactory;
+                    newBuilding = stF.NewInstance(newUnitOwner, buildNodes);
                 }
                 //put the new building on the main map
-                Player newUnitOwner = CommandedEntity.Player;
-                Building newBuilding = Ability.BuildingFactory.NewInstance(newUnitOwner, buildNodes, energySourceNodes);
                 game.Players[newUnitOwner.PlayerID].Entities.Add(newBuilding);
                 map.AddBuilding(newBuilding);
                 game.Map.MapWasChanged = true;
-
-                //if the new building is a tree, make it grow
-                if(newBuilding.GetType()==typeof(Tree))
-                    newUnitOwner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1){ (Tree)newBuilding}, Nothing.Get);
             }
             //the command always immediately finishes regardless of the success of placing the building
             return true;
         }
-
+        
         public override bool PerformCommandLogic(Game game, float deltaT)
             => throw new NotImplementedException("This method is never used.");
     }
@@ -793,6 +970,34 @@ namespace wpfTest
         }
     }
 
+
+    public class ChargeToCommand : Command<Animal, Entity, ChargeTo>, IAnimalStateManipulator
+    {
+        private MoveAnimalToPoint moveAnimalToPoint;
+
+        public ChargeToCommand(Animal commandedEntity, Entity target, ChargeTo chargeTo)
+            : base(commandedEntity, target, chargeTo)
+        {
+            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.ChargeSpeed);
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            CommandedEntity.StateChangeLock = this;
+            CommandedEntity.TurnToPoint(Targ.Center);
+            
+            if (moveAnimalToPoint.Step(deltaT))
+            {
+                CommandedEntity.StateChangeLock = null;
+                Targ.Damage(Ability.AttackDamageMultiplier * CommandedEntity.AttackDamage);
+                return true;
+            }
+
+            //command doesn't finish until the animal jumps
+            return false;
+        }
+    }
+
     public class PullCommand : Command<Animal, Animal, Pull>, IAnimalStateManipulator
     {
         private float timer;
@@ -855,6 +1060,31 @@ namespace wpfTest
         }
     }
 
+    public class KickCommand : Command<Animal, Animal, Kick>
+    {
+        private float timer;
+
+        public KickCommand(Animal commandedEntity, Animal target, Kick kick)
+            : base(commandedEntity, target, kick)
+        {
+            timer = 0f;
+        }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+        {
+            CommandedEntity.TurnToPoint(Targ.Position);
+
+            timer += deltaT;
+            if (timer >= Ability.PreparationTime)
+            {
+                //remove some of the target's energy
+                Targ.Energy -= Ability.EnergyDamage;
+                return true;
+            }
+            return false;
+        }
+    }
+
     public class KnockBackCommand : Command<Animal, Animal, KnockBack>
     {
         public KnockBackCommand(Animal commandedEntity, Animal target, KnockBack knockBack)
@@ -888,17 +1118,17 @@ namespace wpfTest
     public class MoveAnimalToPoint
     {
         public Animal Animal { get; }
-        public Vector2 Point { get; }
+        public IMovementTarget Target { get; }
         public float MaxWaitTime { get; }
         public float Speed { get; }
         private float timer;
 
-        public MoveAnimalToPoint(Animal animal, Vector2 point, float speed)
+        public MoveAnimalToPoint(Animal animal, IMovementTarget point, float speed)
         {
             Animal = animal;
-            Point = point;
+            Target = point;
             Speed = speed;
-            MaxWaitTime = (Animal.Position - point).Length / speed;
+            MaxWaitTime = Target.DistanceTo(Animal) / speed;
             timer = 0f;
         }
 
@@ -914,10 +1144,10 @@ namespace wpfTest
             Animal.Velocity = new Vector2(0, 0);
             //calculate maximal displacement of Animal
             float posChange = deltaT * Speed;
-            float distanceToPoint = (Animal.Position - Point).Length;
+            float distanceToPoint = Target.DistanceTo(Animal);
             float speed = Math.Min(posChange, distanceToPoint);
             //change Animal's position
-            Animal.Position += speed * Animal.Position.UnitDirectionTo(Point);
+            Animal.Position += speed * Animal.Position.UnitDirectionTo(Target.Center);
 
             timer += deltaT;
             //finish command if Animal is close enough or the time is over
