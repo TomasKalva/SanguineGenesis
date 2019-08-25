@@ -15,7 +15,7 @@ namespace wpfTest.GUI
 {
     abstract class ButtonArray<InfoSource> : Grid where InfoSource:IShowable
     {
-        public List<InfoSource> InfoSources { get; private set; }
+        public List<InfoSource> InfoSources { get; set; }
         public InfoSource GetInfoSource(int index)
         {
             if (InfoSources!=null && index < InfoSources.Count)
@@ -23,6 +23,7 @@ namespace wpfTest.GUI
             else
                 return default(InfoSource);
         }
+        public InfoSource Selected { get; set; }
         public int Columns { get; }
         public int Rows { get; }
 
@@ -97,9 +98,10 @@ namespace wpfTest.GUI
             }
         }
 
-        public void Update(List<InfoSource> infoSources)
+        public void Update()
         {
-            InfoSources = infoSources;
+            if (InfoSources == null)
+                return;
             //update units panel
             for (int i = 0; i < Children.Count; i++)
             {
@@ -112,6 +114,11 @@ namespace wpfTest.GUI
                 {
                     b.Content = InfoSources[i].GetName;
                     b.Visibility = Visibility.Visible;
+                    //highlight selected
+                    if (InfoSources[i].Equals(Selected))
+                        b.Background = Brushes.DarkGreen;
+                    else
+                        b.ClearValue(BackgroundProperty);
                 }
             }
         }
@@ -119,40 +126,34 @@ namespace wpfTest.GUI
 
     class EntityButtonArray : ButtonArray<Entity>
     {
-        public List<Entity> SelectedEntities { get; set; }
-        public Entity SelectedEntity { get; private set; }
-
         public EntityButtonArray(int colulmns, int rows, double width, double height)
             : base(colulmns, rows, width, height)
         {
-            SelectedEntities = new List<Entity>();
-            for (int i = 0; i < Children.Count; i++)
-            {
-                Button b = (Button)Children[i];
-                int buttonInd = i;//capture by value
-                                  //select entity
-                b.Click += (button, ev) =>
-                {
-                    if (buttonInd < SelectedEntities.Count)
-                    {
-                        SelectedEntity = SelectedEntities[buttonInd];
-                    }
-                };
-            }
             Style = (Style)Application.Current.FindResource("EntitiesArrayStyle");
         }
 
-        public void ShowInfoOnClick(EntityInfoPanel entityInfoPanel)
+        public void ShowInfoOnClick(EntityInfoPanel entityInfoPanel, AbilityButtonArray abilityButtonArray, GameControls gameControls)
         {
             for (int i = 0; i < Columns * Rows; i++)
             {
                 Button b = (Button)Children[i];
                 int buttonInd = i;//capture by value
-                b.Click += (sender, ev) =>
+                b.PreviewMouseDown += (sender, ev) =>
                 {
                     Entity info;
                     if ((info = GetInfoSource(buttonInd)) != null)
-                        entityInfoPanel.Update(info);
+                    {
+                        if (ev.RightButton == MouseButtonState.Pressed)
+                        {
+                            //remove the entity corresponding to the clicked button from selection
+                            gameControls.SelectedEntities.RemoveEntity(info);
+                        }
+                        else
+                        {
+                            //select this entity
+                            Selected = info;
+                        }
+                    }
                 };
             }
         }
@@ -160,10 +161,8 @@ namespace wpfTest.GUI
 
     class AbilityButtonArray : ButtonArray<Ability>
     {
-        public List<Ability> SelectedEntitysAbilities { get; set; }
-
-        public AbilityButtonArray(int colulmns, int rows, double width, double height)
-            : base(colulmns, rows, width, height)
+        public AbilityButtonArray(int columns, int rows, double width, double height)
+            : base(columns, rows, width, height)
         {
             Style = (Style)Application.Current.FindResource("AbilitiesArrayStyle");
         }
@@ -189,40 +188,26 @@ namespace wpfTest.GUI
 
     class StatusButtonArray : ButtonArray<Status>
     {
-        public List<Status> Statuses { get; set; }
         public Status SelectedStatus { get; private set; }
 
         public StatusButtonArray(int columns, int rows, double width, double height)
             : base(columns, rows, width, height)
         {
-            Statuses = new List<Status>();
-            for (int i = 0; i < Children.Count; i++)
-            {
-                Button b = (Button)Children[i];
-                
-            }
             Style = (Style)Application.Current.FindResource("StatusArrayStyle");
         }
     }
 
     class CommandButtonArray : ButtonArray<Command>
     {
-        public List<Command> Commands { get; set; }
-        public Command SelectedCommand { get; private set; }
-
         public CommandButtonArray(int colulmns, int rows, double width, double height)
             : base(colulmns, rows, width, height)
         {
-            Commands = new List<Command>();
-            for (int i = 0; i < Children.Count; i++)
-            {
-                Button b = (Button)Children[i];
-                int buttonInd = i;//capture by value
-            }
             if (Children.Count > 0)
                 ((Button)Children[0]).Background = Brushes.Green;
             Style = (Style)Application.Current.FindResource("CommandsArrayStyle");
         }
+
+
     }
 
     public interface IShowable

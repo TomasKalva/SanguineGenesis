@@ -60,12 +60,14 @@ namespace wpfTest
                         if (MapSelectorFrame == null)
                         {
                             MapSelectorFrame = new MapSelectorFrame(mapPoint);
-                            SelectedEntities.RemoveUnits(SelectedEntities.Entities);
+                            SelectedEntities.Clear();
                         }
                         else
                         {
                             MapSelectorFrame.SetEndPoint(mapPoint);
-                            SelectedEntities.SetUnits(MapSelectorFrame.GetSelectedUnits(game).ToList());
+                            List<Entity> selected = MapSelectorFrame.GetSelectedUnits(game).ToList();
+                            lock(SelectedEntities)
+                                SelectedEntities.SetEntities(selected);
                             MapSelectorFrame.Update();
                         }
                         break;

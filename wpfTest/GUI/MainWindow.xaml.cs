@@ -55,7 +55,9 @@ namespace wpfTest
             gameControls = new GameControls(MapView, MapMovementInput, game);
             openGLControl1.FrameRate = 30;
 
-            Thread t = new Thread(() => {
+
+            Thread t = new Thread(() =>
+            {
                 Dispatcher.Invoke(DispatcherPriority.Render, new Action(() =>
                 {
                     //wait for window layout initialization
@@ -108,9 +110,6 @@ namespace wpfTest
                 }
 
                 stepStopwatch.Stop();
-                //set resource value for the window
-                lock (resourceLock)
-                    currentPlayersResource = game.CurrentPlayer.Resource;
 
                 //calculate sleep time
                 double diff = stepStopwatch.Elapsed.TotalMilliseconds;
@@ -131,27 +130,7 @@ namespace wpfTest
                 }
             }
         }
-
-        public void ResizeView()
-        {
-            //gameControls.MapView.SetActualExtents((float)tiles.ActualWidth, (float)tiles.ActualHeight);
-        }
-
-        //these variables are used because the original variables can be modified from other threads
-        private List<Entity> selectedUnits;
-        private Button[] unitButtons;
-        private List<Ability> selectedUnitsAbilities;
-        private Button[] abilityButtons;
-        private Entity selectedEntity;
-        private Ability selectedAbility;
-        private Label[] selUnCommands;
-        private object resourceLock = new object();
-        private float currentPlayersResource;
-
         
-
-       
-
         public struct Stat
         {
             public string Name { get; }
@@ -163,10 +142,7 @@ namespace wpfTest
                 Value = value;
             }
         }
-
-
         
-
         private EntityButtonArray entityButtonArray;
         private AbilityButtonArray abilityButtonArray;
         private EntityInfoPanel entityInfoPanel;
@@ -174,90 +150,18 @@ namespace wpfTest
 
         private void InitializeBottomPanel()
         {
-            selectedUnitsAbilities = new List<Ability>();
-
-
             //fill ui elements with buttons
             //units panel
             entityButtonArray = new EntityButtonArray(8, 5, 300, 188);
             gui.Children.Add(entityButtonArray);
-
-            unitButtons = new Button[48];
-            for (int i = 0; i < unitButtons.Length; i++)
-            {
-                Button b = new Button();
-                int buttonInd = i;//capture by value
-                //select unit
-                b.Click += (button,ev) =>
-                {
-                    if (buttonInd < selectedUnits.Count)
-                    {
-                        selectedEntity = selectedUnits[buttonInd];
-                        UpdateUnitInfo();
-                    }
-                };
-                b.Content = "";
-                b.SetValue(Grid.ColumnProperty, i % 8);
-                b.SetValue(Grid.RowProperty, i / 8);
-                b.Background = Brushes.LightBlue;
-                b.Focusable = false;
-                unitPanel.Children.Add(b);
-                unitButtons[i] = b;
-            }
-
+            
             //abilities panel
             abilityButtonArray = new AbilityButtonArray(4, 4, 200, 200);
             gui.Children.Add(abilityButtonArray);
-
-            abilityButtons = new Button[16];
-            for(int i = 0; i < abilityButtons.Length; i++)
-            {
-                Button b= new Button();
-                int buttonInd=i;//capture by value
-                //select ability
-                b.Click += (button, ev) =>
-                  {
-                      if (buttonInd < selectedUnitsAbilities.Count)
-                      {
-                          selectedAbility = selectedUnitsAbilities[buttonInd];
-                          lock (gameControls.EntityCommandsInput)
-                          {
-                              gameControls.EntityCommandsInput.SelectedAbility = selectedAbility;
-                          }
-                      }
-                  };
-                b.Content = "";
-                b.SetValue(Grid.ColumnProperty, i % 4);
-                b.SetValue(Grid.RowProperty, i / 4);
-                b.Background = Brushes.Orange;
-                b.Focusable = false;
-                //add text block for the button
-                TextBlock t = new TextBlock();
-                t.TextWrapping = TextWrapping.Wrap;
-                t.TextAlignment = TextAlignment.Center;
-                b.Content = t;
-                t.Text = "hello world";
-                //add button to the panel
-                abilityPanel.Children.Add(b);
-                abilityButtons[i] = b;
-            }
-
+            
             //unit info panel
             entityInfoPanel = new EntityInfoPanel(250, 200);
             gui.Children.Add(entityInfoPanel);
-
-            selUnCommands = new Label[5];
-            for(int i = 0; i < selUnCommands.Length; i++)
-            {
-                Label l = new Label();
-                l.Content = "";
-                l.SetValue(Grid.ColumnProperty, i);
-                l.SetValue(Grid.RowProperty, 0);
-                l.Focusable = false;
-                commandsPanel.Children.Add(l);
-                selUnCommands[i] = l;
-            }
-            UpdateUnitInfo();
 
             //additional info
             additionalInfo = new AdditionalInfo(100, 200);
@@ -270,7 +174,7 @@ namespace wpfTest
                 });
 
             //add listeners to the buttons
-            entityButtonArray.ShowInfoOnClick(entityInfoPanel);
+            entityButtonArray.ShowInfoOnClick(entityInfoPanel, abilityButtonArray, gameControls);
             abilityButtonArray.ShowInfoOnMouseOver(additionalInfo);
             entityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(additionalInfo);
             entityInfoPanel.StatusButtonArray.ShowInfoOnMouseOver(additionalInfo);
@@ -278,197 +182,82 @@ namespace wpfTest
 
             //set position of ui elements
             Console.WriteLine(ActualWidth);
-            double unitInfoW = entityInfoPanel.Width;
-            double unitPanelW = unitPanel.ActualWidth;
-            double abilityPanelW = abilityPanel.ActualWidth;
-            double abilitInfoW = abilityInfoPanel.ActualWidth;
-            double offsetX=(openGLControl1.ActualWidth - (unitInfoW + unitPanelW + abilityPanelW + abilitInfoW))/ 2;
+            double entityInfoW = entityInfoPanel.Width;
+            double entityButtonArrayW = entityButtonArray.Width;
+            double abilityButtonArrayW = abilityButtonArray.Width;
+            double additionalInfoW = additionalInfo.Width;
+            double offsetX=(openGLControl1.ActualWidth - (entityInfoW + entityButtonArrayW + abilityButtonArrayW + additionalInfoW))/ 2;
             
             double unitInfoX = offsetX;
-            Canvas.SetLeft(unitInfoPanel, unitInfoX);
-            Canvas.SetBottom(unitInfoPanel, 0);
-
             Canvas.SetLeft(entityInfoPanel, unitInfoX);
             Canvas.SetBottom(entityInfoPanel, 0);
 
-            double unitPanelX = unitInfoX + unitInfoW;
-            Canvas.SetLeft(unitPanel, unitPanelX);
-            Canvas.SetBottom(unitPanel, 0);
-
+            double unitPanelX = unitInfoX + entityInfoW;
             Canvas.SetLeft(entityButtonArray, unitPanelX);
             Canvas.SetBottom(entityButtonArray, 0);
 
-            double abilityPanelX = unitPanelX + unitPanelW;
-            Canvas.SetLeft(abilityPanel, abilityPanelX);
-            Canvas.SetBottom(abilityPanel, 0);
-
+            double abilityPanelX = unitPanelX + entityButtonArrayW;
             Canvas.SetLeft(abilityButtonArray, abilityPanelX);
             Canvas.SetBottom(abilityButtonArray, 0);
 
-            double additionalInfoX = abilityPanelX + abilityPanelW;
-            Canvas.SetLeft(abilityInfoPanel, additionalInfoX);
-            Canvas.SetBottom(abilityInfoPanel, 0);
-
+            double additionalInfoX = abilityPanelX + abilityButtonArrayW;
             Canvas.SetLeft(additionalInfo, additionalInfoX);
             Canvas.SetBottom(additionalInfo, 0);
         }
 
         private void UpdateBottomPanel()
         {
-            selectedUnits = gameControls.SelectedEntities.Entities.Take(unitButtons.Length).ToList();
-            //initialize list of abilities
-            selectedUnitsAbilities.Clear();
-            foreach (Entity u in selectedUnits)
-                foreach(Ability at in u.Abilities)
-                    if (!selectedUnitsAbilities.Contains(at))
-                        selectedUnitsAbilities.Add(at);
-            if (selectedUnits == null)
-                return;
-            selectedUnits.Sort((u, v) => u.GetHashCode() - v.GetHashCode());
-            //update units panel
-            entityButtonArray.Update(selectedUnits);
-            for (int i = 0; i < unitButtons.Length; i++)
+            //only set new values if the values changed since the last update
+            CommandsGroup selected = gameControls.SelectedEntities;
+            List<Entity> selectedEntities=null;
+            bool changed;
+            lock (selected)
             {
-                Button b = unitButtons[i];
-                if (i >= selectedUnits.Count)
-                {
-                    b.Visibility = Visibility.Hidden;
-                }
-                else
-                {
-                    b.Content = selectedUnits[i].EntityType;
-                    b.Visibility = Visibility.Visible;
-                }
+                changed = gameControls.SelectedEntities.Changed;
+                if(changed)
+                    selectedEntities = selected.Entities.ToList();
             }
-            //update ability panel
-            abilityButtonArray.Update(selectedUnitsAbilities);
-            for (int i = 0; i < abilityButtons.Length; i++)
+            if (changed)
             {
-                Button b = abilityButtons[i];
-                if (i >= selectedUnitsAbilities.Count)
-                {
-                    b.Visibility = Visibility.Hidden;
-                }
-                else
-                {
-                    ((TextBlock)b.Content).Text = selectedUnitsAbilities[i].ToString();
-                    b.Visibility = Visibility.Visible;
-                }
+                gameControls.SelectedEntities.Changed = false;
+                selectedEntities.Sort((u, v) => u.GetHashCode() - v.GetHashCode());
+                entityButtonArray.Selected = selectedEntities.FirstOrDefault();
+                entityButtonArray.InfoSources = selectedEntities;
             }
-
-            entityInfoPanel.Update(selectedEntity);
-            UpdateUnitInfo();
-            SelectAbility();
-            UpdateAbilityInfo();
-
-            lock(resourceLock)
-                resourceL.Content = currentPlayersResource.ToString();
-        }
-
-        /// <summary>
-        /// Update info about currently selected unit.
-        /// </summary>
-        private void UpdateUnitInfo()
-        {
-            //dont show info about dead units
-            if (selectedEntity!=null && selectedEntity.IsDead)
-                selectedEntity = null;
-
-
-            if (selectedEntity == null)
-            {
-                nameL.Content = "";
-                healthL.Content = "";
-                energyL.Content = "";
-                sizeL.Content = "";
-                viewRangeL.Content = "";
-                maxSpeedL.Content = "";
-                atDamageL.Content = "";
-                atPeriodL.Content = "";
-                atDistanceL.Content = "";
-                //commands panel
-                for (int i = 0; i < selUnCommands.Length; i++)
-                {
-                    selUnCommands[i].Visibility = Visibility.Hidden;
-                }
-            }
-            else
-            {
-                Animal u = selectedEntity as Animal;
-                if (u != null)
-                {
-                    nameL.Content = u.EntityType;
-                    healthL.Content = u.Health + "/" + u.MaxHealth;
-                    energyL.Content = u.MaxEnergy > 0 ? u.Energy + "/" + u.MaxEnergy : "-";
-                    sizeL.Content = u.Range * 2;
-                    viewRangeL.Content = u.ViewRange;
-                    maxSpeedL.Content = u.MaxSpeedLand;
-                    atDamageL.Content = u.AttackDamage;
-                    atPeriodL.Content = u.AttackPeriod;
-                    atDistanceL.Content = u.AttackDistance;
-                }
-                //commands panel
-                List<Command> commands = selectedEntity.CommandQueue.ToList();
-                for (int i = 0; i < selUnCommands.Length; i++)
-                {
-                    Label l = selUnCommands[i];
-                    if (i >= commands.Count)
-                    {
-                        l.Visibility = Visibility.Hidden;
-                    }
-                    else
-                    {
-                        l.Content = commands[i].ToString();
-                        l.Visibility = Visibility.Visible;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update info about currently selected unit.
-        /// </summary>
-        private void UpdateAbilityInfo()
-        {
-            if (selectedAbility != null)
-            {
-                abilityNameL.Content = selectedAbility.ToString();
-                abilityEnergyCostL.Content = selectedAbility.EnergyCost.ToString();
-                abilityTargetL.Content = selectedAbility.TargetType.Name;
-                abilityDescriptionTB.Text = selectedAbility.Description();
-            }
-            else
-            {
-                abilityNameL.Content = "";
-                abilityEnergyCostL.Content = "";
-                abilityResourceCostL.Content = "";
-                abilityTargetL.Content = "";
-                abilityDescriptionTB.Text = "";
-            }
-        }
-
-        /// <summary>
-        /// Sets currently selected unit.
-        /// </summary>
-        private void SelectUnit()
-        {
-            if (selectedUnits != null && selectedUnits.Any())
-                selectedEntity = selectedUnits.FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Sets currently selected ability.
-        /// </summary>
-        private void SelectAbility()
-        {
             lock (gameControls.EntityCommandsInput)
             {
+                //set selected ability
                 if (gameControls.EntityCommandsInput.IsAbilitySelected)
-                    //set currently selected ability
-                    selectedAbility = gameControls.EntityCommandsInput.SelectedAbility;
+                    abilityButtonArray.Selected = gameControls.EntityCommandsInput.SelectedAbility;
                 else
-                    //reset currently selected ability
-                    selectedAbility = null;
+                    abilityButtonArray.Selected = null;
+            }
+
+            if (entityButtonArray.Selected != null)
+                abilityButtonArray.InfoSources = entityButtonArray.Selected.Abilities;
+            else
+                abilityButtonArray.InfoSources = new List<Ability>();
+            entityInfoPanel.SelectedEntity = entityButtonArray.Selected;
+
+            //update units panel
+            entityButtonArray.Update();
+            abilityButtonArray.Update();
+            entityInfoPanel.Update();
+            
+            airTakenL.Content = game.CurrentPlayer.AirTaken+"/"+game.CurrentPlayer.MaxAirTaken;
+        }
+
+        /// <summary>
+        /// Sets currently selected entity.
+        /// </summary>
+        public void SelectEntity()
+        {
+            List<Entity> selectedEntities = entityButtonArray.InfoSources;
+            if (selectedEntities != null && selectedEntities.Any())
+            {
+                Entity selected = selectedEntities[0];
+                entityInfoPanel.SelectedEntity = selected;
+                abilityButtonArray.InfoSources = selected.Abilities;
             }
         }
 
@@ -511,13 +300,11 @@ namespace wpfTest
         {
             if (e.Delta > 0)
             {
-                if (gameControls.MapView.ZoomIn(game.Map))
-                    ResizeView();
+                gameControls.MapView.ZoomIn(game.Map) ;
             }
             else
             {
-                if (gameControls.MapView.ZoomOut(game.Map))
-                    ResizeView();
+                gameControls.MapView.ZoomOut(game.Map);
             }
                 
         }
@@ -534,6 +321,8 @@ namespace wpfTest
             OpenGLAtlasDrawer.CreateFlowMap(gl);
             OpenGLAtlasDrawer.CreateSelectionFrame(gl);
         }
+
+
 
         private void OpenGLControl_OpenGLDraw(object sender, SharpGL.SceneGraph.OpenGLEventArgs args)
         {
@@ -560,13 +349,15 @@ namespace wpfTest
 
         private void openGLControl1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //reset selected unit
-            SelectUnit();
-
             Point clickPos = e.GetPosition(openGLControl1);
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X,(float)clickPos.Y));
             gameControls.EntityCommandsInput.NewPoint(mapCoordinates);
+
+            //hide gui so that player can select from the whole screen
+            gui.Visibility = Visibility.Hidden;
+            //set selected entity
+            SelectEntity();
         }
 
         private void openGLControl1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -576,8 +367,10 @@ namespace wpfTest
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
             gameControls.EntityCommandsInput.EndSelection(mapCoordinates);
 
-            //set selected unit
-            SelectUnit();
+            //turn gui back on
+            gui.Visibility = Visibility.Visible;
+            //set selected entity
+            SelectEntity();
         }
 
         private void openGLControl1_MouseMove(object sender, MouseEventArgs e)
@@ -591,7 +384,7 @@ namespace wpfTest
                 gameControls.EntityCommandsInput.NewPoint(mapCoordinates);
 
                 //set selected unit
-                SelectUnit();
+                SelectEntity();
             }
         }
 

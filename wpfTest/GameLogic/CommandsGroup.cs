@@ -13,44 +13,77 @@ namespace wpfTest
         /// List of currently selected entities. Shouldn't be set to null.
         /// </summary>
         public List<Entity> Entities { get; private set; }
+        /// <summary>
+        /// Set to true after Entities was changed.
+        /// </summary>
+        public bool Changed { get; set; }
 
         public CommandsGroup()
         {
             Entities = new List<Entity>();
+            Changed = true;
         }
 
-        public void SetUnits(List<Entity> units)
+        public void SetEntities(List<Entity> entities)
         {
-            foreach (Entity u in Entities)
-                u.Group = null;
-            Entities.Clear();
-            foreach (Entity u in units)
+            lock (this)
             {
-                Entities.Add(u);
-                u.Group = this;
+                foreach (Entity e in Entities)
+                    e.Group = null;
+                Entities.Clear();
+                foreach (Entity e in entities)
+                {
+                    Entities.Add(e);
+                    e.Group = this;
+                }
+                Changed = true;
             }
         }
 
-        public void AddUnits(List<Entity> units)
+        public void AddEntities(List<Entity> units)
         {
-            foreach(Entity u in units)
-                if (!Entities.Contains(u))
-                {
-                    Entities.Add(u);
-                    u.Group = this;
-                }
+            lock (this)
+            {
+                foreach(Entity u in units)
+                    if (!Entities.Contains(u))
+                    {
+                        Entities.Add(u);
+                        u.Group = this;
+                    }
+                Changed = true;
+            }
         }
 
-        public void RemoveUnits(List<Entity> units)
+        public void RemoveEntity(Entity entity)
         {
-            foreach (Entity u in units)
-                u.Group = null;
-            Entities.RemoveAll((unit) => units.Contains(unit));
+            lock (this)
+            {
+                entity.Group = null;
+                Entities.Remove(entity);
+                Changed = true;
+            }
         }
 
         public void RemoveDead()
         {
-            Entities.RemoveAll((u) => u.IsDead);
+            lock (this)
+            {
+                int count = Entities.Count;
+                Entities.RemoveAll((u) => u.IsDead);
+                if (count != Entities.Count)
+                    Changed = true;
+            }
+        }
+
+        public void Clear()
+        {
+            lock (this)
+            {
+                foreach (Entity e in Entities)
+                    e.Group = null;
+                Entities.Clear();
+                Changed = true;
+            }
         }
         /*
         /// <summary>
