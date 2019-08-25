@@ -8,27 +8,30 @@ using wpfTest.GameLogic;
 
 namespace wpfTest
 {
-    class UnitCommandsInput
+    class EntityCommandsInput
     {
+        //immutable
         public Vector2 INVALID_MAP_COORDINATES => new Vector2(-1, -1);
         private Dictionary<Key, Ability> keyToAbility;
-        public UnitsCommandInputState State { get; set; }
-        public Vector2 MapCoordinates { get; private set; }
+
+        //lock is this instance
+        public EntityCommandsInputState State { get; set; }
+        public Vector2 SelectingCoordinates { get; private set; }
+        public Vector2 TargetCoordinates { get; private set; }
         public Entity TargetedEntity { get; private set; }
         private Ability selectedAbility;
-        public Ability SelectedAbility { get { return selectedAbility; } set { selectedAbility = value; AbilitySelected = true; } }
-        public bool AbilitySelected { get; set; }
-        public Ability Ability => SelectedAbility;// AbilityTypeToAbility[SelectedAbility];
+        public Ability SelectedAbility { get { return selectedAbility; } set { selectedAbility = value; IsAbilitySelected = true; } }
+        public bool IsAbilitySelected { get; set; }
 
         //private static UnitCommandsInput unitCommandsInput=new UnitCommandsInput();
         //public static UnitCommandsInput GetUnitCommandsInput() => unitCommandsInput;
 
-        internal UnitCommandsInput(Game game)
+        internal EntityCommandsInput(Game game)
         {
-            State = UnitsCommandInputState.IDLE;
-            MapCoordinates = new Vector2();
+            State = EntityCommandsInputState.IDLE;
+            SelectingCoordinates = new Vector2();
             SelectedAbility = game.CurrentPlayer.GameStaticData.Abilities.MoveTo;
-             AbilitySelected = false;
+             IsAbilitySelected = false;
 
             //initialize keyToAbilityType
             keyToAbility = new Dictionary<Key, Ability>();
@@ -44,31 +47,40 @@ namespace wpfTest
 
         public void NewPoint(Vector2 mousePos)
         {
-            State = UnitsCommandInputState.SELECTING;
-            MapCoordinates = mousePos;
+            lock (this)
+            { 
+                State = EntityCommandsInputState.SELECTING_UNITS;
+                SelectingCoordinates = mousePos;
+            }
         }
 
         public void EndSelection(Vector2 mousePos)
         {
-            State = UnitsCommandInputState.SELECTED;
-            MapCoordinates = mousePos;
+            lock (this)
+            {
+                State = EntityCommandsInputState.UNITS_SELECTED;
+                SelectingCoordinates = mousePos;
+            }
         }
 
         public void SetTarget(Vector2 mousePos)
         {
-            if(State==UnitsCommandInputState.SELECTED)
+            lock (this)
             {
-                MapCoordinates = mousePos;
-                State = UnitsCommandInputState.ABILITY;
+                if (State == EntityCommandsInputState.UNITS_SELECTED)
+                {
+                    TargetCoordinates = mousePos;
+                    State = EntityCommandsInputState.ABILITY_TARGET_SELECTED;
+                }
             }
         }
     }
 
-    public enum UnitsCommandInputState
+    public enum EntityCommandsInputState
     {
         IDLE,
-        SELECTING,
-        SELECTED,
-        ABILITY
+        SELECTING_UNITS,
+        UNITS_SELECTED,
+        ABILITY_TARGET_SELECTED
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
+using static wpfTest.MainWindow;
 
 namespace wpfTest.GameLogic
 {
@@ -47,7 +48,7 @@ namespace wpfTest.GameLogic
         public int Air { get; }
 
         public Animal(
-            Player player, 
+            Player player,
             Vector2 position,
             string unitType,
             decimal maxHealth,
@@ -70,13 +71,13 @@ namespace wpfTest.GameLogic
             float viewRange,
             List<Ability> abilities,
             int air)
-            :base(player, unitType, maxHealth, viewRange, maxEnergy, abilities, position, range, physical)
+            : base(player, unitType, maxHealth, viewRange, maxEnergy, abilities, position, range, physical)
         {
             Velocity = new Vector2(0f, 0f);
             CanBeMoved = true;
             IsInCollision = false;
             Direction = new Vector2(1f, 0f);
-            
+
             FoodEnergyRegen = foodEnergyRegen;
             FoodEatingPeriod = foodEatingPeriod;
             AttackDamage = attackDamage;
@@ -90,6 +91,34 @@ namespace wpfTest.GameLogic
             Diet = diet;
             SpawningTime = spawningTime;
             Air = air;
+        }
+
+        public override List<Stat> Stats()
+        {
+            List<Stat> stats = new List<Stat>()
+            {
+                new Stat( "Player", Player.ToString()),
+            new Stat( "EntityType", EntityType),
+            new Stat( "Health", Health+"/"+MaxHealth),
+            new Stat("Energy", Energy + "/" + MaxEnergy),
+            new Stat( "Food regen", FoodEnergyRegen.ToString()),
+            new Stat( "Eating period", FoodEatingPeriod.ToString()),
+            new Stat( "Size", (2 * Range).ToString()),
+            new Stat( "Att damage", AttackDamage.ToString()),
+            new Stat( "Att period", AttackPeriod.ToString()),
+            new Stat( "Att Distance", AttackDistance.ToString()),
+            new Stat( "Mechanical damage", MechanicalDamage.ToString()),
+            new Stat( "Speed land", MaxSpeedLand.ToString()),
+            new Stat( "Speed water", MaxSpeedWater.ToString()),
+            new Stat( "Movement", Movement.ToString()),
+            new Stat( "Thick skin", ThickSkin.ToString()),
+            new Stat( "Diet", Diet.ToString()),
+            new Stat( "Spawning time", SpawningTime.ToString()),
+            new Stat( "Physical", Physical.ToString()),
+            new Stat( "Energy cost", EnergyCost.ToString()),
+            new Stat( "View range", ViewRange.ToString()),
+            };
+            return stats;
         }
         
         /// <summary>

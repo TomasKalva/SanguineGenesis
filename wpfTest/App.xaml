@@ -9,5 +9,98 @@
         <BitmapImage x:Key="frameMap" UriSource="Images/frameMap.png"/>
         <BitmapImage x:Key="riverMap" UriSource="Images/riverMap.png"/>
         <BitmapImage x:Key="riverBuildingsMap" UriSource="Images/riverBuildingsMap.png"/>
+        
+        <Style x:Key="AbilitiesArrayStyle" TargetType="Grid">
+            <Setter Property="Background" Value="Gray" />
+            <Style.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="Orange" />
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style x:Key="EntitiesArrayStyle" TargetType="Grid">
+            <Setter Property="Background" Value="Black" />
+            <Style.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="LightBlue" />
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style x:Key="CommandsArrayStyle" TargetType="Grid">
+            <Setter Property="Background" Value="Gray" />
+            <Style.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="LightGreen" />
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style x:Key="AdditionalInfoStyle" TargetType="Canvas">
+            <Setter Property="Background" Value="LightGray" />
+            <Style.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="Background" Value="LightGray" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontSize" Value="15" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="TextWrapping" Value="Wrap" />
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style x:Key="StatusArrayStyle" TargetType="Grid">
+            <Setter Property="Background" Value="Gray" />
+            <Style.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="Yellow" />
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style x:Key="StatsTableStyle" TargetType="Grid">
+            <Setter Property="Background" Value="Beige" />
+            <Style.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                </Style>
+            </Style.Resources>
+        </Style>
     </Application.Resources>
 </Application>

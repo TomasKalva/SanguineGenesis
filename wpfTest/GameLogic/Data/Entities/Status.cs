@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GUI;
+using static wpfTest.MainWindow;
 
 namespace wpfTest.GameLogic.Data.Entities
 {
-    public abstract class Status
+    public abstract class Status: IShowable
     {
         /// <summary>
         /// Called when the status is added to the entity.
@@ -20,6 +22,13 @@ namespace wpfTest.GameLogic.Data.Entities
         /// Called when the status is removed from the entity.
         /// </summary>
         public abstract void Removed();
+
+        string IShowable.GetName => ToString();
+        List<Stat> IShowable.Stats()
+        {
+           return new List<Stat>();
+        }
+        string IShowable.Description() => "todo";
     }
 
     public abstract class Status<Affected,Info>:Status where Info:StatusFactory<Affected>

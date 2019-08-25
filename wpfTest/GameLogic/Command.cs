@@ -7,10 +7,12 @@ using wpfTest.GameLogic;
 using wpfTest.GameLogic.Data.Abilities;
 using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
+using wpfTest.GUI;
+using static wpfTest.MainWindow;
 
 namespace wpfTest
 {
-    public abstract class Command
+    public abstract class Command: IShowable
     {
         /// <summary>
         /// True iff the command can be removed from the first place in the command queue.
@@ -21,6 +23,15 @@ namespace wpfTest
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
         public abstract bool PerformCommand(Game game, float deltaT);
+
+        public string GetName => ToString();
+        public List<Stat> Stats()
+        {
+            List<Stat> stats = new List<Stat>()
+            {};
+            return stats;
+        }
+        public abstract string Description();
     }
 
     public abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
@@ -129,6 +140,11 @@ namespace wpfTest
         }
 
         public abstract bool PerformCommandLogic(Game game, float deltaT);
+
+        public override string Description()
+        {
+            return Ability.Description();
+        }
     }
 
     /// <summary>

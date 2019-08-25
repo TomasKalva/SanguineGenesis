@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic.Data.Abilities;
 using wpfTest.GameLogic.Maps;
+using static wpfTest.MainWindow;
 
 namespace wpfTest.GameLogic.Data.Entities
 {
@@ -30,5 +31,15 @@ namespace wpfTest.GameLogic.Data.Entities
         }
 
 
+        public override List<Stat> Stats()
+        {
+            List<Stat> stats = new List<Stat>()
+            {
+                new Stat( "player", Player.ToString()),
+            new Stat( "EntityType", EntityType),
+            new Stat( "Health", Health+"/"+MaxHealth),
+            };
+            return stats;
+        }
     }
 }

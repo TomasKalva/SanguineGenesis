@@ -192,7 +192,6 @@ namespace wpfTest
                     if(en!=null)
                         a.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(a, en));
                 }
-
             }
 
             //remove dead units

@@ -111,12 +111,15 @@
     <Compile Include="GameLogic\Maps\Pathfinding.cs" />
     <Compile Include="GameLogic\Maps\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityMap.cs" />
+    <Compile Include="GUI\AdditionalInfo.cs" />
     <Compile Include="GUI\BitmapImageExtensions.cs" />
     <Compile Include="GameLogic\Maps\FlowMap.cs" />
     <Compile Include="GameControls\GameControls.cs" />
     <Compile Include="GameLogic\GameQuerying.cs" />
     <Compile Include="GameLogic\CommandsGroup.cs" />
     <Compile Include="GameLogic\Command.cs" />
+    <Compile Include="GUI\ButtonArray.cs" />
+    <Compile Include="GUI\EntityInfoPanel.cs" />
     <Compile Include="GUI\IRectangle.cs" />
     <Compile Include="GameLogic\Maps\IMap.cs" />
     <Compile Include="GameControls\MapMovementInput.cs" />
@@ -152,6 +155,7 @@
   <ItemGroup>
     <Compile Include="GameLogic\Maps\Map.cs" />
     <Compile Include="GameLogic\Node.cs" />
+    <Compile Include="GUI\StatsTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

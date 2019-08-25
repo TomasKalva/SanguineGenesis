@@ -15,13 +15,18 @@
                                    MouseLeftButtonDown="openGLControl1_MouseLeftButtonDown" MouseLeftButtonUp="openGLControl1_MouseLeftButtonUp"
                                    MouseMove="openGLControl1_MouseMove" MouseRightButtonDown="openGLControl1_MouseRightButtonDown"/>
             <!--<DataGridCellsPanel Width="50" Height="50">-->
-            <Canvas>
+            
+            <Canvas Name="gui">
                 <Grid Name="unitInfoPanel" Width="200" Height="200" Background="Gray">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>

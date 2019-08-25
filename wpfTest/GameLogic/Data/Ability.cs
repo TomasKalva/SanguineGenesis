@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic.Data.Entities;
+using wpfTest.GUI;
+using static wpfTest.MainWindow;
 
 namespace wpfTest.GameLogic
 {
 
-    public abstract class Ability
+    public abstract class Ability: IShowable
     {
         /// <summary>
         /// Group of abilities this ability belongs to.
@@ -19,6 +21,8 @@ namespace wpfTest.GameLogic
             this.abilities = abilities;
             abilities.AllAbilities.Add(this);
         }
+        public string GetName => ToString();
+        public abstract List<Stat> Stats();
 
         /// <summary>
         /// Maximal distance from the target where the ability can be cast.
@@ -139,6 +143,21 @@ namespace wpfTest.GameLogic
                 Command com = NewCommand(c, target);
                 c.AddCommand(com);
             }
+        }
+
+
+        public override List<Stat> Stats()
+        {
+            List<Stat> stats = new List<Stat>()
+            {
+                new Stat( "Energy cost", EnergyCost.ToString()),
+            new Stat( "Distance", Distance.ToString()),
+            new Stat( "Self castable", SelfCastable.ToString()),
+            new Stat("Only one", OnlyOne.ToString()),
+            new Stat( "Target type", TargetType.ToString()),
+            new Stat( "Interruptable", Interruptable.ToString()),
+            };
+            return stats;
         }
     }
 

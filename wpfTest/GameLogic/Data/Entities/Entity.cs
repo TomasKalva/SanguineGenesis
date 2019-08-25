@@ -9,10 +9,11 @@ using wpfTest.GameLogic.Data.Abilities;
 using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
+using static wpfTest.MainWindow;
 
 namespace wpfTest
 {
-    public abstract class Entity: ITargetable, IMovementTarget, IRectangle
+    public abstract class Entity: ITargetable, IMovementTarget, IRectangle, IShowable
     {
         public virtual Vector2 Center { get; }
         public abstract float Range { get; }//range of the circle collider
@@ -31,6 +32,9 @@ namespace wpfTest
         public bool Physical { get; set; }
         public List<Ability> Abilities { get; }
         public List<Status> Statuses { get; }
+        string IShowable.GetName => EntityType;
+        string IShowable.Description() => "Represents an object in the game.";
+        public abstract List<Stat> Stats();
 
         public Entity(Player player, string entityType, decimal maxHealth, float viewRange, decimal maxEnergy, bool physical, List<Ability> abilities)
         {
@@ -206,29 +210,29 @@ namespace wpfTest
 
     public class CommandQueue:IEnumerable<Command>
     {
-        private List<Command> queue;
+        public List<Command> Queue { get; }
 
         public CommandQueue()
         {
-            queue = new List<Command>();
+            Queue = new List<Command>();
         }
 
         public void Enqueue(Command command)
         {
-            queue.Add(command);
+            Queue.Add(command);
         }
 
         public Command First()
         {
-            if (queue.Any())
-                return queue[0];
+            if (Queue.Any())
+                return Queue[0];
             else
                 return null;
         }
 
         public void Dequeue()
         {
-            queue.RemoveAt(0);
+            Queue.RemoveAt(0);
         }
 
         /// <summary>
@@ -238,17 +242,17 @@ namespace wpfTest
         {
             Command first = First();
             if (first != null && !first.Interruptable)
-                queue.RemoveAll(comm => comm != first);
+                Queue.RemoveAll(comm => comm != first);
             else
-                queue.Clear();
+                Queue.Clear();
         }
 
-        public List<Command> ToList() => queue.ToList();
-        public bool Any() => queue.Any();
+        public List<Command> ToList() => Queue.ToList();
+        public bool Any() => Queue.Any();
 
         public IEnumerator<Command> GetEnumerator()
         {
-            return queue.GetEnumerator();
+            return Queue.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
