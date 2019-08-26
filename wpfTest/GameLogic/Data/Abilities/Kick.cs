@@ -9,13 +9,11 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public sealed class Kick : TargetAbility<Animal, Animal>
     {
-        public float PreparationTime { get; }
         public decimal EnergyDamage { get; }
 
         internal Kick(decimal energyCost, float distance, float preparationTime, decimal energyDamage)
-            : base(distance, energyCost, false, false)
+            : base(distance, energyCost, false, false, duration:preparationTime)
         {
-            PreparationTime = preparationTime;
             EnergyDamage = energyDamage;
         }
 
@@ -32,20 +30,17 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class KickCommand : Command<Animal, Animal, Kick>
     {
-        private float timer;
-
         public KickCommand(Animal commandedEntity, Animal target, Kick kick)
             : base(commandedEntity, target, kick)
         {
-            timer = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             CommandedEntity.TurnToPoint(Targ.Position);
 
-            timer += deltaT;
-            if (timer >= Ability.PreparationTime)
+            ElapsedTime += deltaT;
+            if (ElapsedTime >= Ability.Duration)
             {
                 //remove some of the target's energy
                 Targ.Energy -= Ability.EnergyDamage;

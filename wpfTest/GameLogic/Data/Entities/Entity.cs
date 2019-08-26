@@ -141,6 +141,17 @@ namespace wpfTest
                 CommandQueue.Enqueue(command);
         }
 
+        public void RemoveCommand(Command command)
+        {
+            if (!IsDead)
+                CommandQueue.RemoveCommand(command);
+        }
+
+        public void ResetCommands()
+        {
+            CommandQueue.Clear();
+        }
+
         public void SetCommand(Command command)
         {
             if (!IsDead)
@@ -232,7 +243,10 @@ namespace wpfTest
 
         public void Dequeue()
         {
-            Queue.RemoveAt(0);
+            Command first = Queue.FirstOrDefault();
+            Queue.Remove(first);
+            if (first != null)
+                first.OnRemove();
         }
 
         /// <summary>
@@ -242,9 +256,31 @@ namespace wpfTest
         {
             Command first = First();
             if (first != null && !first.Interruptable)
+            {
+                foreach(Command c in Queue)
+                    if (c != first)
+                        c.OnRemove();
                 Queue.RemoveAll(comm => comm != first);
+            }
             else
+            {
+                foreach (Command c in Queue)
+                    c.OnRemove();
                 Queue.Clear();
+            }
+        }
+
+        public void RemoveCommand(Command command)
+        {
+            //don't remove command that is first and uninterruptable
+            if (command != null &&
+                command == Queue.FirstOrDefault() &&
+                !command.Interruptable)
+                return;
+
+            Queue.Remove(command);
+            if (command != null)
+                command.OnRemove();
         }
 
         public List<Command> ToList() => Queue.ToList();

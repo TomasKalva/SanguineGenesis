@@ -9,13 +9,11 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public sealed class Pull : TargetAbility<Animal, Animal>
     {
-        public float PreparationTime { get; }
         public float PullSpeed { get; }
 
         internal Pull(decimal energyCost, float distance, float preparationTime, float pullSpeed)
-            : base(distance, energyCost, false, false, false)
+            : base(distance, energyCost, false, false, false, duration:preparationTime)
         {
-            PreparationTime = preparationTime;
             PullSpeed = pullSpeed;
         }
 
@@ -32,7 +30,6 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class PullCommand : Command<Animal, Animal, Pull>, IAnimalStateManipulator
     {
-        private float timer;
         /// <summary>
         /// The unit is jumping.
         /// </summary>
@@ -43,7 +40,6 @@ namespace wpfTest.GameLogic.Data.Abilities
         public PullCommand(Animal commandedEntity, Animal target, Pull pull)
             : base(commandedEntity, target, pull)
         {
-            timer = 0f;
             pulling = false;
             CommandedEntity.TurnToPoint(Targ.Position);
             Vector2 frontOfAnimal = commandedEntity.Position + (commandedEntity.Range + target.Range) * commandedEntity.Direction;
@@ -58,14 +54,14 @@ namespace wpfTest.GameLogic.Data.Abilities
 
             CommandedEntity.TurnToPoint(Targ.Position);
 
-            timer += deltaT;
+            ElapsedTime += deltaT;
             if (!pulling)
             {
                 //animal is preparing to jump
-                if (timer >= Ability.PreparationTime)
+                if (ElapsedTime >= Ability.Duration)
                 {
                     pulling = true;
-                    timer -= Ability.PreparationTime;
+                    ElapsedTime -= Ability.Duration;
                 }
             }
 
@@ -90,5 +86,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             //command doesn't finish until the animal pulls the target animal
             return false;
         }
+
+        public override int Progress => pulling ? 100 : base.Progress;
     }
 }

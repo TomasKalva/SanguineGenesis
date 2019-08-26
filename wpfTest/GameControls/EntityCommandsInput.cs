@@ -22,6 +22,10 @@ namespace wpfTest
         private Ability selectedAbility;
         public Ability SelectedAbility { get { return selectedAbility; } set { selectedAbility = value; IsAbilitySelected = true; } }
         public bool IsAbilitySelected { get; set; }
+        /// <summary>
+        /// True iff before setting new commands, the old should be removed.
+        /// </summary>
+        public bool ResetCommandsQueue { get; set; }
 
         //private static UnitCommandsInput unitCommandsInput=new UnitCommandsInput();
         //public static UnitCommandsInput GetUnitCommandsInput() => unitCommandsInput;

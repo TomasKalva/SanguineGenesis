@@ -91,7 +91,7 @@ namespace wpfTest.GameLogic.Data.Abilities
                     rootNodes = GameQuerying.GetGameQuerying().SelectNodes(map, nX - rDist, nY - rDist, nX + (size + rDist - 1), nY + (size + rDist - 1));
                     newBuilding = trF.NewInstance(newUnitOwner, buildNodes, rootNodes);
                     //make the tree grow
-                    newUnitOwner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get);
+                    newUnitOwner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get, true);
                 }
                 else
                 {

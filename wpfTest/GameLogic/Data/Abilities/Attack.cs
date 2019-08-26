@@ -24,12 +24,9 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class AttackCommand : Command<Animal, Entity, Attack>
     {
-        private float timeUntilAttack;//time in s until this unit attacks
-
         public AttackCommand(Animal commandedEntity, Entity target, Attack attack)
             : base(commandedEntity, target, attack)
         {
-            this.timeUntilAttack = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
@@ -37,10 +34,9 @@ namespace wpfTest.GameLogic.Data.Abilities
             CommandedEntity.TurnToPoint(Targ.Center);
 
             CommandedEntity.CanBeMoved = false;
-            timeUntilAttack += deltaT;
-            if (timeUntilAttack >= CommandedEntity.AttackPeriod)
+            if (ElapsedTime >= CommandedEntity.AttackPeriod)
             {
-                timeUntilAttack -= CommandedEntity.AttackPeriod;
+                ElapsedTime -= CommandedEntity.AttackPeriod;
 
                 if (Targ is Building && !CommandedEntity.MechanicalDamage)
                 {
@@ -61,6 +57,8 @@ namespace wpfTest.GameLogic.Data.Abilities
             }
             return false;
         }
+
+        public override int Progress => (int)((100*(ElapsedTime/CommandedEntity.AttackPeriod)));
     }
 
 }

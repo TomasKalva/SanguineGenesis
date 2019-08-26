@@ -10,13 +10,11 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public sealed class KnockBack : TargetAbility<Animal, Animal>
     {
-        public float PreparationTime { get; }
         public KnockAwayFactory KnockAwayFactory { get; }
 
         internal KnockBack(decimal energyCost, float distance, float preparationTime, KnockAwayFactory knockAwayFactory)
-            : base(distance, energyCost, false, true)
+            : base(distance, energyCost, false, true, duration:preparationTime)
         {
-            PreparationTime = preparationTime;
             KnockAwayFactory = knockAwayFactory;
         }
 

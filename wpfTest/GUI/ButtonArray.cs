@@ -207,7 +207,26 @@ namespace wpfTest.GUI
             Style = (Style)Application.Current.FindResource("CommandsArrayStyle");
         }
 
-
+        public void RemoveCommandOnClick()
+        {
+            for (int i = 0; i < Columns * Rows; i++)
+            {
+                Button b = (Button)Children[i];
+                int buttonInd = i;//capture by value
+                b.PreviewMouseDown += (sender, ev) =>
+                {
+                    Command command;
+                    if ((command = GetInfoSource(buttonInd)) != null)
+                    {
+                        if (ev.RightButton == MouseButtonState.Pressed)
+                        {
+                            //remove the command corresponding to the clicked button from selection
+                            command.Remove();
+                        }
+                    }
+                };
+            }
+        }
     }
 
     public interface IShowable

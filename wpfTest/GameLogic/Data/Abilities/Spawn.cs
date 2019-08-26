@@ -10,7 +10,7 @@ namespace wpfTest.GameLogic.Data.Abilities
     public sealed class Spawn : TargetAbility<Entity, Vector2>
     {
         internal Spawn(AnimalFactory spawningUnitFactory)
-            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false)
+            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false, duration:spawningUnitFactory.SpawningTime)
         {
             SpawningUnitFactory = spawningUnitFactory;
         }
@@ -35,22 +35,15 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class SpawnCommand : Command<Entity, Vector2, Spawn>
     {
-        /// <summary>
-        /// How long the unit was spawning in s.
-        /// </summary>
-        public float SpawnTimer { get; private set; }
-
-        private SpawnCommand() => throw new NotImplementedException();
         public SpawnCommand(Entity commandedEntity, Vector2 target, Spawn spawn)
             : base(commandedEntity, target, spawn)
         {
-            SpawnTimer = 0f;
+            ElapsedTime = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            SpawnTimer += deltaT;
-            if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
+            if (ElapsedTime >= Ability.Duration)
             {
                 Player newUnitOwner = CommandedEntity.Player;
                 Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Targ);
@@ -58,6 +51,13 @@ namespace wpfTest.GameLogic.Data.Abilities
                 return true;
             }
             return false;
+        }
+
+        public override void OnRemove()
+        {
+            //refund the energy after canceling spawn command
+            if (Paid)
+                CommandedEntity.Energy += Ability.EnergyCost;
         }
     }
 }

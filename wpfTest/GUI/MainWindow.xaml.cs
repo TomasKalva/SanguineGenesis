@@ -177,6 +177,7 @@ namespace wpfTest
             entityButtonArray.ShowInfoOnClick(entityInfoPanel, abilityButtonArray, gameControls);
             abilityButtonArray.ShowInfoOnMouseOver(additionalInfo);
             entityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(additionalInfo);
+            entityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
             entityInfoPanel.StatusButtonArray.ShowInfoOnMouseOver(additionalInfo);
             abilityButtonArray.SelectAbilityOnClick(gameControls);
 
@@ -332,6 +333,9 @@ namespace wpfTest
             sw.Start();
             lock (game)
             {
+                bool shiftDown= Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+                lock (gameControls.EntityCommandsInput)
+                    gameControls.EntityCommandsInput.ResetCommandsQueue = !shiftDown;
                 gameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
                 OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, gameControls.MapView, game);

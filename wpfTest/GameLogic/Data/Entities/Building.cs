@@ -72,6 +72,7 @@ namespace wpfTest.GameLogic
             NodeLeft = nodes[0, 0].X;
             NodeBottom = nodes[0, 0].Y;
             Center = new Vector2(nodes[0, 0].X + Range, nodes[0, 0].Y + Range);
+            RallyPoint = new Vector2(Center.X, Bottom - 1);
         }
 
         /// <summary>

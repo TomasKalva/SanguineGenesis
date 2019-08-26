@@ -10,13 +10,11 @@ namespace wpfTest.GameLogic.Data.Abilities
     public sealed class PiercingBite : TargetAbility<Animal, Animal>
     {
         public decimal Damage { get; }
-        public float TimeToAttack { get; }
 
         internal PiercingBite(decimal energyCost, decimal damage, float timeToAttack)
-            : base(0.1f, energyCost, false, true)
+            : base(0.1f, energyCost, false, true, duration:timeToAttack)
         {
             Damage = damage;
-            TimeToAttack = timeToAttack;
         }
 
         public override Command NewCommand(Animal caster, Animal target)
@@ -32,18 +30,14 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class PiercingBiteCommand : Command<Animal, Animal, PiercingBite>
     {
-        private float timer;
-
         public PiercingBiteCommand(Animal commandedEntity, Animal target, PiercingBite bite)
             : base(commandedEntity, target, bite)
         {
-            timer = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            timer += deltaT;
-            if (timer > Ability.TimeToAttack)
+            if (ElapsedTime > Ability.Duration)
             {
                 Targ.Damage(Ability.Damage);
                 return true;

@@ -9,13 +9,11 @@ namespace wpfTest.GameLogic.Data.Abilities
 {
     public sealed class PoisonousSpit : TargetAbility<Animal, Animal>
     {
-        public float TimeUntilSpit { get; }
         public PoisonFactory PoisonFactory { get; }
 
         internal PoisonousSpit(float distance, float timeUntilSpit, decimal energyCost, PoisonFactory poisonFactory)
-            : base(distance, energyCost, false, false)
+            : base(distance, energyCost, false, false, duration:timeUntilSpit)
         {
-            TimeUntilSpit = timeUntilSpit;
             PoisonFactory = poisonFactory;
         }
 
@@ -32,20 +30,16 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class PoisonousSpitCommand : Command<Animal, Animal, PoisonousSpit>
     {
-        private float spitTimer;//time in s until this unit attacks
-
         public PoisonousSpitCommand(Animal commandedEntity, Animal target, PoisonousSpit attack)
             : base(commandedEntity, target, attack)
         {
-            this.spitTimer = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             CommandedEntity.TurnToPoint(CommandedEntity.Center);
-
-            spitTimer += deltaT;
-            if (spitTimer >= Ability.TimeUntilSpit)
+            
+            if (ElapsedTime >= Ability.Duration)
             {
                 //apply poison to the target and finish the command
                 Ability.PoisonFactory.ApplyToAffected(Targ);

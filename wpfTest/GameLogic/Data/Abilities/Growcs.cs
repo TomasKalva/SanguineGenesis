@@ -27,7 +27,6 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class GrowCommand : Command<Tree, Nothing, Grow>
     {
-        private GrowCommand() => throw new NotImplementedException();
         public GrowCommand(Tree commandedEntity, Grow plantBuilding)
             : base(commandedEntity, Nothing.Get, plantBuilding)
         {
@@ -43,8 +42,9 @@ namespace wpfTest.GameLogic.Data.Abilities
             }
             else
                 return false;
-
         }
+
+        public override int Progress => (int)(100 * CommandedEntity.Energy.Percentage);
     }
 
 }

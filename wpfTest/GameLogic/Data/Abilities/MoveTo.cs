@@ -49,11 +49,17 @@ namespace wpfTest.GameLogic.Data.Abilities
         public bool AttackEnemyInstead { get; }
         public bool UsesAttackDistance { get; }
 
-        public override void SetCommands(IEnumerable<Animal> casters, IMovementTarget target)
+        public override void SetCommands(IEnumerable<Animal> casters, IMovementTarget target, bool resetCommandQueue)
         {
             //if there are no casters do nothing
             if (!casters.Any())
                 return;
+
+            if (resetCommandQueue)
+                //reset all commands
+                foreach (Animal c in casters)
+                    c.ResetCommands();
+
             //player whose units are receiving commands
             Players player = casters.First().Player.PlayerID;
 
@@ -106,23 +112,18 @@ namespace wpfTest.GameLogic.Data.Abilities
         /// Flowmap used for navigation. It can be set after the command was assigned.
         /// </summary>
         private FlowMap flowMap;
-
-
-        private MoveToCommand() => throw new NotImplementedException();
+        
         public MoveToCommand(Animal commandedEntity, IMovementTarget target, float minStoppingDistance, MoveTo ability)
             : base(commandedEntity, target, ability)
         {
             moveToLogic = new MoveToLogic(CommandedEntity, null, minStoppingDistance, target, Ability);
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
             if (!CanBeUsed())
-            {
                 //finish if the target is invalid
-                CommandedEntity.StopMoving = true;
                 return true;
-            }
 
             bool finished = false;
             //command immediately finishes if the assignment was invalidated
@@ -130,18 +131,9 @@ namespace wpfTest.GameLogic.Data.Abilities
                 finished = true;
             else
                 finished = moveToLogic.Step(game, deltaT, flowMap, this);
-
-
-            if (finished)
-            {
-                CommandedEntity.StopMoving = true;
-                this.RemoveFromAssignment();
-            }
+            
             return finished;
         }
-
-        public override bool PerformCommandLogic(Game game, float deltaT)
-            => throw new NotImplementedException("This method is never used.");
 
 
         public void UpdateFlowMap(FlowMap flowMap)
@@ -152,6 +144,14 @@ namespace wpfTest.GameLogic.Data.Abilities
         public void RemoveFromAssignment()
         {
             Assignment.Units.Remove(CommandedEntity);
+        }
+
+        public override int Progress => 100;
+
+        public override void OnRemove()
+        {
+            CommandedEntity.StopMoving = true;
+            RemoveFromAssignment();
         }
     }
 

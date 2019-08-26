@@ -18,6 +18,11 @@ namespace wpfTest
         /// True iff the command can be removed from the first place in the command queue.
         /// </summary>
         public abstract bool Interruptable { get; }
+        /// <summary>
+        /// How much of the command is done. From the interval [0,100]. Used only for player's information.
+        /// </summary>
+        public abstract int Progress { get; }
+
 
         /// <summary>
         /// Performs one step of the command. Returns true if command is finished.
@@ -32,6 +37,16 @@ namespace wpfTest
             return stats;
         }
         public abstract string Description();
+
+        /// <summary>
+        /// Removes the command from the entity if possible.
+        /// </summary>
+        public abstract void Remove();
+
+        /// <summary>
+        /// Called when this command is removed from command queue.
+        /// </summary>
+        public virtual void OnRemove() { }
     }
 
     public abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
@@ -53,16 +68,18 @@ namespace wpfTest
         /// <summary>
         /// True iff the ability was paid.
         /// </summary>
-        private bool Paid { get; set; }
+        protected bool Paid { get; private set; }
+        protected float ElapsedTime { get; set; }
         public override bool Interruptable => Ability.Interruptable;
+        public override int Progress => (int)((ElapsedTime / Ability.Duration) * 100);
 
         protected Command(Caster commandedEntity, Target target, Abil ability)
         {
             Ability = ability;
             CommandedEntity = commandedEntity;
             Targ = target;
+            ElapsedTime = 0;
         }
-        protected Command() { }
         public override string ToString()
         {
             return Ability.ToString();
@@ -136,7 +153,11 @@ namespace wpfTest
                 //finish command if paying was unsuccessful
                 return true;
 
-            return PerformCommandLogic(game, deltaT);
+            ElapsedTime += deltaT;
+            bool finished = PerformCommandLogic(game, deltaT);
+            if (finished)
+                OnRemove();
+            return finished;
         }
 
         public abstract bool PerformCommandLogic(Game game, float deltaT);
@@ -144,6 +165,11 @@ namespace wpfTest
         public override string Description()
         {
             return Ability.Description();
+        }
+
+        public override void Remove()
+        {
+            CommandedEntity.RemoveCommand(this);
         }
     }
 

@@ -41,5 +41,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             CommandedEntity.RallyPoint = Targ;
             return true;
         }
+
+        public override int Progress => 100;
     }
 }

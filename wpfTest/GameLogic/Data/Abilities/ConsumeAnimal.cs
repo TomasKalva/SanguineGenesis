@@ -10,13 +10,11 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public sealed class ConsumeAnimal : TargetAbility<Animal, Animal>
     {
-        public float TimeToConsume { get; }
         public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
 
         internal ConsumeAnimal(decimal energyCost, float timeToConsume, ConsumedAnimalFactory consumedAnimalFactory)
-            : base(0.1f, energyCost, false, false)
+            : base(0.1f, energyCost, false, false, duration:timeToConsume)
         {
-            TimeToConsume = timeToConsume;
             ConsumedAnimalFactory = consumedAnimalFactory;
         }
 
@@ -33,18 +31,14 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class ConsumeAnimalCommand : Command<Animal, Animal, ConsumeAnimal>
     {
-        private float timer;
-
         public ConsumeAnimalCommand(Animal commandedEntity, Animal target, ConsumeAnimal bite)
             : base(commandedEntity, target, bite)
         {
-            timer = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            timer += deltaT;
-            if (timer > Ability.TimeToConsume)
+            if (ElapsedTime > Ability.Duration)
             {
                 ConsumedAnimalFactory consumedFact = Ability.ConsumedAnimalFactory;
                 consumedFact.AnimalConsumed = Targ;

@@ -9,13 +9,11 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public sealed class Jump : TargetAbility<Animal, Vector2>
     {
-        public float PreparationTime { get; }
         public float JumpSpeed { get; }
 
         internal Jump(decimal energyCost, float distance, float preparationTime, float jumpSpeed)
-            : base(distance, energyCost, false, false, false)
+            : base(distance, energyCost, false, false, false, duration:preparationTime)
         {
-            PreparationTime = preparationTime;
             JumpSpeed = jumpSpeed;
         }
 
@@ -32,7 +30,6 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class JumpCommand : Command<Animal, Vector2, Jump>, IAnimalStateManipulator
     {
-        private float timer;
         /// <summary>
         /// The unit is jumping.
         /// </summary>
@@ -42,7 +39,6 @@ namespace wpfTest.GameLogic.Data.Abilities
         public JumpCommand(Animal commandedEntity, Vector2 target, Jump jump)
             : base(commandedEntity, target, jump)
         {
-            timer = 0f;
             jumping = false;
             moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.JumpSpeed);
         }
@@ -51,15 +47,14 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             CommandedEntity.StateChangeLock = this;
             CommandedEntity.TurnToPoint(Targ);
-
-            timer += deltaT;
+            
             if (!jumping)
             {
                 //animal is preparing to jump
-                if (timer >= Ability.PreparationTime)
+                if (ElapsedTime >= Ability.Duration)
                 {
                     jumping = true;
-                    timer -= Ability.PreparationTime;
+                    ElapsedTime -= Ability.Duration;
                 }
             }
 
@@ -75,5 +70,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             //command doesn't finish until the animal jumps
             return false;
         }
+
+        public override int Progress => jumping ? 100 : base.Progress;
     }
 }

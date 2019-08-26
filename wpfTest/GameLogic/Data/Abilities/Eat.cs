@@ -31,15 +31,9 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class HerbivoreEatCommand : Command<Animal, IHerbivoreFood, HerbivoreEat>
     {
-        /// <summary>
-        /// Time in s until this animal eats.
-        /// </summary>
-        private float timeUntilEating;
-
         public HerbivoreEatCommand(Animal commandedEntity, IHerbivoreFood target, HerbivoreEat eat)
             : base(commandedEntity, target, eat)
         {
-            this.timeUntilEating = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
@@ -53,17 +47,18 @@ namespace wpfTest.GameLogic.Data.Abilities
             CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
 
             CommandedEntity.CanBeMoved = false;
-            timeUntilEating += deltaT;
-            if (timeUntilEating >= CommandedEntity.FoodEatingPeriod)
+            if (ElapsedTime >= CommandedEntity.FoodEatingPeriod)
             {
                 //eat
                 Targ.EatFood(CommandedEntity);
                 //reset timer
-                timeUntilEating -= CommandedEntity.FoodEatingPeriod;
+                ElapsedTime -= CommandedEntity.FoodEatingPeriod;
             }
 
             return false;
         }
+
+        public override int Progress => (int)(100 * (ElapsedTime / CommandedEntity.FoodEatingPeriod));
     }
 
     public sealed class CarnivoreEat : TargetAbility<Animal, ICarnivoreFood>
@@ -91,15 +86,10 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class CarnivoreEatCommand : Command<Animal, ICarnivoreFood, CarnivoreEat>
     {
-        /// <summary>
-        /// Time in s until this animal eats.
-        /// </summary>
-        private float timeUntilEating;
-
         public CarnivoreEatCommand(Animal commandedEntity, ICarnivoreFood target, CarnivoreEat eat)
             : base(commandedEntity, target, eat)
         {
-            this.timeUntilEating = 0f;
+            this.ElapsedTime = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
@@ -113,17 +103,18 @@ namespace wpfTest.GameLogic.Data.Abilities
             CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
 
             CommandedEntity.CanBeMoved = false;
-            timeUntilEating += deltaT;
-            if (timeUntilEating >= CommandedEntity.FoodEatingPeriod)
+            if (ElapsedTime >= CommandedEntity.FoodEatingPeriod)
             {
                 //eat
                 Targ.EatFood(CommandedEntity);
                 //reset timer
-                timeUntilEating -= CommandedEntity.FoodEatingPeriod;
+                ElapsedTime -= CommandedEntity.FoodEatingPeriod;
             }
 
             return false;
         }
+
+        public override int Progress => (int)(100 * (ElapsedTime / CommandedEntity.FoodEatingPeriod));
     }
 
     /// <summary>

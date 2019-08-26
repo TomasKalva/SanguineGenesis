@@ -10,9 +10,10 @@ namespace wpfTest.GameLogic.Data.Abilities
     public sealed class CreateUnit : TargetAbility<Building, Nothing>
     {
         internal CreateUnit(AnimalFactory spawningUnitFactory)
-            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false)
+            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false, duration: spawningUnitFactory.SpawningTime)
         {
             SpawningUnitFactory = spawningUnitFactory;
+
         }
 
         public AnimalFactory SpawningUnitFactory { get; }
@@ -35,22 +36,14 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class CreateUnitCommand : Command<Building, Nothing, CreateUnit>
     {
-        /// <summary>
-        /// How long the unit was spawning in s.
-        /// </summary>
-        public float SpawnTimer { get; private set; }
-
-        private CreateUnitCommand() => throw new NotImplementedException();
         public CreateUnitCommand(Building commandedEntity, Nothing target, CreateUnit spawn)
             : base(commandedEntity, target, spawn)
         {
-            SpawnTimer = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            SpawnTimer += deltaT;
-            if (SpawnTimer >= Ability.SpawningUnitFactory.SpawningTime)
+            if (ElapsedTime >= Ability.Duration)
             {
                 //if the player doesn't have enough air, wait until he does
                 if (CommandedEntity.Player.AirTaken + Ability.SpawningUnitFactory.Air > CommandedEntity.Player.MaxAirTaken)
@@ -61,10 +54,17 @@ namespace wpfTest.GameLogic.Data.Abilities
                 Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, newUnitPosition);
                 game.Players[newUnitOwner.PlayerID].Entities.Add(newUnit);
                 //make unit go towards the rally point
-                newUnitOwner.GameStaticData.Abilities.MoveTo.SetCommands(new List<Unit>(1) { newUnit }, CommandedEntity.RallyPoint);
+                newUnitOwner.GameStaticData.Abilities.MoveTo.SetCommands(new List<Unit>(1) { newUnit }, CommandedEntity.RallyPoint, true);
                 return true;
             }
             return false;
+        }
+
+        public override void OnRemove()
+        {
+            //refund the energy after canceling spawn command
+            if (Paid)
+                CommandedEntity.Energy += Ability.EnergyCost;
         }
     }
 

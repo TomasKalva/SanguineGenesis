@@ -44,8 +44,12 @@ namespace wpfTest.GameLogic
         /// True iff the command can be removed from the first place in the command queue.
         /// </summary>
         public bool Interruptable { get; }
+        /// <summary>
+        /// How long it takes to perform this ability.
+        /// </summary>
+        public float Duration { get; }
 
-        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target);
+        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue);
         /// <summary>
         /// Returns true if the target type is valid for this ability.
         /// </summary>
@@ -60,21 +64,22 @@ namespace wpfTest.GameLogic
         {
             return GetType().Name;
         }
-        public Ability(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable)
+        public Ability(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable, float duration)
         {
             Distance = distance;
             EnergyCost = energyCost;
             OnlyOne = onlyOne;
             SelfCastable = selfCastable;
             Interruptable = interruptable;
+            Duration = duration;
         }
     }
 
     public abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
-        public TargetAbility(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable=true)
-            :base(distance, energyCost, onlyOne, selfCastable, interruptable)
+        public TargetAbility(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
+            :base(distance, energyCost, onlyOne, selfCastable, interruptable, duration)
         {
         }
 
@@ -95,9 +100,9 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Assigns commands to the units.
         /// </summary>
-        public sealed override void SetCommands(IEnumerable<Entity> casters, ITargetable target)
+        public sealed override void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue)
         {
-            SetCommands(casters.Cast<Caster>(), (Target)target);
+            SetCommands(casters.Cast<Caster>(), (Target)target, resetCommandQueue);
         }
         
         public sealed override bool ValidTargetType(ITargetable target)
@@ -108,7 +113,7 @@ namespace wpfTest.GameLogic
         public sealed override Type TargetType 
             => typeof(Target);
 
-        public virtual void SetCommands(IEnumerable<Caster> casters, Target target)
+        public virtual void SetCommands(IEnumerable<Caster> casters, Target target, bool resetCommandQueue)
         {
             //casters are put to a list so that they can be enumerated multiple times
             List<Caster> validCasters = casters
@@ -128,13 +133,18 @@ namespace wpfTest.GameLogic
             if (OnlyOne)
                 validCasters = validCasters.Take(1).ToList();
 
+            if(resetCommandQueue)
+                //reset all commands
+                foreach (Caster c in validCasters)
+                    c.ResetCommands();
+
             //move units to the target until the required distance is reached
             if(typeof(Animal).IsAssignableFrom(typeof(Caster)) &&
                 !typeof(Nothing).IsAssignableFrom(typeof(Target)))
                 abilities.MoveToCast(this)
                     .SetCommands(validCasters
                     .Where(caster=>caster.GetType()==typeof(Animal))
-                    .Cast<Animal>(), target);
+                    .Cast<Animal>(), target, resetCommandQueue);
 
             //give command to each caster
             foreach (Caster c in validCasters)

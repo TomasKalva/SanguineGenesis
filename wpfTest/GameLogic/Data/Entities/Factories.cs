@@ -269,7 +269,7 @@ namespace wpfTest.GameLogic
                     air:air));
             //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f););
 
-            abilitiesList.Add(unitType, fields[18]);
+            abilitiesList.Add(unitType, fields[19]);
         }
     }
 }

@@ -10,12 +10,10 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public sealed class EnterHole : TargetAbility<Animal, Structure>
     {
-        public float EnteringTime { get; }
 
         internal EnterHole(decimal energyCost, float enteringTime)
-            : base(0.1f, energyCost, false, false)
+            : base(0.1f, energyCost, false, false, duration:enteringTime)
         {
-            EnteringTime = enteringTime;
         }
 
         public override bool ValidArguments(Animal caster, Structure target)
@@ -37,18 +35,14 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class EnterHoleCommand : Command<Animal, Structure, EnterHole>, IAnimalStateManipulator
     {
-        private float timer;
-
         public EnterHoleCommand(Animal commandedEntity, Structure target, EnterHole enterHole)
             : base(commandedEntity, target, enterHole)
         {
-            timer = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            timer += deltaT;
-            if (timer >= Ability.EnteringTime)
+            if (ElapsedTime >= Ability.Duration)
             {
                 Underground underground = (Underground)Targ.Statuses.Where((s) => s is Underground).FirstOrDefault();
                 if (underground != null)
@@ -67,12 +61,9 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public sealed class ExitHole : TargetAbility<Structure, Nothing>
     {
-        public float ExitingTime { get; }
-
         internal ExitHole(decimal energyCost, float exitingTime)
-            : base(0.1f, energyCost, false, false)
+            : base(0.1f, energyCost, false, false, duration:exitingTime)
         {
-            ExitingTime = exitingTime;
         }
 
         public override Command NewCommand(Structure caster, Nothing target)
@@ -88,20 +79,16 @@ namespace wpfTest.GameLogic.Data.Abilities
 
     public class ExitHoleCommand : Command<Structure, Nothing, ExitHole>, IAnimalStateManipulator
     {
-        private float timer;
-
         public ExitHoleCommand(Structure commandedEntity, Nothing target, ExitHole exitHole)
             : base(commandedEntity, target, exitHole)
         {
-            timer = 0f;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            timer += deltaT;
-            if (timer >= Ability.ExitingTime)
+            if (ElapsedTime >= Ability.Duration)
             {
-                timer -= Ability.ExitingTime;
+                ElapsedTime -= Ability.Duration;
                 Underground underground = (Underground)CommandedEntity.Statuses.Where((s) => s is Underground).FirstOrDefault();
                 if (underground != null)
                 {

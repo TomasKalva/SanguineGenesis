@@ -66,6 +66,7 @@ namespace wpfTest.GUI
                 StatusButtonArray.Update();
                 CommandButtonArray.InfoSources = new List<Command>();
                 CommandButtonArray.Update();
+                FirstCommandProgress.Value = 0;
             }
             else
             {
@@ -73,8 +74,13 @@ namespace wpfTest.GUI
                 EntityStatsTable.SetStats(SelectedEntity.Stats());
                 StatusButtonArray.InfoSources = SelectedEntity.Statuses;
                 StatusButtonArray.Update();
-                CommandButtonArray.InfoSources = SelectedEntity.CommandQueue.Queue;
+                List<Command> commandQueue= SelectedEntity.CommandQueue.Queue;
+                CommandButtonArray.InfoSources = commandQueue;
                 CommandButtonArray.Update();
+                if (commandQueue.Any())
+                    FirstCommandProgress.Value = commandQueue[0].Progress;
+                else
+                    FirstCommandProgress.Value = 0;
             }
         }
     }

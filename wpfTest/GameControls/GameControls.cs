@@ -81,12 +81,15 @@ namespace wpfTest
                         //use ability that doesn't require target
                         Ability noTargetAbility = null;
                         bool selectedNoTargetAbility = false;
+                        bool resetCommandsQueue=false;
                         lock (EntityCommandsInput)
                         {
                             if (EntityCommandsInput.IsAbilitySelected)
                             {
                                 noTargetAbility = EntityCommandsInput.SelectedAbility;
                                 selectedNoTargetAbility = (noTargetAbility != null) && noTargetAbility.TargetType == typeof(Nothing);
+                                resetCommandsQueue = EntityCommandsInput.ResetCommandsQueue;
+                                //reset ability selection
                                 if (selectedNoTargetAbility)
                                     EntityCommandsInput.IsAbilitySelected = false;
                             }
@@ -97,7 +100,7 @@ namespace wpfTest
                             IEnumerable<Entity> unitsWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(noTargetAbility));
                             if (unitsWithAbil != null)
                             {
-                                noTargetAbility.SetCommands(unitsWithAbil, Nothing.Get);
+                                noTargetAbility.SetCommands(unitsWithAbil, Nothing.Get, resetCommandsQueue);
                             }
                         }
                         break;
@@ -109,11 +112,13 @@ namespace wpfTest
                         Vector2 targetCoords;
                         bool isAbilitySelected;
                         Ability ability;
+                        bool resetCommandsQueue;
                         lock (EntityCommandsInput)
                         {
                             targetCoords = EntityCommandsInput.TargetCoordinates;
                             isAbilitySelected = EntityCommandsInput.IsAbilitySelected;
                             ability = EntityCommandsInput.SelectedAbility;
+                            resetCommandsQueue = EntityCommandsInput.ResetCommandsQueue;
 
                             //reset ability selection, regargless of success of using selected ability
                             EntityCommandsInput.IsAbilitySelected = false;
@@ -123,7 +128,7 @@ namespace wpfTest
                         if (!isAbilitySelected)
                         //ability wasn't selected, use default abilities
                         {
-                            UseDefaultAbility(game, targetCoords);
+                            UseDefaultAbility(game, targetCoords, resetCommandsQueue);
                         }
                         else
                         //ability was selected
@@ -137,7 +142,7 @@ namespace wpfTest
                                 IEnumerable<Entity> unitsWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(ability));
                                 if (unitsWithAbil != null)
                                 {
-                                    ability.SetCommands(unitsWithAbil, target);
+                                    ability.SetCommands(unitsWithAbil, target, resetCommandsQueue);
                                 }
                             }
                         }
@@ -147,7 +152,7 @@ namespace wpfTest
             SelectedEntities.RemoveDead();
         }
 
-        private void UseDefaultAbility(Game game, Vector2 targetCoords)
+        private void UseDefaultAbility(Game game, Vector2 targetCoords, bool resetQueue)
         {
             //determine target
             ITargetable enemy = SelectClickedTarget(game, targetCoords.X, targetCoords.Y, game.CurrentPlayer,
@@ -157,12 +162,12 @@ namespace wpfTest
             {
                 //no enemy selected, move to the clicked coordiantes
                 game.CurrentPlayer.GameStaticData.Abilities.MoveTo.SetCommands(SelectedEntities.Entities
-                    .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), targetCoords);
+                    .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), targetCoords, resetQueue);
             }
             else
             {
                 //enemy selected => attack it
-                game.CurrentPlayer.GameStaticData.Abilities.Attack.SetCommands(SelectedEntities.Entities, enemy);
+                game.CurrentPlayer.GameStaticData.Abilities.Attack.SetCommands(SelectedEntities.Entities, enemy, resetQueue);
             }
         }
 

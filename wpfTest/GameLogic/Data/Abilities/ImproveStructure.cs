@@ -51,5 +51,7 @@ namespace wpfTest.GameLogic.Data.Abilities
 
             return false;
         }
+
+        public override int Progress => 100;
     }
 }
