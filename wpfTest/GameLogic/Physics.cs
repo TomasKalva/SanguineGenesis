@@ -5,22 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using wpfTest.GameLogic;
 using wpfTest.GameLogic.Data.Entities;
+using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
 {
-    class Physics
+    public class Physics
     {
-        private float terrainAcc=5000000f;
+        private float terrainAcc=500000000f;
 
         /// <summary>
         /// Pushing maps for the current map. If the map changes they are updated by the method UpdatePushingMaps.
         /// </summary>
-        public Dictionary<Movement, FlowMap> PushingMaps { get; }
+        public Dictionary<Movement, PushingMap> PushingMaps { get; }
 
         public static Physics GetPhysics() => new Physics();
         private Physics()
         {
-            PushingMaps = new Dictionary<Movement, FlowMap>();
+            PushingMaps = new Dictionary<Movement, PushingMap>();
             PushingMaps.Add(Movement.LAND, null);
             PushingMaps.Add(Movement.WATER, null);
             PushingMaps.Add(Movement.LAND_WATER, null);
@@ -36,9 +37,9 @@ namespace wpfTest
             ObstacleMap groundObst = map.ObstacleMaps[Movement.LAND];
             ObstacleMap waterObst = map.ObstacleMaps[Movement.WATER];
             ObstacleMap bothObst = map.ObstacleMaps[Movement.LAND_WATER];
-            FlowMap gPMap = PushingMapGenerator.GeneratePushingMap(groundObst);
-            FlowMap wPMap = PushingMapGenerator.GeneratePushingMap(waterObst);
-            FlowMap gwPMap = PushingMapGenerator.GeneratePushingMap(bothObst);
+            PushingMap gPMap = PushingMapGenerator.GeneratePushingMap(groundObst);
+            PushingMap wPMap = PushingMapGenerator.GeneratePushingMap(waterObst);
+            PushingMap gwPMap = PushingMapGenerator.GeneratePushingMap(bothObst);
             PushingMaps[Movement.LAND] = gPMap;
             PushingMaps[Movement.WATER] = wPMap;
             PushingMaps[Movement.LAND_WATER]= gwPMap;
@@ -145,39 +146,42 @@ namespace wpfTest
                 || PushingMaps[Movement.WATER] == null
                 || PushingMaps[Movement.LAND_WATER] == null)
                 UpdatePushingMaps(map);
-            FlowMap gPMap = PushingMaps[Movement.LAND];
-            FlowMap wPMap = PushingMaps[Movement.WATER];
-            FlowMap gwPMap = PushingMaps[Movement.LAND_WATER];
+            PushingMap gPMap = PushingMaps[Movement.LAND];
+            PushingMap wPMap = PushingMaps[Movement.WATER];
+            PushingMap gwPMap = PushingMaps[Movement.LAND_WATER];
             foreach (Animal u in animals)
             {
                 //non-physical animals don't need to check for collisions
                 if (!u.Physical)
                     continue;
 
+                PushingMap pushingMap;
+                ObstacleMap obstacleMap;
                 switch (u.Movement)
                 {
                     case Movement.LAND:
-                        u.Accelerate(
-                            deltaT * gPMap.GetIntensity(u.Center, terrainAcc), map
-                            );
-                        if (gOMap.CollidingWithObstacle(u.Center))
-                            u.IsInCollision = true;
+                        pushingMap = gPMap;
+                        obstacleMap = gOMap;
                         break;
                     case Movement.WATER:
-                        u.Accelerate(
-                            deltaT * wPMap.GetIntensity(u.Center, terrainAcc), map
-                            );
-                        if (wOMap.CollidingWithObstacle(u.Center))
-                            u.IsInCollision = true;
+                        pushingMap = wPMap;
+                        obstacleMap = wOMap;
                         break;
-                    case Movement.LAND_WATER:
-                        u.Accelerate(
-                            deltaT * gwPMap.GetIntensity(u.Center, terrainAcc), map
-                            );
-                        if (gwOMap.CollidingWithObstacle(u.Center))
-                            u.IsInCollision = true;
+                    default://Movement.LAND_WATER
+                        pushingMap = gwPMap;
+                        obstacleMap = gwOMap;
                         break;
                 }
+                u.Accelerate(
+                            deltaT * pushingMap.GetIntensity(u.Center, terrainAcc), map
+                            );
+                /*Vector2 intensity = pushingMap.GetIntensity(u.Center, 1f);
+                float t = (float)Math.Min((Math.Ceiling(u.Position.X) - u.Position.X) / intensity.X,
+                    (Math.Ceiling(u.Position.Y) - u.Position.Y) / intensity.Y);
+                if(!float.IsNaN(t) && !float.IsInfinity(t))
+                    u.Position += t * intensity;*/
+                if (obstacleMap.CollidingWithObstacle(u.Center))
+                    u.IsInCollision = true;
             }
         }
 

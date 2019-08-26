@@ -3,99 +3,106 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
 {
     static class PushingMapGenerator
     {
-        private static Dictionary<Pattern3x3, float> angleForPattern;
+        private static Dictionary<Pattern2x2, float> angleForPattern;
 
         static PushingMapGenerator()
         {
             //initialize the pattern dictionary with angles
-            angleForPattern = new Dictionary<Pattern3x3, float>();
+            angleForPattern = new Dictionary<Pattern2x2, float>();
+            float left= (float)(Math.PI);
+            float leftUp = (float)(Math.PI) * 3 / 4f;
+            float up = (float)(Math.PI) / 2f;
+            float rightDown = (float)(Math.PI) * 7 / 4f;
 
-            Pattern3x3 p0 = new Pattern3x3(
-                true, true, true,
-                true, true, true,
-                false, false, false);
-            float angleP0 = (float)(Math.PI) * 3 / 2;
+            Pattern2x2[] patterns = new Pattern2x2[8];
+            float[] angles = new float[8];
 
-            Pattern3x3 p1 = new Pattern3x3(
-                true, true, true,
-                false, true, true,
-                false, false, true);
-            float angleP1 = (float)(Math.PI) * 5 / 4;
+            patterns[0] = new Pattern2x2(
+                true, true, 
+                true, true);
+            angles[0] = rightDown;
 
-            Pattern3x3 p2 = new Pattern3x3(
-                false, true, true,
-                false, true, true,
-                false, false, false);
-            float angleP2 = (float)(Math.PI) * 5 / 4;
+            patterns[1] = new Pattern2x2(
+                true, true,
+                false, true);
+            angles[1] = left;
 
-            Pattern3x3 p3 = new Pattern3x3(
-                true, true, true,
-                true, true, true,
-                false, false, true);
-            float angleP3 = (float)(Math.PI) * 5 / 4;
+            patterns[2] = new Pattern2x2(
+                true, false,
+                true, true);
+            angles[2] = up;
 
-            Pattern3x3 p3Fli = p3.FlipHoriz();
-            float angleP3Fli = (float)(Math.PI) * 7 / 4;
+            patterns[3] = new Pattern2x2(
+                false, true,
+                true, true);
+            angles[3] = leftUp;
 
-            Pattern3x3 p4 = new Pattern3x3(
-                true, true, true,
-                false, true, true,
-                false, false, false);
-            float angleP4 = (float)(Math.PI) * 5 / 4;
+            patterns[4] = new Pattern2x2(
+                false, false,
+                true, true);
+            angles[4] = up;
 
-            Pattern3x3 p4Fli = p4.FlipHoriz();
-            float angleP4Fli = (float)(Math.PI) * 7 / 4;
+            patterns[5] = new Pattern2x2(
+                false, true,
+                false, true);
+            angles[5] = left;
 
-            Pattern3x3 p5 = new Pattern3x3(
-                true, true, true,
-                true, true, true,
-                false, true, true);
-            float angleP5 = (float)(Math.PI) * 5 / 4;
+            patterns[6] = new Pattern2x2(
+                false, false,
+                false, true);
+            angles[6] = leftUp;
 
-            Func<float, float> RotateRight = (angle)=>angle + (float)Math.PI * 3 / 2;
-            Action<Pattern3x3, float> AddToDic = (pat, angle) =>
-              {
-                  for (int i = 0; i < 4; i++)
-                  {
-                      pat = pat.RotateRight();
-                      angle = RotateRight(angle);
-                      angleForPattern.Add(pat, angle);
-                  }
-              };
+            patterns[7] = new Pattern2x2(
+                true, false,
+                false, true);
+            angles[7] = leftUp;
 
-            AddToDic(p0, angleP0);
-            AddToDic(p1, angleP1);
-            AddToDic(p2, angleP2);
-            AddToDic(p3, angleP3);
-            AddToDic(p4, angleP4);
-            AddToDic(p5, angleP5);
-            AddToDic(p3Fli, angleP3Fli);
-            AddToDic(p4Fli, angleP4Fli);
+            for(int i=0;i<8;i++)
+                angleForPattern.Add(patterns[i], angles[i]);
         }
 
-        public static FlowMap GeneratePushingMap(ObstacleMap obstMap)
+        public static PushingMap GeneratePushingMap(ObstacleMap obstMap)
         {
-            FlowMap flowMap = new FlowMap(obstMap.Width, obstMap.Height);
-            
-            Pattern3x3 curr;
-            for(int i = 0; i < flowMap.Width; i++)
+            PushingMap pushingMap = new PushingMap(obstMap.Width, obstMap.Height);
+
+            Pattern3x3 pat;
+            for(int i = 0; i < pushingMap.Width; i++)
             {
-                for(int j = 0; j < flowMap.Height; j++)
+                for(int j = 0; j < pushingMap.Height; j++)
                 {
-                    curr = new Pattern3x3(
-                        obstMap[i - 1, j + 1], obstMap[i, j + 1], obstMap[i + 1, j + 1],
-                        obstMap[i - 1, j    ], obstMap[i, j    ], obstMap[i + 1, j    ],
-                        obstMap[i - 1, j - 1], obstMap[i, j - 1], obstMap[i + 1, j - 1]);
-                    if (angleForPattern.TryGetValue(curr, out float angle))
-                        flowMap[i, j] = angle;
+                    if (obstMap[i, j])
+                    {
+                        //select square around [i,j]
+                        pat = new Pattern3x3(
+                            obstMap[i - 1, j + 1], obstMap[i, j + 1], obstMap[i + 1, j + 1],
+                            obstMap[i - 1, j], obstMap[i, j], obstMap[i + 1, j],
+                            obstMap[i - 1, j - 1], obstMap[i, j - 1], obstMap[i + 1, j - 1]);
+                        //rotate the square right, find angle for the top left subpattern, rotate
+                        //the angle back left
+                        //repeat for all 4 directions
+                        float rotation = 0f;
+                        float[] directions = new float[4];
+                        for (int k = 0; k < 4; k++)
+                        {
+                            Pattern2x2 sub = pat.LeftUpSubpattern();
+                            directions[k] = angleForPattern[sub] - rotation;
+                            pat=pat.RotateRight();
+                            rotation += (float)((Math.PI) * 3 / 2f);
+                        }
+                        pushingMap[i, j] = new PushingSquare(directions[0], directions[3],
+                                                            directions[1], directions[2]);
+                    }
+                    else
+                        pushingMap[i, j] = null;
                 }
             }
-            return flowMap;
+            return pushingMap;
         }
     }
 
@@ -155,6 +162,46 @@ namespace wpfTest
             newP._31 = _33;
             newP._32 = _23;
             newP._33 = _13;
+
+            return newP;
+        }
+
+        public Pattern2x2 LeftUpSubpattern()
+            => new Pattern2x2( _11, _12, _21, _22);
+    }
+    struct Pattern2x2
+    {
+        bool _11; bool _12;
+        bool _21; bool _22;
+
+        public Pattern2x2(
+            bool _11, bool _12,
+            bool _21, bool _22)
+        {
+            this._11 = _11;
+            this._12 = _12;
+            this._21 = _21;
+            this._22 = _22;
+        }
+
+        public Pattern2x2 FlipHoriz()
+        {
+            Pattern2x2 newP = new Pattern2x2();
+            newP._11 = _21;
+            newP._12 = _22;
+            newP._21 = _11;
+            newP._22 = _12;
+
+            return newP;
+        }
+
+        public Pattern2x2 RotateRight()
+        {
+            Pattern2x2 newP = new Pattern2x2();
+            newP._11 = _21;
+            newP._12 = _11;
+            newP._22 = _12;
+            newP._21 = _22;
 
             return newP;
         }

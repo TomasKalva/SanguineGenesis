@@ -22,7 +22,6 @@ namespace wpfTest
         public bool MapChanged => MapView.MapWasChanged;
         public Map MapView { get; private set; }
         public Players PlayerID { get; }
-        public float Resource { get; set; }
         public List<Building> VisibleBuildings { get; }
         public GameStaticData GameStaticData { get; }
         public int MaxAirTaken { get; private set; }
@@ -32,11 +31,8 @@ namespace wpfTest
         {
             PlayerID = playerID;
             InitUnits();
-            Resource = 1000;
             VisibleBuildings = new List<Building>();
             GameStaticData = new GameStaticData();
-            MaxAirTaken = 10;
-            AirTaken = 0;
         }
 
         public void InitUnits()
@@ -51,9 +47,9 @@ namespace wpfTest
                 //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
             UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 10; i++)
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < 15; j++)
                 {
                     Entities.Add(normalUnits.NewInstance(this, new Vector2(20 + i*.25f,10+ j*.25f)));
                 }

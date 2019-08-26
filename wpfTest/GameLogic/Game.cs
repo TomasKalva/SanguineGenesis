@@ -24,10 +24,10 @@ namespace wpfTest
         public Dictionary<Players,Player> Players { get; }
         public GameQuerying GameQuerying { get; }
         public Player CurrentPlayer { get; private set; }
-        Physics physics;
+        private Physics physics;
         VisibilityGenerator visibilityGenerator;
         /// <summary>
-        /// The next player for who will be generated visibility map.
+        /// The next player to whom will be generated visibility map.
         /// </summary>
         private Players nextVisibilityPlayer;
         public GameplayOptions GameplayOptions { get; }
@@ -37,7 +37,7 @@ namespace wpfTest
             PixelColor[,] mapPC = mapBitmap.GetPixels();
             Map=new Map(mapPC);
             FlowMap = new FlowMap(Map.Width, Map.Height);
-            FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap(Movement.LAND));
+            //FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap(Movement.LAND));
             GameEnded = false;
             Players = new Dictionary<Players, Player>();
             Players.Add(wpfTest.Players.PLAYER0, new Player(wpfTest.Players.PLAYER0));

@@ -364,7 +364,7 @@ namespace wpfTest
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X,(float)clickPos.Y));
             gameControls.EntityCommandsInput.NewPoint(mapCoordinates);
-
+            
             //hide gui so that player can select from the whole screen
             gui.Visibility = Visibility.Hidden;
             //set selected entity

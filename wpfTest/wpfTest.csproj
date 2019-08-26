@@ -99,6 +99,7 @@
     <Compile Include="GameLogic\Data\Entities\StatusFactory.cs" />
     <Compile Include="GameLogic\Data\Entities\Unit.cs" />
     <Compile Include="GameLogic\Data\GameStaticData.cs" />
+    <Compile Include="GameLogic\Maps\PushingMap.cs" />
     <Compile Include="GameLogic\Structure.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\GameplayOptions.cs" />
