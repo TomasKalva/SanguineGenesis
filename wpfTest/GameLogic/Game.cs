@@ -30,7 +30,7 @@ namespace wpfTest
         /// The next player for who will be generated visibility map.
         /// </summary>
         private Players nextVisibilityPlayer;
-        private GameplayOptions gameplayOptions;
+        public GameplayOptions GameplayOptions { get; }
 
         public Game(BitmapImage mapBitmap)
         {
@@ -49,8 +49,8 @@ namespace wpfTest
             physics = Physics.GetPhysics();
             visibilityGenerator = new VisibilityGenerator();
             nextVisibilityPlayer = wpfTest.Players.PLAYER0;
-            gameplayOptions = new GameplayOptions();
-            gameplayOptions.WholeMapVisible = false;
+            GameplayOptions = new GameplayOptions();
+            GameplayOptions.WholeMapVisible = false;
             foreach (Animal u in CurrentPlayer.Units)
             {
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
@@ -199,7 +199,7 @@ namespace wpfTest
             Players[wpfTest.Players.PLAYER1].RemoveDeadEntities();
 
             //update players' view of the map
-            if (!gameplayOptions.WholeMapVisible)
+            if (!GameplayOptions.WholeMapVisible)
             {
                 if (visibilityGenerator.Done)
                 {
@@ -243,7 +243,6 @@ namespace wpfTest
 
             //update move to commands
             mg.UseProcessedCommands();
-
         }
     }
 }

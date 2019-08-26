@@ -70,4 +70,16 @@ namespace wpfTest.GUI
             }
         }
     }
+
+    public struct Stat
+    {
+        public string Name { get; }
+        public string Value { get; }
+
+        public Stat(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+    }
 }

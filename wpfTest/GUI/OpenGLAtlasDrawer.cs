@@ -82,7 +82,7 @@ namespace wpfTest
         /// Draws the scene.
         /// </summary>
         /// <param name="gl">The OpenGL instance.</param>
-        public static void Draw(OpenGL gl)
+        public static void Draw(OpenGL gl, GameplayOptions gameplayOptions)
         {
             //clear the scene
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
@@ -91,11 +91,18 @@ namespace wpfTest
             map.VertexBufferArray.Bind(gl);
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
 
-            flowMap.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-            
-            nutrientsMap.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 30000);
+
+            if (gameplayOptions.NutrientsVisible)
+            {
+                nutrientsMap.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 30000);
+            }
+
+            if (gameplayOptions.ShowFlowmap)
+            {
+                flowMap.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+            }
 
             if (!entitiesEmpty)
             {

@@ -14,30 +14,50 @@
             <sharpGL:OpenGLControl Name="openGLControl1" OpenGLDraw="OpenGLControl_OpenGLDraw" RenderContextType="FBO"
                                    MouseLeftButtonDown="openGLControl1_MouseLeftButtonDown" MouseLeftButtonUp="openGLControl1_MouseLeftButtonUp"
                                    MouseMove="openGLControl1_MouseMove" MouseRightButtonDown="openGLControl1_MouseRightButtonDown"/>
-            <!--<DataGridCellsPanel Width="50" Height="50">-->
-
+            
             <Canvas Name="gui">
                 <Grid Name="resourcesL" Width="100" Height="20" Background="Black">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
+                    
+                    <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource AirIndicatorStyle}">Air:</Label>
+                    <Label Name="airTakenL" Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Center" Style="{StaticResource AirIndicatorStyle}">500</Label>
+                </Grid>
+                <Button Name="menuB" Content="Menu" Click="menuB_Click" HorizontalAlignment="Center"
+                        Width="80" Height="40"/>
+            </Canvas>
+            
+            <Grid Name="menuLayer" Visibility="Hidden">
+                <Grid Name="menu" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Width="150" Height="200" Style="{StaticResource GameMenuStyle}">
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Grid.Resources>
-                        <Style TargetType="Label">
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="Foreground" Value="Yellow" />
-                            <Setter Property="FontSize" Value="10" />
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                        </Style>
-                    </Grid.Resources>
-                    <Label Grid.Row="0" Grid.Column="0">Air:</Label>
-                    <Label Name="airTakenL" Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Center">500</Label>
+
+                    <Button Name="menu_resume" Content="Resume" Click="menu_resume_Click" Grid.Row="0" />
+                    <Button Name="menu_options" Content="Options" Click="menu_options_Click" Grid.Row="1" />
+                    <Button Name="menu_exit" Content="Exit" Click="menu_exit_Click" Grid.Row="2" />
                 </Grid>
-            </Canvas>
+                <Grid Name="options" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Width="150" Height="200" Style="{StaticResource GameMenuStyle}" Visibility="Hidden">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="120"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Label Content="Show nutrients" Grid.Row="0" Grid.Column="0" />
+                    <CheckBox Name="showNutrientsCB" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1" />
+                </Grid>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

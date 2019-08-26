@@ -47,7 +47,7 @@ namespace wpfTest
             if (PlayerID == Players.PLAYER1)
                 return;
 
-            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.4f, 5m, 0.5f, 0.1f, false, 4f, 2f, Movement.LAND_WATER, false, Diet.CARNIVORE, 5f, true, 20m, 5f, new List<StatusFactory>(), 1);
+            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.4f, 5m, 0.5f, 0.1f, false, 4f, 2f, Movement.LAND, false, Diet.CARNIVORE, 5f, true, 20m, 5f, new List<StatusFactory>(), 1);
                 //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
             UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/

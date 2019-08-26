@@ -35,7 +35,8 @@ namespace wpfTest
             State = EntityCommandsInputState.IDLE;
             SelectingCoordinates = new Vector2();
             SelectedAbility = game.CurrentPlayer.GameStaticData.Abilities.MoveTo;
-             IsAbilitySelected = false;
+            IsAbilitySelected = false;
+            ResetCommandsQueue = true;
 
             //initialize keyToAbilityType
             keyToAbility = new Dictionary<Key, Ability>();

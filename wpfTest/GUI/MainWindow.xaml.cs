@@ -87,59 +87,52 @@ namespace wpfTest
             //game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(), new Vector2(10, 2));
             while (true)
             {
-                stepStopwatch.Start();
-
-                lock (game)
-                {
-                    if (game.GameEnded)
-                        break;
-
-                    //process player's input
-                    //Invoke could cause deadlock because drawing also locks game
-                    Dispatcher.BeginInvoke(
-                        (Action)(() =>
-                        gameControls.UpdateMapView(game)));
-
-                    gameControls.UpdateUnitsByInput(game);
-
-                    //update the state of the game
-                    long totalEl = totalStopwatch.ElapsedMilliseconds;
-                    float deltaT = (totalEl - (float)totalTime) / 1000f;
-                    totalTime = totalEl;
-                    game.Update(deltaT);
-                }
-
-                stepStopwatch.Stop();
-
-                //calculate sleep time
-                double diff = stepStopwatch.Elapsed.TotalMilliseconds;
-                stepStopwatch.Reset();
-                totalStepTime += diff;
-                int sleepTime = StepLength - (int)totalStepTime;
-                if ((int)totalStepTime > 0)
-                    totalStepTime = totalStepTime - (int)totalStepTime;
-                //if(sleepTime<0)
-                //    Console.WriteLine(sleepTime);
-                if (sleepTime > 0)
-                {
-                    Thread.Sleep(sleepTime);
-                }
-                else
-                {
-                    Thread.Yield();
-                }
+                MainLoopStep();
             }
         }
         
-        public struct Stat
+        private void MainLoopStep()
         {
-            public string Name { get; }
-            public string Value { get; }
+            stepStopwatch.Start();
 
-            public Stat(string name, string value)
+            lock (game)
             {
-                Name = name;
-                Value = value;
+                if (game.GameEnded)
+                    return;
+
+                //process player's input
+                //Invoke could cause deadlock because drawing also locks game
+                Dispatcher.BeginInvoke(
+                    (Action)(() =>
+                    gameControls.UpdateMapView(game)));
+
+                gameControls.UpdateUnitsByInput(game);
+
+                //update the state of the game
+                long totalEl = totalStopwatch.ElapsedMilliseconds;
+                float deltaT = (totalEl - (float)totalTime) / 1000f;
+                totalTime = totalEl;
+                game.Update(deltaT);
+            }
+
+            stepStopwatch.Stop();
+
+            //calculate sleep time
+            double diff = stepStopwatch.Elapsed.TotalMilliseconds;
+            stepStopwatch.Reset();
+            totalStepTime += diff;
+            int sleepTime = StepLength - (int)totalStepTime;
+            if ((int)totalStepTime > 0)
+                totalStepTime = totalStepTime - (int)totalStepTime;
+            //if(sleepTime<0)
+            //    Console.WriteLine(sleepTime);
+            if (sleepTime > 0)
+            {
+                Thread.Sleep(sleepTime);
+            }
+            else
+            {
+                Thread.Yield();
             }
         }
         
@@ -147,6 +140,7 @@ namespace wpfTest
         private AbilityButtonArray abilityButtonArray;
         private EntityInfoPanel entityInfoPanel;
         private AdditionalInfo additionalInfo;
+        private GameOptionsPanel gameOptionsPanel;
 
         private void InitializeBottomPanel()
         {
@@ -173,6 +167,10 @@ namespace wpfTest
                     new Stat("Air: ", "2")
                 });
 
+            //game options panel
+            gameOptionsPanel = new GameOptionsPanel(250, 300, game.GameplayOptions);
+            menuLayer.Children.Add(gameOptionsPanel);
+
             //add listeners to the buttons
             entityButtonArray.ShowInfoOnClick(entityInfoPanel, abilityButtonArray, gameControls);
             abilityButtonArray.ShowInfoOnMouseOver(additionalInfo);
@@ -182,7 +180,7 @@ namespace wpfTest
             abilityButtonArray.SelectAbilityOnClick(gameControls);
 
             //set position of ui elements
-            Console.WriteLine(ActualWidth);
+            //bottom panel
             double entityInfoW = entityInfoPanel.Width;
             double entityButtonArrayW = entityButtonArray.Width;
             double abilityButtonArrayW = abilityButtonArray.Width;
@@ -204,6 +202,10 @@ namespace wpfTest
             double additionalInfoX = abilityPanelX + abilityButtonArrayW;
             Canvas.SetLeft(additionalInfo, additionalInfoX);
             Canvas.SetBottom(additionalInfo, 0);
+
+            //menu button
+            Canvas.SetRight(menuB, 0);
+            Canvas.SetTop(menuB, 0);
         }
 
         private void UpdateBottomPanel()
@@ -283,6 +285,9 @@ namespace wpfTest
                 case Key.Up: gameControls.MapMovementInput.AddDirection(Direction.UP); break;
                 case Key.Left: gameControls.MapMovementInput.AddDirection(Direction.LEFT); break;
                 case Key.Right: gameControls.MapMovementInput.AddDirection(Direction.RIGHT); break;
+                case Key.LeftShift:
+                    lock (gameControls.EntityCommandsInput)
+                        gameControls.EntityCommandsInput.ResetCommandsQueue = false; break;
             }
         }
 
@@ -294,6 +299,9 @@ namespace wpfTest
                 case Key.Up:  gameControls.MapMovementInput.RemoveDirection(Direction.UP); break;
                 case Key.Left:  gameControls.MapMovementInput.RemoveDirection(Direction.LEFT); break;
                 case Key.Right:  gameControls.MapMovementInput.RemoveDirection(Direction.RIGHT); break;
+                case Key.LeftShift:
+                    lock (gameControls.EntityCommandsInput)
+                        gameControls.EntityCommandsInput.ResetCommandsQueue = true; break;
             }
         }
 
@@ -333,20 +341,19 @@ namespace wpfTest
             sw.Start();
             lock (game)
             {
-                bool shiftDown= Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
-                lock (gameControls.EntityCommandsInput)
-                    gameControls.EntityCommandsInput.ResetCommandsQueue = !shiftDown;
                 gameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
                 OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, gameControls.MapView, game);
+                if(game.GameplayOptions.NutrientsVisible)
+                    OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateUnitIndicatorsDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);
+                if (game.GameplayOptions.ShowFlowmap)
+                    OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, gameControls.MapView, gameControls.MapSelectorFrame);
                 UpdateBottomPanel();
             }
-            OpenGLAtlasDrawer.Draw(gl);
+            OpenGLAtlasDrawer.Draw(gl, game.GameplayOptions);
             sw.Stop();
             //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
         }
@@ -398,7 +405,32 @@ namespace wpfTest
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
             gameControls.EntityCommandsInput.SetTarget(mapCoordinates);
-            // game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(Movement.GROUND),  mapCoordinates);
+            if(game.GameplayOptions.ShowFlowmap)
+                game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(Movement.LAND),  mapCoordinates);
+        }
+
+        private void menuB_Click(object sender, RoutedEventArgs e)
+        {
+            gui.IsEnabled = false;
+            openGLControl1.IsEnabled = false;
+            menuLayer.Visibility = Visibility.Visible;
+        }
+
+        private void menu_resume_Click(object sender, RoutedEventArgs e)
+        {
+            gui.IsEnabled = true;
+            openGLControl1.IsEnabled = true;
+            menuLayer.Visibility = Visibility.Hidden;
+        }
+
+        private void menu_options_Click(object sender, RoutedEventArgs e)
+        {
+            gameOptionsPanel.Visibility = Visibility.Visible;
+        }
+
+        private void menu_exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 

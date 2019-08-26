@@ -8,32 +8,6 @@ namespace wpfTest.GameLogic.Data.Abilities
 {
     public sealed class MoveTo : TargetAbility<Animal, IMovementTarget>, IMovementParametrizing
     {
-        private static MoveTo ability;
-        /// <summary>
-        /// Movement parameters for each ability other than MoveTo.
-        /// </summary>
-        //private static Dictionary<Ability, MoveTo> moveToCast;
-        static MoveTo()
-        {
-            ability = new MoveTo(0.1f, true, false);
-            //initialize MoveTo for all abilities
-            {
-                //moveToCast = new Dictionary<Ability, MoveTo>();
-                //moveToCast.Add(Attack.Get, new MoveTo(-1, true, true));
-                //spawn abilities
-                /*foreach (string unit in stringExtensions.Units)
-                {
-                    Ability a = Spawn.GetAbility(unit);
-                    moveToCast.Add(a, new MoveTo(a.Distance, false, false));
-                }*/
-                //plant abilities
-                /*foreach (string building in stringExtensions.Buildings)
-                {
-                    Ability a = PlantBuilding.GetAbility(building);
-                    moveToCast.Add(a, new MoveTo(a.Distance, false, false));
-                }*/
-            }
-        }
         internal MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
             : base(-1, 0, false, false)
         {
@@ -41,8 +15,6 @@ namespace wpfTest.GameLogic.Data.Abilities
             AttackEnemyInstead = interruptable;
             UsesAttackDistance = usesAttackDistance;
         }
-        //public static MoveTo Get => ability;
-        //public static MoveTo GetMoveTo(Ability a) => moveToCast[a];
 
         //interface IMovementParametrizing properties
         public float GoalDistance { get; }

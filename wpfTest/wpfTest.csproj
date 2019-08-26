@@ -120,6 +120,7 @@
     <Compile Include="GameLogic\Command.cs" />
     <Compile Include="GUI\ButtonArray.cs" />
     <Compile Include="GUI\EntityInfoPanel.cs" />
+    <Compile Include="GUI\GameOptionsPanel.cs" />
     <Compile Include="GUI\IRectangle.cs" />
     <Compile Include="GameLogic\Maps\IMap.cs" />
     <Compile Include="GameControls\MapMovementInput.cs" />
