@@ -191,7 +191,7 @@ namespace wpfTest.GameLogic.Data.Abilities
                 return false;
 
             float dist = (unit.Center - TargetPoint.Center).Length;
-            if (dist > FLOWMAP_DISTANCE)
+            if (dist > FLOWMAP_DISTANCE)//todo: if animal is standing on node with building - push it out
             {
                 //use flowmap
                 unit.Accelerate(flowMap.GetIntensity(unit.Center, 1), game.Map);

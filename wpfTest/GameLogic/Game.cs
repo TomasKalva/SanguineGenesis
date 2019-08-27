@@ -82,7 +82,7 @@ namespace wpfTest
             nextVisibilityPlayer = wpfTest.Players.PLAYER0;
             GameplayOptions = new GameplayOptions();
             GameplayOptions.WholeMapVisible = false;
-            foreach (Animal u in CurrentPlayer.Units)
+            foreach (Animal u in CurrentPlayer.GetAll<Unit>())
             {
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Jump);
@@ -105,7 +105,7 @@ namespace wpfTest
             var Ts = new List<T>();
             foreach (var kvpPlayer in Players)
             {
-                Ts = Ts.Concat(kvpPlayer.Value.Get<T>()).ToList();
+                Ts = Ts.Concat(kvpPlayer.Value.GetAll<T>()).ToList();
             }
             return Ts;
         }
@@ -154,8 +154,8 @@ namespace wpfTest
             //physics
             List<Entity> physicalEntities = entities.Where((e) => e.Physical).ToList();
             physics.MoveAnimals(Map, animals, deltaT);
-            physics.PushAway(Map, animals, physicalEntities, deltaT);
-            physics.PushOutsideOfObstacles(Map, animals, deltaT);
+            physics.PushAway(Map, animals, physicalEntities);
+            physics.PushOutsideOfObstacles(Map, animals);
 
             //attack nearby enemy if idle
             foreach(Animal a in animals)

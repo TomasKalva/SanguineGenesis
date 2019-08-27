@@ -47,14 +47,14 @@ namespace wpfTest.GameLogic.Maps
         public void AddVisibility(View v, ObstacleMap obstMap)
         {
             float viewRange = v.Range;
-            int left = (int)(v.Pos.X - viewRange);
-            int right = (int)(v.Pos.X + viewRange) + 1;
-            int bottom = (int)(v.Pos.Y - viewRange);
-            int top = (int)(v.Pos.Y + viewRange) + 1;
+            int left = (int)(v.Position.X - viewRange);
+            int right = (int)(v.Position.X + viewRange) + 1;
+            int bottom = (int)(v.Position.Y - viewRange);
+            int top = (int)(v.Position.Y + viewRange) + 1;
             //cast rays to the lines on bottom and top of the square around v
             for (int i = left; i <= right; i++)
             {
-                Ray rTop = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
+                Ray rTop = new Ray(new Vector2(v.Position.X, v.Position.Y),
                     new Vector2(i, top),
                     viewRange,
                     obstMap);
@@ -63,7 +63,7 @@ namespace wpfTest.GameLogic.Maps
                     visible[x, y] = true;
                 if (x != -1 && y != -1)
                     visible[x, y] = true;
-                Ray rBottom = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
+                Ray rBottom = new Ray(new Vector2(v.Position.X, v.Position.Y),
                     new Vector2(i, bottom),
                     viewRange,
                     obstMap);
@@ -75,7 +75,7 @@ namespace wpfTest.GameLogic.Maps
             //cast rays to the lines on left and right of the square around v
             for (int j = bottom; j <= top; j++)
             {
-                Ray rLeft = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
+                Ray rLeft = new Ray(new Vector2(v.Position.X, v.Position.Y),
                     new Vector2(left, j),
                     viewRange,
                     obstMap);
@@ -84,7 +84,7 @@ namespace wpfTest.GameLogic.Maps
                     visible[x, y] = true;
                 if (x != -1 && y != -1)
                     visible[x, y] = true;
-                Ray rRight = new Ray(new Vector2(v.Pos.X, v.Pos.Y),
+                Ray rRight = new Ray(new Vector2(v.Position.X, v.Position.Y),
                     new Vector2(right, j),
                     viewRange,
                     obstMap);
@@ -94,8 +94,8 @@ namespace wpfTest.GameLogic.Maps
                    visible[x, y] = true;
             }
             //add the square which contains v
-            int vX = (int)v.Pos.X;
-            int vY = (int)v.Pos.Y;
+            int vX = (int)v.Position.X;
+            int vY = (int)v.Position.Y;
             if(vX >= 0 && vX < Width && vY >= 0 && vY < Height)
                 visible[vX, vY] = true;
         }

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Describes a rectangle.
+    /// </summary>
     public struct Rect
     {
         public float Bottom { get; }
@@ -30,28 +33,10 @@ namespace wpfTest
         /// <param name="y">Y component.</param>
         public bool PointInside(float x, float y)
             => x >= Left && x <= Right && y >= Bottom && y <= Top;
-
-        /*
+        
         /// <summary>
-         /// Returns true if this rectangle collides with rect.
-         /// </summary>
-        public bool CollidesWith(Rect rect)
-        {
-            if((Left<=rect.Left && rect.Left<=Right
-                && rect.Top>=Bottom && rect.Bottom<=Top) 
-                || 
-                (Left <= rect.Right && rect.Right <= Right
-                && rect.Top >= Bottom && rect.Bottom <= Top)
-                || 
-                (Bottom <= rect.Bottom && rect.Bottom <= Top
-                && rect.Right >= Left && rect.Left <= Right)
-                || 
-                (Bottom <= rect.Top && rect.Top <= Top
-                && rect.Right >= Left && rect.Left <= Right))
-                return true;
-            return false;
-        }*/
-
+        /// Returns true if this rectangle collides with rect.
+        /// </summary>
         public bool IntersectsWith(Rect rect)
         {
             //two rectangles don't overlap if the left edge of one of them is

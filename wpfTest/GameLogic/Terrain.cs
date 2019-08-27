@@ -12,7 +12,7 @@ namespace wpfTest
         SHALLOW_WATER,
         DEEP_WATER
     }
-
+    
     public enum Biome
     {
         DEFAULT,
@@ -30,6 +30,11 @@ namespace wpfTest
 
     public static class TerrainExtensions
     {
+        /// <summary>
+        /// Returns soil quality determined by the terrain, biome, nutrients combination.
+        /// Throws argument exception if the combination is not valid.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the parameters are not valid.</exception>
         public static SoilQuality Quality(this Terrain terrain, Biome biome, decimal nutrients)
         {
             switch (terrain)
@@ -83,6 +88,11 @@ namespace wpfTest
             throw new ArgumentException("Combination " + terrain + ", " + biome + ", " + nutrients + " isn't valid");
         }
 
+        /// <summary>
+        /// Returns minimal amount of nutrients determined by the terrain, biome, soil quality combination.
+        /// Throws argument exception if the combination is not valid.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the parameters are not valid.</exception>
         public static decimal Nutrients(this Terrain terrain, Biome biome, SoilQuality soilQuality)
         {
             switch (terrain) {
@@ -148,12 +158,15 @@ namespace wpfTest
 
     public static class SoilQualityExtensions
     {
+        /// <summary>
+        /// Returns amount of nutrients that can be produced by a Node with soilQuality.
+        /// </summary>
         public static decimal NutrientsProduction(this SoilQuality soilQuality)
         {
             switch (soilQuality)
             {
                 case SoilQuality.BAD:
-                    return 0m;
+                    return 0.05m;
                 case SoilQuality.LOW:
                     return 0.01m;
                 case SoilQuality.MEDIUM:
@@ -165,6 +178,9 @@ namespace wpfTest
             }
         }
 
+        /// <summary>
+        /// Returns amount of nutrients that can be transfered by a Node with soilQuality.
+        /// </summary>
         public static decimal TransferCapacity(this SoilQuality soilQuality)
         {
             switch (soilQuality)

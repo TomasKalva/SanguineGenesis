@@ -11,42 +11,47 @@ namespace wpfTest
 {
     public class Player
     {
-        public const int MAX_AIR_TAKEN = 100;
-
-        public List<Entity> Entities { get; private set; }
-        public List<Unit> Units => Entities.Where((e) => e is Unit).Select((u)=>(Unit)u).ToList();
-        public List<Animal> Animals => Entities.Where((e) => e is Animal).Select((u) => (Animal)u).ToList();
-        public List<Building> Buildings => Entities.Where((e) => e is Building).Select((u) => (Building)u).ToList();
-        public List<Tree> Trees => Entities.Where((e) => e is Tree).Select((u) => (Tree)u).ToList();
         /// <summary>
-        /// Returns all entities of type T owned by the player.
+        /// Maximum value of MaxAirTaken.
         /// </summary>
-        public List<T> Get<T>() where T:Entity
-        {
-            if (typeof(T) == typeof(Entity))
-                return Entities.Cast<T>().ToList();
-            else if (typeof(T) == typeof(Unit))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
-            else if (typeof(T) == typeof(Animal))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
-            else if (typeof(T) == typeof(Corpse))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
-            else if (typeof(T) == typeof(Building))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
-            else if(typeof(T) == typeof(Tree))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
-            else if (typeof(T) == typeof(Structure))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
-
-            throw new NotImplementedException("The case when entity is " + typeof(T) + " is not covered!");
-        }
+        public const int MAX_AIR_TAKEN = 100;
+        /// <summary>
+        /// Entities owned by the player.
+        /// </summary>
+        public List<Entity> Entities { get; private set; }
+        /// <summary>
+        /// Describes the area of map view by the player.
+        /// </summary>
         public VisibilityMap VisibilityMap { get; private set; }
+        /// <summary>
+        /// Set to true after VisibilityMap was changed.
+        /// </summary>
         public bool MapChanged => VisibleMap.MapWasChanged;
+        /// <summary>
+        /// Map seen by the player.
+        /// </summary>
         public Map VisibleMap { get; private set; }
+        /// <summary>
+        /// Index of player.
+        /// </summary>
         public Players PlayerID { get; }
+        /// <summary>
+        /// Buildings visible by the player. Some of them might no longer
+        /// exist.
+        /// </summary>
         public List<Building> VisibleBuildings { get; }
+        /// <summary>
+        /// Entities factories, abilities and statuses used by the player.
+        /// </summary>
         public GameStaticData GameStaticData { get; }
+        /// <summary>
+        /// Maximum amount of air that can be taken by animals. If reached or exceeded, 
+        /// no new animals can be created.
+        /// </summary>
         public int MaxAirTaken { get; private set; }
+        /// <summary>
+        /// Air required by the animals.
+        /// </summary>
         public int AirTaken { get; private set; }
 
         public Player(Players playerID)
@@ -57,6 +62,7 @@ namespace wpfTest
             GameStaticData = new GameStaticData();
         }
 
+        //todo: remove this things
         public void InitUnits()
         {
 
@@ -83,12 +89,43 @@ namespace wpfTest
             Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(4f, 9f)));*/
         }
 
-        public void CalulateAir()
+        /// <summary>
+        /// Returns all entities of type T owned by the player.
+        /// </summary>
+        public List<T> GetAll<T>() where T : Entity
         {
-            MaxAirTaken = Math.Min(MAX_AIR_TAKEN, Trees.Sum((t) => t.Air));
-            AirTaken = Animals.Sum((a) => a.Air);
+            if (typeof(T) == typeof(Entity))
+                return Entities.Cast<T>().ToList();
+            else if (typeof(T) == typeof(Unit))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Animal))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Corpse))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Building))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Tree))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Structure))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+
+            throw new NotImplementedException("The case when entity is " + typeof(T) + " is not covered!");
         }
 
+        /// <summary>
+        /// Sets correct values of AirTaken and MaxAirTaken.
+        /// </summary>
+        public void CalulateAir()
+        {
+            MaxAirTaken = Math.Min(MAX_AIR_TAKEN, GetAll<Tree>().Sum((t) => t.Air));
+            AirTaken = GetAll<Animal>().Sum((a) => a.Air);
+        }
+
+        /// <summary>
+        /// Add buildings that weren't visible and now are to VisibleBuildings. Remove 
+        /// buildings that were visible but now can be seen that they no longer exist.
+        /// </summary>
+        /// <param name="buildings"></param>
         public void UpdateBuildingsView(List<Building> buildings)
         {
             if (VisibilityMap == null)
@@ -113,8 +150,15 @@ namespace wpfTest
                     AddVisibleBuilding(b);
                 }
             }
+
+            //remove visible buildings for which it can be seen that they no longer exist
+            VisibleBuildings.RemoveAll((b) => b.IsVisible(VisibilityMap) &&
+                                                !buildings.Contains(b));
         }
 
+        /// <summary>
+        /// Update visible nodes.
+        /// </summary>
         public void UpdateVisibleMap(Map map)
         {
             if (VisibilityMap == null)
@@ -136,18 +180,27 @@ namespace wpfTest
                 }
         }
 
+        /// <summary>
+        /// Removes building from VisibleBuildings and updates VisibleMap.
+        /// </summary>
         private void RemoveVisibleBuilding(Building building)
         {
             VisibleBuildings.Remove(building);
             VisibleMap.RemoveBuilding(building);
         }
 
+        /// <summary>
+        /// Adds building to VisibleBuildings and updates VisibleMap.
+        /// </summary>
         private void AddVisibleBuilding(Building building)
         {
             VisibleBuildings.Add(building);
             VisibleMap.AddBuilding(building);
         }
 
+        /// <summary>
+        /// Sets VisibilityMap and updates visible buildings.
+        /// </summary>
         public void SetVisibilityMap(VisibilityMap visMap, List<Building> buildings)
         {
             VisibilityMap = visMap;
@@ -167,12 +220,6 @@ namespace wpfTest
                 if(e.IsDead)
                 {
                     deadEntities.Add(e);
-                    /*if(e is Building b)
-                    {
-                        
-                    }*/
-                    //CommandsAssignments still have reference to the entity
-                    //e.RemoveFromAllCommandsAssignments();
                 }
             }
             foreach(Entity e in deadEntities)
@@ -196,22 +243,20 @@ namespace wpfTest
             VisibleBuildings.RemoveAll((building) => building.IsDead);
         }
 
+        /// <summary>
+        /// Copy map to the player's VisibleMap.
+        /// </summary>
+        /// <param name="map"></param>
         public void InitializeMapView(Map map)
         {
             //todo: implement with visibility map
             VisibleMap = new Map(map);
         }
-
-        /*public ObstacleMap GetViewMap()
-        {
-            ObstacleMap om = new ObstacleMap(Width, Height);
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                    om[i, j] = nodes[i, j].Blocked;
-            return om;
-        }*/
     }
 
+    /// <summary>
+    /// Use for indexing players.
+    /// </summary>
     public enum Players
     {
         PLAYER0,

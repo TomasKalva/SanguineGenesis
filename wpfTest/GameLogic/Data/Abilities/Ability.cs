@@ -224,7 +224,7 @@ namespace wpfTest.GameLogic
     public interface IMovementTarget : ITargetable
     {
         /// <summary>
-        /// Distance from this to animal.
+        /// Distance to animal.
         /// </summary>
         float DistanceTo(Animal animal);
     }

@@ -9,7 +9,8 @@ using wpfTest.GameLogic.Maps;
 namespace wpfTest.GameLogic
 {
     /// <summary>
-    /// Used for asynchronous creating of visibility maps.
+    /// Used for asynchronous creating of visibility maps. Lock for accessing public properties
+    /// is the instance.
     /// </summary>
     public class VisibilityGenerator
     {
@@ -20,19 +21,33 @@ namespace wpfTest.GameLogic
 
         //outputs
         private VisibilityMap visibilityMap;
-        public bool Done { get; private set; }
+        private bool done;
+        public bool Done
+        {
+            get
+            {
+                lock (this) return done;
+            }
+            private set
+            {
+                lock (this) done = value;
+            }
+        }
         public VisibilityMap VisibilityMap
         {
             get
             {
-                if (Done)
+                lock (this)
                 {
-                    Done = false;
-                    return visibilityMap;
-                }
-                else
-                {
-                    return null;
+                    if (Done)
+                    {
+                        Done = false;
+                        return visibilityMap;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
         }
@@ -55,7 +70,8 @@ namespace wpfTest.GameLogic
         /// </summary>
         public void SetNewTask(ObstacleMap obstMap, List<View> unitViews)
         {
-            if (newTask) return;
+            lock(this)
+                if (newTask) return;
 
             this.obstMap = obstMap;
             this.views = unitViews;
@@ -67,7 +83,8 @@ namespace wpfTest.GameLogic
         }
 
         /// <summary>
-        /// Infinite loop for generating visibility maps.
+        /// Infinite loop for generating visibility maps. Listens to Pulses on this instance,
+        /// the pulse condition is newTask.
         /// </summary>
         public void Generate()
         {
@@ -77,8 +94,12 @@ namespace wpfTest.GameLogic
                     while (!newTask) Monitor.Wait(this);
                 visibilityMap = new VisibilityMap(obstMap.Width, obstMap.Height);
                 visibilityMap.FindVisibility(views, obstMap);
-                newTask = false;
-                Done = true;
+
+                lock (this)
+                {
+                    newTask = false;
+                    Done = true;
+                }
             }
         }
     }

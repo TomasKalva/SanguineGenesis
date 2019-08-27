@@ -182,23 +182,19 @@ namespace wpfTest
         }
 
         /// <summary>
-        /// Remove command from this entity. If the entity is dead, the command is not removed. 
+        /// Remove command from this entity.
         /// </summary>
         public void RemoveCommand(Command command)
         {
-            if (!IsDead)
-                CommandQueue.RemoveCommand(command);
+            CommandQueue.RemoveCommand(command);
         }
 
         /// <summary>
-        /// Removes all commands from this entity. If the entity is dead, the commands are not reset.
+        /// Removes all commands from this entity.
         /// </summary>
         public void ResetCommands()
         {
-            if (!IsDead)
-            {
-                CommandQueue.Clear();
-            }
+            CommandQueue.Clear();
         }
 
         #endregion Commands
@@ -272,6 +268,8 @@ namespace wpfTest
         /// </summary>
         public virtual void Die()
         {
+            //reset commands - some commands might require entity to be unregistered (e.g. MoveTo)
+            ResetCommands();
         }
 
         float IMovementTarget.DistanceTo(Animal animal)

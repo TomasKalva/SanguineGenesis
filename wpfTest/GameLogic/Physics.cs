@@ -9,6 +9,9 @@ using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Used for handling collisions.
+    /// </summary>
     public class Physics
     {
         /// <summary>
@@ -43,16 +46,19 @@ namespace wpfTest
             PushingMaps[Movement.LAND_WATER]= gwPMap;
         }
 
-        public void PushAway(Map map, List<Animal> animals, List<Entity> entities, float deltaT)
+        /// <summary>
+        /// Handles collisions between animals and entities. If animal gets pushed to blocked node,
+        /// use corresponding PushingMap to push it back.
+        /// </summary>
+        public void PushAway(Map map, List<Animal> animals, List<Entity> entities)
         {
+            //set push maps so that colliding animals can be correctly pushed to not blocked squares
             SetPushMaps(map);
-
-
-
-            foreach (Animal u in animals)
+            
+            foreach (Animal a in animals)
             {
                 //animals that aren't physical don't need to check for collisions
-                if (!u.Physical)
+                if (!a.Physical)
                     continue;
 
                 foreach (Entity e in entities)
@@ -62,86 +68,81 @@ namespace wpfTest
                         continue;
 
                     //calculate collisions for each pair of unit and entity only once
-                    if (u.GetHashCode() < e.GetHashCode() || e is Building)
+                    if (a.GetHashCode() < e.GetHashCode() || e is Building)
                     {
 
-                        float dist = (u.Center - e.Center).Length;
+                        float dist = (a.Center - e.Center).Length;
                         //if two units get stuck on top of each other, move them apart
                         if (dist == 0)
                         {
                             Vector2 epsilon = new Vector2(0.1f, 0.1f);
-                            u.Position = u.Center + epsilon;
+                            a.Position = a.Center + epsilon;
                             dist = epsilon.Length;
                         }
-                        float totalR = u.Range + e.Range;
+                        float totalR = a.Range + e.Range;
                         //check if u and e are in collision
                         if (dist < totalR && dist != 0)
                         {
                             //push centres of the units from each other
-                            Vector2 dir12 = u.Center.UnitDirectionTo(e.Center);
-                            Vector2 pushVec = (totalR - dist) / 2 * dir12;
+                            Vector2 dirAtoE = a.Center.UnitDirectionTo(e.Center);
+                            Vector2 pushVec = (totalR - dist) / 2 * dirAtoE;
                             if (e is Building)
                             {
                                 //buildings can't be pushed
-                                //u.Position = u.Center - 2 * pushVec;
-                                u.Push(-2 * pushVec);
+                                a.Push(-2 * pushVec);
                             }
                             else if (e is Corpse)
                             {
-                                Corpse c = (Corpse)e;
-                                //u.Position = u.Center - pushVec;
-                                //c.Position = c.Center + pushVec;
-                                u.Push(pushVec);
+                                //corpse isn't pushed
+                                a.Push(pushVec);
                             }
                             else
                             {
-                                Animal u1 = (Animal)e;
-                                if (u.Player != u1.Player)
+                                Animal a1 = (Animal)e;
+                                if (a.Player != a1.Player)
                                 {
-                                    if (u.WantsToMove && !u1.WantsToMove)
+                                    //if the players are different, push the animal that wants to move
+                                    //if both or none want to move, push both of them
+                                    if (a.WantsToMove && !a1.WantsToMove)
                                     {
-                                        //u.Position = u.Center - 2 * pushVec;
-                                        u.Push(-2 * pushVec);
+                                        a.Push(-2 * pushVec);
 
                                     }
-                                    else if (u1.WantsToMove && !u.WantsToMove)
+                                    else if (a1.WantsToMove && !a.WantsToMove)
                                     {
-                                        //u1.Position = u1.Center + 2 * pushVec;
-                                        u1.Push(2 * pushVec);
+                                        a1.Push(2 * pushVec);
 
                                     }
                                     else
                                     {
-                                        //u.Position = u.Center - pushVec;
-                                        //u1.Position = u1.Center + pushVec;
-                                        u.Push(-1 * pushVec);
-                                        u1.Push(pushVec);
+                                        a.Push(-1 * pushVec);
+                                        a1.Push(pushVec);
 
                                     }
                                 }
                                 else
                                 {
-                                    if (u.CanBeMoved && !u1.CanBeMoved)
+                                    //if the players are different, push the animal that wants to move
+                                    //if both or none want to move, push both of them
+                                    if (a.CanBeMoved && !a1.CanBeMoved)
                                     {
-                                        //u.Position = u.Center - 2 * pushVec;
-                                        u.Push(-2 * pushVec);
+                                        a.Push(-2 * pushVec);
 
                                     }
-                                    else if (u1.CanBeMoved && !u.CanBeMoved)
+                                    else if (a1.CanBeMoved && !a.CanBeMoved)
                                     {
-                                        //u1.Position = u1.Center + 2 * pushVec;
-                                        u1.Push(2 * pushVec);
+                                        a1.Push(2 * pushVec);
                                     }
                                     else
                                     {
-                                        //u.Position = u.Center - pushVec;
-                                        //u1.Position = u1.Center + pushVec;
-                                        u.Push(-1 * pushVec);
-                                        u1.Push(pushVec);
+                                        a.Push(-1 * pushVec);
+                                        a1.Push(pushVec);
                                     }
                                 }
-                                PushOutsideOfObstacles(u, deltaT);
-                                PushOutsideOfObstacles(u1, deltaT);
+                                //push animal with a pushing map if it gets into 
+                                //collision with blocked node
+                                PushOutsideOfObstacles(a);
+                                PushOutsideOfObstacles(a1);
                             }
                         }
                     }
@@ -149,31 +150,29 @@ namespace wpfTest
             }
         }
 
-        public void PushOutsideOfObstacles(Map map, List<Animal> animals, float deltaT)
+        /// <summary>
+        /// Uses pushing maps to push animals that are on blocked squares.
+        /// </summary>
+        public void PushOutsideOfObstacles(Map map, List<Animal> animals)
         {
-
-            ObstacleMap gOMap = map.ObstacleMaps[Movement.LAND];
-            ObstacleMap wOMap = map.ObstacleMaps[Movement.WATER];
-            ObstacleMap gwOMap = map.ObstacleMaps[Movement.LAND_WATER];
+            //set pushing maps or reset them if map was changed
             if (map.MapWasChanged
                 || PushingMaps[Movement.LAND] == null
                 || PushingMaps[Movement.WATER] == null
                 || PushingMaps[Movement.LAND_WATER] == null)
                 UpdatePushingMaps(map);
-            PushingMap gPMap = PushingMaps[Movement.LAND];
-            PushingMap wPMap = PushingMaps[Movement.WATER];
-            PushingMap gwPMap = PushingMaps[Movement.LAND_WATER];
             foreach (Animal a in animals)
             {
-                PushOutsideOfObstacles(a, deltaT);
+                PushOutsideOfObstacles(a);
             }
         }
 
+        /// <summary>
+        /// Set pushing maps or reset them if map was changed.
+        /// </summary>
+        /// <param name="map"></param>
         public void SetPushMaps(Map map)
         {
-            ObstacleMap gOMap = map.ObstacleMaps[Movement.LAND];
-            ObstacleMap wOMap = map.ObstacleMaps[Movement.WATER];
-            ObstacleMap gwOMap = map.ObstacleMaps[Movement.LAND_WATER];
             if (map.MapWasChanged
                 || PushingMaps[Movement.LAND] == null
                 || PushingMaps[Movement.WATER] == null
@@ -181,7 +180,10 @@ namespace wpfTest
                 UpdatePushingMaps(map);
         }
 
-        public void PushOutsideOfObstacles(Animal animal, float deltaT)
+        /// <summary>
+        /// Pushes each animal using pushing map corresponding to the animal's movement.
+        /// </summary>
+        public void PushOutsideOfObstacles(Animal animal)
         {
             //non-physical animals don't need to check for collisions
             if (!animal.Physical)
@@ -222,9 +224,12 @@ namespace wpfTest
                 animal.Position += (t + 0.01f) * pushDirection;
         }
 
-        public void MoveAnimals(Map map, List<Animal> units, float deltaT)
+        /// <summary>
+        /// Move each animal.
+        /// </summary>
+        public void MoveAnimals(Map map, List<Animal> animals, float deltaT)
         {
-            foreach(Animal u in units)
+            foreach(Animal u in animals)
             {
                 u.Move(map,deltaT);
             }
