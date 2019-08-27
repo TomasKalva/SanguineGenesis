@@ -21,7 +21,6 @@ namespace wpfTest.GameLogic
         public Node[,] RootNodes { get; }
         public int Air { get; }
 
-        bool IFood.FoodLeft => !IsDead;
 
         public Tree(Player player, string treeType, Node[,] nodes, Node[,] rootNodes, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int air, List<Ability> abilities)
@@ -33,14 +32,19 @@ namespace wpfTest.GameLogic
             foreach(Node n in rootNodes)
                 n.Roots.Add(this);
         }
-
+        #region IFood
+        bool IFood.FoodLeft => !IsDead;
         void IFood.EatFood(Animal eater)
         {
             decimal nutrientsToEat = Math.Min(eater.FoodEnergyRegen, Health);
             Health -= nutrientsToEat;
             eater.Energy += nutrientsToEat;
         }
+        #endregion IFood
 
+        /// <summary>
+        /// Called after this entity dies. Creates a structure representing dead tree.
+        /// </summary>
         public override void Die()
         {
             base.Die();
@@ -48,10 +52,11 @@ namespace wpfTest.GameLogic
             //after physical tree dies and has energy left, spawn a dead tree
             if(Physical && Energy > 0)
                 Player.Entities.Add(
-                    new Structure(Player, "DEAD_TREE", Nodes, MaxEnergy, 0, Size,
+                    new Structure(Player, "DEAD_TREE", Nodes, Energy, 0, Size,
                     Physical, Biome, Terrain, SoilQuality.BAD, false, 0, new List<Ability>()));
         }
 
+        #region Energy manipulation
         /// <summary>
         /// Transforms nutrients from energy sources to energy.
         /// </summary>
@@ -73,7 +78,7 @@ namespace wpfTest.GameLogic
                     nutrientsTaken = Math.Min(nutrientsTaken, n.Nutrients);
 
                     //building only takes energy it can use
-                    nutrientsTaken = Math.Min(nutrientsTaken, Energy.NotFilled);
+                    nutrientsTaken = Math.Min(nutrientsTaken, Energy.AmountNotFilled);
 
                     Energy += nutrientsTaken;
                     n.Nutrients -= nutrientsTaken;
@@ -91,15 +96,17 @@ namespace wpfTest.GameLogic
                 n.Nutrients += MaxEnergyIntake * 2;
             }
         }
+        #endregion Energy manipulation
 
+        #region IShowable
         public override List<Stat> Stats()
         {
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Player", Player.ToString()),
             new Stat( "EntityType", EntityType),
-            new Stat( "Health", Health+"/"+MaxHealth),
-            new Stat("Energy", Energy + "/" + MaxEnergy),
+            new Stat( "Health", Health.ToString()),
+            new Stat("Energy", Energy.ToString()),
             new Stat( "Air", Air.ToString()),
             new Stat( "Size", Size.ToString()),
             new Stat( "Biome", Biome.ToString()),
@@ -111,5 +118,6 @@ namespace wpfTest.GameLogic
             };
             return stats;
         }
+        #endregion IShowable
     }
 }

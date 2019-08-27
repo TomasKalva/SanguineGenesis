@@ -48,7 +48,7 @@ namespace wpfTest
             InitializeComponent();
 
 
-            BitmapImage mapBitmap = (BitmapImage)FindResource("riverMap");
+            BitmapImage mapBitmap = (BitmapImage)FindResource("riverBuildingsMap");
             game = new Game(mapBitmap);
             var MapView = new MapView(0, 0, 60, game.Map, game);
             var MapMovementInput = new MapMovementInput();
@@ -211,7 +211,7 @@ namespace wpfTest
         private void UpdateBottomPanel()
         {
             //only set new values if the values changed since the last update
-            CommandsGroup selected = gameControls.SelectedEntities;
+            SelectedGroup selected = gameControls.SelectedEntities;
             List<Entity> selectedEntities=null;
             bool changed;
             lock (selected)
@@ -364,7 +364,9 @@ namespace wpfTest
             Vector2 mapCoordinates = gameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X,(float)clickPos.Y));
             gameControls.EntityCommandsInput.NewPoint(mapCoordinates);
-            
+
+
+            Console.WriteLine(game.physics.PushingMaps[Movement.LAND][(int)mapCoordinates.X, (int)mapCoordinates.Y]);
             //hide gui so that player can select from the whole screen
             gui.Visibility = Visibility.Hidden;
             //set selected entity

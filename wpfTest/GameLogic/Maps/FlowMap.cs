@@ -191,7 +191,8 @@ namespace wpfTest
           => decR.Value;
 
         public decimal Percentage => MaxValue!=0 ? Value / MaxValue : 0;
-        public decimal NotFilled => MaxValue - Value;
-        public override string ToString() => Value.ToString();
+        public decimal AmountNotFilled => MaxValue - Value;
+        public bool Full => Value == MaxValue;
+        public override string ToString() => Value +"/"+MaxValue;
     }
 }

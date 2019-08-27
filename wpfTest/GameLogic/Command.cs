@@ -12,6 +12,9 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Tells entity what to do.
+    /// </summary>
     public abstract class Command: IShowable
     {
         /// <summary>
@@ -22,13 +25,13 @@ namespace wpfTest
         /// How much of the command is done. From the interval [0,100]. Used only for player's information.
         /// </summary>
         public abstract int Progress { get; }
-
-
+        
         /// <summary>
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
         public abstract bool PerformCommand(Game game, float deltaT);
 
+        #region IShowable
         public string GetName => ToString();
         public List<Stat> Stats()
         {
@@ -37,6 +40,7 @@ namespace wpfTest
             return stats;
         }
         public abstract string Description();
+        #endregion IShowable
 
         /// <summary>
         /// Removes the command from the entity if possible.
@@ -69,8 +73,17 @@ namespace wpfTest
         /// True iff the ability was paid.
         /// </summary>
         protected bool Paid { get; private set; }
+        /// <summary>
+        /// Time elapsed since start of this command.
+        /// </summary>
         protected float ElapsedTime { get; set; }
+        /// <summary>
+        /// True iff it can be removed while being performed.
+        /// </summary>
         public override bool Interruptable => Ability.Interruptable;
+        /// <summary>
+        /// How much of the command is done. From the interval [0,100]. Used only for player's information.
+        /// </summary>
         public override int Progress => (int)((ElapsedTime / Ability.Duration) * 100);
 
         protected Command(Caster commandedEntity, Target target, Abil ability)
@@ -80,6 +93,7 @@ namespace wpfTest
             Targ = target;
             ElapsedTime = 0;
         }
+
         public override string ToString()
         {
             return Ability.ToString();
@@ -143,6 +157,10 @@ namespace wpfTest
             return true;
         }
 
+        /// <summary>
+        /// If the command can be used and entity is able to pay for it or 
+        /// already paid for it, call the PerformCommandLogic.
+        /// </summary>
         public override bool PerformCommand(Game game, float deltaT)
         {
             if (!CanBeUsed())
@@ -160,6 +178,9 @@ namespace wpfTest
             return finished;
         }
 
+        /// <summary>
+        /// Performs one step of the command. Returns true if command is finished.
+        /// </summary>
         public abstract bool PerformCommandLogic(Game game, float deltaT);
 
         public override string Description()
@@ -167,6 +188,9 @@ namespace wpfTest
             return Ability.Description();
         }
 
+        /// <summary>
+        /// Remove this command from the commanded entity if possible.
+        /// </summary>
         public override void Remove()
         {
             CommandedEntity.RemoveCommand(this);
@@ -181,6 +205,9 @@ namespace wpfTest
     {
         public Animal Animal { get; }
         public IMovementTarget Target { get; }
+        /// <summary>
+        /// Maximal waiting time until the moving finishes.
+        /// </summary>
         public float MaxWaitTime { get; }
         public float Speed { get; }
         private float timer;
@@ -195,13 +222,12 @@ namespace wpfTest
         }
 
         /// <summary>
-        /// Returns true if the unit reached its destination.
+        /// Returns true if the unit reached its destination or the MaxWaitingTime was reached.
         /// </summary>
         public bool Step(float deltaT)
         {
             //animal can jump over all obstacles
             Animal.Physical = false;
-            //Animal.CanBeTarget = false;
             //the animal can't move naturally
             Animal.Velocity = new Vector2(0, 0);
             //calculate maximal displacement of Animal
@@ -216,7 +242,6 @@ namespace wpfTest
             if (timer >= MaxWaitTime || posChange >= distanceToPoint)
             {
                 Animal.Physical = true;
-                //Animal.CanBeTarget = true;
                 return true;
             }
 

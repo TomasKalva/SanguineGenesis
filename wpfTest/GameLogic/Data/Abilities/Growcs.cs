@@ -35,7 +35,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             //finish if the tree is at full energy
-            if (CommandedEntity.Energy == CommandedEntity.MaxEnergy)
+            if (CommandedEntity.Energy.Full)
             {
                 CommandedEntity.Built = true;
                 return true;

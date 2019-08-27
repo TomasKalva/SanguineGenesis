@@ -8,6 +8,9 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Represent building that doesn't do anything special.
+    /// </summary>
     public class Structure : Building
     {
         public Structure(Player player, string buildingType, Node[,] nodes, decimal maxHealth, decimal maxEnergy, int size,
@@ -16,14 +19,15 @@ namespace wpfTest.GameLogic
         {
         }
 
+        #region IShowable
         public override List<Stat> Stats()
         {
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Player", Player.ToString()),
                 new Stat( "EntityType", EntityType),
-                new Stat( "Health", Health+"/"+MaxHealth),
-                new Stat("Energy", Energy + "/" + MaxEnergy),
+                new Stat( "Health", Health.ToString()),
+                new Stat("Energy", Energy.ToString()),
                 new Stat( "Size", Size.ToString()),
                 new Stat( "Biome", Biome.ToString()),
                 new Stat( "Terrain", Terrain.ToString()),
@@ -33,5 +37,6 @@ namespace wpfTest.GameLogic
             };
             return stats;
         }
+        #endregion IShowable
     }
 }

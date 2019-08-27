@@ -12,34 +12,44 @@ namespace wpfTest.GUI
     /// </summary>
     public class ImageAtlas
     {
-        private static ImageAtlas imageAtlas;
-
+        /// <summary>
+        /// Size of tile in the atlas.
+        /// </summary>
         private const int TILE_SIZE = 64;
+        /// <summary>
+        /// Width of the atlas.
+        /// </summary>
         private const int ATLAS_WIDTH = 2048;
+        /// <summary>
+        /// Height of the atlas.
+        /// </summary>
         private const int ATLAS_HEIGHT = 2048;
+
+        /// <summary>
+        /// Contains animations for entity types.
+        /// </summary>
         private Dictionary<string, Animation> entitiesAnimations;
+        /// <summary>
+        /// For each number 0-9 contains corresponding glyph. At the index
+        /// -1 is glyph for '.'.
+        /// </summary>
         private Dictionary<int, Rect> glyphs;
 
+        /// <summary>
+        /// Position of unit circle in the atlas.
+        /// </summary>
         public Rect UnitCircle { get; }
+        /// <summary>
+        /// Position of transparent square in the atlas.
+        /// </summary>
         public Rect UnitsSelector { get; }
+        /// <summary>
+        /// Position of blank white square in the atlas.
+        /// </summary>
         public Rect BlankWhite { get; }
 
-        private struct Square
-        {
-            Biome Biome { get; }
-            SoilQuality SoilQuality { get; }
-            Terrain Terrain { get; }
-
-            public Square(Biome biome, SoilQuality soilQuality, Terrain terrain)
-            {
-                Biome = biome;
-                SoilQuality = soilQuality;
-                Terrain = terrain;
-            }
-        }
-
+        private static ImageAtlas imageAtlas;
         public static ImageAtlas GetImageAtlas => imageAtlas;
-
         static ImageAtlas()
         {
             imageAtlas=new ImageAtlas();
@@ -48,7 +58,6 @@ namespace wpfTest.GUI
         private ImageAtlas()
         {
             InitializeDigitImages();
-            //InitializeUnitsAnimations();
             LoadEntitiesAnimations("Images/atlas0.xml");
 
             UnitCircle = ToRelative(GridToCoordinates(2, 0, 1, 1));
@@ -57,6 +66,9 @@ namespace wpfTest.GUI
 
         }
 
+        /// <summary>
+        /// Initialize glyphs with images of digits and '.'.
+        /// </summary>
         private void InitializeDigitImages()
         {
             glyphs = new Dictionary<int, Rect>();
@@ -84,30 +96,18 @@ namespace wpfTest.GUI
             AddGlyphImage(-1, offset, 3, 0.5f, 1);
         }
 
+        /// <summary>
+        /// Add image for the glyph number.
+        /// </summary>
         private void AddGlyphImage(int glyph, float left, float bottom, float width, float height)
         {
             glyphs.Add(glyph, ToRelative(GridToCoordinates(new Rect(left, bottom, left + width, bottom + height))));
         }
 
-        private void InitializeUnitsAnimations()
-        {
-            entitiesAnimations = new Dictionary<string, Animation>();
-            AddEntitiesAnimation("TIGER",
-                new Vector2(0.75f, 0.2f),
-                1.5f, 1f, 0.5f,
-                new List<Rect>()
-                { ToRelative(GridToCoordinates(0,2,1.5f,1)),
-                  ToRelative(GridToCoordinates(1.5f,2,1.5f,1))});
-            AddEntitiesAnimation("BAOBAB",
-                new Vector2(2.5f, 1.5f),
-                5, 6, 0.8f,
-                new List<Rect>()
-                { ToRelative(GridToCoordinates(10,0,5,6)),
-                  ToRelative(GridToCoordinates(15,0,5,6)),
-                  ToRelative(GridToCoordinates(10,0,5,6)),
-                  ToRelative(GridToCoordinates(20,0,5,6)),});
-        }
-
+        /// <summary>
+        /// Loads animations from the file.
+        /// </summary>
+        /// <param name="animationDescriptionFileName">The file name.</param>
         private void LoadEntitiesAnimations(string animationDescriptionFileName)
         {
             //try block used ONLY for easier debugging
@@ -157,9 +157,12 @@ namespace wpfTest.GUI
 
         }
 
-        private void AddEntitiesAnimation(string unit, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
+        /// <summary>
+        /// Creates new Animation for the entity with the given parameters and adds it to entitiesAnimations.
+        /// </summary>
+        private void AddEntitiesAnimation(string entity, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
         {
-            entitiesAnimations.Add(unit, new Animation(leftBottom,width, height, animChangeTimeS, images));
+            entitiesAnimations.Add(entity, new Animation(leftBottom,width, height, animChangeTimeS, images));
         }
 
         /// <summary>
@@ -293,22 +296,45 @@ namespace wpfTest.GUI
         }
     }
 
+    /// <summary>
+    /// Represents animation and location of its images in the atlas.
+    /// </summary>
     public class Animation
     {
+        /// <summary>
+        /// Left bottom position in the atlas. In grid coordinates.
+        /// </summary>
         public Vector2 LeftBottom { get; }
+        /// <summary>
+        /// Rectangles describe position and extens of the images of animation in the atlas.
+        /// In coordinates relative to the atlas extents.
+        /// Rect(x, y, width, height)
+        /// </summary>
         public List<Rect> Images { get; }
+        /// <summary>
+        /// Width in grid coordinates.
+        /// </summary>
         public float Width { get; }
+        /// <summary>
+        /// Height in grid coordinates.
+        /// </summary>
         public float Height { get; }
+        /// <summary>
+        /// The time it takes for images to change.
+        /// </summary>
         public float ChangeTimeS { get; }
+        /// <summary>
+        /// Number of images in animation.
+        /// </summary>
         public int Length => Images.Count;
 
         /// <summary>
-        /// 
+        /// Creates new animation.
         /// </summary>
-        /// <param name="leftBottom"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="animChangeTimeS"></param>
+        /// <param name="leftBottom">Left bottom coordinate in the atlas.</param>
+        /// <param name="width">Width of the images in animation.</param>
+        /// <param name="height">Height of the images in animation.</param>
+        /// <param name="animChangeTimeS">Time it takes to change images.</param>
         /// <param name="images">First two numbers represent left bottom position of the image, second two represent width and height.</param>
         public Animation(Vector2 leftBottom, float width, float height, float animChangeTimeS, List<Rect> images)
         {

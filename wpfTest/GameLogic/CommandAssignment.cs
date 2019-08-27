@@ -14,7 +14,7 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Units whose commands should be updated.
         /// </summary>
-        public List<Animal> Units { get; }
+        public List<Animal> Animals { get; }
         /// <summary>
         /// Whose units are performing commands for this assignment.
         /// </summary>
@@ -40,17 +40,17 @@ namespace wpfTest.GameLogic
             Movement = movement;
             Active = false;
             Player = player;
-            Units = units;
+            Animals = units;
             TargetPoint = target;
         }
 
         /// <summary>
-        /// Generate flowmap for the give obstacle map obst.
+        /// Generate flowmap for the given obstacle map obst.
         /// </summary>
         public void Process(ObstacleMap obst)
         {
             //if there are no more units, cancel this assignment
-            if (!Units.Any())
+            if (!Animals.Any())
             {
                 Invalid = true;
                 return;
@@ -63,7 +63,7 @@ namespace wpfTest.GameLogic
             Node targAsNode = TargetPoint as Node;
             if (targAsBuilding!=null || (targAsNode!=null && targAsNode.Building!=null))
             {
-                //remove the building that blocks path to the target from this obstacle map
+                //remove the building that is over the target on this obstacle map
                 Building blockingBuilding;
                 if (targAsNode != null)
                     blockingBuilding = targAsNode.Building;
@@ -81,7 +81,7 @@ namespace wpfTest.GameLogic
             {
                 //if there is an obstacle on the target square, cancel this assignment
                 if (obst[(int)TargetPoint.Center.X, (int)TargetPoint.Center.Y] ||
-                    !Units.Any())
+                    !Animals.Any())
                 {
                     Invalid = true;
                     return;
@@ -100,10 +100,10 @@ namespace wpfTest.GameLogic
         /// </summary>
         public virtual void UpdateCommands()
         {
-            foreach (Animal u in Units)
+            foreach (Animal a in Animals)
             {
                 //find command from this assignment
-                foreach(Command c in u.CommandQueue)
+                foreach(Command c in a.CommandQueue)
                 {
                     if (c is MoveToCommand mtpc)
                         //update its flowmap

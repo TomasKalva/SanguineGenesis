@@ -7,8 +7,14 @@ using wpfTest.GameLogic.Data.Abilities;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Contains abilities that are used in the game.
+    /// </summary>
     public class Abilities
     {
+        /// <summary>
+        /// List of all abilities that aren't moveToCast ability.
+        /// </summary>
         public List<Ability> AllAbilities { get; }
 
         private Dictionary<Ability, MoveTo> moveToCast;

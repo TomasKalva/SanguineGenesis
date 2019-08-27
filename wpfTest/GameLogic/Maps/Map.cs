@@ -168,12 +168,35 @@ namespace wpfTest
             MapWasChanged = true;
         }
 
+        private const float NUTRIENT_UPDATE_TIME = 1f;
+        private float nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
+
+        public void UpdateNutrientsMap(List<Tree> trees, float deltaT)
+        {
+            nutrientUpdateTimer -= deltaT;
+            if (nutrientUpdateTimer <= 0)
+            {
+                nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
+                //nodes with roots produce nutrients
+                ProduceNutrients();
+
+                //trees drain energy from nodes
+                foreach (Tree t in trees)
+                {
+                    t.DrainEnergy();
+                }
+            }
+
+
+            //nutrients biomes and terrain can't be updated in this step after calling this method
+            UpdateBiomes();
+        }
+
         /// <summary>
         /// One step of nodes producing and sharing nutrients.
         /// </summary>
         public void UpdateNutrients()
         {
-
             //generate nutrients
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)

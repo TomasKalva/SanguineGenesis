@@ -67,7 +67,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="GameLogic\Data\Abilities.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Abilities.cs" />
     <Compile Include="GameLogic\Data\Abilities\ApplyStatus.cs" />
     <Compile Include="GameLogic\Data\Abilities\Attack.cs" />
     <Compile Include="GameLogic\Data\Abilities\BuildBuilding.cs" />
@@ -88,19 +88,19 @@
     <Compile Include="GameLogic\Data\Abilities\Pull.cs" />
     <Compile Include="GameLogic\Data\Abilities\SetRallyPoint.cs" />
     <Compile Include="GameLogic\Data\Abilities\Spawn.cs" />
-    <Compile Include="GameLogic\Data\Ability.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Ability.cs" />
     <Compile Include="GameLogic\AnimationState.cs" />
     <Compile Include="GameLogic\Data\Entities\Building.cs" />
     <Compile Include="GameLogic\Data\Entities\Corpse.cs" />
     <Compile Include="GameLogic\Data\Entities\EntityFactory.cs" />
     <Compile Include="GameLogic\Data\Entities\Factories.cs" />
-    <Compile Include="GameLogic\Data\Entities\Status.cs" />
-    <Compile Include="GameLogic\Data\Entities\Statuses.cs" />
-    <Compile Include="GameLogic\Data\Entities\StatusFactory.cs" />
+    <Compile Include="GameLogic\Data\Statuses\Status.cs" />
+    <Compile Include="GameLogic\Data\Statuses\Statuses.cs" />
+    <Compile Include="GameLogic\Data\Statuses\StatusFactory.cs" />
     <Compile Include="GameLogic\Data\Entities\Unit.cs" />
     <Compile Include="GameLogic\Data\GameStaticData.cs" />
     <Compile Include="GameLogic\Maps\PushingMap.cs" />
-    <Compile Include="GameLogic\Structure.cs" />
+    <Compile Include="GameLogic\Data\Entities\Structure.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\GameplayOptions.cs" />
     <Compile Include="GameLogic\MovementGenerator.cs" />
@@ -117,7 +117,7 @@
     <Compile Include="GameLogic\Maps\FlowMap.cs" />
     <Compile Include="GameControls\GameControls.cs" />
     <Compile Include="GameLogic\GameQuerying.cs" />
-    <Compile Include="GameLogic\CommandsGroup.cs" />
+    <Compile Include="GameControls\CommandsGroup.cs" />
     <Compile Include="GameLogic\Command.cs" />
     <Compile Include="GUI\ButtonArray.cs" />
     <Compile Include="GUI\EntityInfoPanel.cs" />

@@ -8,8 +8,14 @@ using wpfTest.GameLogic.Data.Abilities;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Represents one square of the map.
+    /// </summary>
     public class Node:ITargetable,IMovementTarget, IHerbivoreFood
     {
+        /// <summary>
+        /// Maximal number of nutrients a node can have.
+        /// </summary>
         public const decimal MAX_NUTRIENTS = 9.9m;
 
         public int X { get; }

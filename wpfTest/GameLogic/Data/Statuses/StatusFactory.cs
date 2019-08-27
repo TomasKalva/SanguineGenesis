@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Entities
 {
+    /// <summary>
+    /// Use for creating statuses.
+    /// </summary>
     public abstract class StatusFactory
     {
         /// <summary>

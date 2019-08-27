@@ -8,9 +8,20 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Loads and stores factories of the type EntityFactory.
+    /// </summary>
     public abstract class Factories<Factory> where Factory : EntityFactory
     {
+        /// <summary>
+        /// For each entity name created by Factory contains a factory that
+        /// creates the entity.
+        /// </summary>
         public Dictionary<string, Factory> Factorys { get; }
+        /// <summary>
+        /// For each entity name contains list of ability names separated by ',' that
+        /// this entity factory will parse.
+        /// </summary>
         protected Dictionary<string, string> abilitiesList;
 
         public Factories()
@@ -19,6 +30,9 @@ namespace wpfTest.GameLogic
             abilitiesList = new Dictionary<string, string>();
         }
 
+        /// <summary>
+        /// Returns factory for the entity type.
+        /// </summary>
         public Factory this[string entityType] 
         {
             get
@@ -30,6 +44,11 @@ namespace wpfTest.GameLogic
             }
         }
 
+        /// <summary>
+        /// Load Factorys and abilities from the file.
+        /// </summary>
+        /// <param name="fileName">Name of the file.</param>
+        /// <param name="statuses">Statuses that can be given to factories that require them.</param>
         public void InitFactorys(string fileName, Statuses statuses)
         {
             using (StreamReader fileReader = new StreamReader(fileName))
@@ -43,8 +62,16 @@ namespace wpfTest.GameLogic
             }
         }
 
+        /// <summary>
+        /// Adds a new factory to the Factorys.
+        /// </summary>
+        /// <param name="description">String that describes the factory's properties.</param>
+        /// <param name="statuses">Statuses that can be given to the factory if it requires them.</param>
         public abstract void AddNewFactory(string description, Statuses statuses);
 
+        /// <summary>
+        /// Returns a list of statuses represented by the string listOfStatuses.
+        /// </summary>
         public List<StatusFactory> ParseStatuses(string listOfStatuses, Statuses statuses)
         {
             List<StatusFactory> statusFactories = new List<StatusFactory>();
@@ -61,6 +88,10 @@ namespace wpfTest.GameLogic
             return statusFactories;
         }
 
+        /// <summary>
+        /// Uses abilitiesList to set abilities to the already created Factorys. Has to be called after
+        /// InitFactorys.
+        /// </summary>
         public void InitAbilities(Abilities abilities)
         {
             foreach(var entityAbilities in abilitiesList)
@@ -167,6 +198,9 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Loads and stores factories of the type TreeFactory.
+    /// </summary>
     public class TreeFactories : Factories<TreeFactory>
     {
         public override void AddNewFactory(string description, Statuses statuses)
@@ -194,6 +228,9 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Loads and stores factories of the type StructureFactory.
+    /// </summary>
     public class StructureFactories : Factories<StructureFactory>
     {
         public override void AddNewFactory(string description, Statuses statuses)
@@ -218,6 +255,9 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Loads and stores factories of the type AnimalFactory.
+    /// </summary>
     public class UnitFactories : Factories<AnimalFactory>
     {
         public override void AddNewFactory(string description, Statuses statuses)
@@ -267,7 +307,6 @@ namespace wpfTest.GameLogic
                     viewRange: 5,
                     statusFactories: statusFactories,
                     air:air));
-            //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f););
 
             abilitiesList.Add(unitType, fields[19]);
         }

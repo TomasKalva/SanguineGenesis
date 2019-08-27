@@ -319,7 +319,7 @@ namespace wpfTest
             float viewRight = mapView.Right;
 
             bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.PlayerID].VisibilityMap);
-            Node[,] visible = mapView.GetVisibleNodes(game.Players[game.CurrentPlayer.PlayerID].MapView);
+            Node[,] visible = mapView.GetVisibleNodes(game.Players[game.CurrentPlayer.PlayerID].VisibleMap);
             int width = visible.GetLength(0);
             int height = visible.GetLength(1);
 
@@ -401,7 +401,7 @@ namespace wpfTest
             float viewRight = mapView.Right;
 
             bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.PlayerID].VisibilityMap);
-            Node[,] visible = mapView.GetVisibleNodes(game.CurrentPlayer.MapView);
+            Node[,] visible = mapView.GetVisibleNodes(game.CurrentPlayer.VisibleMap);
             int width = visible.GetLength(0);
             int height = visible.GetLength(1);
 
@@ -720,7 +720,7 @@ namespace wpfTest
                     SetSquareVertices(vertices, bottom, top, left, right, -8, index);
 
                     //colors
-                    if (current.Group == null)
+                    if (!current.Selected)
                     {
                         //fill the circle with color of the corresponding player
                         switch (current.Player.PlayerID)
@@ -734,6 +734,7 @@ namespace wpfTest
                         }
                     }
                     else
+                        //fill the circle with selected entity circle color
                         SetColor(colors, 1f, 1f, 0f, index, 6);
 
                     //texture coordinates

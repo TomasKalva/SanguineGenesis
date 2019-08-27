@@ -8,6 +8,9 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest.GameLogic.Data.Entities
 {
+    /// <summary>
+    /// Can be applied to Entity. Does something.
+    /// </summary>
     public abstract class Status: IShowable
     {
         /// <summary>
@@ -23,12 +26,14 @@ namespace wpfTest.GameLogic.Data.Entities
         /// </summary>
         public abstract void Removed();
 
+        #region IShowable
         string IShowable.GetName => ToString();
         List<Stat> IShowable.Stats()
         {
            return new List<Stat>();
         }
         string IShowable.Description() => "todo";
+        #endregion IShowable
     }
 
     public abstract class Status<Affected,Info>:Status where Info:StatusFactory<Affected>
@@ -56,7 +61,7 @@ namespace wpfTest.GameLogic.Data.Entities
             :base(affectedEntity, sprintInfo)
         {
         }
-
+        
         public override void Added()
         {
             AffectedEntity.MaxSpeedLand += StatusInfo.SpeedBonus;

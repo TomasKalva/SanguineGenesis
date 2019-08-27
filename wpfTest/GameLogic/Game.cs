@@ -16,20 +16,50 @@ using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Represents game state.
+    /// </summary>
     public class Game
     {
+        /// <summary>
+        /// The main map of the game.
+        /// </summary>
         public Map Map { get; }
+        /// <summary>
+        /// Used only for debugging. Can be set visible by GameplayOptions.
+        /// </summary>
         public FlowMap FlowMap { get; set; }
+        /// <summary>
+        /// True if the game is over.
+        /// </summary>
         public bool GameEnded { get; set; }
+        /// <summary>
+        /// Dictionary of all players.
+        /// </summary>
         public Dictionary<Players,Player> Players { get; }
+        /// <summary>
+        /// Used for extracting information about the game.
+        /// </summary>
         public GameQuerying GameQuerying { get; }
+        /// <summary>
+        /// Player controlled by the user.
+        /// </summary>
         public Player CurrentPlayer { get; private set; }
-        private Physics physics;
+        /// <summary>
+        /// Used for handling collisions.
+        /// </summary>
+        public Physics physics;
+        /// <summary>
+        /// Generates visibility maps for players.
+        /// </summary>
         VisibilityGenerator visibilityGenerator;
         /// <summary>
         /// The next player to whom will be generated visibility map.
         /// </summary>
         private Players nextVisibilityPlayer;
+        /// <summary>
+        /// Describes customizable parts of the game.
+        /// </summary>
         public GameplayOptions GameplayOptions { get; }
 
         public Game(BitmapImage mapBitmap)
@@ -37,14 +67,15 @@ namespace wpfTest
             PixelColor[,] mapPC = mapBitmap.GetPixels();
             Map=new Map(mapPC);
             FlowMap = new FlowMap(Map.Width, Map.Height);
-            //FlowMap = PushingMapGenerator.GeneratePushingMap(Map.GetObstacleMap(Movement.LAND));
             GameEnded = false;
+            //players
             Players = new Dictionary<Players, Player>();
             Players.Add(wpfTest.Players.PLAYER0, new Player(wpfTest.Players.PLAYER0));
             Players.Add(wpfTest.Players.PLAYER1, new Player(wpfTest.Players.PLAYER1));
-            CurrentPlayer = Players[0];
-            Players[wpfTest.Players.PLAYER0].InitializeMapView(Map);
-            Players[wpfTest.Players.PLAYER1].InitializeMapView(Map);
+            CurrentPlayer = Players[wpfTest.Players.PLAYER0];
+            foreach(var kvp in Players)
+                kvp.Value.InitializeMapView(Map);
+
             GameQuerying = GameQuerying.GetGameQuerying();
             physics = Physics.GetPhysics();
             visibilityGenerator = new VisibilityGenerator();
@@ -66,121 +97,65 @@ namespace wpfTest
             }
         }
 
-        public List<Entity> GetEntities()
+        /// <summary>
+        /// Returns all entities of the type T that are in the game.
+        /// </summary>
+        public List<T> GetAll<T>() where T:Entity
         {
-            List<Entity> units=new List<Entity>();
-            foreach(Players player in Enum.GetValues(typeof(Players)))
+            var Ts = new List<T>();
+            foreach (var kvpPlayer in Players)
             {
-                units=units.Concat(Players[player].Entities.Where((u) => !u.IsDead).ToList()).ToList();
+                Ts = Ts.Concat(kvpPlayer.Value.Get<T>()).ToList();
             }
-            return units;
+            return Ts;
         }
 
-        public List<Unit> GetUnits()
-        {
-            var units = new List<Unit>();
-            foreach (Players player in Enum.GetValues(typeof(Players)))
-            {
-                units = units.Concat(Players[player].Units.Where((u) => !u.IsDead).ToList()).ToList();
-            }
-            return units;
-        }
-        
-        public List<Animal> GetAnimals()
-        {
-            var animals = new List<Animal>();
-            foreach (Players player in Enum.GetValues(typeof(Players)))
-            {
-                animals = animals.Concat(Players[player].Animals.Where((u) => !u.IsDead).ToList()).ToList();
-            }
-            return animals;
-        }
-
-        public List<Building> GetBuildings()
-        {
-            var buildings = new List<Building>();
-            foreach (Players player in Enum.GetValues(typeof(Players)))
-            {
-                buildings = buildings.Concat(Players[player].Buildings.Where((b) => !b.IsDead).ToList()).ToList();
-            }
-            return buildings;
-        }
-
-        public List<Tree> GetTrees()
-        {
-            var trees = new List<Tree>();
-            foreach (Players player in Enum.GetValues(typeof(Players)))
-            {
-                trees = trees.Concat(Players[player].Trees.Where((b) => !b.IsDead).ToList()).ToList();
-            }
-            return trees;
-        }
-
-        private const float NUTRIENT_UPDATE_TIME = 1f;
-        private float nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
-
+        /// <summary>
+        /// Update the state of the game.
+        /// </summary>
         public void Update(float deltaT)
         {
             //map changing phase
-
-            /*if (Map.MapWasChanged)
-            {
-                Map.UpdateObstacleMaps();
-                MovementGenerator.GetMovementGenerator().SetMapChanged(wpfTest.Players.PLAYER0, Map.ObstacleMaps);
-            }*/
-
-            List<Entity> entities = GetEntities();
-            List<Unit> units = GetUnits();
-            List<Animal> animals = GetAnimals();
-            List<Building> buildings = GetBuildings();
-            List<Tree> trees = GetTrees();
+            List<Entity> entities = GetAll<Entity>();
+            List<Unit> units = GetAll<Unit>();
+            List<Animal> animals = GetAll<Animal>();
+            List<Building> buildings = GetAll<Building>();
+            List<Tree> trees = GetAll<Tree>();
 
             //update air values
             foreach (var kvp in Players)
                 kvp.Value.CalulateAir();
 
-            //update nutrients
-            nutrientUpdateTimer -= deltaT;
-            if (nutrientUpdateTimer <= 0)
-            {
-                nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
-                //Map.UpdateNutrients();
-                Map.ProduceNutrients();
+            //generate and drain nutrients by trees
+            Map.UpdateNutrientsMap(trees, deltaT);
 
-                foreach (Tree t in trees)
-                {
-                    t.DrainEnergy();
-                }
-            }
-
-
-            //nutrients biomes and terrain can't be updated in this step after calling this method
-            Map.UpdateBiomes();
+            //update parts of map that can be seen for each player
             foreach (var p in Players)
-                p.Value.UpdateNodesView(Map);
+                p.Value.UpdateVisibleMap(Map);
 
-            //statuses
+            //one step of statuses
             foreach (Entity e in entities)
             {
                 e.StepStatuses(this, deltaT);
             }
-            //commands
+
+            //one step of commands
             foreach (Entity e in entities)
             {
                 e.PerformCommand(this, deltaT);
-                e.AnimationStep(deltaT);
             }
-            //animations
+
+            //one step of animations
             foreach (Entity e in entities)
             {
                 e.AnimationStep(deltaT);
             }
+
             //physics
             List<Entity> physicalEntities = entities.Where((e) => e.Physical).ToList();
-            physics.PushOutsideOfObstacles(Map, animals,deltaT);
+            physics.MoveAnimals(Map, animals, deltaT);
             physics.PushAway(Map, animals, physicalEntities, deltaT);
-            physics.Step(Map, animals, deltaT);
-            physics.ResetCollision(animals);
+            physics.PushOutsideOfObstacles(Map, animals, deltaT);
 
             //attack nearby enemy if idle
             foreach(Animal a in animals)
@@ -195,50 +170,68 @@ namespace wpfTest
             }
 
             //remove dead units
-            Players[wpfTest.Players.PLAYER0].RemoveDeadEntities();
-            Players[wpfTest.Players.PLAYER1].RemoveDeadEntities();
+            foreach(var kvp in Players)
+                kvp.Value.RemoveDeadEntities();
 
-            //update players' view of the map
+            //update players' visibility map
             if (!GameplayOptions.WholeMapVisible)
             {
-                if (visibilityGenerator.Done)
-                {
-                    Players current = nextVisibilityPlayer;
-                    Players other = nextVisibilityPlayer == wpfTest.Players.PLAYER0 ?
-                                            wpfTest.Players.PLAYER1 :
-                                            wpfTest.Players.PLAYER0;
-                    //update current player's view of the map
-                    Players[current].VisibilityMap = visibilityGenerator.VisibilityMap;
-                    Players[current].UpdateBuildingsView(GetBuildings());
-
-                    //generated visibility map for the other player
-                    nextVisibilityPlayer = other;
-
-                    visibilityGenerator.SetNewTask(Map.GetViewMap(nextVisibilityPlayer),
-                        Players[nextVisibilityPlayer].Entities.Select((entity) => entity.View).ToList());
-                }
+                VisibilityGeneratorInteraction(buildings);
             }
             else
             {
                 foreach(var kvp in Players)
                 {
-                    kvp.Value.VisibilityMap = VisibilityMap.GetEverythingVisible(Map.Width, Map.Height);
-                    kvp.Value.UpdateBuildingsView(GetBuildings());
+                    VisibilityMap everythingVisible = VisibilityMap.GetEverythingVisible(Map.Width, Map.Height);
+                    kvp.Value.SetVisibilityMap(everythingVisible, buildings);
                 }
             }
-            MovementGenerator mg = MovementGenerator.GetMovementGenerator();
-            if (Players[wpfTest.Players.PLAYER0].MapChanged)
-            {
-                Players[wpfTest.Players.PLAYER0].MapView.UpdateObstacleMaps();
-                mg.SetMapChanged(wpfTest.Players.PLAYER0, Players[wpfTest.Players.PLAYER0].MapView.ObstacleMaps);
-                Players[wpfTest.Players.PLAYER0].MapView.MapWasChanged = false;
 
-            }
-            if (Players[wpfTest.Players.PLAYER1].MapChanged)
+            //set and refresh movement commands
+            MovementGeneratorInteraction();
+        }
+
+        /// <summary>
+        /// Sets tasks to visibilityGenerator and updates visibility maps.
+        /// </summary>
+        private void VisibilityGeneratorInteraction(List<Building> allBuildings)
+        {
+            if (visibilityGenerator.Done)
             {
-                Players[wpfTest.Players.PLAYER1].MapView.UpdateObstacleMaps();
-                mg.SetMapChanged(wpfTest.Players.PLAYER1, Players[wpfTest.Players.PLAYER1].MapView.ObstacleMaps);
-                Players[wpfTest.Players.PLAYER1].MapView.MapWasChanged = false;
+                Players current = nextVisibilityPlayer;
+                Players other = nextVisibilityPlayer == wpfTest.Players.PLAYER0 ?
+                                        wpfTest.Players.PLAYER1 :
+                                        wpfTest.Players.PLAYER0;
+
+                //update current player's visibility map
+                Players[current].SetVisibilityMap(visibilityGenerator.VisibilityMap, allBuildings);
+
+                //generated visibility map for the other player
+                nextVisibilityPlayer = other;
+
+                visibilityGenerator.SetNewTask(Map.GetViewMap(nextVisibilityPlayer),
+                    Players[nextVisibilityPlayer].Entities.Select((entity) => entity.View).ToList());
+            }
+        }
+
+        /// <summary>
+        /// Enable computation of flow maps if map was changed, and update MoveTo commands
+        /// with computed flow maps.
+        /// </summary>
+        private void MovementGeneratorInteraction()
+        {
+            MovementGenerator mg = MovementGenerator.GetMovementGenerator();
+            foreach (var kvp in Players)
+            {
+                Player p = kvp.Value;
+                //if map changed, set new obstacle maps to mg and make it re-generate all
+                //movement maps
+                if (p.MapChanged)
+                {
+                    p.VisibleMap.UpdateObstacleMaps();
+                    mg.SetMapChanged(kvp.Key, p.VisibleMap.ObstacleMaps);
+                    p.VisibleMap.MapWasChanged = false;
+                }
             }
 
             //update move to commands

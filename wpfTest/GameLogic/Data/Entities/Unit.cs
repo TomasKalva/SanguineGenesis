@@ -7,11 +7,23 @@ using wpfTest.GameLogic.Maps;
 
 namespace wpfTest.GameLogic.Data.Entities
 {
+    /// <summary>
+    /// Represent entity that isn't bound to the square grid.
+    /// </summary>
     public abstract class Unit : Entity
     {
+        /// <summary>
+        /// Position of the unit on the map.
+        /// </summary>
         public Vector2 Position { get; set; }
+        /// <summary>
+        /// Center of the entity on the map.
+        /// </summary>
         public override Vector2 Center => Position;
-        public override float Range { get; }//range of the circle collider
+        /// <summary>
+        /// Range of the circle collider.
+        /// </summary>
+        public override float Range { get; }
 
         public Unit(Player player, string unitType, decimal maxHealth, float viewRange, decimal maxEnergy, List<Ability> abilities, Vector2 position, float range, bool physical)
             :base(player, unitType, maxHealth, viewRange, maxEnergy, physical, abilities)

@@ -7,6 +7,9 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Used for creating Entities.
+    /// </summary>
     public abstract class EntityFactory
     {
         public string EntityType { get; }
@@ -31,6 +34,9 @@ namespace wpfTest.GameLogic
             StatusFactories = statusFactories;
         }
 
+        /// <summary>
+        /// Sets statuses of this factory to the entity.
+        /// </summary>
         public Entity SetStatuses(Entity entity)
         {
             foreach(StatusFactory statFac in StatusFactories)
@@ -39,6 +45,9 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Used for creating Buildings.
+    /// </summary>
     public abstract class BuildingFactory : EntityFactory
     {
         public int Size { get; }
@@ -69,12 +78,18 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Used for creating Trees.
+    /// </summary>
     public class TreeFactory : BuildingFactory
     {
         public decimal MaxEnergyIntake { get; }
         public int RootsDistance { get; }
         public int Air { get; }
 
+        /// <summary>
+        /// Creates a new Tree for the player.
+        /// </summary>
         public Tree NewInstance(Player player, Node[,] nodesUnder, Node[,] roots)
         {
             return (Tree)SetStatuses(new Tree(player, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake,
@@ -92,8 +107,14 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Used for creating Structures.
+    /// </summary>
     public class StructureFactory : BuildingFactory
     {
+        /// <summary>
+        /// Creates a new Structure for the player.
+        /// </summary>
         public Structure NewInstance(Player player, Node[,] nodesUnder)
         {
             return (Structure)SetStatuses(new Structure(player, EntityType, nodesUnder, MaxHealth, MaxEnergy,
@@ -108,6 +129,9 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Used for creating Units.
+    /// </summary>
     public abstract class UnitFactory : EntityFactory
     {
         public float Range { get; }//range of the circle collider
@@ -120,6 +144,9 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Used for creating Animals.
+    /// </summary>
     public class AnimalFactory : UnitFactory
     {
         public decimal FoodEnergyRegen { get; }
@@ -136,6 +163,9 @@ namespace wpfTest.GameLogic
         public float SpawningTime { get; }
         public int Air { get; }
 
+        /// <summary>
+        /// Creates a new Animal for the player.
+        /// </summary>
         public Animal NewInstance(Player player, Vector2 pos)
         {
             return (Animal)SetStatuses(new Animal(

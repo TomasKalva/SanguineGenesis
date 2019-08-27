@@ -9,20 +9,23 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest.GameLogic
 {
-
+    /// <summary>
+    /// Used to set commands to entities.
+    /// </summary>
     public abstract class Ability: IShowable
     {
         /// <summary>
         /// Group of abilities this ability belongs to.
         /// </summary>
         protected Abilities abilities;
+        /// <summary>
+        /// Sets this.abilities and adds reference to this to abilities.
+        /// </summary>
         public void SetAbilities(Abilities abilities)
         {
             this.abilities = abilities;
             abilities.AllAbilities.Add(this);
         }
-        public string GetName => ToString();
-        public abstract List<Stat> Stats();
 
         /// <summary>
         /// Maximal distance from the target where the ability can be cast.
@@ -49,21 +52,27 @@ namespace wpfTest.GameLogic
         /// </summary>
         public float Duration { get; }
 
+        /// <summary>
+        /// Set commands to the units. Calls the generic version of this method.
+        /// </summary>
+        /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
+        /// <exception cref="NullReferenceException">If some casters are null.</exception>
         public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue);
         /// <summary>
         /// Returns true if the target type is valid for this ability.
         /// </summary>
         public abstract bool ValidTargetType(ITargetable target);
-        public abstract Type TargetType { get; }
-        public abstract Command NewCommand(Entity caster, ITargetable target);
         /// <summary>
-        /// Returns text which describes what the ability does.
-        /// </summary>>
-        public abstract string Description();
-        public override string ToString()
-        {
-            return GetType().Name;
-        }
+        /// Type of Target.
+        /// </summary>
+        public abstract Type TargetType { get; }
+        /// <summary>
+        /// Creates new instance of the command with specified caster and target. 
+        /// Calls the generic version of this method. 
+        /// </summary>
+        /// <exception cref="InvalidCastException">If caster or target has incompatible type.</exception>
+        public abstract Command NewCommand(Entity caster, ITargetable target);
+
         public Ability(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable, float duration)
         {
             Distance = distance;
@@ -72,6 +81,16 @@ namespace wpfTest.GameLogic
             SelfCastable = selfCastable;
             Interruptable = interruptable;
             Duration = duration;
+        }
+
+        //IShowable
+        public string GetName => ToString();
+        public abstract List<Stat> Stats();
+        public abstract string Description();
+
+        public override string ToString()
+        {
+            return GetType().Name;
         }
     }
 
@@ -84,35 +103,55 @@ namespace wpfTest.GameLogic
         }
 
         /// <summary>
-        /// Calls generic version of this method. 
+        /// Creates new instance of the command with specified caster and target. 
+        /// Calls the generic version of this method. 
         /// </summary>
-        /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
-        /// <exception cref="NullReferenceException">If some casters are null.</exception>
+        /// <exception cref="InvalidCastException">If caster or target has incompatible type.</exception>
         public sealed override Command NewCommand(Entity caster, ITargetable target)
         {
             return NewCommand((Caster)caster, (Target)target);
         }
 
+        /// <summary>
+        /// Creates new instance of the command with specified caster and target.
+        /// </summary>
         public abstract Command NewCommand(Caster caster, Target target);
 
+        /// <summary>
+        /// Returns false if command with caster and target can't be created.
+        /// </summary>
         public virtual bool ValidArguments(Caster caster, Target target) => true;
 
         /// <summary>
-        /// Assigns commands to the units.
+        /// Set commands to the units. Calls the generic version of this method.
         /// </summary>
+        /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
+        /// <exception cref="NullReferenceException">If some casters are null.</exception>
         public sealed override void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue)
         {
             SetCommands(casters.Cast<Caster>(), (Target)target, resetCommandQueue);
         }
         
+        /// <summary>
+        /// Returns true iff target has valid type.
+        /// </summary>
         public sealed override bool ValidTargetType(ITargetable target)
         {
             return target is Target;
         }
 
+        /// <summary>
+        /// Type of Target.
+        /// </summary>
         public sealed override Type TargetType 
             => typeof(Target);
 
+        /// <summary>
+        /// Sets the command for this ability to all valid casters.
+        /// </summary>
+        /// <param name="casters">Casters who should receive the command. Only valid casters will receive the command.</param>
+        /// <param name="target">Target of the new commands.</param>
+        /// <param name="resetCommandQueue">If true, the casters CommandQueue will be reset.</param>
         public virtual void SetCommands(IEnumerable<Caster> casters, Target target, bool resetCommandQueue)
         {
             //casters are put to a list so that they can be enumerated multiple times
@@ -180,19 +219,29 @@ namespace wpfTest.GameLogic
     }
 
     /// <summary>
-    /// Place where unit can go to.
+    /// Place to which an animal can go.
     /// </summary>
     public interface IMovementTarget : ITargetable
     {
+        /// <summary>
+        /// Distance from this to animal.
+        /// </summary>
         float DistanceTo(Animal animal);
     }
 
     /// <summary>
     /// Used as generic parameter for abilities without target.
     /// </summary>
-    public class Nothing : ITargetable
+    public sealed class Nothing : ITargetable
     {
+        /// <summary>
+        /// Throws an exception.
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
         public Vector2 Center => throw new NotImplementedException("Nothing doesn't have a center!");
+        /// <summary>
+        /// Returns the instance of Nothing.
+        /// </summary>
         public static Nothing Get { get; }
         static Nothing()
         {

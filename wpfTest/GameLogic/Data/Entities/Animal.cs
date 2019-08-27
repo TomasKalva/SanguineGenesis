@@ -10,27 +10,76 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Represent unit that can move.
+    /// </summary>
     public class Animal : Unit
     {
+        /// <summary>
+        /// Velocity vector.
+        /// </summary>
         public Vector2 Velocity { get; set; }
-        public bool CanBeMoved { get; set; }//false if the unit has to stand still
-        public bool StopMoving { get; set; }//set to true to set WantsToMove to false after Move
-        public bool WantsToMove { get; set; }//true if the unit has a target destination
-        public bool IsInCollision { get; set; }//true if the unit is colliding with obstacles or other units
-        public float Acceleration => 4f;
-        public Vector2 Direction { get; set; }//direction the unit is facing
+        /// <summary>
+        /// False if the unit has to stand still.
+        /// </summary>
+        public bool CanBeMoved { get; set; }
+        /// <summary>
+        /// Set to true to set WantsToMove to false in Move.
+        /// </summary>
+        public bool StopMoving { get; set; }
+        /// <summary>
+        /// True if the unit is performing a MoveToCommand.
+        /// </summary>
+        public bool WantsToMove { get; set; }
+        /// <summary>
+        /// Direction the unit is facing.
+        /// </summary>
+        public Vector2 Direction { get; set; }
+        /// <summary>
+        /// True iff the unit is facing left.
+        /// </summary>
         public bool FacingLeft => Direction.X <= 0;
 
+        /// <summary>
+        /// Energy regenerated from eating food.
+        /// </summary>
         public decimal FoodEnergyRegen { get; }
+        /// <summary>
+        /// Time it takes to eat food once in s.
+        /// </summary>
         public float FoodEatingPeriod { get; }
+        /// <summary>
+        /// Energy required to spawn/create this animal.
+        /// </summary>
         public decimal EnergyCost { get; }
+        /// <summary>
+        /// Damage this animal deals in one attack.
+        /// </summary>
         public decimal AttackDamage { get; }
+        /// <summary>
+        /// Time it takes this animal to do one attack.
+        /// </summary>
         public float AttackPeriod { get; set; }
+        /// <summary>
+        /// Minimimal distance required to attack other entity.
+        /// </summary>
         public float AttackDistance { get; }
+        /// <summary>
+        /// True iff the animal deals extra damage to buildings.
+        /// </summary>
         public bool MechanicalDamage { get; }
+        /// <summary>
+        /// Maximal speed on land.
+        /// </summary>
         public float MaxSpeedLand { get; set; }
+        /// <summary>
+        /// Maximal speed in water.
+        /// </summary>
         public float MaxSpeedWater { get; }
-        public Movement Movement { get; }//where can the unit walk
+        /// <summary>
+        /// Where the unit can walk.
+        /// </summary>
+        public Movement Movement { get; }
         /// <summary>
         /// Animals with thick skin take less damage.
         /// </summary>
@@ -40,7 +89,13 @@ namespace wpfTest.GameLogic
         /// removing it from the map...
         /// </summary>
         public IAnimalStateManipulator StateChangeLock { get; set; }
+        /// <summary>
+        /// The food this entity can eat.
+        /// </summary>
         public Diet Diet { get; }
+        /// <summary>
+        /// Time it takes for this animal to spawn.
+        /// </summary>
         public float SpawningTime { get; }
         /// <summary>
         /// Amount of air taken by this animal.
@@ -75,7 +130,6 @@ namespace wpfTest.GameLogic
         {
             Velocity = new Vector2(0f, 0f);
             CanBeMoved = true;
-            IsInCollision = false;
             Direction = new Vector2(1f, 0f);
 
             FoodEnergyRegen = foodEnergyRegen;
@@ -92,15 +146,15 @@ namespace wpfTest.GameLogic
             SpawningTime = spawningTime;
             Air = air;
         }
-
+        #region IShowable
         public override List<Stat> Stats()
         {
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Player", Player.ToString()),
             new Stat( "EntityType", EntityType),
-            new Stat( "Health", Health+"/"+MaxHealth),
-            new Stat("Energy", Energy + "/" + MaxEnergy),
+            new Stat( "Health", Health.ToString()),
+            new Stat("Energy", Energy.ToString()),
             new Stat( "Food regen", FoodEnergyRegen.ToString()),
             new Stat( "Eating period", FoodEatingPeriod.ToString()),
             new Stat( "Size", (2 * Range).ToString()),
@@ -120,7 +174,9 @@ namespace wpfTest.GameLogic
             };
             return stats;
         }
-        
+        #endregion IShowable
+
+        #region Movement
         /// <summary>
         /// Unit moves using its velocity.
         /// </summary>
@@ -135,31 +191,30 @@ namespace wpfTest.GameLogic
             {
                 StopMoving = false;
                 WantsToMove = false;
+                Velocity = new Vector2(0, 0);
             }
         }
 
         /// <summary>
         /// Add acceleration to units velocity.
         /// </summary>
-        public void Accelerate(Vector2 acc, Map map)
+        public void Accelerate(Vector2 direction, Map map)
         {
-            //add acceleration to the velocity
-            Velocity += acc;
-
+            Vector2 vel;
             //determine current max speed
-            float maxSpeed;
             Terrain underAnimal = map[(int)Position.X, (int)Position.Y].Terrain;
             if (underAnimal == Terrain.LAND)
-                maxSpeed = MaxSpeedLand;
+                vel = MaxSpeedLand * direction;
             else
-                maxSpeed = MaxSpeedWater;
+                vel = MaxSpeedWater * direction;
 
-            //scale the velocity down if it exceeds max speed
-            float l = Velocity.Length;
-            if (l > maxSpeed && l != 0)
-                Velocity = (maxSpeed / l) * Velocity;
+            Velocity = vel;
         }
+        #endregion Movement
 
+        /// <summary>
+        /// Called after this animal dies. Spawns a corpse.
+        /// </summary>
         public override void Die()
         {
             base.Die();
@@ -167,7 +222,7 @@ namespace wpfTest.GameLogic
             //spawn a corpse of this animal if the animal has any energy left
             if(Energy > 0)
                 Player.Entities.Add(
-                    new Corpse(Player, "CORPSE", MaxEnergy, 0, Position, 0.2f));
+                    new Corpse(Player, "CORPSE", Energy, 0, Position, 0.2f));
         }
 
         /// <summary>
@@ -178,6 +233,9 @@ namespace wpfTest.GameLogic
             Direction = Center.UnitDirectionTo(point);
         }
 
+        /// <summary>
+        /// Deals damage to this animal.
+        /// </summary>
         public override void Damage(decimal damage)
         {
             //thick skin prevents some damage
@@ -186,12 +244,29 @@ namespace wpfTest.GameLogic
 
             base.Damage(damage);
         }
+
+        /// <summary>
+        /// Pushes animal by displacement. Should be only used in collision handling.
+        /// </summary>
+        public void Push(Vector2 displacement)
+        {
+            Position += displacement;
+        }
+    }
+
+    /// <summary>
+    /// Describes where an animal can move.
+    /// </summary>
+    public enum Movement
+    {
+        LAND,
+        WATER,
+        LAND_WATER
     }
 
     public enum Diet
     {
         HERBIVORE,
-        CARNIVORE,
-        OMNIVORE
+        CARNIVORE
     }
 }

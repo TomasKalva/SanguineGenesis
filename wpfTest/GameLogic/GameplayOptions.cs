@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Describes customizable game features.
+    /// </summary>
     public class GameplayOptions
     {
         static GameplayOptions Get { get; }
@@ -15,6 +18,9 @@ namespace wpfTest.GameLogic
         }
 
         private bool _wholeMapVisible;
+        /// <summary>
+        /// True if both players can see the whole map.
+        /// </summary>
         public bool WholeMapVisible
         {
             get
@@ -29,6 +35,9 @@ namespace wpfTest.GameLogic
             }
         }
         private bool _nutrientsVisible;
+        /// <summary>
+        /// True if nutrients numbers for each node are visible.
+        /// </summary>
         public bool NutrientsVisible
         {
             get
@@ -43,6 +52,9 @@ namespace wpfTest.GameLogic
             }
         }
         private bool _showFlowmap;
+        /// <summary>
+        /// True if flowmap created by right click is visible.
+        /// </summary>
         public bool ShowFlowmap
         {
             get

@@ -8,9 +8,18 @@ using wpfTest.GUI;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Represent entity that is bound to the square grid.
+    /// </summary>
     public abstract class Building : Entity
     {
+        /// <summary>
+        /// Center of this building on the map.
+        /// </summary>
         public override Vector2 Center { get; }
+        /// <summary>
+        /// Range of the circle collider.
+        /// </summary>
         public override float Range => Size / 2f;
         /// <summary>
         /// True iff the building was built.
@@ -103,6 +112,9 @@ namespace wpfTest.GameLogic
         }
 
 
+        /// <summary>
+        /// Called after this building dies.
+        /// </summary>
         public override void Die()
         {
             base.Die();

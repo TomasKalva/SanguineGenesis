@@ -83,20 +83,28 @@ namespace wpfTest
                             obstMap[i - 1, j + 1], obstMap[i, j + 1], obstMap[i + 1, j + 1],
                             obstMap[i - 1, j], obstMap[i, j], obstMap[i + 1, j],
                             obstMap[i - 1, j - 1], obstMap[i, j - 1], obstMap[i + 1, j - 1]);
-                        //rotate the square right, find angle for the top left subpattern, rotate
-                        //the angle back left
-                        //repeat for all 4 directions
-                        float rotation = 0f;
-                        float[] directions = new float[4];
-                        for (int k = 0; k < 4; k++)
+
+                        if (pat.AllBlocked())
                         {
-                            Pattern2x2 sub = pat.LeftUpSubpattern();
-                            directions[k] = angleForPattern[sub] - rotation;
-                            pat=pat.RotateRight();
-                            rotation += (float)((Math.PI) * 3 / 2f);
+                            pushingMap[i, j] = null;
                         }
-                        pushingMap[i, j] = new PushingSquare(directions[0], directions[3],
-                                                            directions[1], directions[2]);
+                        else
+                        {
+                            //rotate the square right, find angle for the top left subpattern, rotate
+                            //the angle back left
+                            //repeat for all 4 directions
+                            float rotation = 0f;
+                            float[] directions = new float[4];
+                            for (int k = 0; k < 4; k++)
+                            {
+                                Pattern2x2 sub = pat.LeftUpSubpattern();
+                                directions[k] = angleForPattern[sub] - rotation;
+                                pat = pat.RotateRight();
+                                rotation += (float)((Math.PI) * 3 / 2f);
+                            }
+                            pushingMap[i, j] = new PushingSquare(directions[0], directions[3],
+                                                                directions[1], directions[2]);
+                        }
                     }
                     else
                         pushingMap[i, j] = null;
@@ -168,6 +176,13 @@ namespace wpfTest
 
         public Pattern2x2 LeftUpSubpattern()
             => new Pattern2x2( _11, _12, _21, _22);
+
+        public bool AllBlocked()
+        {
+            return _11 && _12 && _13 &&
+                _21 && _22 && _23 &&
+                _31 && _32 && _33;
+        }
     }
     struct Pattern2x2
     {

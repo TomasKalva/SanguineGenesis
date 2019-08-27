@@ -115,7 +115,7 @@ namespace wpfTest.GameLogic.Data.Abilities
 
         public void RemoveFromAssignment()
         {
-            Assignment.Units.Remove(CommandedEntity);
+            Assignment.Animals.Remove(CommandedEntity);
         }
 
         public override int Progress => 100;
@@ -167,12 +167,13 @@ namespace wpfTest.GameLogic.Data.Abilities
         public bool Step(Game game, float deltaT, FlowMap flowMap, MoveToCommand command)
         {
             //set the command assignment to be active to increase its priority
-            command.Assignment.Active = true;
+            if (!command.Assignment.Active)
+                command.Assignment.Active = true;
 
             //if an enemy is in attack range, attack it instead of other commands
             if (movementParametrizing.AttackEnemyInstead)
             {
-                Entity enemy = GameQuerying.GetGameQuerying().SelectUnits(game,
+                Entity enemy = GameQuerying.GetGameQuerying().SelectEntities(game,
                     (u) => u.Player != unit.Player
                             && unit.DistanceTo(u) <= unit.AttackDistance).FirstOrDefault();
                 if (enemy != null)
@@ -193,13 +194,13 @@ namespace wpfTest.GameLogic.Data.Abilities
             if (dist > FLOWMAP_DISTANCE)
             {
                 //use flowmap
-                unit.Accelerate(flowMap.GetIntensity(unit.Center, unit.Acceleration), game.Map);
+                unit.Accelerate(flowMap.GetIntensity(unit.Center, 1), game.Map);
             }
             else
             {
                 //go in straight line
                 Vector2 direction = unit.Center.UnitDirectionTo(TargetPoint.Center);
-                unit.Accelerate(unit.Acceleration * direction, game.Map);
+                unit.Accelerate(direction, game.Map);
             }
             //update last four positions
             noMovementDetection.AddNextPosition(unit.Center);

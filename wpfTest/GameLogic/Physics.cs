@@ -11,8 +11,6 @@ namespace wpfTest
 {
     public class Physics
     {
-        private float terrainAcc=500000000f;
-
         /// <summary>
         /// Pushing maps for the current map. If the map changes they are updated by the method UpdatePushingMaps.
         /// </summary>
@@ -47,6 +45,10 @@ namespace wpfTest
 
         public void PushAway(Map map, List<Animal> animals, List<Entity> entities, float deltaT)
         {
+            SetPushMaps(map);
+
+
+
             foreach (Animal u in animals)
             {
                 //animals that aren't physical don't need to check for collisions
@@ -81,13 +83,15 @@ namespace wpfTest
                             if (e is Building)
                             {
                                 //buildings can't be pushed
-                                u.Position = u.Center - 2 * pushVec;
+                                //u.Position = u.Center - 2 * pushVec;
+                                u.Push(-2 * pushVec);
                             }
                             else if (e is Corpse)
                             {
                                 Corpse c = (Corpse)e;
-                                u.Position = u.Center - pushVec;
-                                c.Position = c.Center + pushVec;
+                                //u.Position = u.Center - pushVec;
+                                //c.Position = c.Center + pushVec;
+                                u.Push(pushVec);
                             }
                             else
                             {
@@ -96,18 +100,22 @@ namespace wpfTest
                                 {
                                     if (u.WantsToMove && !u1.WantsToMove)
                                     {
-                                        u.Position = u.Center - 2 * pushVec;
+                                        //u.Position = u.Center - 2 * pushVec;
+                                        u.Push(-2 * pushVec);
 
                                     }
                                     else if (u1.WantsToMove && !u.WantsToMove)
                                     {
-                                        u1.Position = u1.Center + 2 * pushVec;
+                                        //u1.Position = u1.Center + 2 * pushVec;
+                                        u1.Push(2 * pushVec);
 
                                     }
                                     else
                                     {
-                                        u.Position = u.Center - pushVec;
-                                        u1.Position = u1.Center + pushVec;
+                                        //u.Position = u.Center - pushVec;
+                                        //u1.Position = u1.Center + pushVec;
+                                        u.Push(-1 * pushVec);
+                                        u1.Push(pushVec);
 
                                     }
                                 }
@@ -115,19 +123,25 @@ namespace wpfTest
                                 {
                                     if (u.CanBeMoved && !u1.CanBeMoved)
                                     {
-                                        u.Position = u.Center - 2 * pushVec;
+                                        //u.Position = u.Center - 2 * pushVec;
+                                        u.Push(-2 * pushVec);
 
                                     }
                                     else if (u1.CanBeMoved && !u.CanBeMoved)
                                     {
-                                        u1.Position = u1.Center + 2 * pushVec;
+                                        //u1.Position = u1.Center + 2 * pushVec;
+                                        u1.Push(2 * pushVec);
                                     }
                                     else
                                     {
-                                        u.Position = u.Center - pushVec;
-                                        u1.Position = u1.Center + pushVec;
+                                        //u.Position = u.Center - pushVec;
+                                        //u1.Position = u1.Center + pushVec;
+                                        u.Push(-1 * pushVec);
+                                        u1.Push(pushVec);
                                     }
                                 }
+                                PushOutsideOfObstacles(u, deltaT);
+                                PushOutsideOfObstacles(u1, deltaT);
                             }
                         }
                     }
@@ -149,53 +163,66 @@ namespace wpfTest
             PushingMap gPMap = PushingMaps[Movement.LAND];
             PushingMap wPMap = PushingMaps[Movement.WATER];
             PushingMap gwPMap = PushingMaps[Movement.LAND_WATER];
-            foreach (Animal u in animals)
+            foreach (Animal a in animals)
             {
-                //non-physical animals don't need to check for collisions
-                if (!u.Physical)
-                    continue;
-
-                PushingMap pushingMap;
-                ObstacleMap obstacleMap;
-                switch (u.Movement)
-                {
-                    case Movement.LAND:
-                        pushingMap = gPMap;
-                        obstacleMap = gOMap;
-                        break;
-                    case Movement.WATER:
-                        pushingMap = wPMap;
-                        obstacleMap = wOMap;
-                        break;
-                    default://Movement.LAND_WATER
-                        pushingMap = gwPMap;
-                        obstacleMap = gwOMap;
-                        break;
-                }
-                u.Accelerate(
-                            deltaT * pushingMap.GetIntensity(u.Center, terrainAcc), map
-                            );
-                /*Vector2 intensity = pushingMap.GetIntensity(u.Center, 1f);
-                float t = (float)Math.Min((Math.Ceiling(u.Position.X) - u.Position.X) / intensity.X,
-                    (Math.Ceiling(u.Position.Y) - u.Position.Y) / intensity.Y);
-                if(!float.IsNaN(t) && !float.IsInfinity(t))
-                    u.Position += t * intensity;*/
-                if (obstacleMap.CollidingWithObstacle(u.Center))
-                    u.IsInCollision = true;
+                PushOutsideOfObstacles(a, deltaT);
             }
         }
 
-        public void ResetCollision(List<Animal> units)
+        public void SetPushMaps(Map map)
         {
-            foreach (Animal u in units)
-            {
-                if (!u.WantsToMove && !u.IsInCollision)
-                    u.Velocity = new Vector2(0f, 0f);
-                u.IsInCollision = false;
-            }
+            ObstacleMap gOMap = map.ObstacleMaps[Movement.LAND];
+            ObstacleMap wOMap = map.ObstacleMaps[Movement.WATER];
+            ObstacleMap gwOMap = map.ObstacleMaps[Movement.LAND_WATER];
+            if (map.MapWasChanged
+                || PushingMaps[Movement.LAND] == null
+                || PushingMaps[Movement.WATER] == null
+                || PushingMaps[Movement.LAND_WATER] == null)
+                UpdatePushingMaps(map);
         }
 
-        public void Step(Map map, List<Animal> units, float deltaT)
+        public void PushOutsideOfObstacles(Animal animal, float deltaT)
+        {
+            //non-physical animals don't need to check for collisions
+            if (!animal.Physical)
+                return;
+
+            PushingMap pushingMap;
+            switch (animal.Movement)
+            {
+                case Movement.LAND:
+                    pushingMap = PushingMaps[Movement.LAND];
+                    break;
+                case Movement.WATER:
+                    pushingMap = PushingMaps[Movement.WATER];
+                    break;
+                default://Movement.LAND_WATER
+                    pushingMap = PushingMaps[Movement.LAND_WATER];
+                    break;
+            }
+
+            //move the animal outside of the blocked square in pushDirection
+            Vector2 pushDirection = pushingMap.GetIntensity(animal.Center, 1f);
+            float t1, t2;
+            //t1 * pushDirection.X = point outside of the blocked square
+            if (pushDirection.X > 0)
+                t1 = ((float)Math.Ceiling(animal.Position.X) - animal.Position.X) / pushDirection.X;
+            else
+                t1 = ((float)Math.Floor(animal.Position.X) - animal.Position.X) / pushDirection.X;
+
+            //t2 * pushDirection.Y = point outside of the blocked square
+            if (pushDirection.Y > 0)
+                t2 = ((float)Math.Ceiling(animal.Position.Y) - animal.Position.Y) / pushDirection.Y;
+            else
+                t2 = ((float)Math.Floor(animal.Position.Y) - animal.Position.Y) / pushDirection.Y;
+
+            //use the smaller of t1, t2 to push animal outside of the blocked square
+            float t = Math.Min(t1, t2);
+            if (!float.IsNaN(t) && !float.IsInfinity(t))
+                animal.Position += (t + 0.01f) * pushDirection;
+        }
+
+        public void MoveAnimals(Map map, List<Animal> units, float deltaT)
         {
             foreach(Animal u in units)
             {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic
 {
+    //todo: remove this
     public interface IMovementParametrizing
     {
         /// <summary>

@@ -39,7 +39,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             //calculate transfered energy so that no energy is gained or lost during the transfer
             decimal transferedEn = Math.Min(((decimal)deltaT) * Ability.EnergyPerS, CommandedEntity.Energy);
-            transferedEn = Math.Min(transferedEn, Targ.Energy.NotFilled);
+            transferedEn = Math.Min(transferedEn, Targ.Energy.AmountNotFilled);
 
             //transfer the energy
             CommandedEntity.Energy -= transferedEn;

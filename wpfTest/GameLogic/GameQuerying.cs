@@ -9,15 +9,23 @@ using wpfTest.GUI;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Used for extracting information about the game.
+    /// </summary>
     public class GameQuerying
     {
         public static GameQuerying GetGameQuerying()=>new GameQuerying(); 
         private GameQuerying() { }
+        
+        //todo: some of the following 4 methods might not be needed
 
-        public IEnumerable<Entity> SelectRectEntities(Game game, Rect area, Func<Entity,bool> entityProperty)
+        /// <summary>
+        /// Select all entities which satisfy the condition.
+        /// </summary>
+        public IEnumerable<Entity> SelectRectEntities(Game game, Rect area, Func<Entity,bool> condition)
         {
-            return game.GetEntities()
-                .Where(entityProperty)
+            return game.GetAll<Entity>()
+                .Where(condition)
                 .Where((unit) =>
                 {
                     Rect unitRect = ((IRectangle)unit).GetRect();
@@ -25,7 +33,10 @@ namespace wpfTest
                 });
         }
 
-        public List<Unit> SelectRectUnits(Game game, Rect area, Func<Unit, bool> unitProperty)
+        /// <summary>
+        /// Select all units that intersect area and satisfy the condition.
+        /// </summary>
+        public List<Unit> SelectRectUnits(Game game, Rect area, Func<Unit, bool> condition)
         {
             List<Unit> selected = new List<Unit>();
             foreach (Unit unit in SelectRectEntities(game, area, (e)=>e is Unit))
@@ -33,7 +44,7 @@ namespace wpfTest
                 Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
                 unitRect = ((IRectangle)unit).GetRect();
                 //todo: select units by circles on the ground
-                if (area.IntersectsWith(unitRect))
+                if (area.IntersectsWith(unitRect) && condition(unit))
                 {
                     selected.Add(unit);
                 }
@@ -41,16 +52,22 @@ namespace wpfTest
             return selected;
         }
 
-        public List<Entity> SelectUnits(Game game, Func<Entity, bool> unitProperty)
+        /// <summary>
+        /// Select all entities which satisfy the condition.
+        /// </summary>
+        public List<Entity> SelectEntities(Game game, Func<Entity, bool> condition)
         {
             List<Entity> selected = new List<Entity>();
-            foreach (Entity unit in game.GetUnits().Where(unitProperty))
+            foreach (Entity entity in game.GetAll<Entity>().Where(condition))
             {
-                selected.Add(unit);
+                selected.Add(entity);
             }
             return selected;
         }
 
+        /// <summary>
+        /// Returns all entities visible by observer.
+        /// </summary>
         public IEnumerable<Entity> SelectVisibleEntities(Game game, Player observer, IEnumerable<Entity> entities)
         {
             return entities.Where((e) =>
@@ -72,7 +89,7 @@ namespace wpfTest
         }
 
         /// <summary>
-        /// Select the rectangle of nodes give by the coordinates.
+        /// Select the rectangle of Nodes given by the coordinates.
         /// </summary>
         public Node[,] SelectNodes(Map map, int left, int bottom, int right, int top)
         {
@@ -80,7 +97,7 @@ namespace wpfTest
         }
 
         /// <summary>
-        /// Select the rectangle of T give by the coordinates.
+        /// Select the rectangle of squares T given by the coordinates.
         /// </summary>
         public T[,] SelectPartOfMap<T>(IMap<T> map, int left, int bottom, int right, int top)
         {
@@ -102,7 +119,7 @@ namespace wpfTest
         }
 
         /// <summary>
-        /// Selects rectangle of T. Each T intersects the area.
+        /// Selects rectangle of squares T. Each T intersects the area.
         /// </summary>
         public T[,] SelectPartOfMap<T>(IMap<T> map, Rect area)
         {

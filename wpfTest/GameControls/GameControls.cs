@@ -15,7 +15,7 @@ namespace wpfTest
         public EntityCommandsInput EntityCommandsInput { get; }
         public MapView MapView { get; }
         public MapSelectorFrame MapSelectorFrame { get; set; }
-        public CommandsGroup SelectedEntities { get; private set; }
+        public SelectedGroup SelectedEntities { get; private set; }
         
 
         public GameControls(MapView mapView, MapMovementInput mapMovementInput, Game game)
@@ -24,7 +24,7 @@ namespace wpfTest
             MapMovementInput = mapMovementInput;
             EntityCommandsInput = new EntityCommandsInput(game);
             MapSelectorFrame = null;
-            SelectedEntities = new CommandsGroup();
+            SelectedEntities = new SelectedGroup();
         }
 
         /// <summary>

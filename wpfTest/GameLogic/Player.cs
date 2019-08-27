@@ -18,9 +18,31 @@ namespace wpfTest
         public List<Animal> Animals => Entities.Where((e) => e is Animal).Select((u) => (Animal)u).ToList();
         public List<Building> Buildings => Entities.Where((e) => e is Building).Select((u) => (Building)u).ToList();
         public List<Tree> Trees => Entities.Where((e) => e is Tree).Select((u) => (Tree)u).ToList();
-        public VisibilityMap VisibilityMap { get; set; }
-        public bool MapChanged => MapView.MapWasChanged;
-        public Map MapView { get; private set; }
+        /// <summary>
+        /// Returns all entities of type T owned by the player.
+        /// </summary>
+        public List<T> Get<T>() where T:Entity
+        {
+            if (typeof(T) == typeof(Entity))
+                return Entities.Cast<T>().ToList();
+            else if (typeof(T) == typeof(Unit))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Animal))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Corpse))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Building))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if(typeof(T) == typeof(Tree))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+            else if (typeof(T) == typeof(Structure))
+                return Entities.Where((e) => e is T).Cast<T>().ToList();
+
+            throw new NotImplementedException("The case when entity is " + typeof(T) + " is not covered!");
+        }
+        public VisibilityMap VisibilityMap { get; private set; }
+        public bool MapChanged => VisibleMap.MapWasChanged;
+        public Map VisibleMap { get; private set; }
         public Players PlayerID { get; }
         public List<Building> VisibleBuildings { get; }
         public GameStaticData GameStaticData { get; }
@@ -43,7 +65,7 @@ namespace wpfTest
             if (PlayerID == Players.PLAYER1)
                 return;
 
-            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.4f, 5m, 0.5f, 0.1f, false, 4f, 2f, Movement.LAND, false, Diet.CARNIVORE, 5f, true, 20m, 5f, new List<StatusFactory>(), 1);
+            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3m, 0.5f, 0.4f, 5m, 0.5f, 0.1f, false, 3f, 2f, Movement.LAND, false, Diet.CARNIVORE, 5f, true, 20m, 5f, new List<StatusFactory>(), 1);
                 //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
             UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/
@@ -78,22 +100,22 @@ namespace wpfTest
                 Node bottomLeft = b.Nodes[0, 0];
                 //check if the building is visible and if it wasn't added to the view map yet
                 if (b.IsVisible(VisibilityMap)
-                    && MapView[bottomLeft.X, bottomLeft.Y].Building != b)
+                    && VisibleMap[bottomLeft.X, bottomLeft.Y].Building != b)
                 {
                     //remove buildings that no longer exist
                     foreach (Node n in b.Nodes)
                     {
-                        Building deprecB = MapView[n.X, n.Y].Building;
+                        Building deprecB = VisibleMap[n.X, n.Y].Building;
                         if (deprecB != null)
-                            RemoveBuilding(deprecB);
+                            RemoveVisibleBuilding(deprecB);
                     }
                     //add the newly visible building
-                    AddBuilding(b);
+                    AddVisibleBuilding(b);
                 }
             }
         }
 
-        public void UpdateNodesView(Map map)
+        public void UpdateVisibleMap(Map map)
         {
             if (VisibilityMap == null)
                 return;
@@ -105,7 +127,7 @@ namespace wpfTest
                     //update node if it can be seen
                     if (VisibilityMap[i, j])
                     {
-                        Node destN=MapView[i, j];
+                        Node destN=VisibleMap[i, j];
                         Node sourceN = map[i, j];
                         destN.Biome = sourceN.Biome;
                         destN.Nutrients = sourceN.Nutrients;
@@ -114,16 +136,22 @@ namespace wpfTest
                 }
         }
 
-        private void RemoveBuilding(Building building)
+        private void RemoveVisibleBuilding(Building building)
         {
             VisibleBuildings.Remove(building);
-            MapView.RemoveBuilding(building);
+            VisibleMap.RemoveBuilding(building);
         }
 
-        private void AddBuilding(Building building)
+        private void AddVisibleBuilding(Building building)
         {
             VisibleBuildings.Add(building);
-            MapView.AddBuilding(building);
+            VisibleMap.AddBuilding(building);
+        }
+
+        public void SetVisibilityMap(VisibilityMap visMap, List<Building> buildings)
+        {
+            VisibilityMap = visMap;
+            UpdateBuildingsView(buildings);
         }
 
         /// <summary>
@@ -163,7 +191,7 @@ namespace wpfTest
         {
             VisibleBuildings.ForEach((building)=> 
             {
-                if (building.IsDead) MapView.RemoveBuilding(building);
+                if (building.IsDead) VisibleMap.RemoveBuilding(building);
             });
             VisibleBuildings.RemoveAll((building) => building.IsDead);
         }
@@ -171,7 +199,7 @@ namespace wpfTest
         public void InitializeMapView(Map map)
         {
             //todo: implement with visibility map
-            MapView = new Map(map);
+            VisibleMap = new Map(map);
         }
 
         /*public ObstacleMap GetViewMap()

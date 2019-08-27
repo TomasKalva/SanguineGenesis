@@ -231,8 +231,17 @@ namespace wpfTest.GUI
 
     public interface IShowable
     {
+        /// <summary>
+        /// Name of this.
+        /// </summary>
         string GetName { get; }
+        /// <summary>
+        /// Represents parameters and their values.
+        /// </summary>
         List<Stat> Stats();
+        /// <summary>
+        /// Text (~1-4 sentences) describing purpose of this. 
+        /// </summary>
         string Description();
     }
 }

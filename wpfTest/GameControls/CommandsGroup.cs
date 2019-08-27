@@ -7,7 +7,7 @@ using wpfTest.GameLogic;
 
 namespace wpfTest
 {
-    public class CommandsGroup
+    public class SelectedGroup
     {
         /// <summary>
         /// List of currently selected entities. Shouldn't be set to null.
@@ -18,7 +18,7 @@ namespace wpfTest
         /// </summary>
         public bool Changed { get; set; }
 
-        public CommandsGroup()
+        public SelectedGroup()
         {
             Entities = new List<Entity>();
             Changed = true;
@@ -29,12 +29,12 @@ namespace wpfTest
             lock (this)
             {
                 foreach (Entity e in Entities)
-                    e.Group = null;
+                    e.Selected = false;
                 Entities.Clear();
                 foreach (Entity e in entities)
                 {
                     Entities.Add(e);
-                    e.Group = this;
+                    e.Selected = true;
                 }
                 Changed = true;
             }
@@ -48,7 +48,7 @@ namespace wpfTest
                     if (!Entities.Contains(u))
                     {
                         Entities.Add(u);
-                        u.Group = this;
+                        u.Selected = true;
                     }
                 Changed = true;
             }
@@ -58,7 +58,7 @@ namespace wpfTest
         {
             lock (this)
             {
-                entity.Group = null;
+                entity.Selected = false;
                 Entities.Remove(entity);
                 Changed = true;
             }
@@ -80,7 +80,7 @@ namespace wpfTest
             lock (this)
             {
                 foreach (Entity e in Entities)
-                    e.Group = null;
+                    e.Selected = false;
                 Entities.Clear();
                 Changed = true;
             }

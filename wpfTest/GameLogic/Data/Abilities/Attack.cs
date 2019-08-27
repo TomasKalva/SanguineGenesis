@@ -59,6 +59,10 @@ namespace wpfTest.GameLogic.Data.Abilities
         }
 
         public override int Progress => (int)((100*(ElapsedTime/CommandedEntity.AttackPeriod)));
-    }
 
+        public override void OnRemove()
+        {
+            CommandedEntity.CanBeMoved = true;
+        }
+    }
 }
