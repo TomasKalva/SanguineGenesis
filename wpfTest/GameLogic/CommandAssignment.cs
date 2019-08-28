@@ -114,7 +114,7 @@ namespace wpfTest.GameLogic
                     if (c is MoveToCommand mtpc)
                         //update its flowmap
                         if (mtpc.Assignment == this)
-                            mtpc.UpdateFlowMap(flowMap);
+                            mtpc.FlowMap=flowMap;
                 }
             }
         }
