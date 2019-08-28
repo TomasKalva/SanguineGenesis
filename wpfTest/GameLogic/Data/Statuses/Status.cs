@@ -27,12 +27,12 @@ namespace wpfTest.GameLogic.Data.Entities
         public abstract void Removed();
 
         #region IShowable
-        string IShowable.GetName => ToString();
-        List<Stat> IShowable.Stats()
+        public abstract string GetName();
+        public virtual List<Stat> Stats()
         {
            return new List<Stat>();
         }
-        string IShowable.Description() => "todo";
+        public abstract string Description();
         #endregion IShowable
     }
 
@@ -55,6 +55,9 @@ namespace wpfTest.GameLogic.Data.Entities
         }
     }
 
+    /// <summary>
+    /// Increases speed.
+    /// </summary>
     public class Sprint : Status<Animal, SprintFactory>
     {
         public Sprint(Animal affectedEntity, SprintFactory sprintInfo)
@@ -80,8 +83,18 @@ namespace wpfTest.GameLogic.Data.Entities
                 return true;
             return false;
         }
+
+        public override string GetName() => "Sprint";
+
+        public override string Description()
+        {
+            return "Increases speed of animal by " + StatusInfo.SpeedBonus + ".";
+        }
     }
 
+    /// <summary>
+    /// Represents consumed animal by this animal.
+    /// </summary>
     public class ConsumedAnimal : Status<Animal, ConsumedAnimalFactory>, IAnimalStateManipulator
     {
         /// <summary>
@@ -125,8 +138,26 @@ namespace wpfTest.GameLogic.Data.Entities
                 return true;
             return false;
         }
+
+        public override string GetName() => "Consumed";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Duration", StatusInfo.Duration.ToString())
+            };
+        }
+
+        public override string Description()
+        {
+            return "Consumed another animal for " + StatusInfo.Duration + " seconds.";
+        }
     }
 
+    /// <summary>
+    /// Deals damage over time.
+    /// </summary>
     public class Poison : Status<Entity, PoisonFactory>
     {
         /// <summary>
@@ -171,8 +202,28 @@ namespace wpfTest.GameLogic.Data.Entities
             //finish if all ticks have been performed
             return ticksPerformed > StatusInfo.TotalNumberOfTicks;
         }
+
+        public override string GetName() => "Poison";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Damage", StatusInfo.TickDamage.ToString()),
+                new Stat( "Tick time", StatusInfo.TickTime.ToString()),
+                new Stat( "Ticks", StatusInfo.TotalNumberOfTicks.ToString()),
+            };
+        }
+
+        public override string Description()
+        {
+            return "Deals " + StatusInfo.TickDamage + " damage every "+StatusInfo.TickTime+" seconds.";
+        }
     }
 
+    /// <summary>
+    /// Gives thick skin.
+    /// </summary>
     public class Shell : Status<Animal, ShellFactory>
     {
         private float timer;
@@ -201,8 +252,18 @@ namespace wpfTest.GameLogic.Data.Entities
                 return true;
             return false;
         }
+
+        public override string GetName() => "Shell";
+
+        public override string Description()
+        {
+            return "Gives animal thick skin.";
+        }
     }
 
+    /// <summary>
+    /// Increases attack speed.
+    /// </summary>
     public class FastStrikes : Status<Animal, FastStrikesFactory>
     {
         private float timer;
@@ -231,8 +292,26 @@ namespace wpfTest.GameLogic.Data.Entities
                 return true;
             return false;
         }
+
+        public override string GetName() => "Fast strikes";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Duration", StatusInfo.Duration.ToString())
+            };
+        }
+
+        public override string Description()
+        {
+            return "Increases attack speed of animal by " + 0.1f + ".";
+        }
     }
 
+    /// <summary>
+    /// Represents animal on tree.
+    /// </summary>
     public class AnimalsOnTree : Status<Tree, AnimalsOnTreeFactory>, IAnimalStateManipulator
     {
         public List<Animal> Animals { get; }
@@ -259,8 +338,26 @@ namespace wpfTest.GameLogic.Data.Entities
         {
             return false;
         }
+
+        public override string GetName() => "On tree";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Animals", Animals.Count.ToString())
+            };
+        }
+
+        public override string Description()
+        {
+            return "There are " + Animals.Count() + " animals on this tree.";
+        }
     }
 
+    /// <summary>
+    /// Represents animals underground.
+    /// </summary>
     public class Underground : Status<Structure, UndergroundFactory>, IAnimalStateManipulator
     {
         public List<Animal> AnimalsUnderGround => StatusInfo.AnimalsUnderGround;
@@ -284,8 +381,26 @@ namespace wpfTest.GameLogic.Data.Entities
         {
             return false;
         }
+
+        public override string GetName() => "Underground";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Animals", AnimalsUnderGround.Count.ToString())
+            };
+        }
+
+        public override string Description()
+        {
+            return "There are " + AnimalsUnderGround.Count() + " underground.";
+        }
     }
 
+    /// <summary>
+    /// Increases view range.
+    /// </summary>
     public class FarSight : Status<Animal, FarSightFactory>
     {
         public FarSight(Animal affectedEntity, FarSightFactory farSightInfo)
@@ -310,8 +425,26 @@ namespace wpfTest.GameLogic.Data.Entities
                 return true;
             return false;
         }
+
+        public override string GetName() => "Far sight";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Range bonus", StatusInfo.RangeExtension.ToString())
+            };
+        }
+
+        public override string Description()
+        {
+            return "Increases view range by " + StatusInfo.RangeExtension + ".";
+        }
     }
 
+    /// <summary>
+    /// Animal is being knocked away.
+    /// </summary>
     public class KnockAway : Status<Animal, KnockAwayFactory>, IAnimalStateManipulator
     {
         private MoveAnimalToPoint moveAnimalToPoint;
@@ -336,6 +469,21 @@ namespace wpfTest.GameLogic.Data.Entities
         public override bool Step(Game game, float deltaT)
         {
             return moveAnimalToPoint.Step(deltaT);
+        }
+
+        public override string GetName() => "Knocked away";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Distance", StatusInfo.Distance.ToString())
+            };
+        }
+
+        public override string Description()
+        {
+            return "This animal is being knocked away.";
         }
     }
 }

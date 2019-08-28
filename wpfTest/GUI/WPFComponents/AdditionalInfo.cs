@@ -76,7 +76,7 @@ namespace wpfTest.GUI
         public void Update(IShowable showable)
         {
             Shown = showable;
-            Caption.Content = showable.GetName;
+            Caption.Content = showable.GetName();
             Stats.SetStats(showable.Stats());
             Description.Text = showable.Description();
         }

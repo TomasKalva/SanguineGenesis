@@ -142,7 +142,7 @@ namespace wpfTest.GUI
                 }
                 else
                 {
-                    b.Content = InfoSources[i].GetName;
+                    ((TextBlock)b.Content).Text = InfoSources[i].GetName();
                     b.Visibility = Visibility.Visible;
                     //highlight selected
                     if (InfoSources[i].Equals(Selected))
@@ -285,7 +285,7 @@ namespace wpfTest.GUI
         /// <summary>
         /// Name of this.
         /// </summary>
-        string GetName { get; }
+        string GetName();
         /// <summary>
         /// Represents parameters and their values.
         /// </summary>

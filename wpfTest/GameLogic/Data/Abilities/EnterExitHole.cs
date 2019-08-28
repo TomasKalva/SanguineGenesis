@@ -7,10 +7,11 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Enter hole.
+    /// </summary>
     public sealed class EnterHole : TargetAbility<Animal, Structure>
     {
-
         internal EnterHole(decimal energyCost, float enteringTime)
             : base(0.1f, energyCost, false, false, duration:enteringTime)
         {
@@ -26,6 +27,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new EnterHoleCommand(caster, target, this);
         }
+
+        public override string GetName() => "Enter hole";
 
         public override string Description()
         {
@@ -59,6 +62,9 @@ namespace wpfTest.GameLogic.Data.Abilities
         }
     }
 
+    /// <summary>
+    /// Exit hole.
+    /// </summary>
     public sealed class ExitHole : TargetAbility<Structure, Nothing>
     {
         internal ExitHole(decimal energyCost, float exitingTime)
@@ -70,6 +76,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new ExitHoleCommand(caster, target, this);
         }
+
+        public override string GetName() => "Exit hole";
 
         public override string Description()
         {

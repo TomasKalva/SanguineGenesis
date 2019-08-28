@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// The tree grows until it has full energy.
+    /// </summary>
     public sealed class Grow : TargetAbility<Tree, Nothing>
     {
         internal Grow()
@@ -18,6 +20,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new GrowCommand(caster, this);
         }
+
+        public override string GetName() => "Grow";
 
         public override string Description()
         {

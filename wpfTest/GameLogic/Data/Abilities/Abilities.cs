@@ -19,14 +19,14 @@ namespace wpfTest.GameLogic
 
         private Dictionary<Ability, MoveTo> moveToCast;
         private Dictionary<string, Spawn> unitSpawn;
-        private Dictionary<string, CreateUnit> unitCreate;
+        private Dictionary<string, CreateAnimal> unitCreate;
         private Dictionary<string, BuildBuilding> buildBuilding;
 
         public MoveTo MoveTo { get; }
         public MoveTo MoveToCast(Ability ability) => moveToCast[ability];
         public Attack Attack { get; }
         public Spawn UnitSpawn(string type) => unitSpawn[type];
-        public CreateUnit UnitCreate(string type) => unitCreate[type];
+        public CreateAnimal UnitCreate(string type) => unitCreate[type];
         public BuildBuilding BuildBuilding(string type) => buildBuilding[type];
         public Grow Grow { get; }
         public SetRallyPoint SetRallyPoint { get; }
@@ -70,10 +70,10 @@ namespace wpfTest.GameLogic
             }
 
             //unit create
-            unitCreate = new Dictionary<string, CreateUnit>();
+            unitCreate = new Dictionary<string, CreateAnimal>();
             foreach (var unitFac in gameStaticData.UnitFactories.Factorys)
             {
-                CreateUnit createUnit = new CreateUnit(unitFac.Value);
+                CreateAnimal createUnit = new CreateAnimal(unitFac.Value);
                 createUnit.SetAbilities(this);
                 unitCreate.Add(unitFac.Value.EntityType, createUnit);
             }

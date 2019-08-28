@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Deal energy damage to the animal.
+    /// </summary>
     public sealed class Kick : TargetAbility<Animal, Animal>
     {
         public decimal EnergyDamage { get; }
@@ -21,6 +23,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new KickCommand(caster, target, this);
         }
+
+        public override string GetName() => "Kick";
 
         public override string Description()
         {

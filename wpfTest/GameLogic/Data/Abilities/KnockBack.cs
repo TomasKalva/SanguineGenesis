@@ -7,7 +7,9 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Knock the target back.
+    /// </summary>
     public sealed class KnockBack : TargetAbility<Animal, Animal>
     {
         public KnockAwayFactory KnockAwayFactory { get; }
@@ -22,6 +24,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new KnockBackCommand(caster, target, this);
         }
+
+        public override string GetName() => "Knock back";
 
         public override string Description()
         {

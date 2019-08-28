@@ -32,7 +32,7 @@ namespace wpfTest
         public abstract bool PerformCommand(Game game, float deltaT);
 
         #region IShowable
-        public string GetName => ToString();
+        public abstract string GetName();
         public List<Stat> Stats()
         {
             List<Stat> stats = new List<Stat>()
@@ -195,6 +195,8 @@ namespace wpfTest
         {
             CommandedEntity.RemoveCommand(this);
         }
+
+        public override string GetName() => Ability.GetName();
     }
 
     /// <summary>

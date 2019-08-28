@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Attack the target.
+    /// </summary>
     public sealed class Attack : TargetAbility<Animal, Entity>
     {
         internal Attack() : base(0.1f, 0, false, false) { }
@@ -15,6 +17,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new AttackCommand(caster, target, this);
         }
+
+        public override string GetName() => "Attack";
 
         public override string Description()
         {

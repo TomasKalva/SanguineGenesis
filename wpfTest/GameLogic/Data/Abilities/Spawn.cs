@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Create a new animal at the target location.
+    /// </summary>
     public sealed class Spawn : TargetAbility<Entity, Vector2>
     {
         internal Spawn(AnimalFactory spawningUnitFactory)
@@ -26,6 +28,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return base.ToString() + " " + SpawningUnitFactory.EntityType;
         }
+
+        public override string GetName() => "Spawn " + SpawningUnitFactory.EntityType;
 
         public override string Description()
         {

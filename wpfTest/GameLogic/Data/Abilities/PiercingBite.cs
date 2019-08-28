@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Deal huge amount of damage to animal.
+    /// </summary>
     public sealed class PiercingBite : TargetAbility<Animal, Animal>
     {
         public decimal Damage { get; }
@@ -21,6 +23,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new PiercingBiteCommand(caster, target, this);
         }
+
+        public override string GetName() => "Piercing bite";
 
         public override string Description()
         {

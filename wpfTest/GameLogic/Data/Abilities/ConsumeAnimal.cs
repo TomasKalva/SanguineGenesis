@@ -7,7 +7,9 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// The target is consumed for a short time by the caster.
+    /// </summary>
     public sealed class ConsumeAnimal : TargetAbility<Animal, Animal>
     {
         public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
@@ -22,6 +24,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new ConsumeAnimalCommand(caster, target, this);
         }
+
+        public override string GetName() => "Consume";
 
         public override string Description()
         {

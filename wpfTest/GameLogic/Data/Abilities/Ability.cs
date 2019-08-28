@@ -84,7 +84,7 @@ namespace wpfTest.GameLogic
         }
 
         //IShowable
-        public string GetName => ToString();
+        public abstract string GetName();
         public abstract List<Stat> Stats();
         public abstract string Description();
 

@@ -7,9 +7,12 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-    public sealed class CreateUnit : TargetAbility<Building, Nothing>
+    /// <summary>
+    /// Creates a new animal near the building.
+    /// </summary>
+    public sealed class CreateAnimal : TargetAbility<Building, Nothing>
     {
-        internal CreateUnit(AnimalFactory spawningUnitFactory)
+        internal CreateAnimal(AnimalFactory spawningUnitFactory)
             : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false, duration: spawningUnitFactory.SpawningTime)
         {
             SpawningUnitFactory = spawningUnitFactory;
@@ -28,15 +31,17 @@ namespace wpfTest.GameLogic.Data.Abilities
             return base.ToString() + " " + SpawningUnitFactory.EntityType;
         }
 
+        public override string GetName() => "Create " + SpawningUnitFactory.EntityType;
+
         public override string Description()
         {
             return "The entity spawns a new unit at the target point.";
         }
     }
 
-    public class CreateUnitCommand : Command<Building, Nothing, CreateUnit>
+    public class CreateUnitCommand : Command<Building, Nothing, CreateAnimal>
     {
-        public CreateUnitCommand(Building commandedEntity, Nothing target, CreateUnit spawn)
+        public CreateUnitCommand(Building commandedEntity, Nothing target, CreateAnimal spawn)
             : base(commandedEntity, target, spawn)
         {
         }

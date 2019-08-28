@@ -278,7 +278,7 @@ namespace wpfTest
         }
 
         #region IShowable
-        string IShowable.GetName => EntityType;
+        string IShowable.GetName() => EntityType;
         string IShowable.Description() => "Represents an object in the game.";
         public abstract List<Stat> Stats();
         #endregion IShowable

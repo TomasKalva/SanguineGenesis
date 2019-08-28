@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
+    /// <summary>
+    /// Set rally point of the building.
+    /// </summary>
     public sealed class SetRallyPoint : TargetAbility<Building, Vector2>
     {
         internal SetRallyPoint()
@@ -22,6 +25,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return base.ToString();
         }
+
+        public override string GetName() => "Rally point";
 
         public override string Description()
         {

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
+    /// <summary>
+    /// Eat a node or tree to regenerate energy.
+    /// </summary>
     public sealed class HerbivoreEat : TargetAbility<Animal, IHerbivoreFood>
     {
         internal HerbivoreEat()
@@ -22,6 +25,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return base.ToString();
         }
+
+        public override string GetName() => "Eat";
 
         public override string Description()
         {
@@ -61,6 +66,9 @@ namespace wpfTest.GameLogic.Data.Abilities
         public override int Progress => (int)(100 * (ElapsedTime / CommandedEntity.FoodEatingPeriod));
     }
 
+    /// <summary>
+    /// Eat a corpse to regenerate energy.
+    /// </summary>
     public sealed class CarnivoreEat : TargetAbility<Animal, ICarnivoreFood>
     {
         internal CarnivoreEat()
@@ -77,6 +85,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return base.ToString();
         }
+
+        public override string GetName() => "Eat";
 
         public override string Description()
         {

@@ -7,6 +7,9 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
+    /// <summary>
+    /// Apply poison to the animal.
+    /// </summary>
     public sealed class PoisonousSpit : TargetAbility<Animal, Animal>
     {
         public PoisonFactory PoisonFactory { get; }
@@ -21,6 +24,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new PoisonousSpitCommand(caster, target, this);
         }
+
+        public override string GetName() => "Poisonous spit";
 
         public override string Description()
         {

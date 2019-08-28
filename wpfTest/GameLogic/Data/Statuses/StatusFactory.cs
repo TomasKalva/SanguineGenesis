@@ -53,6 +53,8 @@ namespace wpfTest.GameLogic.Data.Entities
             affectedEntity.AddStatus(newStatus);
             return true;
         }
+
+        public override string ToString() => NewInstance(null).GetName();
     }
 
     public class PoisonFactory : StatusFactory<Entity>

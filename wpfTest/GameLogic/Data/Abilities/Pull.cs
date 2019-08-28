@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Pull the target to the caster.
+    /// </summary>
     public sealed class Pull : TargetAbility<Animal, Animal>
     {
         public float PullSpeed { get; }
@@ -21,6 +23,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new PullCommand(caster, target, this);
         }
+
+        public override string GetName() => "Pull";
 
         public override string Description()
         {

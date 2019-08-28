@@ -7,7 +7,9 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Applies status to the CommandedEntity.
+    /// </summary>
     public sealed class ApplyStatus : TargetAbility<Animal, Nothing>
     {
         public StatusFactory StatusFactory { get; }
@@ -22,6 +24,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new ApplyStatusCommand(caster, target, this);
         }
+
+        public override string GetName() => "Apply " + StatusFactory.ToString();
 
         public override string Description()
         {

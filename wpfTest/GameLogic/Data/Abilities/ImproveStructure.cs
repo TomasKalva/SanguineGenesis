@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Transfer energy to the target structure.
+    /// </summary>
     public sealed class ImproveStructure : TargetAbility<Animal, Structure>
     {
         public decimal EnergyPerS { get; }
@@ -21,6 +23,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new ImproveStructureCommand(caster, target, this);
         }
+
+        public override string GetName() => "Improve structure";
 
         public override string Description()
         {

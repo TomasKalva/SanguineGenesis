@@ -7,7 +7,9 @@ using wpfTest.GameLogic.Data.Entities;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Climb on a tree.
+    /// </summary>
     public sealed class ClimbTree : TargetAbility<Animal, Tree>
     {
         public AnimalsOnTreeFactory AnimalsOnTreeFactory { get; }
@@ -22,6 +24,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new ClimbTreeCommand(caster, target, this);
         }
+
+        public override string GetName() => "Climb";
 
         public override string Description()
         {
@@ -53,6 +57,9 @@ namespace wpfTest.GameLogic.Data.Abilities
         }
     }
 
+    /// <summary>
+    /// Climb down a tree.
+    /// </summary>
     public sealed class ClimbDownTree : TargetAbility<Tree, Nothing>
     {
         internal ClimbDownTree(decimal energyCost, float climbingTime)
@@ -64,6 +71,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new ClimbDownTreeCommand(caster, target, this);
         }
+
+        public override string GetName() => "Climb down";
 
         public override string Description()
         {

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Build a building at the target node.
+    /// </summary>
     public sealed class BuildBuilding : TargetAbility<Entity, Node>
     {
         internal BuildBuilding(BuildingFactory buildingFactory)
@@ -26,6 +28,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return base.ToString() + " " + BuildingFactory.EntityType;
         }
+
+        public override string GetName() => "Build "+BuildingFactory.EntityType;
 
         public override string Description()
         {

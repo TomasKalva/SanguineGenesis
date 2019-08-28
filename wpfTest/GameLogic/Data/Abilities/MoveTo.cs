@@ -68,6 +68,8 @@ namespace wpfTest.GameLogic.Data.Abilities
             throw new NotImplementedException("This method is not necessary because the virtual method " + nameof(SetCommands) + " was overriden");
         }
 
+        public override string GetName() => "Move to";
+
         public override string Description()
         {
             return "The unit moves to the target. If the target is on a terrain " +

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Jump to the target location.
+    /// </summary>
     public sealed class Jump : TargetAbility<Animal, Vector2>
     {
         public float JumpSpeed { get; }
@@ -21,6 +23,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new JumpCommand(caster, target, this);
         }
+
+        public override string GetName() => "Jump";
 
         public override string Description()
         {

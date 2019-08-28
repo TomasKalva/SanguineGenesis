@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
-
+    /// <summary>
+    /// Move quickly to the target and deal it damage.
+    /// </summary>
     public sealed class ChargeTo : TargetAbility<Animal, Entity>
     {
         public decimal AttackDamageMultiplier { get; }
@@ -23,6 +25,8 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             return new ChargeToCommand(caster, target, this);
         }
+
+        public override string GetName() => "Charge to";
 
         public override string Description()
         {
