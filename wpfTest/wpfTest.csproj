@@ -112,27 +112,24 @@
     <Compile Include="GameLogic\Maps\Pathfinding.cs" />
     <Compile Include="GameLogic\Maps\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityMap.cs" />
-    <Compile Include="GUI\AdditionalInfo.cs" />
+    <Compile Include="GUI\WPFComponents\AdditionalInfo.cs" />
     <Compile Include="GUI\BitmapImageExtensions.cs" />
     <Compile Include="GameLogic\Maps\FlowMap.cs" />
     <Compile Include="GameControls\GameControls.cs" />
     <Compile Include="GameLogic\GameQuerying.cs" />
-    <Compile Include="GameControls\CommandsGroup.cs" />
+    <Compile Include="GameControls\SelectedGroup.cs" />
     <Compile Include="GameLogic\Command.cs" />
-    <Compile Include="GUI\ButtonArray.cs" />
-    <Compile Include="GUI\EntityInfoPanel.cs" />
-    <Compile Include="GUI\GameOptionsPanel.cs" />
+    <Compile Include="GUI\WPFComponents\ButtonArray.cs" />
+    <Compile Include="GUI\WPFComponents\EntityInfoPanel.cs" />
+    <Compile Include="GUI\WPFComponents\GameOptionsPanel.cs" />
     <Compile Include="GUI\IRectangle.cs" />
     <Compile Include="GameLogic\Maps\IMap.cs" />
     <Compile Include="GameControls\MapMovementInput.cs" />
     <Compile Include="GameControls\MapSelectorFrame.cs" />
     <Compile Include="GameControls\MapView.cs" />
     <Compile Include="GameLogic\Maps\ObstacleMap.cs" />
-    <Compile Include="GUI\ImageAtlas.cs" />
-    <Compile Include="GUI\OpenGLColorBufferDrawer.cs" />
-    <Compile Include="GUI\OpenGLImmediateDrawer.cs" />
-    <Compile Include="GUI\OpenGLAtlasDrawer.cs" />
-    <Compile Include="GUI\OpenGLTextureBufferDrawer.cs" />
+    <Compile Include="GUI\OpenGL\ImageAtlas.cs" />
+    <Compile Include="GUI\OpenGL\OpenGLAtlasDrawer.cs" />
     <Compile Include="GameLogic\Physics.cs" />
     <Compile Include="GameLogic\Player.cs" />
     <Compile Include="GameLogic\Maps\PushingMapGenerator.cs" />
@@ -157,7 +154,7 @@
   <ItemGroup>
     <Compile Include="GameLogic\Maps\Map.cs" />
     <Compile Include="GameLogic\Node.cs" />
-    <Compile Include="GUI\StatsTable.cs" />
+    <Compile Include="GUI\WPFComponents\StatsTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -192,22 +189,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <EmbeddedResource Include="GUI\Shaders\Shader.frag">
+    <EmbeddedResource Include="GUI\OpenGL\AtlasTexShader.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Shaders\Shader.vert">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Shaders\TexShader.frag">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Shaders\TexShader.vert">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Shaders\AtlasTexShader.frag">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Shaders\AtlasTexShader.vert">
+    <EmbeddedResource Include="GUI\OpenGL\AtlasTexShader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

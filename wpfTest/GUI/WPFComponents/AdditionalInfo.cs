@@ -9,12 +9,27 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest.GUI
 {
+    /// <summary>
+    /// Shows info about IShowable.
+    /// </summary>
     class AdditionalInfo : Canvas
     {
+        /// <summary>
+        /// The instance whose info is shown.
+        /// </summary>
         public IShowable Shown { get; private set; }
 
+        /// <summary>
+        /// Label with the name of Shown.
+        /// </summary>
         public Label Caption { get; }
+        /// <summary>
+        /// Stats table with the stats of Shown.
+        /// </summary>
         public StatsTable Stats { get; }
+        /// <summary>
+        /// TextBlock with the description of Shown.
+        /// </summary>
         public TextBlock Description { get; }
 
         public AdditionalInfo(int width, int height)
@@ -55,6 +70,9 @@ namespace wpfTest.GUI
             Style = (Style)Application.Current.FindResource("AdditionalInfoStyle");
         }
 
+        /// <summary>
+        /// Sets Shown to showable and updates the components.
+        /// </summary>
         public void Update(IShowable showable)
         {
             Shown = showable;
@@ -63,6 +81,9 @@ namespace wpfTest.GUI
             Description.Text = showable.Description();
         }
 
+        /// <summary>
+        /// Sets Shown to null and reset the components.
+        /// </summary>
         public void Reset()
         {
             Shown = null;

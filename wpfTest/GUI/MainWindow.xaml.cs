@@ -36,23 +36,14 @@ namespace wpfTest
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Game game;
-        /// <summary>
-        /// Can only be used synchronously from this window. Using this variable or
-        /// its contents from other threads requires invocation.
-        /// </summary>
-        private GameControls gameControls;
-
         public MainWindow()
         {
             InitializeComponent();
-
-
+            
             BitmapImage mapBitmap = (BitmapImage)FindResource("riverBuildingsMap");
-            game = new Game(mapBitmap);
-            var MapView = new MapView(0, 0, 60, game.Map, game);
-            var MapMovementInput = new MapMovementInput();
-            gameControls = new GameControls(MapView, MapMovementInput, game);
+            Game = new Game(mapBitmap);
+            var MapView = new MapView(0, 0, 60, Game.Map, Game);
+            GameControls = new GameControls(MapView, Game);
             openGLControl1.FrameRate = 30;
 
 
@@ -70,49 +61,84 @@ namespace wpfTest
             t.Start();
         }
 
-        private int wantedGameFps = 50;
-        private int StepLength => 1000 / wantedGameFps;
+        #region Game logic
+        /// <summary>
+        /// The game this window is showing.
+        /// </summary>
+        private Game Game { get; }
+        /// <summary>
+        /// Can only be used synchronously from this window. Using this variable or
+        /// its contents from other threads requires invocation.
+        /// </summary>
+        private GameControls GameControls { get; }
 
+        /// <summary>
+        /// Number of updates of the game per second.
+        /// </summary>
+        private int WantedGameUps => 50;
+        /// <summary>
+        /// Time between two game updates.
+        /// </summary>
+        private int StepLength => 1000 / WantedGameUps;
+
+        /// <summary>
+        /// Measures time from the start of the game.
+        /// </summary>
         private Stopwatch totalStopwatch = new Stopwatch();
-        private double totalTime;
+        /// <summary>
+        /// Total time elapsed since the start of the game. Is set in
+        /// the main loop.
+        /// </summary>
+        private double TotalTime { get; set; }
 
+        /// <summary>
+        /// Measures time from the start of the step.
+        /// </summary>
         private Stopwatch stepStopwatch = new Stopwatch();
-        private double totalStepTime;
+        /// <summary>
+        /// Total time elapsed since the start of the step. Is set in
+        /// the main loop.
+        /// </summary>
+        private double TotalStepTime { get; set; }
 
-
+        /// <summary>
+        /// The main loop of the game.
+        /// </summary>
         public void MainLoop()
         {
-            totalTime = 0;
+            TotalTime = 0;
             totalStopwatch.Start();
-            //game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(), new Vector2(10, 2));
             while (true)
             {
                 MainLoopStep();
             }
         }
-        
+
+        /// <summary>
+        /// One update of the game.
+        /// </summary>
         private void MainLoopStep()
         {
             stepStopwatch.Start();
 
-            lock (game)
+            lock (Game)
             {
-                if (game.GameEnded)
+                if (Game.GameEnded)
                     return;
 
                 //process player's input
                 //Invoke could cause deadlock because drawing also locks game
                 Dispatcher.BeginInvoke(
                     (Action)(() =>
-                    gameControls.UpdateMapView(game)));
+                    GameControls.UpdateMapView(Game)));
 
-                gameControls.UpdateUnitsByInput(game);
+                GameControls.UpdateEntitiesByInput(Game);
 
                 //update the state of the game
                 long totalEl = totalStopwatch.ElapsedMilliseconds;
-                float deltaT = (totalEl - (float)totalTime) / 1000f;
-                totalTime = totalEl;
-                game.Update(deltaT);
+                float deltaT = (totalEl - (float)TotalTime) / 1000f;
+                TotalTime = totalEl;
+                Game.Update(deltaT);
             }
 
             stepStopwatch.Stop();
@@ -120,47 +146,45 @@ namespace wpfTest
             //calculate sleep time
             double diff = stepStopwatch.Elapsed.TotalMilliseconds;
             stepStopwatch.Reset();
-            totalStepTime += diff;
-            int sleepTime = StepLength - (int)totalStepTime;
-            if ((int)totalStepTime > 0)
-                totalStepTime = totalStepTime - (int)totalStepTime;
-            //if(sleepTime<0)
-            //    Console.WriteLine(sleepTime);
+            TotalStepTime += diff;
+            int sleepTime = StepLength - (int)TotalStepTime;
+            if ((int)TotalStepTime > 0)
+                TotalStepTime = TotalStepTime - (int)TotalStepTime;
+            //sleep for the rest of the step time
             if (sleepTime > 0)
-            {
                 Thread.Sleep(sleepTime);
-            }
-            else
-            {
-                Thread.Yield();
-            }
         }
-        
-        private EntityButtonArray entityButtonArray;
-        private AbilityButtonArray abilityButtonArray;
-        private EntityInfoPanel entityInfoPanel;
-        private AdditionalInfo additionalInfo;
-        private GameOptionsPanel gameOptionsPanel;
+        #endregion Game logic
 
+        #region User interface
+        private EntityButtonArray EntityButtonArray { get; set; }
+        private AbilityButtonArray AbilityButtonArray { get; set; }
+        private EntityInfoPanel EntityInfoPanel { get; set; }
+        private AdditionalInfo AdditionalInfo { get; set; }
+        private GameOptionsPanel GameOptionsPanel { get; set; }
+
+        /// <summary>
+        /// Initializes user interface.
+        /// </summary>
         private void InitializeBottomPanel()
         {
             //fill ui elements with buttons
             //units panel
-            entityButtonArray = new EntityButtonArray(8, 5, 300, 188);
-            gui.Children.Add(entityButtonArray);
+            EntityButtonArray = new EntityButtonArray(8, 5, 300, 188);
+            gui.Children.Add(EntityButtonArray);
             
             //abilities panel
-            abilityButtonArray = new AbilityButtonArray(4, 4, 200, 200);
-            gui.Children.Add(abilityButtonArray);
+            AbilityButtonArray = new AbilityButtonArray(4, 4, 200, 200);
+            gui.Children.Add(AbilityButtonArray);
             
             //unit info panel
-            entityInfoPanel = new EntityInfoPanel(250, 200);
-            gui.Children.Add(entityInfoPanel);
+            EntityInfoPanel = new EntityInfoPanel(250, 200);
+            gui.Children.Add(EntityInfoPanel);
 
             //additional info
-            additionalInfo = new AdditionalInfo(100, 200);
-            gui.Children.Add(additionalInfo);
-            additionalInfo.Stats.SetStats(
+            AdditionalInfo = new AdditionalInfo(100, 200);
+            gui.Children.Add(AdditionalInfo);
+            AdditionalInfo.Stats.SetStats(
                 new List<Stat>()
                 {
                     new Stat("Energy cost: ", "50"),
@@ -168,86 +192,89 @@ namespace wpfTest
                 });
 
             //game options panel
-            gameOptionsPanel = new GameOptionsPanel(250, 300, game.GameplayOptions);
-            menuLayer.Children.Add(gameOptionsPanel);
+            GameOptionsPanel = new GameOptionsPanel(250, 300, Game.GameplayOptions);
+            menuLayer.Children.Add(GameOptionsPanel);
 
             //add listeners to the buttons
-            entityButtonArray.ShowInfoOnClick(entityInfoPanel, abilityButtonArray, gameControls);
-            abilityButtonArray.ShowInfoOnMouseOver(additionalInfo);
-            entityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(additionalInfo);
-            entityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
-            entityInfoPanel.StatusButtonArray.ShowInfoOnMouseOver(additionalInfo);
-            abilityButtonArray.SelectAbilityOnClick(gameControls);
+            EntityButtonArray.ShowInfoOnClick(EntityInfoPanel, AbilityButtonArray, GameControls);
+            AbilityButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
+            EntityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
+            EntityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
+            EntityInfoPanel.StatusButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
+            AbilityButtonArray.SelectAbilityOnClick(GameControls);
 
             //set position of ui elements
             //bottom panel
-            double entityInfoW = entityInfoPanel.Width;
-            double entityButtonArrayW = entityButtonArray.Width;
-            double abilityButtonArrayW = abilityButtonArray.Width;
-            double additionalInfoW = additionalInfo.Width;
+            double entityInfoW = EntityInfoPanel.Width;
+            double entityButtonArrayW = EntityButtonArray.Width;
+            double abilityButtonArrayW = AbilityButtonArray.Width;
+            double additionalInfoW = AdditionalInfo.Width;
             double offsetX=(openGLControl1.ActualWidth - (entityInfoW + entityButtonArrayW + abilityButtonArrayW + additionalInfoW))/ 2;
             
             double unitInfoX = offsetX;
-            Canvas.SetLeft(entityInfoPanel, unitInfoX);
-            Canvas.SetBottom(entityInfoPanel, 0);
+            Canvas.SetLeft(EntityInfoPanel, unitInfoX);
+            Canvas.SetBottom(EntityInfoPanel, 0);
 
             double unitPanelX = unitInfoX + entityInfoW;
-            Canvas.SetLeft(entityButtonArray, unitPanelX);
-            Canvas.SetBottom(entityButtonArray, 0);
+            Canvas.SetLeft(EntityButtonArray, unitPanelX);
+            Canvas.SetBottom(EntityButtonArray, 0);
 
             double abilityPanelX = unitPanelX + entityButtonArrayW;
-            Canvas.SetLeft(abilityButtonArray, abilityPanelX);
-            Canvas.SetBottom(abilityButtonArray, 0);
+            Canvas.SetLeft(AbilityButtonArray, abilityPanelX);
+            Canvas.SetBottom(AbilityButtonArray, 0);
 
             double additionalInfoX = abilityPanelX + abilityButtonArrayW;
-            Canvas.SetLeft(additionalInfo, additionalInfoX);
-            Canvas.SetBottom(additionalInfo, 0);
+            Canvas.SetLeft(AdditionalInfo, additionalInfoX);
+            Canvas.SetBottom(AdditionalInfo, 0);
 
             //menu button
             Canvas.SetRight(menuB, 0);
             Canvas.SetTop(menuB, 0);
         }
 
+        /// <summary>
+        /// Updates information for the bottom panel and air taken.
+        /// </summary>
         private void UpdateBottomPanel()
         {
             //only set new values if the values changed since the last update
-            SelectedGroup selected = gameControls.SelectedEntities;
+            SelectedGroup selected = GameControls.SelectedEntities;
             List<Entity> selectedEntities=null;
             bool changed;
             lock (selected)
             {
-                changed = gameControls.SelectedEntities.Changed;
+                changed = GameControls.SelectedEntities.Changed;
                 if(changed)
                     selectedEntities = selected.Entities.ToList();
             }
             if (changed)
             {
-                gameControls.SelectedEntities.Changed = false;
+                GameControls.SelectedEntities.Changed = false;
                 selectedEntities.Sort((u, v) => u.GetHashCode() - v.GetHashCode());
-                entityButtonArray.Selected = selectedEntities.FirstOrDefault();
-                entityButtonArray.InfoSources = selectedEntities;
+                EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
+                EntityButtonArray.InfoSources = selectedEntities;
             }
-            lock (gameControls.EntityCommandsInput)
+            lock (GameControls.EntityCommandsInput)
             {
                 //set selected ability
-                if (gameControls.EntityCommandsInput.IsAbilitySelected)
-                    abilityButtonArray.Selected = gameControls.EntityCommandsInput.SelectedAbility;
+                if (GameControls.EntityCommandsInput.IsAbilitySelected)
+                    AbilityButtonArray.Selected = GameControls.EntityCommandsInput.SelectedAbility;
                 else
-                    abilityButtonArray.Selected = null;
+                    AbilityButtonArray.Selected = null;
             }
 
-            if (entityButtonArray.Selected != null)
-                abilityButtonArray.InfoSources = entityButtonArray.Selected.Abilities;
+            if (EntityButtonArray.Selected != null)
+                AbilityButtonArray.InfoSources = EntityButtonArray.Selected.Abilities;
             else
-                abilityButtonArray.InfoSources = new List<Ability>();
-            entityInfoPanel.SelectedEntity = entityButtonArray.Selected;
+                AbilityButtonArray.InfoSources = new List<Ability>();
+            EntityInfoPanel.SelectedEntity = EntityButtonArray.Selected;
 
             //update units panel
-            entityButtonArray.Update();
-            abilityButtonArray.Update();
-            entityInfoPanel.Update();
+            EntityButtonArray.Update();
+            AbilityButtonArray.Update();
+            EntityInfoPanel.Update();
             
-            airTakenL.Content = game.CurrentPlayer.AirTaken+"/"+game.CurrentPlayer.MaxAirTaken;
+            airTakenL.Content = Game.CurrentPlayer.AirTaken+"/"+Game.CurrentPlayer.MaxAirTaken;
         }
 
         /// <summary>
@@ -255,69 +282,77 @@ namespace wpfTest
         /// </summary>
         public void SelectEntity()
         {
-            List<Entity> selectedEntities = entityButtonArray.InfoSources;
+            List<Entity> selectedEntities = EntityButtonArray.InfoSources;
             if (selectedEntities != null && selectedEntities.Any())
             {
                 Entity selected = selectedEntities[0];
-                entityInfoPanel.SelectedEntity = selected;
-                abilityButtonArray.InfoSources = selected.Abilities;
+                EntityInfoPanel.SelectedEntity = selected;
+                AbilityButtonArray.InfoSources = selected.Abilities;
             }
         }
 
+        /// <summary>
+        /// Ends the thread with Game when the window closes.
+        /// </summary>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            game.GameEnded = true;
+            lock(Game)
+                Game.GameEnded = true;
         }
         
-        public enum Direction
-        {
-            LEFT,
-            UP,
-            RIGHT,
-            DOWN
-        }
-
+        /// <summary>
+        /// Updates information about pressed keys.
+        /// </summary>
         public void Window_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
-                case Key.Down: gameControls.MapMovementInput.AddDirection(Direction.DOWN); break;
-                case Key.Up: gameControls.MapMovementInput.AddDirection(Direction.UP); break;
-                case Key.Left: gameControls.MapMovementInput.AddDirection(Direction.LEFT); break;
-                case Key.Right: gameControls.MapMovementInput.AddDirection(Direction.RIGHT); break;
+                case Key.Down: GameControls.MapMovementInput.AddDirection(Direction.DOWN); break;
+                case Key.Up: GameControls.MapMovementInput.AddDirection(Direction.UP); break;
+                case Key.Left: GameControls.MapMovementInput.AddDirection(Direction.LEFT); break;
+                case Key.Right: GameControls.MapMovementInput.AddDirection(Direction.RIGHT); break;
                 case Key.LeftShift:
-                    lock (gameControls.EntityCommandsInput)
-                        gameControls.EntityCommandsInput.ResetCommandsQueue = false; break;
+                    lock (GameControls.EntityCommandsInput)
+                        GameControls.EntityCommandsInput.ResetCommandsQueue = false; break;
             }
         }
 
+        /// <summary>
+        /// Updates information about pressed keys.
+        /// </summary>
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
-                case Key.Down: gameControls.MapMovementInput.RemoveDirection(Direction.DOWN); break;
-                case Key.Up:  gameControls.MapMovementInput.RemoveDirection(Direction.UP); break;
-                case Key.Left:  gameControls.MapMovementInput.RemoveDirection(Direction.LEFT); break;
-                case Key.Right:  gameControls.MapMovementInput.RemoveDirection(Direction.RIGHT); break;
+                case Key.Down: GameControls.MapMovementInput.RemoveDirection(Direction.DOWN); break;
+                case Key.Up:  GameControls.MapMovementInput.RemoveDirection(Direction.UP); break;
+                case Key.Left:  GameControls.MapMovementInput.RemoveDirection(Direction.LEFT); break;
+                case Key.Right:  GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT); break;
                 case Key.LeftShift:
-                    lock (gameControls.EntityCommandsInput)
-                        gameControls.EntityCommandsInput.ResetCommandsQueue = true; break;
+                    lock (GameControls.EntityCommandsInput)
+                        GameControls.EntityCommandsInput.ResetCommandsQueue = true; break;
             }
         }
 
+        /// <summary>
+        /// Changes the zoom of the map.
+        /// </summary>
         private void Window_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
             {
-                gameControls.MapView.ZoomIn(game.Map) ;
+                GameControls.MapView.ZoomIn(Game.Map) ;
             }
             else
             {
-                gameControls.MapView.ZoomOut(game.Map);
+                GameControls.MapView.ZoomOut(Game.Map);
             }
                 
         }
 
+        /// <summary>
+        /// Initializes OpenGLAtlasDrawer.
+        /// </summary>
         private void InitializeOpenGL()
         {
             OpenGL gl = openGLControl1.OpenGL;
@@ -326,34 +361,39 @@ namespace wpfTest
             OpenGLAtlasDrawer.CreateNutrientsMap(gl);
             OpenGLAtlasDrawer.CreateUnitCircles(gl);
             OpenGLAtlasDrawer.CreateEntities(gl);
-            OpenGLAtlasDrawer.CreateUnitIndicators(gl);
+            OpenGLAtlasDrawer.CreateEntitiesIndicators(gl);
             OpenGLAtlasDrawer.CreateFlowMap(gl);
             OpenGLAtlasDrawer.CreateSelectionFrame(gl);
         }
 
 
 
+        /// <summary>
+        /// Updates information about what should be drawn.
+        /// </summary>
         private void OpenGLControl_OpenGLDraw(object sender, SharpGL.SceneGraph.OpenGLEventArgs args)
         {
-            OpenGL gl = args.OpenGL;
-
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            lock (game)
+
+            OpenGL gl = args.OpenGL;
+            //Game has to be locked, because it can be used from the main loop
+            lock (Game)
             {
-                gameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
-                OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, gameControls.MapView, game);
-                if(game.GameplayOptions.NutrientsVisible)
-                    OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateUnitIndicatorsDataBuffers(gl, gameControls.MapView, game);
-                if (game.GameplayOptions.ShowFlowmap)
-                    OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, gameControls.MapView, game);
-                OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, gameControls.MapView, gameControls.MapSelectorFrame);
+                GameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
+                OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, GameControls.MapView, Game);
+                if(Game.GameplayOptions.NutrientsVisible)
+                    OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
+                OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
+                OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
+                OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
+                if (Game.GameplayOptions.ShowFlowmap)
+                    OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, GameControls.MapView, Game);
+                OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
                 UpdateBottomPanel();
             }
-            OpenGLAtlasDrawer.Draw(gl, game.GameplayOptions);
+            OpenGLAtlasDrawer.Draw(gl, Game.GameplayOptions);
+
             sw.Stop();
             //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
         }
@@ -361,12 +401,10 @@ namespace wpfTest
         private void openGLControl1_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point clickPos = e.GetPosition(openGLControl1);
-            Vector2 mapCoordinates = gameControls.MapView
+            Vector2 mapCoordinates = GameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X,(float)clickPos.Y));
-            gameControls.EntityCommandsInput.NewPoint(mapCoordinates);
-
-
-            Console.WriteLine(game.physics.PushingMaps[Movement.LAND][(int)mapCoordinates.X, (int)mapCoordinates.Y]);
+            GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
+            
             //hide gui so that player can select from the whole screen
             gui.Visibility = Visibility.Hidden;
             //set selected entity
@@ -376,9 +414,9 @@ namespace wpfTest
         private void openGLControl1_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Point clickPos = e.GetPosition(openGLControl1);
-            Vector2 mapCoordinates = gameControls.MapView
+            Vector2 mapCoordinates = GameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
-            gameControls.EntityCommandsInput.EndSelection(mapCoordinates);
+            GameControls.EntityCommandsInput.EndSelection(mapCoordinates);
 
             //turn gui back on
             gui.Visibility = Visibility.Visible;
@@ -388,13 +426,13 @@ namespace wpfTest
 
         private void openGLControl1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (gameControls.EntityCommandsInput.State== EntityCommandsInputState.SELECTING_UNITS)
+            if (GameControls.EntityCommandsInput.State== EntityCommandsInputState.SELECTING_UNITS)
             {
 
                 Point clickPos = e.GetPosition(openGLControl1);
-                Vector2 mapCoordinates = gameControls.MapView
+                Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
-                gameControls.EntityCommandsInput.NewPoint(mapCoordinates);
+                GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
 
                 //set selected unit
                 SelectEntity();
@@ -404,13 +442,17 @@ namespace wpfTest
         private void openGLControl1_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point clickPos = e.GetPosition(openGLControl1);
-            Vector2 mapCoordinates = gameControls.MapView
+            Vector2 mapCoordinates = GameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
-            gameControls.EntityCommandsInput.SetTarget(mapCoordinates);
-            if(game.GameplayOptions.ShowFlowmap)
-                game.FlowMap = Pathfinding.GetPathfinding.GenerateFlowMap(game.Map.GetObstacleMap(Movement.LAND),  mapCoordinates);
+            GameControls.EntityCommandsInput.SetTarget(mapCoordinates);
+
+            if(Game.GameplayOptions.ShowFlowmap)
+                Game.FlowMap = RayPathfinding.GetPathfinding.GenerateFlowMap(Game.Map.GetObstacleMap(Movement.LAND),  mapCoordinates);
         }
 
+        /// <summary>
+        /// Opens menu and disables interaction with the game.
+        /// </summary>
         private void menuB_Click(object sender, RoutedEventArgs e)
         {
             gui.IsEnabled = false;
@@ -418,6 +460,9 @@ namespace wpfTest
             menuLayer.Visibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Closes menu and enables interaction with the game.
+        /// </summary>
         private void menu_resume_Click(object sender, RoutedEventArgs e)
         {
             gui.IsEnabled = true;
@@ -425,41 +470,22 @@ namespace wpfTest
             menuLayer.Visibility = Visibility.Hidden;
         }
 
+        /// <summary>
+        /// Opens options menu.
+        /// </summary>
         private void menu_options_Click(object sender, RoutedEventArgs e)
         {
-            gameOptionsPanel.Visibility = Visibility.Visible;
+            GameOptionsPanel.Visibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Closes the game.
+        /// </summary>
         private void menu_exit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
         }
-    }
 
-
-    /// <summary>
-    /// A small helper class to load manifest resource files.
-    /// </summary>
-    public static class ManifestResourceLoader
-    {
-        /// <summary>
-        /// Loads the named manifest resource as a text string.
-        /// </summary>
-        /// <param name="textFileName">Name of the text file.</param>
-        /// <returns>The contents of the manifest resource.</returns>
-        public static string LoadTextFile(string textFileName)
-        {
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            var pathToDots = textFileName.Replace("\\", ".");
-            var location = string.Format("{0}.{1}", executingAssembly.GetName().Name, pathToDots);
-
-            using (var stream = executingAssembly.GetManifestResourceStream(location))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    return reader.ReadToEnd();
-                }
-            }
-        }
+        #endregion User interface
     }
 }

@@ -7,8 +7,15 @@ using wpfTest.GameLogic.Maps;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Generates PushingMap for Map.
+    /// </summary>
     static class PushingMapGenerator
     {
+        /// <summary>
+        /// For each possible 2x2 square arrangement of nodes where the bottom right is blocked contains
+        /// angle where the animal should be pushed if its on the bottom right node.
+        /// </summary>
         private static Dictionary<Pattern2x2, float> angleForPattern;
 
         static PushingMapGenerator()
@@ -19,7 +26,7 @@ namespace wpfTest
             float leftUp = (float)(Math.PI) * 3 / 4f;
             float up = (float)(Math.PI) / 2f;
             float rightDown = (float)(Math.PI) * 7 / 4f;
-
+            
             Pattern2x2[] patterns = new Pattern2x2[8];
             float[] angles = new float[8];
 
@@ -67,6 +74,10 @@ namespace wpfTest
                 angleForPattern.Add(patterns[i], angles[i]);
         }
 
+        /// <summary>
+        /// Generates pushing map for the given obstacle map. Only blocked squares that are adjacent (by 
+        /// edge or vertex) with a not blocked square contain a pushing square. The other squares are null.
+        /// </summary>
         public static PushingMap GeneratePushingMap(ObstacleMap obstMap)
         {
             PushingMap pushingMap = new PushingMap(obstMap.Width, obstMap.Height);
@@ -114,6 +125,9 @@ namespace wpfTest
         }
     }
 
+    /// <summary>
+    /// Represents 3x3 pattern of obstacles.
+    /// </summary>
     struct Pattern3x3
     {
         bool _11; bool _12; bool _13;
@@ -138,6 +152,9 @@ namespace wpfTest
             this._33 = _33;
         }
 
+        /// <summary>
+        /// Returns a pattern that is flipped horizontaly.
+        /// </summary>
         public Pattern3x3 FlipHoriz()
         {
             Pattern3x3 newP = new Pattern3x3();
@@ -156,6 +173,9 @@ namespace wpfTest
             return newP;
         }
 
+        /// <summary>
+        /// Returns a pattern that is rotated by 90 degrees right.
+        /// </summary>
         public Pattern3x3 RotateRight()
         {
             Pattern3x3 newP = new Pattern3x3();
@@ -174,9 +194,15 @@ namespace wpfTest
             return newP;
         }
 
+        /// <summary>
+        /// Returns left top subsquare of size 2x2.
+        /// </summary>
         public Pattern2x2 LeftUpSubpattern()
             => new Pattern2x2( _11, _12, _21, _22);
 
+        /// <summary>
+        /// Returns true if all squares are blocked.
+        /// </summary>
         public bool AllBlocked()
         {
             return _11 && _12 && _13 &&
@@ -184,6 +210,11 @@ namespace wpfTest
                 _31 && _32 && _33;
         }
     }
+
+
+    /// <summary>
+    /// Represents 2x2 pattern of obstacles.
+    /// </summary>
     struct Pattern2x2
     {
         bool _11; bool _12;
@@ -199,6 +230,9 @@ namespace wpfTest
             this._22 = _22;
         }
 
+        /// <summary>
+        /// Returns a pattern that is flipped horizontaly.
+        /// </summary>
         public Pattern2x2 FlipHoriz()
         {
             Pattern2x2 newP = new Pattern2x2();
@@ -210,6 +244,9 @@ namespace wpfTest
             return newP;
         }
 
+        /// <summary>
+        /// Returns a pattern that is rotated by 90 degrees right.
+        /// </summary>
         public Pattern2x2 RotateRight()
         {
             Pattern2x2 newP = new Pattern2x2();

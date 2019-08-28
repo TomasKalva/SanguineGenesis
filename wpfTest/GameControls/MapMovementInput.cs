@@ -7,8 +7,14 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Represents where the movement of MapView.
+    /// </summary>
     class MapMovementInput
     {
+        /// <summary>
+        /// List of directions, in which the MapView moves.
+        /// </summary>
         public List<Direction> MapDirection { get; private set; }
 
         public MapMovementInput()
@@ -16,11 +22,18 @@ namespace wpfTest
             MapDirection = new List<Direction>();
         }
 
+        /// <summary>
+        /// Adds movement direction dir. If the opposite direction is in list of movement directions,
+        /// remove it.
+        /// </summary>
+        /// <param name="dir"></param>
         public void AddDirection(Direction dir)
         {
+            //don't add direction twice
             if (MapDirection.Contains(dir))
                 return;
 
+            //remove opposite direction
             if (MapDirection.Contains(Opposite(dir)))
             {
                 MapDirection.Remove(Opposite(dir));
@@ -28,11 +41,17 @@ namespace wpfTest
             MapDirection.Add(dir);
         }
 
+        /// <summary>
+        /// Removes movement direction dir.
+        /// </summary>
         public void RemoveDirection(Direction dir)
         {
             MapDirection.Remove(dir);
         }
 
+        /// <summary>
+        /// Opposite direction to the dir.
+        /// </summary>
         private Direction Opposite(Direction dir)
         {
             switch (dir)
@@ -43,5 +62,13 @@ namespace wpfTest
                 default: return Direction.LEFT;
             }
         }
+    }
+
+    public enum Direction
+    {
+        LEFT,
+        UP,
+        RIGHT,
+        DOWN
     }
 }

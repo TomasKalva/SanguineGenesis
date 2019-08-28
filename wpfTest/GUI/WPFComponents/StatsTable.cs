@@ -9,9 +9,11 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest.GUI
 {
+    /// <summary>
+    /// Shows list of Stats.
+    /// </summary>
     public class StatsTable : Grid
     {
-        public List<Stat> Stats { get; set; }
         public int Rows { get; }
         public int Columns { get; }
 
@@ -49,6 +51,9 @@ namespace wpfTest.GUI
             Style = (Style)Application.Current.FindResource("StatsTableStyle");
         }
 
+        /// <summary>
+        /// Update the components with stats.
+        /// </summary>
         public void SetStats(List<Stat> stats)
         {
             for (int i = 0; i < Rows * Columns; i++)
@@ -66,11 +71,13 @@ namespace wpfTest.GUI
                     name.Content = "";
                     value.Content = "";
                 }
-
             }
         }
     }
 
+    /// <summary>
+    /// Pair of name and value.
+    /// </summary>
     public struct Stat
     {
         public string Name { get; }

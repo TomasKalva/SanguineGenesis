@@ -9,19 +9,24 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Takes player's input and performs corresponding action in the game.
+    /// </summary>
     class GameControls
     {
         public MapMovementInput MapMovementInput { get; }
-        public EntityCommandsInput EntityCommandsInput { get; }
         public MapView MapView { get; }
-        public MapSelectorFrame MapSelectorFrame { get; set; }
-        public SelectedGroup SelectedEntities { get; private set; }
-        
 
-        public GameControls(MapView mapView, MapMovementInput mapMovementInput, Game game)
+        public MapSelectorFrame MapSelectorFrame { get; set; }
+
+        public EntityCommandsInput EntityCommandsInput { get; }
+        public SelectedGroup SelectedEntities { get; }
+
+
+        public GameControls(MapView mapView, Game game)
         {
             MapView = mapView;
-            MapMovementInput = mapMovementInput;
+            MapMovementInput = new MapMovementInput();
             EntityCommandsInput = new EntityCommandsInput(game);
             MapSelectorFrame = null;
             SelectedEntities = new SelectedGroup();
@@ -39,9 +44,11 @@ namespace wpfTest
         }
 
         /// <summary>
+        /// Selects entities based on EntityCommandsInput and MapSelector frame. Sets commands
+        /// to SelectedEntities.
         /// Has to be called from the main loop of the game, with game being locked.
         /// </summary>
-        public void UpdateUnitsByInput(Game game)
+        public void UpdateEntitiesByInput(Game game)
         {
 
             switch (EntityCommandsInput.State)
@@ -66,8 +73,7 @@ namespace wpfTest
                         {
                             MapSelectorFrame.SetEndPoint(mapPoint);
                             List<Entity> selected = MapSelectorFrame.GetSelectedUnits(game).ToList();
-                            lock(SelectedEntities)
-                                SelectedEntities.SetEntities(selected);
+                            SelectedEntities.SetEntities(selected);
                             MapSelectorFrame.Update();
                         }
                         break;
@@ -97,10 +103,10 @@ namespace wpfTest
                         if (selectedNoTargetAbility)
                         {
                             //use the ability with no target
-                            IEnumerable<Entity> unitsWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(noTargetAbility));
-                            if (unitsWithAbil != null)
+                            IEnumerable<Entity> entitiesWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(noTargetAbility));
+                            if (entitiesWithAbil != null)
                             {
-                                noTargetAbility.SetCommands(unitsWithAbil, Nothing.Get, resetCommandsQueue);
+                                noTargetAbility.SetCommands(entitiesWithAbil, Nothing.Get, resetCommandsQueue);
                             }
                         }
                         break;
@@ -139,10 +145,10 @@ namespace wpfTest
                             if (target != null)
                             {
                                 //use the ability if a valid target was selected
-                                IEnumerable<Entity> unitsWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(ability));
-                                if (unitsWithAbil != null)
+                                IEnumerable<Entity> entitiesWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(ability));
+                                if (entitiesWithAbil != null)
                                 {
-                                    ability.SetCommands(unitsWithAbil, target, resetCommandsQueue);
+                                    ability.SetCommands(entitiesWithAbil, target, resetCommandsQueue);
                                 }
                             }
                         }
@@ -152,6 +158,10 @@ namespace wpfTest
             SelectedEntities.RemoveDead();
         }
 
+        /// <summary>
+        /// Use default ability by entities on with the targetCoords.
+        /// </summary>
+        /// <param name="resetQueue">True if the entities command queue should be reset.</param>
         private void UseDefaultAbility(Game game, Vector2 targetCoords, bool resetQueue)
         {
             //determine target
@@ -171,6 +181,9 @@ namespace wpfTest
             }
         }
 
+        /// <summary>
+        /// Select valid target for the ability.
+        /// </summary>
         private ITargetable FindAbilityTarget(Game game, Ability ability, Vector2 targetCoords)
         {
             //if no target is found, the target doesn't exist

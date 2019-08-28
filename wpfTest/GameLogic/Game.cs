@@ -209,7 +209,7 @@ namespace wpfTest
                 //generated visibility map for the other player
                 nextVisibilityPlayer = other;
 
-                visibilityGenerator.SetNewTask(Map.GetViewMap(nextVisibilityPlayer),
+                visibilityGenerator.SetNewTask(Map.GetViewObstaclesMap(nextVisibilityPlayer),
                     Players[nextVisibilityPlayer].Entities.Select((entity) => entity.View).ToList());
             }
         }

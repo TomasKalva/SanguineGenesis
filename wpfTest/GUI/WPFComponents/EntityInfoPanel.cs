@@ -9,14 +9,31 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest.GUI
 {
-
+    /// <summary>
+    /// Shows info about entity.
+    /// </summary>
     class EntityInfoPanel : Canvas
     {
+        /// <summary>
+        /// Button array showing statuses.
+        /// </summary>
         public StatusButtonArray StatusButtonArray { get; }
+        /// <summary>
+        /// Button array showing commands.
+        /// </summary>
         public CommandButtonArray CommandButtonArray { get; }
+        /// <summary>
+        /// Stats table with the entity's stats.
+        /// </summary>
         public StatsTable EntityStatsTable { get; }
+        /// <summary>
+        /// Progress bar showing progress of the entity's first command.
+        /// </summary>
         public ProgressBar FirstCommandProgress { get; }
 
+        /// <summary>
+        /// Entity whose info is shown.
+        /// </summary>
         public Entity SelectedEntity { get; set; }
 
         public EntityInfoPanel(int width, int height)
@@ -56,6 +73,9 @@ namespace wpfTest.GUI
             FirstCommandProgress.Value = 70;
         }
 
+        /// <summary>
+        /// Update the components with the SelectedEntity info.
+        /// </summary>
         public void Update()
         {
             if (SelectedEntity == null || SelectedEntity.IsDead)

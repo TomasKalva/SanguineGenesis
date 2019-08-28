@@ -12,24 +12,62 @@ namespace wpfTest
 {
     /// <summary>
     /// The class describes player's view of the map.
-    /// Enumerator returns the nodes inside current players view from left top to right bottom.
     /// </summary>
     public class MapView:IRectangle
     {
+        /// <summary>
+        /// Width of the component this view is drawn to.
+        /// </summary>
         private float actualWidth;
+        /// <summary>
+        /// Height of the component this view is drawn to.
+        /// </summary>
         private float actualHeight;
+        /// <summary>
+        /// Speed of scrolling through the map. Relative to size of one node.
+        /// </summary>
         private float scrollSpeed;
+        /// <summary>
+        /// Size difference of a node before and after zoom.
+        /// </summary>
         private float zoomSpeed;
-        private float minNodeSize;
-        private float maxNodeSize;
 
+        /// <summary>
+        /// Minimal node size.
+        /// </summary>
+        private float minNodeSize;
+        /// <summary>
+        /// Maximal node size.
+        /// </summary>
+        private float maxNodeSize;
+        /// <summary>
+        /// Size of a node on screen.
+        /// </summary>
         public float NodeSize { get; set; }
-        //These values are relative to size of one node.
+        
+        /// <summary>
+        /// In map coordinates.
+        /// </summary>
         public float Bottom { get; private set; }
+        /// <summary>
+        /// In map coordinates.
+        /// </summary>
         public float Left { get; private set; }
+        /// <summary>
+        /// In map coordinates.
+        /// </summary>
         public float Width => actualWidth / NodeSize;
+        /// <summary>
+        /// In map coordinates.
+        /// </summary>
         public float Height => actualHeight / NodeSize;
+        /// <summary>
+        /// In map coordinates.
+        /// </summary>
         public float Right => Left + Width;
+        /// <summary>
+        /// In map coordinates.
+        /// </summary>
         public float Top => Bottom + Height;
 
 
@@ -45,6 +83,10 @@ namespace wpfTest
             this.maxNodeSize = maxNodeSize;
         }
 
+        /// <summary>
+        /// Returns sub-rectangle of the map visible by this MapView.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">If actual extens haven't been set.</exception>
         public Node[,] GetVisibleNodes(Map map)
         {
             if (actualHeight == 0 || actualWidth == 0)
@@ -54,6 +96,10 @@ namespace wpfTest
             return GameQuerying.GetGameQuerying().SelectPartOfMap(map, ((IRectangle)this).GetRect());
         }
 
+        /// <summary>
+        /// Returns sub-rectangle of game's FlowMap visible by this MapView.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">If actual extens haven't been set.</exception>
         public float[,] GetVisibleFlowMap(Game game)
         {
             if (actualHeight == 0 || actualWidth == 0)
@@ -64,19 +110,25 @@ namespace wpfTest
         }
 
         /// <summary>
+        /// Returns sub-rectangle of the VisibilityMap visible by this MapView.
         /// Returns null if the map doesn't exist.
         /// </summary>
-        public bool[,] GetVisibleVisibilityMap(VisibilityMap map)
+        /// <exception cref="InvalidOperationException">If actual extens haven't been set.</exception>
+        public bool[,] GetVisibleVisibilityMap(VisibilityMap visibilityMap)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
-            if (map == null)
+            if (visibilityMap == null)
                 return null;
 
-            return GameQuerying.GetGameQuerying().SelectPartOfMap(map, ((IRectangle)this).GetRect());
+            return GameQuerying.GetGameQuerying().SelectPartOfMap(visibilityMap, ((IRectangle)this).GetRect());
         }
-        
+
+        /// <summary>
+        /// Returns all entities visible by this MapView and also visible by observer.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">If actual extens haven't been set.</exception>
         public List<Entity> GetVisibleEntities(Game game, Player observer)
         {
             if (actualHeight == 0 || actualWidth == 0)
@@ -84,23 +136,13 @@ namespace wpfTest
                     "The actual extents have to be specified before calling this method");
 
             return GameQuerying.GetGameQuerying()
-                .SelectRectUnits(game, ((IRectangle)this).GetRect(),
-                (unit) => unit.IsVisible(observer.VisibilityMap))//select units
-                .Cast<Entity>()
-                .Concat(observer.VisibleBuildings)//select buildings
-                .Cast<Entity>()
+                .SelectVisibleEntities(game, observer, game.GetAll<Entity>())
                 .ToList();
         }
 
-        public List<Unit> GetVisibleUnits(Game game)
-        {
-            if (actualHeight == 0 || actualWidth == 0)
-                throw new InvalidOperationException(
-                    "The actual extents have to be specified before calling this method");
-
-            return game.GameQuerying.SelectRectUnits(game, ((IRectangle)this).GetRect(), (unit) => true);
-        }
-
+        /// <summary>
+        /// Sets extents of the component this MapView is drawn to.
+        /// </summary>
         public void SetActualExtents(float width, float height)
         {
             this.actualWidth = width;
@@ -154,11 +196,16 @@ namespace wpfTest
             return false;
         }
 
+        /// <summary>
+        /// Changes NodeSize and keeps center of the view on the same point of the
+        /// map if possible.
+        /// </summary>
         private void ChangeNodeSizeAndCenterView(float newNodeSize)
         {
             float oldWidth = Width;
             float oldHeight = Height;
             NodeSize = newNodeSize;
+
             //center the view
             Left = Left + (oldWidth - Width) / 2;
             Bottom = Bottom + (oldHeight - Height) / 2;
@@ -184,6 +231,7 @@ namespace wpfTest
         /// correspond to the point on the screen.
         /// </summary>
         /// <param name="screenPoint">Point on the screen.</param>
+        /// <exception cref="InvalidOperationException">If actual extens haven't been set.</exception>
         public Vector2 ScreenToMap(Vector2 screenPoint)
         {
             if (actualHeight == 0 || actualWidth == 0)

@@ -12,6 +12,9 @@ namespace wpfTest
 {
     public class Map:IMap<Node>
     {
+        /// <summary>
+        /// Data of the map.
+        /// </summary>
         private Node[,] nodes { get; set; }
         public Node this[int i, int j]
         {
@@ -22,7 +25,10 @@ namespace wpfTest
         public int Height => nodes.GetLength(1) - 2;
         //color is in rgb format
         private Dictionary<int, Node> colorToNode;
-        public bool MapWasChanged { get; set; }//set to true after building was added/removed etc
+        /// <summary>
+        /// Set to true after building was added or removed.
+        /// </summary>
+        public bool MapWasChanged { get; set; }
         /// <summary>
         /// Obstacle maps for the current map. Is updated by the UpdateObstacleMaps.
         /// </summary>
@@ -90,6 +96,9 @@ namespace wpfTest
                 Terrain.LAND.Nutrients(Biome.SAVANNA,SoilQuality.MEDIUM), Biome.SAVANNA, Terrain.LAND));
         }
 
+        /// <summary>
+        /// Initializes obstacle maps with values based on the map terrain.
+        /// </summary>
         private void InitializeObstacleMaps()
         {
             ObstacleMaps.Add(Movement.LAND, GetObstacleMap(Movement.LAND));
@@ -108,6 +117,9 @@ namespace wpfTest
             MapWasChanged = false;
         }
 
+        /// <summary>
+        /// Creates a new obstacle map from this Map for movement.
+        /// </summary>
         public ObstacleMap GetObstacleMap(Movement movement)
         {
             ObstacleMap om = new ObstacleMap(Width,Height);
@@ -134,7 +146,10 @@ namespace wpfTest
             return om;
         }
 
-        public ObstacleMap GetViewMap(Players player)
+        /// <summary>
+        /// Returns obstacles map where the obstacles block vision.
+        /// </summary>
+        public ObstacleMap GetViewObstaclesMap(Players player)
         {
             ObstacleMap om = new ObstacleMap(Width, Height);
             for (int i = 0; i < Width; i++)
@@ -144,6 +159,9 @@ namespace wpfTest
             return om;
         }
 
+        /// <summary>
+        /// Adds building to the map. Set MapWasChanged to true.
+        /// </summary>
         public void AddBuilding(Building building)
         {
             Node[,] nodes = GameQuerying.GetGameQuerying()
@@ -159,6 +177,9 @@ namespace wpfTest
             MapWasChanged = true;
         }
 
+        /// <summary>
+        /// Removes building from the map. Set MapWasChanged to true.
+        /// </summary>
         public void RemoveBuilding(Building building)
         {
             foreach (Node n in building.Nodes)
@@ -168,9 +189,18 @@ namespace wpfTest
             MapWasChanged = true;
         }
 
+        /// <summary>
+        /// Time between two updates of nutrients.
+        /// </summary>
         private const float NUTRIENT_UPDATE_TIME = 1f;
+        /// <summary>
+        /// Time until the next nutrients update.
+        /// </summary>
         private float nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
 
+        /// <summary>
+        /// Trees draing nutrients from nodes and nodes with roots generate nutrients.
+        /// </summary>
         public void UpdateNutrientsMap(List<Tree> trees, float deltaT)
         {
             nutrientUpdateTimer -= deltaT;

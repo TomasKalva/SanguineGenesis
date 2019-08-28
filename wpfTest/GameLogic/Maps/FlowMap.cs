@@ -9,6 +9,9 @@ namespace wpfTest
 {
     public class FlowMap:IMap<float>
     {
+        /// <summary>
+        /// Minimal valid value for an angle in flowmap.
+        /// </summary>
         public const float MIN_VALID_VALUE= -0.01f;
 
         //values are oriented angles in radians relative to the positive x axis
@@ -19,7 +22,13 @@ namespace wpfTest
             get => directions[i, j];
             set => directions[i, j] = value;
         }
+        /// <summary>
+        /// Width of the map in squares.
+        /// </summary>
         public int Width => directions.GetLength(0);
+        /// <summary>
+        /// Height of the map in squares.
+        /// </summary>
         public int Height => directions.GetLength(1);
 
         internal FlowMap(int width, int height)
@@ -52,16 +61,15 @@ namespace wpfTest
                 );
         }
 
-        public void Update()
-        {
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                    this[i, j] += .01f;
-        }
-
+        /// <summary>
+        /// True iff val is valid value in flowmap.
+        /// </summary>
         public static bool IsValidValue(float val) => val >= MIN_VALID_VALUE;
     }
 
+    /// <summary>
+    /// Represents a 2d vector.
+    /// </summary>
     public struct Vector2 : ITargetable, IMovementTarget
     {
         Vector2 ITargetable.Center => this;
@@ -103,10 +111,6 @@ namespace wpfTest
         {
             Vector2 dir = vec - this;
             return dir.UnitVector();
-            /*if (dir.Length != 0)
-                return dir / dir.Length;
-            else
-                return new Vector2(0, 0);*/
         }
 
         public Vector2 UnitVector()

@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Maps
 {
+    /// <summary>
+    /// Represents part of a map visible by a player.
+    /// </summary>
     public class VisibilityMap : IMap<bool>
     {
         private static VisibilityMap everythingVisible;
+        /// <summary>
+        /// Visibility map where the whole map is visible.
+        /// </summary>
         public static VisibilityMap GetEverythingVisible(int width, int height)
         {
             if(everythingVisible==null)
@@ -21,28 +27,43 @@ namespace wpfTest.GameLogic.Maps
             return everythingVisible;
         }
 
+        /// <summary>
+        /// Data of the map.
+        /// </summary>
         private bool[,] visible;
 
         public bool this[int i, int j] => visible[i, j];
 
+        /// <summary>
+        /// Width of the map in squares.
+        /// </summary>
         public int Width => visible.GetLength(0);
+        /// <summary>
+        /// Height of the map in squares.
+        /// </summary>
         public int Height => visible.GetLength(1);
 
+        /// <summary>
+        /// Creates new visibility map with the given widht and height. Nothing is visible.
+        /// </summary>
         public VisibilityMap(int width, int height)
         {
             visible = new bool[width, height];
         }
 
-        public void FindVisibility(List<View> units, ObstacleMap obstMap)
+        /// <summary>
+        /// Sets true to all squares visible by the entities.
+        /// </summary>
+        public void FindVisibility(List<View> entities, ObstacleMap obstMap)
         {
-            foreach(View v in units)
+            foreach(View v in entities)
             {
                 AddVisibility(v, obstMap);
             }
         }
 
         /// <summary>
-        /// Set true to all squares visible by the unit.
+        /// Set true to all squares visible by the entity.
         /// </summary>
         public void AddVisibility(View v, ObstacleMap obstMap)
         {
@@ -99,28 +120,5 @@ namespace wpfTest.GameLogic.Maps
             if(vX >= 0 && vX < Width && vY >= 0 && vY < Height)
                 visible[vX, vY] = true;
         }
-
-        /*
-        /// <summary>
-        /// Returns true if at least one of the building's nodes is visible.
-        /// </summary>
-        public bool IsVisible(Building b)
-        {
-            foreach(Node n in b.Nodes)
-            {
-                if (visible[n.X, n.Y])
-                    return true;
-            }
-            return false;
-        }
-        
-        /// <summary>
-        /// Returns true if at least part of the unit is visible.
-        /// </summary>
-        public bool IsVisible(Unit u)
-        {
-            //todo: check for intersection with the circle instead of the center
-            return visible[(int)u.Center.X, (int)u.Center.Y];
-        }*/
     }
 }

@@ -9,9 +9,15 @@ using wpfTest.GameLogic;
 
 namespace wpfTest.GUI
 {
+    /// <summary>
+    /// Panel for enabling and disabling game options.
+    /// </summary>
     class GameOptionsPanel:Grid
     {
-        private CheckBox[] checkboxes;
+        /// <summary>
+        /// Checkboxes for each gameplay option.
+        /// </summary>
+        private CheckBox[] optionCheckboxes;
 
         public GameOptionsPanel(double width, double height, GameplayOptions gameplayOptions)
         {
@@ -31,7 +37,7 @@ namespace wpfTest.GUI
             }
             
             //initialize checkboxes
-            checkboxes = new CheckBox[rows];
+            optionCheckboxes = new CheckBox[rows];
             for(int i=0; i < rows - 1; i++)
             {
                 CheckBox cb = new CheckBox();
@@ -41,7 +47,7 @@ namespace wpfTest.GUI
                 cb.SetValue(ColumnSpanProperty, columns);
                 cb.Focusable = false;
                 Children.Add(cb);
-                checkboxes[i] = cb;
+                optionCheckboxes[i] = cb;
             }
 
             //create button for exiting this panel
@@ -53,41 +59,41 @@ namespace wpfTest.GUI
             okButton.Click += (sender, ev) => Visibility = Visibility.Hidden;
             Children.Add(okButton);
 
-            checkboxes[0].Content = "Whole map visible";
+            optionCheckboxes[0].Content = "Whole map visible";
             RoutedEventHandler evHand = (s, e) =>
             {
                 lock (gameplayOptions)
                 {
-                    if (checkboxes[0].IsChecked != null)
-                        gameplayOptions.WholeMapVisible = (bool)checkboxes[0].IsChecked;
+                    if (optionCheckboxes[0].IsChecked != null)
+                        gameplayOptions.WholeMapVisible = (bool)optionCheckboxes[0].IsChecked;
                 }
             };
-            checkboxes[0].Unchecked += evHand;
-            checkboxes[0].Checked += evHand;
+            optionCheckboxes[0].Unchecked += evHand;
+            optionCheckboxes[0].Checked += evHand;
 
-            checkboxes[1].Content = "Nutrients visible";
+            optionCheckboxes[1].Content = "Nutrients visible";
             evHand = (s, e) =>
             {
                 lock (gameplayOptions)
                 {
-                    if (checkboxes[1].IsChecked != null)
-                        gameplayOptions.NutrientsVisible = (bool)checkboxes[1].IsChecked;
+                    if (optionCheckboxes[1].IsChecked != null)
+                        gameplayOptions.NutrientsVisible = (bool)optionCheckboxes[1].IsChecked;
                 }
             };
-            checkboxes[1].Unchecked += evHand;
-            checkboxes[1].Checked += evHand;
+            optionCheckboxes[1].Unchecked += evHand;
+            optionCheckboxes[1].Checked += evHand;
 
-            checkboxes[2].Content = "Show flowmap";
+            optionCheckboxes[2].Content = "Show flowmap";
             evHand = (s, e) =>
             {
                 lock (gameplayOptions)
                 {
-                    if (checkboxes[2].IsChecked != null)
-                        gameplayOptions.ShowFlowmap = (bool)checkboxes[2].IsChecked;
+                    if (optionCheckboxes[2].IsChecked != null)
+                        gameplayOptions.ShowFlowmap = (bool)optionCheckboxes[2].IsChecked;
                 }
             };
-            checkboxes[2].Unchecked += evHand;
-            checkboxes[2].Checked += evHand;
+            optionCheckboxes[2].Unchecked += evHand;
+            optionCheckboxes[2].Checked += evHand;
 
             Visibility = Visibility.Hidden;
             Style = (Style)Application.Current.FindResource("GameOptionsStyle");

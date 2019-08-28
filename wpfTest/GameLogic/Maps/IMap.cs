@@ -6,10 +6,19 @@ using System.Threading.Tasks;
 
 namespace wpfTest
 {
-    public interface IMap<T>
+    /// <summary>
+    /// Represents rectangle area of squares. Type of the square is Square.
+    /// </summary>
+    public interface IMap<Square>
     {
-        T this[int i, int j] { get;}
+        Square this[int i, int j] { get;}
+        /// <summary>
+        /// Width of the map in squares.
+        /// </summary>
         int Width { get; }
+        /// <summary>
+        /// Height of the map in squares.
+        /// </summary>
         int Height { get; }
     }
 }

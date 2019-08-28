@@ -8,6 +8,9 @@ using wpfTest.GameLogic;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// 
+    /// </summary>
     class EntityCommandsInput
     {
         //immutable
@@ -27,9 +30,6 @@ namespace wpfTest
         /// </summary>
         public bool ResetCommandsQueue { get; set; }
 
-        //private static UnitCommandsInput unitCommandsInput=new UnitCommandsInput();
-        //public static UnitCommandsInput GetUnitCommandsInput() => unitCommandsInput;
-
         internal EntityCommandsInput(Game game)
         {
             State = EntityCommandsInputState.IDLE;
@@ -41,15 +41,11 @@ namespace wpfTest
             //initialize keyToAbilityType
             keyToAbility = new Dictionary<Key, Ability>();
             keyToAbility.Add(Key.Escape, game.CurrentPlayer.GameStaticData.Abilities.MoveTo);
-
-            //initialize abilityTypeToAbility
-            /*AbilityTypeToAbility = new Dictionary<Ability, Ability>();
-            AbilityTypeToAbility.Add(SelectedAbility.MOVE_TO,
-                new TargetPointAbility(SelectedAbility.MOVE_TO, 0.1f));
-            AbilityTypeToAbility.Add(SelectedAbility.ATTACK,
-                 new TargetUnitAbility(SelectedAbility.ATTACK, 1.2f, true));*/
         }
 
+        /// <summary>
+        /// Set new corner for selection frame.
+        /// </summary>
         public void NewPoint(Vector2 mousePos)
         {
             lock (this)
@@ -59,6 +55,9 @@ namespace wpfTest
             }
         }
 
+        /// <summary>
+        /// Set new corner for selection frame and end selecting.
+        /// </summary>
         public void EndSelection(Vector2 mousePos)
         {
             lock (this)
@@ -68,6 +67,9 @@ namespace wpfTest
             }
         }
 
+        /// <summary>
+        /// Sets target point for selecting target for the selected ability.
+        /// </summary>
         public void SetTarget(Vector2 mousePos)
         {
             lock (this)
@@ -81,6 +83,9 @@ namespace wpfTest
         }
     }
 
+    /// <summary>
+    /// States of EntityCommandsInput.
+    /// </summary>
     public enum EntityCommandsInputState
     {
         IDLE,

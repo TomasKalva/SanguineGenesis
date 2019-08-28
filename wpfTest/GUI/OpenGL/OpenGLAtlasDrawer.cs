@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -19,6 +20,9 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Used for drawing objects in game to the OpenGL control.
+    /// </summary>
     static class OpenGLAtlasDrawer
     {
         //the projection, view and model matrices.
@@ -35,6 +39,7 @@ namespace wpfTest
         //the shader program for the vertex and fragment shader
         static private ShaderProgram shaderProgram;
 
+        #region Initialization
         /// <summary>
         /// Initializes the instance of OpenGL.
         /// </summary>
@@ -45,8 +50,14 @@ namespace wpfTest
         {
             //create the shader program
             shaderProgram = new ShaderProgram();
-            var vertexShaderSource = ManifestResourceLoader.LoadTextFile("GUI\\Shaders\\AtlasTexShader.vert");
-            var fragmentShaderSource = ManifestResourceLoader.LoadTextFile("GUI\\Shaders\\AtlasTexShader.frag");
+            string vertexShaderSource;
+            string fragmentShaderSource;
+            using (var vertReader = new StreamReader("GUI\\OpenGL\\AtlasTexShader.vert"))
+            using (var fragReader = new StreamReader("GUI\\OpenGL\\AtlasTexShader.frag"))
+            {
+                vertexShaderSource = vertReader.ReadToEnd();
+                fragmentShaderSource = fragReader.ReadToEnd();
+            }
             shaderProgram.Create(gl, vertexShaderSource, fragmentShaderSource, null);
             
 
@@ -77,48 +88,6 @@ namespace wpfTest
             shaderProgram.SetUniformMatrix4(gl, "viewMatrix", viewMatrix.to_array());
             shaderProgram.SetUniformMatrix4(gl, "modelMatrix", modelMatrix.to_array());
         }
-        
-        /// <summary>
-        /// Draws the scene.
-        /// </summary>
-        /// <param name="gl">The OpenGL instance.</param>
-        public static void Draw(OpenGL gl, GameplayOptions gameplayOptions)
-        {
-            //clear the scene
-            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
-            
-            //draw vertex array buffers
-            map.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-
-
-            if (gameplayOptions.NutrientsVisible)
-            {
-                nutrientsMap.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 30000);
-            }
-
-            if (gameplayOptions.ShowFlowmap)
-            {
-                flowMap.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-            }
-
-            if (!entitiesEmpty)
-            {
-                unitCircles.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-
-                entities.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-
-                unitIndicators.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-            }
-            
-            selectionFrame.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-        }
 
         /// <summary>
         /// Loads the tile map texture, binds it and sets texture drawing parameters.
@@ -137,9 +106,6 @@ namespace wpfTest
             //set linear filtering
             gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR);
             gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_LINEAR);
-
-
-
         }
 
         /// <summary>
@@ -186,7 +152,59 @@ namespace wpfTest
 
         }
 
+        #endregion Initialization
 
+        /// <summary>
+        /// Draws the scene.
+        /// </summary>
+        /// <param name="gl">The OpenGL instance.</param>
+        public static void Draw(OpenGL gl, GameplayOptions gameplayOptions)
+        {
+            //clear the scene
+            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
+            
+            //draw vertex array buffers
+
+            //draw map
+            map.VertexBufferArray.Bind(gl);
+            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+
+            //draw nutrients map
+            if (gameplayOptions.NutrientsVisible)
+            {
+                nutrientsMap.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 30000);
+            }
+
+            //draw flowmap
+            if (gameplayOptions.ShowFlowmap)
+            {
+                flowMap.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+            }
+
+            //draw entities
+            if (!entitiesEmpty)
+            {
+                entityCircles.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+
+                entities.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+
+                entityIndicators.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+            }
+            
+            //draw selection frame
+            selectionFrame.VertexBufferArray.Bind(gl);
+            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+        }
+
+
+        /// <summary>
+        /// Represents data that can be drawn by the shader program.
+        /// </summary>
         private class MyBufferArray
         {
             public VertexBufferArray VertexBufferArray { get; set; }
@@ -202,24 +220,24 @@ namespace wpfTest
 
             public MyBufferArray(OpenGL gl)
             {
-                //initialize map.VertexBufferArray and link it to its VertexBuffers
+                //initialize VertexBufferArray and link it to its VertexBuffers
                 VertexBufferArray = new VertexBufferArray();
                 VertexBufferArray.Create(gl);
                 VertexBufferArray.Bind(gl);
 
-                //initialize empty map.VertexDataBuffer
+                //initialize empty VertexDataBuffer
                 VertexDataBuffer = new VertexBuffer();
                 VertexDataBuffer.Create(gl);
 
-                //initialize empty map.ColorDataBuffer
+                //initialize empty ColorDataBuffer
                 ColorDataBuffer = new VertexBuffer();
                 ColorDataBuffer.Create(gl);
 
-                //initialize empty map.TextureDataBuffer
+                //initialize empty TextureDataBuffer
                 TextureDataBuffer = new VertexBuffer();
                 TextureDataBuffer.Create(gl);
 
-                //initialize empty map.TexBLDataBuffer
+                //initialize empty TexBLDataBuffer
                 TexAtlasDataBuffer = new VertexBuffer();
                 TexAtlasDataBuffer.Create(gl);
 
@@ -271,8 +289,6 @@ namespace wpfTest
             /// <summary>
             /// If the array is shorter than the size, create a new array with the size, otherwise clear the array.
             /// </summary>
-            /// <param name="array"></param>
-            /// <param name="size"></param>
             private void InitArray(ref float[] array, int size)
             {
                 if (array.Length < size)
@@ -287,14 +303,15 @@ namespace wpfTest
         private static MyBufferArray map;
         private static MyBufferArray flowMap;
         private static MyBufferArray nutrientsMap;
-        private static MyBufferArray unitCircles;
+        private static MyBufferArray entityCircles;
         private static MyBufferArray entities;
-        private static MyBufferArray unitIndicators;
+        private static MyBufferArray entityIndicators;
         private static MyBufferArray selectionFrame;
 
         //true if there are no units to draw
         private static bool entitiesEmpty;
 
+        #region Map
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
@@ -364,7 +381,7 @@ namespace wpfTest
                     float left = (current.X - viewLeft) * sqW;
                     float right = (current.X - viewLeft + 1) * sqW;
 
-                    SetSquareVertices(vertices, bottom, top, left, right, -10, coord);
+                    SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
                     if(isVisible)
                         SetColor(colors, 1f, 1f, 1f, coord,6);
                     else
@@ -377,6 +394,9 @@ namespace wpfTest
             map.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
+        #endregion Map
+
+        #region Nutrients map
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
@@ -415,11 +435,11 @@ namespace wpfTest
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
-            float[] vertices = map.vertices;
-            float[] colors = map.colors;
-            float[] texture = map.texture;
-            float[] texAtlas = map.texAtlas;
+            nutrientsMap.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = nutrientsMap.vertices;
+            float[] colors = nutrientsMap.colors;
+            float[] texture = nutrientsMap.texture;
+            float[] texAtlas = nutrientsMap.texAtlas;
 
             for (int i = 0; i < width; i++)
             {
@@ -449,7 +469,7 @@ namespace wpfTest
                     float left = (current.X - viewLeft + 0.2f) * sqW;
                     float right = (current.X - viewLeft + 0.45f) * sqW;
 
-                    SetSquareVertices(vertices, bottom, top, left, right, -10, coord);
+                    SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
                     SetColor(colors, 1f, 1f, 1f, coord, 6);
                     SetSquareTextureCoordinates(texture, texCoord);
                     SetAtlasCoordinates(texAtlas, leftDigAtlasCoords, bottomLeftInd, 6);
@@ -462,7 +482,7 @@ namespace wpfTest
                     left = (current.X - viewLeft + 0.4f) * sqW;
                     right = (current.X - viewLeft + 0.6f) * sqW;
 
-                    SetSquareVertices(vertices, bottom, top, left, right, -10, coord);
+                    SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
                     SetColor(colors, 1f, 1f, 1f, coord, 6);
                     SetSquareTextureCoordinates(texture, texCoord);
                     SetAtlasCoordinates(texAtlas, decPointAtlasCoords, bottomLeftInd, 6);
@@ -475,7 +495,7 @@ namespace wpfTest
                     left = (current.X - viewLeft + 0.55f) * sqW;
                     right = (current.X - viewLeft + 0.8f) * sqW;
 
-                    SetSquareVertices(vertices, bottom, top, left, right, -10, coord);
+                    SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
                     SetColor(colors, 1f, 1f, 1f, coord, 6);
                     SetSquareTextureCoordinates(texture, texCoord);
                     SetAtlasCoordinates(texAtlas, rightDigAtlasCoords, bottomLeftInd, 6);
@@ -485,170 +505,16 @@ namespace wpfTest
             nutrientsMap.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
-        private static void SetSquareVertices(float[] vertices, float bottom, float top,
-                                                float left, float right, float dist, int coord)
-        {
-            int offset = 0;
-
-            //bottom left
-            vertices[coord + offset + 0] = left;
-            vertices[coord + offset + 1] = bottom;
-            vertices[coord + offset + 2] = dist;
-
-            offset += 3;
-
-            //top left
-            vertices[coord + offset + 0] = left;
-            vertices[coord + offset + 1] = top;
-            vertices[coord + offset + 2] = dist;
-
-            offset += 3;
-
-            //top right
-            vertices[coord + offset + 0] = right;
-            vertices[coord + offset + 1] = top;
-            vertices[coord + offset + 2] = dist;
-
-            offset += 3;
-
-            //bottom right
-            vertices[coord + offset + 0] = right;
-            vertices[coord + offset + 1] = bottom;
-            vertices[coord + offset + 2] = dist;
-
-            offset += 3;
-
-            //bottom left
-            vertices[coord + offset + 0] = left;
-            vertices[coord + offset + 1] = bottom;
-            vertices[coord + offset + 2] = dist;
-
-            offset += 3;
-
-            //top right
-            vertices[coord + offset + 0] = right;
-            vertices[coord + offset + 1] = top;
-            vertices[coord + offset + 2] = dist;
-        }
-
-        private static void SetColor(float[] colors, float red, float green, float blue , int coord,
-            int vertCount)
-        {
-            int offset = 0;
-
-            for(int i = 0; i < vertCount; i++)
-            {
-                colors[coord + offset + 0] = red;
-                colors[coord + offset + 1] = green;
-                colors[coord + offset + 2] = blue;
-
-                offset += 3;
-
-            }
-        }
-
-        private static void SetSquareTextureCoordinates(float[] textureCoords, int coord)
-        {
-            int offset = 0;
-
-            //bottom left
-            textureCoords[coord + offset + 0] = 0;
-            textureCoords[coord + offset + 1] = 0;
-            
-            offset += 2;
-
-            //top left
-            textureCoords[coord + offset + 0] = 0;
-            textureCoords[coord + offset + 1] = 1;
-            
-            offset += 2;
-
-            //top right
-            textureCoords[coord + offset + 0] = 1;
-            textureCoords[coord + offset + 1] = 1;
-            
-            offset += 2;
-
-            //bottom right
-            textureCoords[coord + offset + 0] = 1;
-            textureCoords[coord + offset + 1] = 0;
-
-            offset += 2;
-
-            //bottom left
-            textureCoords[coord + offset + 0] = 0;
-            textureCoords[coord + offset + 1] = 0;
-            
-            offset += 2;
-
-            //top right
-            textureCoords[coord + offset + 0] = 1;
-            textureCoords[coord + offset + 1] = 1;
-        }
-
-        private static void SetHorizFlipSquareTextureCoordinates(float[] textureCoords, int coord)
-        {
-            int offset = 0;
-
-            //bottom left
-            textureCoords[coord + offset + 0] = 1;
-            textureCoords[coord + offset + 1] = 0;
-
-            offset += 2;
-
-            //top left
-            textureCoords[coord + offset + 0] = 1;
-            textureCoords[coord + offset + 1] = 1;
-
-            offset += 2;
-
-            //top right
-            textureCoords[coord + offset + 0] = 0;
-            textureCoords[coord + offset + 1] = 1;
-
-            offset += 2;
-
-            //bottom right
-            textureCoords[coord + offset + 0] = 0;
-            textureCoords[coord + offset + 1] = 0;
-
-            offset += 2;
-
-            //bottom left
-            textureCoords[coord + offset + 0] = 1;
-            textureCoords[coord + offset + 1] = 0;
-
-            offset += 2;
-
-            //top right
-            textureCoords[coord + offset + 0] = 0;
-            textureCoords[coord + offset + 1] = 1;
-        }
-
-        private static void SetAtlasCoordinates(float[] texBottomLeft, Rect imageCoords , int coord,
-            int vertCount)
-        {
-            int offset = 0;
-
-            for(int i = 0; i < vertCount; i++)
-            {
-                texBottomLeft[coord + offset + 0] = imageCoords.Left;
-                texBottomLeft[coord + offset + 1] = imageCoords.Bottom;
-                texBottomLeft[coord + offset + 2] = imageCoords.Width;
-                texBottomLeft[coord + offset + 3] = imageCoords.Height;
-
-                offset += 4;
-            }
-        }
-
-
+        #endregion Nutrients map
+        
+        #region Entity circles
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateUnitCircles(OpenGL gl)
         {
-            unitCircles = new MyBufferArray(gl);
+            entityCircles = new MyBufferArray(gl);
         }
 
         /// <summary>
@@ -678,22 +544,17 @@ namespace wpfTest
                 entitiesEmpty = false;
             }
 
-            /*float[] vertices = new float[size * 6 * 3];
-            float[] colors = new float[size * 6 * 3];
-            float[] textureCoords = new float[size * 6 * 2];
-            float[] texAtlas = new float[size * 6 * 4];*/
-
             int verticesPerOne = size * 6;
             int verticesSize = verticesPerOne * 3;
             int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
-            float[] vertices = map.vertices;
-            float[] colors = map.colors;
-            float[] texture = map.texture;
-            float[] texAtlas = map.texAtlas;
+            entityCircles.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = entityCircles.vertices;
+            float[] colors = entityCircles.colors;
+            float[] texture = entityCircles.texture;
+            float[] texAtlas = entityCircles.texAtlas;
 
             for (int i=0;i<visEntity.Count;i++)
             {                
@@ -706,18 +567,18 @@ namespace wpfTest
                 if (current == null)
                     continue;
 
-                float unitSize = nodeSize;
+                float entitySize = nodeSize;
 
-                //unit circle
+                //entity circle
                 {
                     //tile position
-                    float bottom = (current.Bottom - viewBottom) * unitSize;
-                    float top = (current.Top - viewBottom) * unitSize;
-                    float left = (current.Left - viewLeft) * unitSize;
-                    float right = (current.Right - viewLeft) * unitSize;
+                    float bottom = (current.Bottom - viewBottom) * entitySize;
+                    float top = (current.Top - viewBottom) * entitySize;
+                    float left = (current.Left - viewLeft) * entitySize;
+                    float right = (current.Right - viewLeft) * entitySize;
 
                     //vertices
-                    SetSquareVertices(vertices, bottom, top, left, right, -8, index);
+                    SetRectangleVertices(vertices, bottom, top, left, right, -8, index);
 
                     //colors
                     if (!current.Selected)
@@ -746,9 +607,11 @@ namespace wpfTest
                 }
             }
 
-            unitCircles.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            entityCircles.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
+        #endregion Entity circles
 
+        #region Entity
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
@@ -784,22 +647,18 @@ namespace wpfTest
             {
                 entitiesEmpty = false;
             }
-
-            /*float[] vertices = new float[size * 6 * 3];
-            float[] colors = new float[size * 6 * 3];
-            float[] textureCoords = new float[size * 6 * 2];
-            float[] texAtlas = new float[size * 6 * 4];*/
+            
             int verticesPerOne = size * 6;
             int verticesSize = verticesPerOne * 3;
             int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
-            float[] vertices = map.vertices;
-            float[] colors = map.colors;
-            float[] texture = map.texture;
-            float[] texAtlas = map.texAtlas;
+            entities.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = entities.vertices;
+            float[] colors = entities.colors;
+            float[] texture = entities.texture;
+            float[] texAtlas = entities.texAtlas;
 
             //visible units have to be sorted to draw them properly
             visEntities.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
@@ -815,9 +674,9 @@ namespace wpfTest
                 if (current == null)
                     continue;
 
-                float unitSize = nodeSize;
+                float entitySize = nodeSize;
                 
-                //unit image
+                //entity image
                 {
                     Animation anim = current.AnimationState.Animation;
 
@@ -827,15 +686,15 @@ namespace wpfTest
                         imageCenter = new Vector2(anim.Width - anim.LeftBottom.X, anim.LeftBottom.Y);
 
                     //tile position
-                    float bottom = (current.Center.Y - imageCenter.Y - viewBottom) * unitSize;
-                    float top = (current.Center.Y - imageCenter.Y - viewBottom + anim.Height) * unitSize;
-                    float left = (current.Center.X - imageCenter.X - viewLeft) * unitSize;
-                    float right = (current.Center.X - imageCenter.X - viewLeft + anim.Width) * unitSize;
+                    float bottom = (current.Center.Y - imageCenter.Y - viewBottom) * entitySize;
+                    float top = (current.Center.Y - imageCenter.Y - viewBottom + anim.Height) * entitySize;
+                    float left = (current.Center.X - imageCenter.X - viewLeft) * entitySize;
+                    float right = (current.Center.X - imageCenter.X - viewLeft + anim.Width) * entitySize;
 
                     //depth is from [4,5]
                     float depth = 4f + current.Center.Y / game.Map.Height;
                     //vertices
-                    SetSquareVertices(vertices, bottom, top, left, right, -depth, index);
+                    SetRectangleVertices(vertices, bottom, top, left, right, -depth, index);
 
                     //colors
                     SetColor(colors, 1f, 1f, 1f, index, 6);
@@ -847,21 +706,23 @@ namespace wpfTest
                         SetSquareTextureCoordinates(texture, texIndex);
 
                     //atlas coordinates
-                    Rect unitImage = current.AnimationState.CurrentImage;
-                    SetAtlasCoordinates(texAtlas, unitImage, atlasInd, 6);
+                    Rect entityImage = current.AnimationState.CurrentImage;
+                    SetAtlasCoordinates(texAtlas, entityImage, atlasInd, 6);
                 }
             }
 
             entities.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
+        #endregion Entity
 
+        #region Entity indicators
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
         /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateUnitIndicators(OpenGL gl)
+        public static void CreateEntitiesIndicators(OpenGL gl)
         {
-            unitIndicators = new MyBufferArray(gl);
+            entityIndicators = new MyBufferArray(gl);
         }
 
         /// <summary>
@@ -870,7 +731,7 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateUnitIndicatorsDataBuffers(OpenGL gl, MapView mapView, Game game)
+        public static void UpdateEntityIndicatorsDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
@@ -890,22 +751,18 @@ namespace wpfTest
             {
                 entitiesEmpty = false;
             }
-
-            /*float[] vertices = new float[size * 24 * 3];
-            float[] colors = new float[size * 24 * 3];
-            float[] textureCoords = new float[size * 24 * 2];
-            float[] texAtlas = new float[size * 24 * 4];*/
+            
             int verticesPerOne = size * 24;
             int verticesSize = verticesPerOne * 3;
             int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
-            float[] vertices = map.vertices;
-            float[] colors = map.colors;
-            float[] texture = map.texture;
-            float[] texAtlas = map.texAtlas;
+            entityIndicators.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = entityIndicators.vertices;
+            float[] colors = entityIndicators.colors;
+            float[] texture = entityIndicators.texture;
+            float[] texAtlas = entityIndicators.texAtlas;
 
             //visible units have to be sorted to draw the indicators properly
             visUnits.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
@@ -966,28 +823,12 @@ namespace wpfTest
                 }
             }
 
-            unitIndicators.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            entityIndicators.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
-        public static void AddRectangle(float left, float bottom, float right, float top, Rect image, float depth,
-                                            int vInd, float[] vertices,
-                                            int cInd, float[] colors,
-                                            int tInd, float[] textureCoords,
-                                            int aInd, float[] texAtlas,
-                                            float r, float g, float b)
-        {
-            //vertices
-            SetSquareVertices(vertices, bottom, top, left, right, -depth, vInd);
+        #endregion Entity indicators
 
-            //colors
-            SetColor(colors, r, g, b, cInd, 6);
-
-            //texture coordinates
-            SetSquareTextureCoordinates(textureCoords, tInd);
-
-            //atlas coordinates
-            SetAtlasCoordinates(texAtlas, image, aInd, 6);
-        }
+        #region Flowmap
 
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
@@ -1018,22 +859,18 @@ namespace wpfTest
             //extents of one rectangle
             float sqW = nodeSize;
             float sqH = nodeSize;
-
-            /*float[] vertices = new float[width * height * 3 * 3];
-            float[] colors = new float[width * height * 3 * 3];
-            float[] textureCoords = new float[width * height * 3 * 2];
-            float[] texAtlas = new float[width * height * 3 * 4];*/
+            
             int verticesPerOne = width * height * 3;
             int verticesSize = verticesPerOne * 3;
             int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
-            float[] vertices = map.vertices;
-            float[] colors = map.colors;
-            float[] texture = map.texture;
-            float[] texAtlas = map.texAtlas;
+            flowMap.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = flowMap.vertices;
+            float[] colors = flowMap.colors;
+            float[] texture = flowMap.texture;
+            float[] texAtlas = flowMap.texAtlas;
 
             //triangle
             vec2 triLB = new vec2(-0.25f, -0.15f);
@@ -1055,6 +892,7 @@ namespace wpfTest
                     vec2 leftBottom =new vec2((i - (viewLeft % 1)), (j - (viewBottom % 1)));
                     vec2 squareExt = new vec2(sqW, sqH);
 
+                    //rotated triangle coordinates
                     vec2 rotTriLB = (Rotate(triLB,angle) + triOffset + leftBottom) * squareExt;
                     vec2 rotTriLT = (Rotate(triLT, angle) + triOffset + leftBottom) * squareExt;
                     vec2 rotTriRM = (Rotate(triRM, angle) + triOffset + leftBottom) * squareExt;
@@ -1114,6 +952,9 @@ namespace wpfTest
             flowMap.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
+        #endregion Flowmap
+        
+        #region Selection frame
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
@@ -1153,7 +994,7 @@ namespace wpfTest
                 float top = selectorFrame.Top - viewBottom;
                 float left = selectorFrame.Left - viewLeft;
                 float right = selectorFrame.Right - viewLeft;
-                SetSquareVertices(vertices, bottom * nodeSize, top * nodeSize,
+                SetRectangleVertices(vertices, bottom * nodeSize, top * nodeSize,
                     left * nodeSize, right * nodeSize, -1f, 0);
                 SetSquareTextureCoordinates(textureCoords, 0);
                 SetColor(colors, 1f, 1f, 1f, 0, 6);
@@ -1163,7 +1004,223 @@ namespace wpfTest
 
             selectionFrame.BindData(gl, 3, vertices, 3, colors, 2, textureCoords, 4, texBottomLeft);
         }
+        #endregion Selection frame
 
+        #region Array writing methods
+        /// <summary>
+        /// Write rectangle vertices with the given parameters to the index of the array. The rectangle
+        /// is made of two triangles.
+        /// </summary>
+        /// <param name="vertices">Writing array.</param>
+        /// <param name="bottom">Bottom of the rectangle.</param>
+        /// <param name="top">Top of the rectangle.</param>
+        /// <param name="left">Left of the rectangle.</param>
+        /// <param name="right">Right of the rectangle.</param>
+        /// <param name="depth">Depth of the vertices.</param>
+        /// <param name="index">Index of the first vertex in array.</param>
+        private static void SetRectangleVertices(float[] vertices, float bottom, float top,
+                                                float left, float right, float depth, int index)
+        {
+            int offset = 0;
+
+            //bottom left
+            vertices[index + offset + 0] = left;
+            vertices[index + offset + 1] = bottom;
+            vertices[index + offset + 2] = depth;
+
+            offset += 3;
+
+            //top left
+            vertices[index + offset + 0] = left;
+            vertices[index + offset + 1] = top;
+            vertices[index + offset + 2] = depth;
+
+            offset += 3;
+
+            //top right
+            vertices[index + offset + 0] = right;
+            vertices[index + offset + 1] = top;
+            vertices[index + offset + 2] = depth;
+
+            offset += 3;
+
+            //bottom right
+            vertices[index + offset + 0] = right;
+            vertices[index + offset + 1] = bottom;
+            vertices[index + offset + 2] = depth;
+
+            offset += 3;
+
+            //bottom left
+            vertices[index + offset + 0] = left;
+            vertices[index + offset + 1] = bottom;
+            vertices[index + offset + 2] = depth;
+
+            offset += 3;
+
+            //top right
+            vertices[index + offset + 0] = right;
+            vertices[index + offset + 1] = top;
+            vertices[index + offset + 2] = depth;
+        }
+
+        /// <summary>
+        /// Write vertex colors with the given parameters to the index of the array.
+        /// </summary>
+        /// <param name="colors">Writing array.</param>
+        /// <param name="index">Index of the first color in array.</param>
+        /// <param name="vertCount">Number of times this color should be repeated (for each vertex once).</param>
+        private static void SetColor(float[] colors, float red, float green, float blue, int index,
+            int vertCount)
+        {
+            int offset = 0;
+
+            for (int i = 0; i < vertCount; i++)
+            {
+                colors[index + offset + 0] = red;
+                colors[index + offset + 1] = green;
+                colors[index + offset + 2] = blue;
+
+                offset += 3;
+
+            }
+        }
+
+        /// <summary>
+        /// Write texture UV coordinates for a square made of two triangles.
+        /// </summary>
+        /// <param name="textureCoords">Writing array.</param>
+        /// <param name="index">Index of the first UV coordinate in array.</param>
+        private static void SetSquareTextureCoordinates(float[] textureCoords, int index)
+        {
+            int offset = 0;
+
+            //bottom left
+            textureCoords[index + offset + 0] = 0;
+            textureCoords[index + offset + 1] = 0;
+
+            offset += 2;
+
+            //top left
+            textureCoords[index + offset + 0] = 0;
+            textureCoords[index + offset + 1] = 1;
+
+            offset += 2;
+
+            //top right
+            textureCoords[index + offset + 0] = 1;
+            textureCoords[index + offset + 1] = 1;
+
+            offset += 2;
+
+            //bottom right
+            textureCoords[index + offset + 0] = 1;
+            textureCoords[index + offset + 1] = 0;
+
+            offset += 2;
+
+            //bottom left
+            textureCoords[index + offset + 0] = 0;
+            textureCoords[index + offset + 1] = 0;
+
+            offset += 2;
+
+            //top right
+            textureCoords[index + offset + 0] = 1;
+            textureCoords[index + offset + 1] = 1;
+        }
+
+        /// <summary>
+        /// Write texture UV coordinates for a square made of two triangles. The texture is horizontaly flipped.
+        /// </summary>
+        /// <param name="textureCoords">Writing array.</param>
+        /// <param name="index">Index of the first UV coordinate in array.</param>
+        private static void SetHorizFlipSquareTextureCoordinates(float[] textureCoords, int index)
+        {
+            int offset = 0;
+
+            //bottom left
+            textureCoords[index + offset + 0] = 1;
+            textureCoords[index + offset + 1] = 0;
+
+            offset += 2;
+
+            //top left
+            textureCoords[index + offset + 0] = 1;
+            textureCoords[index + offset + 1] = 1;
+
+            offset += 2;
+
+            //top right
+            textureCoords[index + offset + 0] = 0;
+            textureCoords[index + offset + 1] = 1;
+
+            offset += 2;
+
+            //bottom right
+            textureCoords[index + offset + 0] = 0;
+            textureCoords[index + offset + 1] = 0;
+
+            offset += 2;
+
+            //bottom left
+            textureCoords[index + offset + 0] = 1;
+            textureCoords[index + offset + 1] = 0;
+
+            offset += 2;
+
+            //top right
+            textureCoords[index + offset + 0] = 0;
+            textureCoords[index + offset + 1] = 1;
+        }
+
+        /// <summary>
+        /// Write texture atlas coordinates to the array.
+        /// </summary>
+        /// <param name="texBotLeftWidthHeight">Writing array.</param>
+        /// <param name="imageCoords">Coordinates of the image in the atlas with format: Rect(x, y, withd, height).</param>
+        /// <param name="index">Index of the first coordinate in array.</param>
+        /// <param name="vertCount">Number of times this coordinates should be repeated (for each vertex once).</param>
+        private static void SetAtlasCoordinates(float[] texBotLeftWidthHeight, Rect imageCoords, int index,
+            int vertCount)
+        {
+            int offset = 0;
+
+            for (int i = 0; i < vertCount; i++)
+            {
+                texBotLeftWidthHeight[index + offset + 0] = imageCoords.Left;
+                texBotLeftWidthHeight[index + offset + 1] = imageCoords.Bottom;
+                texBotLeftWidthHeight[index + offset + 2] = imageCoords.Width;
+                texBotLeftWidthHeight[index + offset + 3] = imageCoords.Height;
+
+                offset += 4;
+            }
+        }
+
+
+        /// <summary>
+        /// Adds a rectangle with the parameters to the arrays.
+        /// </summary>
+        public static void AddRectangle(float left, float bottom, float right, float top, Rect image, float depth,
+                                            int vInd, float[] vertices,
+                                            int cInd, float[] colors,
+                                            int tInd, float[] textureCoords,
+                                            int aInd, float[] texAtlas,
+                                            float r, float g, float b)
+        {
+            //vertices
+            SetRectangleVertices(vertices, bottom, top, left, right, -depth, vInd);
+
+            //colors
+            SetColor(colors, r, g, b, cInd, 6);
+
+            //texture coordinates
+            SetSquareTextureCoordinates(textureCoords, tInd);
+
+            //atlas coordinates
+            SetAtlasCoordinates(texAtlas, image, aInd, 6);
+        }
+        #endregion Array writing methods
 
         /// <summary>
         /// Rotates the vector by the angle.

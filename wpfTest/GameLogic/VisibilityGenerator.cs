@@ -15,12 +15,21 @@ namespace wpfTest.GameLogic
     public class VisibilityGenerator
     {
         //inputs
+        /// <summary>
+        /// newTask has to be false to set this.
+        /// </summary>
         private List<View> views;
+        /// <summary>
+        /// newTask has to be false to set this.
+        /// </summary>
         private ObstacleMap obstMap;
+        /// <summary>
+        /// Set to true after new task was given. Set to false after completing the task. New task
+        /// can't be given if newTask is true. To access, this instance has to be locked.
+        /// </summary>
         private bool newTask;
 
         //outputs
-        private VisibilityMap visibilityMap;
         private bool done;
         public bool Done
         {
@@ -33,6 +42,10 @@ namespace wpfTest.GameLogic
                 lock (this) done = value;
             }
         }
+        private VisibilityMap visibilityMap;
+        /// <summary>
+        /// Done has to be true to get this.
+        /// </summary>
         public VisibilityMap VisibilityMap
         {
             get

@@ -6,14 +6,39 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Maps
 {
+    /// <summary>
+    /// Represents ray from one point to another. It returns indices of
+    /// squares it intersects in the order of the intersections.
+    /// </summary>
     public struct Ray
     {
+        /// <summary>
+        /// Starting point of the ray.
+        /// </summary>
         private Vector2 Start { get; }
+        /// <summary>
+        /// Ending point of the ray.
+        /// </summary>
         private Vector2 End { get; }
+        /// <summary>
+        /// Current position on the ray.
+        /// </summary>
         private Vector2 Current { get; set; }
+        /// <summary>
+        /// Obstacle map that blocks the ray.
+        /// </summary>
         private ObstacleMap ObstMap { get; }
+        /// <summary>
+        /// Angle from Start to End relative to positive x axis.
+        /// </summary>
         public float Angle { get; }
+        /// <summary>
+        /// Angle from End to Start relative to positive x axis.
+        /// </summary>
         public float OppositeAngle => Angle + (float)Math.PI;
+        /// <summary>
+        /// Distance that was already traveled on the ray.
+        /// </summary>
         public float TraveledDist => (Current - Start).Length;
 
         public Ray(Vector2 start, Vector2 end, ObstacleMap obstacleMap)
@@ -66,13 +91,13 @@ namespace wpfTest.GameLogic.Maps
                 //moving bottom
                 intersAxY = (int)Math.Ceiling(Current.Y) - 1;
 
-            Vector2 Delta = End - Current;
+            Vector2 delta = End - Current;
 
             //(x,y) = Current + t*Delta
             //t for intersection with vertical axis
-            float tY = Math.Abs((intersAxX - Current.X) / Delta.X);
+            float tY = Math.Abs((intersAxX - Current.X) / delta.X);
             //t for intersection with horizontal axis
-            float tX = Math.Abs((intersAxY - Current.Y) / Delta.Y);
+            float tX = Math.Abs((intersAxY - Current.Y) / delta.Y);
             //t determines how far across the ray we move
             //we want to move the lower distance
             float t;
@@ -89,10 +114,10 @@ namespace wpfTest.GameLogic.Maps
             }
 
             //update Current
-            Current = Current + t * Delta;
+            Current = Current + t * delta;
 
             //return false if the next square is outside of the ray
-            Vector2 Dir = Delta;
+            Vector2 Dir = delta;
             if (Current.X * Dir.X > End.X * Dir.X || 
                 Current.Y * Dir.Y > End.Y * Dir.Y)
                 return false;
@@ -136,7 +161,5 @@ namespace wpfTest.GameLogic.Maps
 
             return true;
         }
-
-
     }
 }

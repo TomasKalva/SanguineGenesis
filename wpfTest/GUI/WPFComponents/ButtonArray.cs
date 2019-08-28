@@ -13,9 +13,19 @@ using static wpfTest.MainWindow;
 
 namespace wpfTest.GUI
 {
+    /// <summary>
+    /// Control for drawing rectangle array of buttons.
+    /// </summary>
     abstract class ButtonArray<InfoSource> : Grid where InfoSource:IShowable
     {
+        /// <summary>
+        /// InfoSources corresponding to the button indexes.
+        /// </summary>
         public List<InfoSource> InfoSources { get; set; }
+        /// <summary>
+        /// Returns info source with the given index or default(InfoSource) if the
+        /// index is not valid.
+        /// </summary>
         public InfoSource GetInfoSource(int index)
         {
             if (InfoSources!=null && index < InfoSources.Count)
@@ -23,10 +33,22 @@ namespace wpfTest.GUI
             else
                 return default(InfoSource);
         }
+        /// <summary>
+        /// Selected InfoSource.
+        /// </summary>
         public InfoSource Selected { get; set; }
+        /// <summary>
+        /// Number of columns.
+        /// </summary>
         public int Columns { get; }
+        /// <summary>
+        /// Number of rows.
+        /// </summary>
         public int Rows { get; }
 
+        /// <summary>
+        /// Creates new ButtonArray with the given extents and number of rows and columns.
+        /// </summary>
         public ButtonArray(int columns, int rows, double width, double height)
         {
             Columns = columns;
@@ -59,6 +81,10 @@ namespace wpfTest.GUI
             }
         }
 
+        /// <summary>
+        /// Sets listeners to buttons to show corresponding InfoSource in
+        /// additionalInfo if mouse is over it.
+        /// </summary>
         public void ShowInfoOnMouseOver(AdditionalInfo additionalInfo)
         {
             for (int i = 0; i < Columns * Rows; i++)
@@ -98,6 +124,10 @@ namespace wpfTest.GUI
             }
         }
 
+        /// <summary>
+        /// Update the info on the buttons, hide buttons without info, show buttons
+        /// with info.
+        /// </summary>
         public void Update()
         {
             if (InfoSources == null)
@@ -124,6 +154,9 @@ namespace wpfTest.GUI
         }
     }
 
+    /// <summary>
+    /// Used for drawing buttons with entities.
+    /// </summary>
     class EntityButtonArray : ButtonArray<Entity>
     {
         public EntityButtonArray(int colulmns, int rows, double width, double height)
@@ -132,6 +165,11 @@ namespace wpfTest.GUI
             Style = (Style)Application.Current.FindResource("EntitiesArrayStyle");
         }
 
+        /// <summary>
+        /// Sets listeners to buttons click to show corresponding Entity's in
+        /// entityInfoPanel and its abilities in abilityButtonArray, and to remove
+        /// the entity from selected entities on right click.
+        /// </summary>
         public void ShowInfoOnClick(EntityInfoPanel entityInfoPanel, AbilityButtonArray abilityButtonArray, GameControls gameControls)
         {
             for (int i = 0; i < Columns * Rows; i++)
@@ -159,6 +197,9 @@ namespace wpfTest.GUI
         }
     }
 
+    /// <summary>
+    /// Used for drawing buttons with abilities.
+    /// </summary>
     class AbilityButtonArray : ButtonArray<Ability>
     {
         public AbilityButtonArray(int columns, int rows, double width, double height)
@@ -166,7 +207,10 @@ namespace wpfTest.GUI
         {
             Style = (Style)Application.Current.FindResource("AbilitiesArrayStyle");
         }
-
+        
+        /// <summary>
+        /// Sets listeners to buttons click to select ability.
+        /// </summary>
         public void SelectAbilityOnClick(GameControls gameControls)
         {
             for (int i = 0; i < Columns * Rows; i++)
@@ -186,10 +230,11 @@ namespace wpfTest.GUI
         }
     }
 
+    /// <summary>
+    /// Used for drawing buttons with statuses.
+    /// </summary>
     class StatusButtonArray : ButtonArray<Status>
     {
-        public Status SelectedStatus { get; private set; }
-
         public StatusButtonArray(int columns, int rows, double width, double height)
             : base(columns, rows, width, height)
         {
@@ -197,6 +242,9 @@ namespace wpfTest.GUI
         }
     }
 
+    /// <summary>
+    /// Used for drawing buttons with commands.
+    /// </summary>
     class CommandButtonArray : ButtonArray<Command>
     {
         public CommandButtonArray(int colulmns, int rows, double width, double height)
@@ -207,6 +255,9 @@ namespace wpfTest.GUI
             Style = (Style)Application.Current.FindResource("CommandsArrayStyle");
         }
 
+        /// <summary>
+        /// Sets listeners to buttons left clicks to remove corresponding command from its entity.
+        /// </summary>
         public void RemoveCommandOnClick()
         {
             for (int i = 0; i < Columns * Rows; i++)

@@ -6,10 +6,18 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Maps
 {
-    class Pathfinding
+    /// <summary>
+    /// Used for pathfinding using raycasting algorithm.
+    /// </summary>
+    class RayPathfinding
     {
-        private static Pathfinding pathfinding;
-        public static Pathfinding GetPathfinding => pathfinding;
+        private static RayPathfinding pathfinding;
+        public static RayPathfinding GetPathfinding => pathfinding;
+        static RayPathfinding()
+        {
+            pathfinding = new RayPathfinding();
+        }
+        private RayPathfinding() { }
 
         private enum SquareState
         {
@@ -18,13 +26,6 @@ namespace wpfTest.GameLogic.Maps
             DISCOVERED_IN_CURRENT,
             NOT_DISCOVERED
         }
-
-        static Pathfinding()
-        {
-            pathfinding = new Pathfinding();
-        }
-
-        private Pathfinding() { }
 
         public FlowMap GenerateFlowMap(ObstacleMap obst, Vector2 targetLocation)
         {
@@ -71,7 +72,6 @@ namespace wpfTest.GameLogic.Maps
         /// Finds the square that is closest to the point, was already found and
         /// has a not discovered adjacent neighbour. Returns true if the square exists.
         /// </summary>
-        /// <returns></returns>
         private bool FindClosest(Vector2 point, SquareState[,] state, float[,] distance, out int x, out int y)
         {
             //the coordinates have to be initialized even if the algorithm returns false
@@ -105,6 +105,9 @@ namespace wpfTest.GameLogic.Maps
                 (y + 1 < state.GetLength(1) && state[x, y + 1] == SquareState.NOT_DISCOVERED)) ;
         }
         
+        /// <summary>
+        /// Raycast to find shorter paths.
+        /// </summary>
         private void RelaxDistances(Vector2 center, ObstacleMap obst, float[,] distance, SquareState[,] state, FlowMap flMap)
         {
             //ray has no length limit
@@ -200,8 +203,6 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// Normalises angle to the interval [0,2pi).
         /// </summary>
-        /// <param name="angle"></param>
-        /// <returns></returns>
         private float NormaliseAngle(float angle)
         {
             while (angle >= 2 * Math.PI)
@@ -223,6 +224,9 @@ namespace wpfTest.GameLogic.Maps
                         state[i, j] = SquareState.DISCOVERED;
         }
 
+        /// <summary>
+        /// Fill spaces that are surrounded by already discovered squares with their average angle.
+        /// </summary>
         private void InferSmoothly(float[,] distance, SquareState[,] state, FlowMap flMap)
         {
             for(int i=1;i<flMap.Width-1;i++)

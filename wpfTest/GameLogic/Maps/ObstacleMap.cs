@@ -12,6 +12,9 @@ namespace wpfTest
     /// </summary>
     public class ObstacleMap : IMap<bool>
     {
+        /// <summary>
+        /// Data of the map.
+        /// </summary>
         private bool[,] isObstacle;
 
         public bool this[int i, int j]

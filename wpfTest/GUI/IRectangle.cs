@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Implemented by classes that can be seen as a rectangle.
+    /// </summary>
     interface IRectangle
     {
         float Bottom { get; }
@@ -15,7 +18,7 @@ namespace wpfTest
         float Width { get; }
         float Height { get; }
     }
-
+    
     /// <summary>
     /// Used to implement default methods in the interface IRectangle.
     /// </summary>

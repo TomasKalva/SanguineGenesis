@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Maps
 {
+    /// <summary>
+    /// Used for pushing animals out of terrain they can't walk on.
+    /// </summary>
     public class PushingMap : IMap<PushingSquare?>
     {
-        //values are oriented angles in radians relative to the positive x axis
+        /// <summary>
+        /// Data of the map.
+        /// </summary>
         private PushingSquare?[,] pushingSquares;
 
         public PushingSquare? this[int i, int j]
@@ -16,9 +21,18 @@ namespace wpfTest.GameLogic.Maps
             get => pushingSquares[i, j];
             set => pushingSquares[i, j] = value;
         }
+        /// <summary>
+        /// Width of the map in squares.
+        /// </summary>
         public int Width => pushingSquares.GetLength(0);
+        /// <summary>
+        /// Height of the map in squares.
+        /// </summary>
         public int Height => pushingSquares.GetLength(1);
 
+        /// <summary>
+        /// Creates new pushing map with the given width and height with no pushing squares.
+        /// </summary>
         internal PushingMap(int width, int height)
         {
             pushingSquares = new PushingSquare?[width, height];

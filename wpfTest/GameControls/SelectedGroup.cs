@@ -7,12 +7,16 @@ using wpfTest.GameLogic;
 
 namespace wpfTest
 {
+    /// <summary>
+    /// Represents entities selected by player.
+    /// </summary>
     public class SelectedGroup
     {
+        private List<Entity> entities;
         /// <summary>
         /// List of currently selected entities. Shouldn't be set to null.
         /// </summary>
-        public List<Entity> Entities { get; private set; }
+        public List<Entity> Entities { get { lock (this) return entities; } private set { entities = value; } }
         /// <summary>
         /// Set to true after Entities was changed.
         /// </summary>
@@ -20,10 +24,13 @@ namespace wpfTest
 
         public SelectedGroup()
         {
-            Entities = new List<Entity>();
+            entities = new List<Entity>();
             Changed = true;
         }
 
+        /// <summary>
+        /// Remove all selected entities and the set them to be entities.
+        /// </summary>
         public void SetEntities(List<Entity> entities)
         {
             lock (this)
@@ -40,11 +47,14 @@ namespace wpfTest
             }
         }
 
-        public void AddEntities(List<Entity> units)
+        /// <summary>
+        /// Adds entities to the Entities.
+        /// </summary>
+        public void AddEntities(List<Entity> entities)
         {
             lock (this)
             {
-                foreach(Entity u in units)
+                foreach(Entity u in entities)
                     if (!Entities.Contains(u))
                     {
                         Entities.Add(u);
@@ -54,6 +64,9 @@ namespace wpfTest
             }
         }
 
+        /// <summary>
+        /// Removes entity from Entities.
+        /// </summary>
         public void RemoveEntity(Entity entity)
         {
             lock (this)
@@ -64,6 +77,9 @@ namespace wpfTest
             }
         }
 
+        /// <summary>
+        /// Removes dead entities from Entities.
+        /// </summary>
         public void RemoveDead()
         {
             lock (this)
@@ -75,6 +91,9 @@ namespace wpfTest
             }
         }
 
+        /// <summary>
+        /// Remove all entities.
+        /// </summary>
         public void Clear()
         {
             lock (this)
@@ -85,29 +104,5 @@ namespace wpfTest
                 Changed = true;
             }
         }
-        /*
-        /// <summary>
-        /// Adds a new command created by the factory to every entity in the group.
-        /// </summary>
-        /// <param name="ability">Determines command type.</param>
-        public void AddCommand(Ability ability, ITargetable target)
-        {
-            Units.RemoveAll((u) => u.IsDead);
-            ability.SetCommands(Players.PLAYER0,Units, target);
-            //foreach (Entity u in Units)
-            //    u.AddCommand(ability.NewInstance(u));
-        }
-
-        /// <summary>
-        /// Sets a new command created by the factory to every entity in the group.
-        /// </summary>
-        /// <param name="ability">Determines command type.</param>
-        public void SetCommand(Ability ability, ITargetable target)
-        {
-            Units.RemoveAll((u) => u.IsDead);
-            ability.SetCommands(Players.PLAYER0, Units, target);
-            //foreach (Entity u in Units)
-            //    u.SetCommand(commandFactory.NewInstance(u));
-        }*/
     }
 }
