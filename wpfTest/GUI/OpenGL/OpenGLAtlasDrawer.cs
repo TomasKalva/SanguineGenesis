@@ -852,7 +852,7 @@ namespace wpfTest
             float viewTop = mapView.Top;
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
-            float[,] flowM = mapView.GetVisibleFlowMap(game);
+            float?[,] flowM = mapView.GetVisibleFlowMap(game);
             int width = flowM.GetLength(0);
             int height = flowM.GetLength(1);
 
@@ -887,25 +887,27 @@ namespace wpfTest
                     int texCoord = (i + j * width) * 3 * 2;
                     int bottomLeftInd = (i + j * width) * 3 * 4;
 
-                    float angle = flowM[i, j];
 
                     vec2 leftBottom =new vec2((i - (viewLeft % 1)), (j - (viewBottom % 1)));
                     vec2 squareExt = new vec2(sqW, sqH);
 
-                    //rotated triangle coordinates
-                    vec2 rotTriLB = (Rotate(triLB,angle) + triOffset + leftBottom) * squareExt;
-                    vec2 rotTriLT = (Rotate(triLT, angle) + triOffset + leftBottom) * squareExt;
-                    vec2 rotTriRM = (Rotate(triRM, angle) + triOffset + leftBottom) * squareExt;
 
                     int offset = 0;
                     int texOffset = 0;
-                    if (!FlowMap.IsValidValue(angle))
+                    if (flowM[i, j] == null)
                     {
                         vertices[coord + 0] = vertices[coord + 1] = vertices[coord + 2]
                             = vertices[coord + 3] = vertices[coord + 4] = vertices[coord + 5] = 0;
                     }
                     else
                     {
+                        float angle = flowM[i, j].Value;
+
+                        //rotated triangle coordinates
+                        vec2 rotTriLB = (Rotate(triLB, angle) + triOffset + leftBottom) * squareExt;
+                        vec2 rotTriLT = (Rotate(triLT, angle) + triOffset + leftBottom) * squareExt;
+                        vec2 rotTriRM = (Rotate(triRM, angle) + triOffset + leftBottom) * squareExt;
+
                         //bottom left
                         vertices[coord + offset + 0] = rotTriLB.x;
                         vertices[coord + offset + 1] = rotTriLB.y;

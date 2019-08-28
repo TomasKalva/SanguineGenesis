@@ -100,7 +100,7 @@ namespace wpfTest
         /// Returns sub-rectangle of game's FlowMap visible by this MapView.
         /// </summary>
         /// <exception cref="InvalidOperationException">If actual extens haven't been set.</exception>
-        public float[,] GetVisibleFlowMap(Game game)
+        public float?[,] GetVisibleFlowMap(Game game)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic.Data.Abilities
 {
+    /// <summary>
+    /// The animal moves to the target.
+    /// </summary>
     public sealed class MoveTo : TargetAbility<Animal, IMovementTarget>, IMovementParametrizing
     {
         internal MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
@@ -144,7 +147,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         /// <summary>
         /// Point on the map where the unit should go.
         /// </summary>
-        public ITargetable TargetPoint { get; }
+        public IMovementTarget TargetPoint { get; }
         /// <summary>
         /// Flowmap used for navigation. It can be set after the command was assigned.
         /// </summary>
@@ -175,9 +178,9 @@ namespace wpfTest.GameLogic.Data.Abilities
             //if an enemy is in attack range, attack it instead of other commands
             if (movementParametrizing.AttackEnemyInstead)
             {
-                Entity enemy = GameQuerying.GetGameQuerying().SelectEntities(game,
-                    (u) => u.Player != unit.Player
-                            && unit.DistanceTo(u) <= unit.AttackDistance).FirstOrDefault();
+                Entity enemy = game.GetAll<Animal>().Where(
+                            (a) => a.Player != unit.Player
+                            && unit.DistanceTo(a) <= unit.AttackDistance).FirstOrDefault();
                 if (enemy != null)
                 {
                     //attack the enemy
@@ -193,7 +196,15 @@ namespace wpfTest.GameLogic.Data.Abilities
                 return false;
 
             float dist = (unit.Center - TargetPoint.Center).Length;
-            if (dist > FLOWMAP_DISTANCE)//todo: if animal is standing on node with building - push it out
+
+            Vector2 animalPos = unit.Position;
+            Building blockingBuilding;
+            if((blockingBuilding = game.Map[(int)animalPos.X, (int)animalPos.Y].Building) != null
+                && blockingBuilding!=TargetPoint)
+            {
+                unit.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos), game.Map);
+            }
+            else if (dist > FLOWMAP_DISTANCE)//todo: if animal is standing on node with building - push it out
             {
                 //use flowmap
                 unit.Accelerate(flowMap.GetIntensity(unit.Center, 1), game.Map);
@@ -225,26 +236,10 @@ namespace wpfTest.GameLogic.Data.Abilities
 
         public bool Finished()
         {
-            if (TargetPoint is Entity entity)
-            {
-                //target is entity
-                //use distance between closest points of the unit and the target
-                if (movementParametrizing.UsesAttackDistance)
-                    return unit.DistanceTo(entity) <= unit.AttackDistance;
-                else
-                    return unit.DistanceTo(entity) <= movementParametrizing.GoalDistance;
-            }
-            else if (TargetPoint is Vector2 vector)
-            {
-                //target is vector
-                //use distance between center of the unit and the point
-                return (vector - unit.Center).Length <= movementParametrizing.GoalDistance;
-            }
+            if (movementParametrizing.UsesAttackDistance)
+                return TargetPoint.DistanceTo(unit) <= unit.AttackDistance;
             else
-            {
-                Node node = TargetPoint as Node;
-                return unit.DistanceTo(node) <= movementParametrizing.GoalDistance;
-            }
+                return TargetPoint.DistanceTo(unit) <= movementParametrizing.GoalDistance;
         }
 
         public void UpdateFlowMap(FlowMap flMap)
@@ -253,7 +248,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Returns true if the unit can stop because of being stuck.
+        /// Returns true if the unit should stop because of being stuck.
         /// </summary>
         private bool CanStop()
         {
@@ -262,10 +257,13 @@ namespace wpfTest.GameLogic.Data.Abilities
     }
 
     /// <summary>
-    /// Detects if the unit is not moving much.
+    /// Detects if the animal is not moving much.
     /// </summary>
     public class NoMovementDetection
     {
+        /// <summary>
+        /// Invalid vector in last4positions.
+        /// </summary>
         private static Vector2 INVALID { get; }
         private Vector2[] last4positions;
         static NoMovementDetection()

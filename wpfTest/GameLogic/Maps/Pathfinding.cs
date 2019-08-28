@@ -187,7 +187,7 @@ namespace wpfTest.GameLogic.Maps
             {
                 //check if the path along this ray is more optimal
                 float sqRayAngle = NormaliseAngle(squaresAngle - rayAngle);
-                float sqFlMapAngle = NormaliseAngle(squaresAngle - flMap[x, y]);
+                float sqFlMapAngle = NormaliseAngle(squaresAngle - flMap[x, y].Value);
                 if (sqRayAngle<sqFlMapAngle)
                 {
                     //ray angle is closer to the angles between the two squares,
@@ -238,28 +238,32 @@ namespace wpfTest.GameLogic.Maps
                     float dist = flMap.Width * flMap.Height;
                     float angle = 0;
                     int neigbCount = 0;
-                    if (state[i - 1, j] == SquareState.DISCOVERED)
+                    if (state[i - 1, j] == SquareState.DISCOVERED
+                        && flMap[i - 1, j]!=null)
                     {
                         neigbCount++;
-                        angle += flMap[i - 1, j];
+                        angle += flMap[i - 1, j].Value;
                         dist = Math.Min(dist, distance[i - 1, j]);
                     }
-                    if (state[i + 1, j] == SquareState.DISCOVERED)
+                    if (state[i + 1, j] == SquareState.DISCOVERED
+                        && flMap[i + 1, j] != null)
                     {
                         neigbCount++;
-                        angle += flMap[i + 1, j];
+                        angle += flMap[i + 1, j].Value;
                         dist = Math.Min(dist, distance[i + 1, j]);
                     }
-                    if (state[i, j - 1] == SquareState.DISCOVERED)
+                    if (state[i, j - 1] == SquareState.DISCOVERED
+                        && flMap[i, j - 1] != null)
                     {
                         neigbCount++;
-                        angle += flMap[i, j - 1];
+                        angle += flMap[i, j - 1].Value;
                         dist = Math.Min(dist, distance[i, j - 1]);
                     }
-                    if (state[i, j + 1] == SquareState.DISCOVERED)
+                    if (state[i, j + 1] == SquareState.DISCOVERED
+                        && flMap[i, j + 1] != null)
                     {
                         neigbCount++;
-                        angle += flMap[i, j + 1];
+                        angle += flMap[i, j + 1].Value;
                         dist = Math.Min(dist, distance[i, j + 1]);
                     }
                     if (neigbCount >= 3)
@@ -281,10 +285,10 @@ namespace wpfTest.GameLogic.Maps
                 for(int j=0;j<flowMap.Height;j++)
                 {
                     //update only squares that are not blocked and have valid value of flowMap
-                    if (obstMap[i, j] || !FlowMap.IsValidValue(flowMap[i,j]))
+                    if (obstMap[i, j] || flowMap[i,j]==null)
                         continue;
 
-                    float angle = flowMap[i, j];
+                    float angle = flowMap[i, j].Value;
                     //directions of the components
                     int dirX = Math.Sign(Math.Cos(angle));
                     int dirY = Math.Sign(Math.Sin(angle));

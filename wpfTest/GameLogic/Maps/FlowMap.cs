@@ -7,7 +7,7 @@ using wpfTest.GameLogic;
 
 namespace wpfTest
 {
-    public class FlowMap:IMap<float>
+    public class FlowMap:IMap<float?>
     {
         /// <summary>
         /// Minimal valid value for an angle in flowmap.
@@ -15,9 +15,9 @@ namespace wpfTest
         public const float MIN_VALID_VALUE= -0.01f;
 
         //values are oriented angles in radians relative to the positive x axis
-        private float[,] directions;
+        private float?[,] directions;
 
-        public float this[int i, int j]
+        public float? this[int i, int j]
         {
             get => directions[i, j];
             set => directions[i, j] = value;
@@ -33,11 +33,7 @@ namespace wpfTest
 
         internal FlowMap(int width, int height)
         {
-            directions = new float[width, height];
-
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                    this[i, j] = -10.57f;
+            directions = new float?[width, height];
         }
 
         /// <summary>
@@ -51,10 +47,10 @@ namespace wpfTest
         {
             int i = (int)position.X; int j = (int)position.Y;
             if (i < 0 || i >= Width || j < 0 || j >= Height ||
-                !IsValidValue(directions[i,j]))
+                directions[i,j] == null)
                 return new Vector2(0f, 0f);
 
-            float angle = directions[i, j];
+            float angle = directions[i, j].Value;
             return new Vector2(
                 (float)Math.Cos(angle) * speed,
                 (float)Math.Sin(angle) * speed

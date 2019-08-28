@@ -12,14 +12,20 @@ namespace wpfTest.GameLogic
     public class MoveToCommandAssignment
     {
         /// <summary>
-        /// Units whose commands should be updated.
+        /// Animals whose commands should be updated.
         /// </summary>
         public List<Animal> Animals { get; }
         /// <summary>
-        /// Whose units are performing commands for this assignment.
+        /// Whose animals are performing commands for this assignment.
         /// </summary>
         public Players Player { get; }
+        /// <summary>
+        /// Where the animals should go.
+        /// </summary>
         public IMovementTarget TargetPoint { get; }
+        /// <summary>
+        /// Movement type of the animals.
+        /// </summary>
         public Movement Movement { get; }
         /// <summary>
         /// True if any units are currently using this command.
