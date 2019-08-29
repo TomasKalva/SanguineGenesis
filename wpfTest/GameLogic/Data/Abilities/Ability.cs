@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using wpfTest.GameLogic.Data.Abilities;
 using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GUI;
 using static wpfTest.MainWindow;
@@ -190,6 +191,13 @@ namespace wpfTest.GameLogic
             {
                 //create new command and assign it to c
                 Command com = NewCommand(c, target);
+                Animal a = c as Animal;
+                if (a != null)
+                {
+                    MoveToCommand followCommand = (MoveToCommand)a.CommandQueue.Queue.LastOrDefault();
+                    a.CommandQueue.Queue.Remove(followCommand);
+                    com.FollowCommand = followCommand;
+                }
                 c.AddCommand(com);
             }
         }

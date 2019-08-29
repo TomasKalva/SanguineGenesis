@@ -92,6 +92,7 @@ namespace wpfTest
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ConsumeAnimal);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ClimbTree);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ChargeTo);
+                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.HerbivoreEat);
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.BuildBuilding("KAPOC"));
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.BuildBuilding("BAOBAB"));
             }

@@ -68,5 +68,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             CommandedEntity.CanBeMoved = true;
         }
+
+        public override bool FollowTarget() => true;
     }
 }

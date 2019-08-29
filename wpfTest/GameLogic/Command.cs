@@ -50,7 +50,20 @@ namespace wpfTest
         /// <summary>
         /// Called when this command is removed from command queue.
         /// </summary>
-        public virtual void OnRemove() { }
+        public virtual void OnRemove()
+        {
+            if (FollowCommand != null)
+                FollowCommand.OnRemove();
+        }
+
+        /// <summary>
+        /// Returns true if the caster animal should keep following the target.
+        /// </summary>
+        public virtual bool FollowTarget() => false;
+        /// <summary>
+        /// Command used for following the target.
+        /// </summary>
+        public MoveToCommand FollowCommand { get; set; }
     }
 
     public abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
@@ -171,10 +184,31 @@ namespace wpfTest
                 //finish command if paying was unsuccessful
                 return true;
 
+            //follow the target animal if caster is animal and too far away
+            Animal animal = CommandedEntity as Animal;
+            if (FollowCommand != null &&
+                FollowTarget() &&
+                Targ.GetType() != typeof(Nothing) &&
+                animal != null)
+            {
+                float distance = ((IMovementTarget)Targ).DistanceTo(animal);
+                if (distance > animal.AttackDistance)
+                {
+                    FollowCommand.PerformCommand(game, deltaT);
+                    return false;
+                }
+                else
+                {
+                    animal.StopMoving = true;
+                }
+            }
+
             ElapsedTime += deltaT;
             bool finished = PerformCommandLogic(game, deltaT);
             if (finished)
+            {
                 OnRemove();
+            }
             return finished;
         }
 
