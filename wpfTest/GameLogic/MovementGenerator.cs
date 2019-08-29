@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace wpfTest.GameLogic
 {
+    /// <summary>
+    /// Generates movement flowmaps in other thread.
+    /// </summary>
     public class MovementGenerator
     {
         private static MovementGenerator movementGenerator;
@@ -18,37 +21,69 @@ namespace wpfTest.GameLogic
             movementGenerator.StartThread();
         }
 
-        private Dictionary<Players, MovementGenerating> playersMovementGenerating;
+        private Dictionary<Players, PlayerMovementGenerator> playersMovementGenerators;
         /// <summary>
         /// The player whose next command will be processed. Players switch after each iteration.
         /// </summary>
         private Players NextPlayer { get; set; }
 
-        private class MovementGenerating
+        /// <summary>
+        /// Calculates movement flowmaps for one player.
+        /// </summary>
+        private class PlayerMovementGenerator
         {
-            //commands that were not registered yet
-            private List<MoveToCommandAssignment> newCommands;//lock is MovementGenerator
-            //all currently active commands
-            private List<MoveToCommandAssignment> commands;//isolated
-            //true if there are commands in newCommands
-            public bool AddedCommands { get; private set; }//lock is MovementGenerator
-            //true if the visible part of map was changed
-            public bool MapChanged { get; set; }//lock is MovementGenerator
+            //Inputs that can be changed from other threads.
+            /// <summary>
+            /// Commands that were not registered yet. Lock is MovementGenerator.
+            /// </summary>
+            private List<MoveToCommandAssignment> newCommands;//
+            /// <summary>
+            /// Obstacle maps that were not registered yet. Lock is MovementGenerator.
+            /// </summary>
+            private Dictionary<Movement, ObstacleMap> newObstMaps;
+            /// <summary>
+            /// Set to true after assignments are added to newCommands. Lock is MovementGenerator.
+            /// </summary>
+            public bool AddedCommands { get; private set; }
+            /// <summary>
+            /// Set to true after newObstMaps was changed. Lock is MovementGenerator.
+            /// </summary>
+            public bool MapChanged { get; set; }
+            /// <summary>
+            /// Outputs of the algorithm. Lock is MovementGenerator.
+            /// </summary>
+            public List<MoveToCommandAssignment> Output { get; set; }
 
-            //inputs
-            private List<MoveToCommandAssignment> inputs;//lock is MovementGenerator
-            private Dictionary<Movement, ObstacleMap> newObstMaps;//lock is MovementGenerator
-            private Dictionary<Movement, ObstacleMap> obstMaps;//isolated
 
-            //outputs
-            public List<MoveToCommandAssignment> Output { get; set; }//lock is MovementGenerator
-            public bool Finished { get; private set; }//isolated
+            //These fields are set at the start of new cycle from the input from outside.
+            //They are isolated during the algorithm.
+            /// <summary>
+            /// All valid MoveToCommandAssignments for this player in the game.
+            /// </summary>
+            private List<MoveToCommandAssignment> commands;
+            /// <summary>
+            /// MoveToCommandAssignments that will be recalculated in this cycle.
+            /// </summary>
+            private List<MoveToCommandAssignment> inputs;
+            /// <summary>
+            /// MoveToCommandAssignments that will be calculated repeatedly in this cycle.
+            /// </summary>
+            private List<MoveToCommandAssignment> repeatedInputs;
+            /// <summary>
+            /// Obstacle maps used in this cycle.
+            /// </summary>
+            private Dictionary<Movement, ObstacleMap> obstMaps;
+            /// <summary>
+            /// What kind of command assignment is currently calculated.
+            /// </summary>
+            public Work CurrentWork { get; private set; }
 
-            public MovementGenerating()
+            public PlayerMovementGenerator()
             {
                 inputs = new List<MoveToCommandAssignment>();
+                repeatedInputs = new List<MoveToCommandAssignment>();
                 Output = new List<MoveToCommandAssignment>();
-                Finished = true;
+                CurrentWork = Work.NOTHING;
                 commands = new List<MoveToCommandAssignment>();
                 newCommands = new List<MoveToCommandAssignment>();
                 newObstMaps = new Dictionary<Movement, ObstacleMap>();
@@ -61,9 +96,13 @@ namespace wpfTest.GameLogic
                 obstMaps.Add(Movement.LAND_WATER, null);
             }
 
-            public void UpdateInputs(object lockObj)
+            /// <summary>
+            /// Is called at the start of new cycle. Sets input using newCommands, resets
+            /// newCommands and repeatedInput.
+            /// </summary>
+            public void StartNewCycle(object movementGenerator)
             {
-                lock (lockObj)
+                lock (movementGenerator)
                 {
                     //update obstacle maps
                     foreach (Movement m in Enum.GetValues(typeof(Movement)))
@@ -85,23 +124,40 @@ namespace wpfTest.GameLogic
                     if (MapChanged)
                     {
                         inputs = commands.ToList();//we don't want the same reference
+                        repeatedInputs.Clear();
                         MapChanged = false;
                     }
 
                     if (inputs.Any())
-                        Finished = false;
+                        CurrentWork = Work.INPUTS;
                 }
             }
 
-            public MoveToCommandAssignment HighestPriorityCommand()
+            /// <summary>
+            /// Returns command assignment with the highest priority.
+            /// </summary>
+            public MoveToCommandAssignment HighestPriorityAssignment()
             {
-                MoveToCommandAssignment comAss = inputs.FirstOrDefault();
+                MoveToCommandAssignment comAss = GetCommAssWithHighestPriority(inputs);
+
+                if(comAss!=null)
+                    return comAss;
+                else
+                    return GetCommAssWithHighestPriority(repeatedInputs);
+            }
+
+            /// <summary>
+            /// Returns command assignment from assignments with the highest priority.
+            /// </summary>
+            private MoveToCommandAssignment GetCommAssWithHighestPriority(List<MoveToCommandAssignment> assignments)
+            {
+                MoveToCommandAssignment comAss = assignments.FirstOrDefault();
                 //highest priority command doesn't exist
                 if (comAss == null)
                     return null;
 
                 Priority highest = comAss.Active ? Priority.HIGH : Priority.LOW;
-                foreach (MoveToCommandAssignment c in inputs)
+                foreach (MoveToCommandAssignment c in assignments)
                 {
                     //no higher priority can be found
                     if (highest == Priority.HIGH)
@@ -117,11 +173,15 @@ namespace wpfTest.GameLogic
                 return comAss;
             }
 
+            /// <summary>
+            /// Returns priority of the command with the highest priority.
+            /// Returns no commands if there are no commands.
+            /// </summary>
             public Priority GetHighestPriority()
             {
-                MoveToCommandAssignment c = HighestPriorityCommand();
+                MoveToCommandAssignment c = HighestPriorityAssignment();
                 if (c == null)
-                    return Priority.LOWEST;
+                    return Priority.NO_COMMANDS;
                 else
                     return c.Active ? Priority.HIGH : Priority.LOW;
             }
@@ -129,31 +189,52 @@ namespace wpfTest.GameLogic
             /// <summary>
             /// Processes the command with the highest prioirty and puts it to the output.
             /// </summary>
-            public void ProcessCommand(object lockObj)
+            public void ProcessCommand(object movementGenerator)
             {
-                MoveToCommandAssignment c = HighestPriorityCommand();
-                inputs.Remove(c);
-                if (!inputs.Any())
-                    Finished = true;
+                MoveToCommandAssignment current = HighestPriorityAssignment();
+                //remove command from the corresponding list
+                if(inputs.Contains(current))
+                    inputs.Remove(current);
+                else
+                    repeatedInputs.Remove(current);
 
-                if (obstMaps[c.Movement] == null)
+                //animal targets can move so the flowmap needs to be repeatedly recalculated
+                if (current.Target is Animal && current.Animals.Any())
+                    repeatedInputs.Add(current);
+
+                //set current state of work
+                if (!inputs.Any())
+                {
+                    if (!repeatedInputs.Any())
+                        CurrentWork = Work.NOTHING;
+                    else
+                        CurrentWork = Work.REPEATED_INPUTS;
+                }
+
+                //don't do anything if obstacle map for the movement doesn't exist
+                if (obstMaps[current.Movement] == null)
                     return;
 
-                c.Process(obstMaps[c.Movement]);
-                lock (lockObj)
-                    Output.Add(c);
+                //process current command assignment
+                current.Process(obstMaps[current.Movement]);
+
+                //put the command assignment to outputs
+                lock (movementGenerator)
+                    Output.Add(current);
             }
 
             /// <summary>
-            /// Sets the new obstacle maps.
+            /// Sets the newObstMaps.
             /// </summary>
-            /// <param name="obstMaps"></param>
             public void SetObstMaps(Dictionary<Movement,ObstacleMap> obstMaps)
             {
                 foreach(Movement m in Enum.GetValues(typeof(Movement)))
                     newObstMaps[m] = obstMaps[m];
             }
 
+            /// <summary>
+            /// Adds command to newCommands.
+            /// </summary>
             public void AddNewCommand(MoveToCommandAssignment command)
             {
                 newCommands.Add(command);
@@ -161,16 +242,16 @@ namespace wpfTest.GameLogic
             }
         }
 
+        public MovementGenerator()
+        {
+            playersMovementGenerators = new Dictionary<Players, PlayerMovementGenerator>();
+            playersMovementGenerators.Add(Players.PLAYER0, new PlayerMovementGenerator());
+            playersMovementGenerators.Add(Players.PLAYER1, new PlayerMovementGenerator());
+        }
+
         /// <summary>
         /// Starts a new thread for creating flow maps.
         /// </summary>
-        public MovementGenerator()
-        {
-            playersMovementGenerating = new Dictionary<Players, MovementGenerating>();
-            playersMovementGenerating.Add(Players.PLAYER0, new MovementGenerating());
-            playersMovementGenerating.Add(Players.PLAYER1, new MovementGenerating());
-        }
-
         private void StartThread()
         {
             Thread t = new Thread(() => Generate());
@@ -183,7 +264,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public void SetMapChanged(Players player, Dictionary<Movement,ObstacleMap> obstMaps)
         {
-            MovementGenerating mg = playersMovementGenerating[player];
+            PlayerMovementGenerator mg = playersMovementGenerators[player];
             lock (this)
             {
                 mg.SetObstMaps(obstMaps);
@@ -197,7 +278,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public void AddNewCommand(Players player, MoveToCommandAssignment command)
         {
-            MovementGenerating mg = playersMovementGenerating[player];
+            PlayerMovementGenerator mg = playersMovementGenerators[player];
             lock (this)
             {
                 mg.AddNewCommand(command);
@@ -211,8 +292,8 @@ namespace wpfTest.GameLogic
         {
             lock (this)
             {
-                MovementGenerating mg0 = playersMovementGenerating[Players.PLAYER0];
-                MovementGenerating mg1 = playersMovementGenerating[Players.PLAYER1];
+                PlayerMovementGenerator mg0 = playersMovementGenerators[Players.PLAYER0];
+                PlayerMovementGenerator mg1 = playersMovementGenerators[Players.PLAYER1];
                 foreach (MoveToCommandAssignment c in mg0.Output)
                 {
                     c.UpdateCommands();
@@ -230,44 +311,88 @@ namespace wpfTest.GameLogic
         public void Generate()
         {
             //movement generatings for players don't change
-            MovementGenerating mg0 = playersMovementGenerating[Players.PLAYER0];
-            MovementGenerating mg1 = playersMovementGenerating[Players.PLAYER1];
+            PlayerMovementGenerator mg0 = playersMovementGenerators[Players.PLAYER0];
+            PlayerMovementGenerator mg1 = playersMovementGenerators[Players.PLAYER1];
             while (true)
             {
                 //wait until at least one of the players needs to recalculate the commands
                 lock (this)
                 {
-                    while (!mg0.MapChanged &&
-                             !mg0.AddedCommands &&
-                             !mg1.MapChanged &&
-                             !mg1.AddedCommands) { Monitor.Wait(this); }
+                    while (!StartNewCycle()) { Monitor.Wait(this); }
                 }
                 lock (this)
                 {
-                    //map doesn't change very often, so we don't check for it in the calculating cycle 
-                    mg0.UpdateInputs(this);
-                    mg1.UpdateInputs(this);
+                    //map doesn't change very often, so we don't check for the change in the calculation cycle 
+                    mg0.StartNewCycle(this);
+                    mg1.StartNewCycle(this);
                 }
 
-                while (!mg0.Finished ||
-                      !mg1.Finished)
+                //calculation cycle
+                while (!CycleFinished())
                 {
                     //determine which player's command will be processed next
-                    Priority nextPr = playersMovementGenerating[NextPlayer].GetHighestPriority();
-                    Priority oppPr = playersMovementGenerating[Opposite(NextPlayer)].GetHighestPriority();
+                    Priority nextPr = playersMovementGenerators[NextPlayer].GetHighestPriority();
+                    Priority oppPr = playersMovementGenerators[Next(NextPlayer)].GetHighestPriority();
                     if (oppPr.HigherThan(nextPr))
-                        NextPlayer = Opposite(NextPlayer);
+                        NextPlayer = Next(NextPlayer);
 
                     //process the command from NextPlayer with the highest priority
-                    MovementGenerating nMg = playersMovementGenerating[NextPlayer];
+                    PlayerMovementGenerator nMg = playersMovementGenerators[NextPlayer];
                     nMg.ProcessCommand(this);
-
-                    NextPlayer = Opposite(NextPlayer);
+                    
+                    NextPlayer = Next(NextPlayer);
+                    
                 }
             }
         }
 
-        private Players Opposite(Players p)
+        /// <summary>
+        /// Returns true iff the calculation cycle should finish.
+        /// </summary>
+        private bool CycleFinished()
+        {
+            PlayerMovementGenerator mg0 = playersMovementGenerators[Players.PLAYER0];
+            PlayerMovementGenerator mg1 = playersMovementGenerators[Players.PLAYER1];
+            if (mg0.CurrentWork == Work.NOTHING && mg1.CurrentWork == Work.NOTHING)
+                //cycle is finished if both mg0 and mg1 are doing nothing
+                return true;
+            else if (mg0.CurrentWork == Work.INPUTS || mg1.CurrentWork == Work.INPUTS)
+                //cycle isn't finished if at least one of mg0 and mg1 is working on inputs
+                return false;
+            else
+            {
+                //mg0 and mg1 can only be working on repeated inputs - finish if there are no
+                //new regular inputs waiting to be calculated in the next cycle
+                if (StartNewCycle())
+                    return true;
+                else
+                    return false;
+
+            }
+
+        }
+
+        /// <summary>
+        /// Returns true iff new calculation cycle should begin.
+        /// </summary>
+        private bool StartNewCycle()
+        {
+            PlayerMovementGenerator mg0 = playersMovementGenerators[Players.PLAYER0];
+            PlayerMovementGenerator mg1 = playersMovementGenerators[Players.PLAYER1];
+            lock (this)
+            {
+                return (mg0.MapChanged ||
+                        mg0.AddedCommands ||
+                        mg1.MapChanged ||
+                        mg1.AddedCommands);
+            }
+        }
+
+
+        /// <summary>
+        /// Returns the player that comes after p.
+        /// </summary>
+        private Players Next(Players p)
         {
             switch (p)
             {
@@ -277,11 +402,24 @@ namespace wpfTest.GameLogic
         }
     }
 
+    /// <summary>
+    /// Priority of CommandAssignment and PlayerMovementGenerator.
+    /// </summary>
     enum Priority
     {
         HIGH,
         LOW,
-        LOWEST
+        NO_COMMANDS
+    }
+
+    /// <summary>
+    /// Type of work that PlayerMovementGenerator does.
+    /// </summary>
+    enum Work
+    {
+        NOTHING,
+        INPUTS,
+        REPEATED_INPUTS
     }
 
     static class PriorityExtensions
@@ -291,10 +429,10 @@ namespace wpfTest.GameLogic
             switch (p)
             {
                 case Priority.HIGH: return q !=Priority.HIGH;//no priority is higher than high
-                case Priority.LOW: return q == Priority.LOWEST;//only high priority is higher than low
-                case Priority.LOWEST: return false;//any priority other than lowest is higher than lowest
+                case Priority.LOW: return q == Priority.NO_COMMANDS;//only high priority is higher than low
+                case Priority.NO_COMMANDS: return false;//any priority other than NO_COMMANDS is higher than NO_COMMANDS
             }
-            throw new NotImplementedException("Method " + nameof(HigherThan) + " is implemented incorrectly!");
+            throw new NotImplementedException("Method " + nameof(HigherThan) + " doesn't cover the case where p="+p+" and q=" + q+"!");
         }
     }
 }

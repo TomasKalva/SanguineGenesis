@@ -22,13 +22,13 @@ namespace wpfTest.GameLogic
         /// <summary>
         /// Where the animals should go.
         /// </summary>
-        public IMovementTarget TargetPoint { get; }
+        public IMovementTarget Target { get; }
         /// <summary>
         /// Movement type of the animals.
         /// </summary>
         public Movement Movement { get; }
         /// <summary>
-        /// True if any units are currently using this command.
+        /// True if any animals are currently using this command.
         /// </summary>
         public bool Active { get; set; }
         /// <summary>
@@ -47,7 +47,7 @@ namespace wpfTest.GameLogic
             Active = false;
             Player = player;
             Animals = units;
-            TargetPoint = target;
+            Target = target;
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace wpfTest.GameLogic
             //map used in the pathfinding algorithm
             ObstacleMap forPathfinding = obst;
 
-            Building targAsBuilding = TargetPoint as Building;
-            Node targAsNode = TargetPoint as Node;
+            Building targAsBuilding = Target as Building;
+            Node targAsNode = Target as Node;
             if (targAsBuilding!=null || (targAsNode!=null && targAsNode.Building!=null))
             {
                 //remove the building that is over the target on this obstacle map
@@ -86,7 +86,7 @@ namespace wpfTest.GameLogic
             else
             {
                 //if there is an obstacle on the target square, cancel this assignment
-                if (obst[(int)TargetPoint.Center.X, (int)TargetPoint.Center.Y] ||
+                if (obst[(int)Target.Center.X, (int)Target.Center.Y] ||
                     !Animals.Any())
                 {
                     Invalid = true;
@@ -96,7 +96,7 @@ namespace wpfTest.GameLogic
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            flowMap = RayPathfinding.GetPathfinding.GenerateFlowMap(forPathfinding, TargetPoint.Center);
+            flowMap = RayPathfinding.GetPathfinding.GenerateFlowMap(forPathfinding, Target.Center);
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
         }

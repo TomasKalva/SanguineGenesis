@@ -46,7 +46,6 @@ namespace wpfTest
             GameControls = new GameControls(MapView, Game);
             openGLControl1.FrameRate = 30;
 
-
             Thread t = new Thread(() =>
             {
                 Dispatcher.Invoke(DispatcherPriority.Render, new Action(() =>

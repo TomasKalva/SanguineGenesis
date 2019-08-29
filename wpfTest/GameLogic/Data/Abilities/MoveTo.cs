@@ -9,7 +9,7 @@ namespace wpfTest.GameLogic.Data.Abilities
     /// <summary>
     /// The animal moves to the target.
     /// </summary>
-    public sealed class MoveTo : TargetAbility<Animal, IMovementTarget>, IMovementParametrizing
+    public sealed class MoveTo : TargetAbility<Animal, IMovementTarget>
     {
         internal MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
             : base(-1, 0, false, false)

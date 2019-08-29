@@ -104,7 +104,6 @@
     <Compile Include="GameLogic\CommandAssignment.cs" />
     <Compile Include="GameLogic\GameplayOptions.cs" />
     <Compile Include="GameLogic\MovementGenerator.cs" />
-    <Compile Include="GameLogic\MovementParameters.cs" />
     <Compile Include="GameLogic\Data\Entities\Tree.cs" />
     <Compile Include="GameLogic\Data\Entities\Animal.cs" />
     <Compile Include="GameLogic\View.cs" />
