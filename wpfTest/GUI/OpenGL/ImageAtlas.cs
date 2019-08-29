@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -125,19 +126,19 @@ namespace wpfTest.GUI
                 foreach(XmlElement animation in entity.ChildNodes)
                 {
                     XmlElement firstImage = (XmlElement)animation.FirstChild;
-                    float centerX = float.Parse(animation.GetAttribute("CenterX"));
-                    float centerY = float.Parse(animation.GetAttribute("CenterY"));
-                    float animWidth = float.Parse(firstImage.GetAttribute("Width"));
-                    float animHeight = float.Parse(firstImage.GetAttribute("Height"));
+                    float centerX = float.Parse(animation.GetAttribute("CenterX"), CultureInfo.InvariantCulture);
+                    float centerY = float.Parse(animation.GetAttribute("CenterY"), CultureInfo.InvariantCulture);
+                    float animWidth = float.Parse(firstImage.GetAttribute("Width"), CultureInfo.InvariantCulture);
+                    float animHeight = float.Parse(firstImage.GetAttribute("Height"), CultureInfo.InvariantCulture);
                     
                     //iterate over all images of the animation
                     var animationImages = new List<Rect>();
                     foreach (XmlElement image in animation.ChildNodes)
                     {
-                        float x = float.Parse(image.GetAttribute("X"));
-                        float y = float.Parse(image.GetAttribute("Y"));
-                        float width = float.Parse(image.GetAttribute("Width"));
-                        float height = float.Parse(image.GetAttribute("Height"));
+                        float x = float.Parse(image.GetAttribute("X"), CultureInfo.InvariantCulture);
+                        float y = float.Parse(image.GetAttribute("Y"), CultureInfo.InvariantCulture);
+                        float width = float.Parse(image.GetAttribute("Width"), CultureInfo.InvariantCulture);
+                        float height = float.Parse(image.GetAttribute("Height"), CultureInfo.InvariantCulture);
                         animationImages.Add(
                             ToRelative(
                                 GridToCoordinates(x, y, width, height)));

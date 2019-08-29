@@ -162,43 +162,44 @@ namespace wpfTest
         {
             //clear the scene
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
-            
+
             //draw vertex array buffers
 
             //draw map
             map.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
-
+            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, map.VertexCount);
+            
             //draw nutrients map
             if (gameplayOptions.NutrientsVisible)
             {
                 nutrientsMap.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 30000);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, nutrientsMap.VertexCount);
             }
 
             //draw flowmap
             if (gameplayOptions.ShowFlowmap)
             {
                 flowMap.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, flowMap.VertexCount);
             }
-
+            
             //draw entities
             if (!entitiesEmpty)
             {
                 entityCircles.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entityCircles.VertexCount);
 
                 entities.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entities.VertexCount);
 
                 entityIndicators.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entityIndicators.VertexCount);
             }
             
             //draw selection frame
             selectionFrame.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 10000);
+            gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 6);
+            
         }
 
 
@@ -296,6 +297,8 @@ namespace wpfTest
                 else
                     Array.Clear(array, 0, array.Length);
             }
+
+            public int VertexCount => vertices == null ? 0 : vertices.Length / 3;
         }
 
         //vertex buffer arrays which contain the buffers for vertex, 

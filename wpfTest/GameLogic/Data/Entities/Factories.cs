@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -207,19 +208,19 @@ namespace wpfTest.GameLogic
         {
             string[] fields = description.Split(',');
             string treeType = fields[0];
-            decimal maxHealth=decimal.Parse(fields[1]);
-            decimal maxEnergy = decimal.Parse(fields[2]);
-            decimal energyRegen = decimal.Parse(fields[3]);
+            decimal maxHealth=decimal.Parse(fields[1], CultureInfo.InvariantCulture);
+            decimal maxEnergy = decimal.Parse(fields[2], CultureInfo.InvariantCulture);
+            decimal energyRegen = decimal.Parse(fields[3], CultureInfo.InvariantCulture);
             bool physical = fields[4] == "yes";
-            int size = int.Parse(fields[5]);
-            int rootsDistance = int.Parse(fields[6]);
-            decimal energyCost = decimal.Parse(fields[7]);
+            int size = int.Parse(fields[5], CultureInfo.InvariantCulture);
+            int rootsDistance = int.Parse(fields[6], CultureInfo.InvariantCulture);
+            decimal energyCost = decimal.Parse(fields[7], CultureInfo.InvariantCulture);
             Biome biome = (Biome)Enum.Parse(typeof(Biome),fields[8]);
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain),fields[9]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality),fields[10]);
             List<StatusFactory> statusFactories = ParseStatuses(fields[12], statuses);
             bool producer = fields[13] == "yes";
-            int air = int.Parse(fields[14]);
+            int air = int.Parse(fields[14], CultureInfo.InvariantCulture);
 
             TreeFactory newFactory = new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
                 biome, terrain, soilQuality, producer, 10f, rootsDistance, air, statusFactories);
@@ -237,11 +238,11 @@ namespace wpfTest.GameLogic
         {
             string[] fields = description.Split(',');
             string structureType = fields[0];
-            decimal maxHealth = decimal.Parse(fields[1]);
-            decimal maxEnergy = decimal.Parse(fields[2]);
+            decimal maxHealth = decimal.Parse(fields[1], CultureInfo.InvariantCulture);
+            decimal maxEnergy = decimal.Parse(fields[2], CultureInfo.InvariantCulture);
             bool physical = fields[3] == "yes";
-            int size = int.Parse(fields[4]);
-            decimal energyCost = decimal.Parse(fields[5]);
+            int size = int.Parse(fields[4], CultureInfo.InvariantCulture);
+            decimal energyCost = decimal.Parse(fields[5], CultureInfo.InvariantCulture);
             Biome biome = (Biome)Enum.Parse(typeof(Biome), fields[6]);
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[7]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[8]);
@@ -264,25 +265,25 @@ namespace wpfTest.GameLogic
         {
             string[] fields = description.Split(',');
             string unitType = fields[0];
-            decimal maxHealth = decimal.Parse(fields[1]);
-            decimal maxEnergy = decimal.Parse(fields[2]);
-            decimal foodEnergyRegen = decimal.Parse(fields[3]);
-            float foodEatingPeriod = float.Parse(fields[4]);
-            float range = float.Parse(fields[5]);
-            decimal energyCost = decimal.Parse(fields[6]);
-            decimal attackDamage = decimal.Parse(fields[7]);
-            float attackDistance = float.Parse(fields[8]);
-            float attackPeriod = float.Parse(fields[9]);
+            decimal maxHealth = decimal.Parse(fields[1], CultureInfo.InvariantCulture);
+            decimal maxEnergy = decimal.Parse(fields[2], CultureInfo.InvariantCulture);
+            decimal foodEnergyRegen = decimal.Parse(fields[3], CultureInfo.InvariantCulture);
+            float foodEatingPeriod = float.Parse(fields[4], CultureInfo.InvariantCulture);
+            float range = float.Parse(fields[5], CultureInfo.InvariantCulture);
+            decimal energyCost = decimal.Parse(fields[6], CultureInfo.InvariantCulture);
+            decimal attackDamage = decimal.Parse(fields[7], CultureInfo.InvariantCulture);
+            float attackDistance = float.Parse(fields[8], CultureInfo.InvariantCulture);
+            float attackPeriod = float.Parse(fields[9], CultureInfo.InvariantCulture);
             bool mechanicalDamage = fields[10] == "yes";
             //field[11] isn't important
-            float maxSpeedLand = float.Parse(fields[12]);
-            float maxSpeedWater = float.Parse(fields[13]);
+            float maxSpeedLand = float.Parse(fields[12], CultureInfo.InvariantCulture);
+            float maxSpeedWater = float.Parse(fields[13], CultureInfo.InvariantCulture);
             Movement movement = (Movement)Enum.Parse(typeof(Movement), fields[14]);
             bool thickSkin = fields[15] == "yes";
             Diet diet = (Diet)Enum.Parse(typeof(Diet), fields[16]);
-            float spawningTime = float.Parse(fields[17]);
+            float spawningTime = float.Parse(fields[17], CultureInfo.InvariantCulture);
             List<StatusFactory> statusFactories = ParseStatuses(fields[19], statuses);
-            int air = int.Parse(fields[20]);
+            int air = int.Parse(fields[20], CultureInfo.InvariantCulture);
 
             Factorys.Add(unitType, 
                 new AnimalFactory(
