@@ -848,14 +848,14 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateFlowMapDataBuffers(OpenGL gl, MapView mapView, Game game)
+        public static void UpdateFlowMapDataBuffers(OpenGL gl, MapView mapView, FlowMap flowmap)
         {
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
             float viewTop = mapView.Top;
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
-            float?[,] flowM = mapView.GetVisibleFlowMap(game);
+            float?[,] flowM = mapView.GetVisibleFlowMap(flowmap);
             int width = flowM.GetLength(0);
             int height = flowM.GetLength(1);
 

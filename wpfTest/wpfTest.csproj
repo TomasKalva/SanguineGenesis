@@ -99,6 +99,8 @@
     <Compile Include="GameLogic\Data\Statuses\StatusFactory.cs" />
     <Compile Include="GameLogic\Data\Entities\Unit.cs" />
     <Compile Include="GameLogic\Data\GameStaticData.cs" />
+    <Compile Include="GameLogic\Maps\BfsPathfinding.cs" />
+    <Compile Include="GameLogic\Maps\IPathfinding.cs" />
     <Compile Include="GameLogic\Maps\PushingMap.cs" />
     <Compile Include="GameLogic\Data\Entities\Structure.cs" />
     <Compile Include="GameLogic\CommandAssignment.cs" />
@@ -108,7 +110,7 @@
     <Compile Include="GameLogic\Data\Entities\Animal.cs" />
     <Compile Include="GameLogic\View.cs" />
     <Compile Include="GameLogic\VisibilityGenerator.cs" />
-    <Compile Include="GameLogic\Maps\Pathfinding.cs" />
+    <Compile Include="GameLogic\Maps\RayPathfinding.cs" />
     <Compile Include="GameLogic\Maps\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityMap.cs" />
     <Compile Include="GUI\WPFComponents\AdditionalInfo.cs" />

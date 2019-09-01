@@ -191,13 +191,17 @@ namespace wpfTest.GameLogic
             {
                 //create new command and assign it to c
                 Command com = NewCommand(c, target);
+
+                //instead of MoveTo command before com set MoveTo as FollowCommand for com
                 Animal a = c as Animal;
-                if (a != null)
+                if (a != null && com.FollowTarget())
                 {
                     MoveToCommand followCommand = (MoveToCommand)a.CommandQueue.Queue.LastOrDefault();
                     a.CommandQueue.Queue.Remove(followCommand);
                     com.FollowCommand = followCommand;
                 }
+
+
                 c.AddCommand(com);
             }
         }

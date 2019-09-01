@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace wpfTest.GameLogic.Maps
 {
     /// <summary>
-    /// Used for pathfinding using raycasting algorithm.
+    /// Used for generating flowmap using raycasting algorithm.
     /// </summary>
-    class RayPathfinding
+    class RayPathfinding: IPathfinding
     {
         private static RayPathfinding pathfinding;
         public static RayPathfinding GetPathfinding => pathfinding;

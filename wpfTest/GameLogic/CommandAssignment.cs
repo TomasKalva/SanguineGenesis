@@ -105,7 +105,8 @@ namespace wpfTest.GameLogic
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            FlowMap flM= RayPathfinding.GetPathfinding.GenerateFlowMap(forPathfinding, Target.Center);
+            //FlowMap flM= RayPathfinding.GetPathfinding.GenerateFlowMap(forPathfinding, Target.Center);
+            FlowMap flM = new BfsPathfinding().GenerateFlowMap(forPathfinding, Target.Center);
             FlowMap = flM;
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);

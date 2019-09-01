@@ -194,7 +194,8 @@ namespace wpfTest
                 float distance = ((IMovementTarget)Targ).DistanceTo(animal);
                 if (distance > animal.AttackDistance)
                 {
-                    FollowCommand.PerformCommand(game, deltaT);
+                    ElapsedTime = 0;
+                    FollowCommand.PerformCommandLogic(game, deltaT);
                     return false;
                 }
                 else

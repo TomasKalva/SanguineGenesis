@@ -25,6 +25,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using wpfTest.GameLogic;
+using wpfTest.GameLogic.Data.Abilities;
 using wpfTest.GameLogic.Data.Entities;
 using wpfTest.GameLogic.Maps;
 using wpfTest.GUI;
@@ -386,8 +387,19 @@ namespace wpfTest
                 OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
                 OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
                 OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
+                //show flowmap of the selected animal if an animal is selected and player wants to show flowmap
                 if (Game.GameplayOptions.ShowFlowmap)
-                    OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, GameControls.MapView, Game);
+                {
+                    Animal selected;
+                    MoveToCommand command;
+                    FlowMap flM = null;
+                    if ((selected = (EntityButtonArray.Selected as Animal)) != null &&
+                        (command = (selected.CommandQueue.First() as MoveToCommand))!=null &&
+                        (flM =command.FlowMap)!=null)
+                    {
+                        OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, GameControls.MapView, flM);
+                    }
+                }
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
                 UpdateBottomPanel();
             }
@@ -444,9 +456,6 @@ namespace wpfTest
             Vector2 mapCoordinates = GameControls.MapView
                 .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));
             GameControls.EntityCommandsInput.SetTarget(mapCoordinates);
-
-            if(Game.GameplayOptions.ShowFlowmap)
-                Game.FlowMap = RayPathfinding.GetPathfinding.GenerateFlowMap(Game.Map.GetObstacleMap(Movement.LAND),  mapCoordinates);
         }
 
         /// <summary>

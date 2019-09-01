@@ -66,6 +66,7 @@ namespace wpfTest.GameLogic.Data.Abilities
 
         public override void OnRemove()
         {
+            base.OnRemove();
             CommandedEntity.CanBeMoved = true;
         }
 
