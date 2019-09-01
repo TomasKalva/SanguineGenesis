@@ -33,7 +33,8 @@ namespace wpfTest.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The building is build at the target node.";
+            return "The building is build at the target node. Requires at least "+BuildingFactory.SoilQuality+" soil qulity in " +
+                BuildingFactory.Biome+" to be built";
         }
     }
 

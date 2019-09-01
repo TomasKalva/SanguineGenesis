@@ -58,6 +58,16 @@ namespace wpfTest
             mg.SetMapChanged(wpfTest.Players.PLAYER1, ObstacleMaps);
         }
 
+        internal Map(Node[,] nodes)
+        {
+            this.nodes = nodes;
+            ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
+            InitializeObstacleMaps();
+            MovementGenerator mg = MovementGenerator.GetMovementGenerator();
+            mg.SetMapChanged(wpfTest.Players.PLAYER0, ObstacleMaps);
+            mg.SetMapChanged(wpfTest.Players.PLAYER1, ObstacleMaps);
+        }
+
         /// <summary>
         /// Copy the terrain of already existing map.
         /// </summary>
@@ -291,10 +301,10 @@ namespace wpfTest
                         this[i, j].GenerateNutrients();
         }
 
-            /// <summary>
-            /// Change biome by the amount of nutrients and neighbour biomes.
-            /// </summary>
-            public void UpdateBiomes()
+        /// <summary>
+        /// Change biome by the amount of nutrients and neighbour biomes.
+        /// </summary>
+        public void UpdateBiomes()
         {
             //spread biome to neighbours
             Biome[,] newBiomes = new Biome[Width, Height];

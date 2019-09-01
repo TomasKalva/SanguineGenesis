@@ -79,7 +79,7 @@ namespace wpfTest
             {
                 for (int j = 0; j < 15; j++)
                 {
-                    Entities.Add(normalUnits.NewInstance(this, new Vector2(20 + i*.25f,10+ j*.25f)));
+                    //Entities.Add(normalUnits.NewInstance(this, new Vector2(20 + i*.25f,10+ j*.25f)));
                 }
             }
             /*Entities.Add(bigUnits.NewInstance(this, new Vector2(5f, 6f)));

@@ -62,7 +62,7 @@ namespace wpfTest.GameLogic
             
             //unit spawn
             unitSpawn = new Dictionary<string, Spawn>();
-            foreach (var unitFac in gameStaticData.UnitFactories.Factorys)
+            foreach (var unitFac in gameStaticData.AnimalFactories.Factorys)
             {
                 Spawn spawn = new Spawn(unitFac.Value);
                 spawn.SetAbilities(this);
@@ -71,7 +71,7 @@ namespace wpfTest.GameLogic
 
             //unit create
             unitCreate = new Dictionary<string, CreateAnimal>();
-            foreach (var unitFac in gameStaticData.UnitFactories.Factorys)
+            foreach (var unitFac in gameStaticData.AnimalFactories.Factorys)
             {
                 CreateAnimal createUnit = new CreateAnimal(unitFac.Value);
                 createUnit.SetAbilities(this);

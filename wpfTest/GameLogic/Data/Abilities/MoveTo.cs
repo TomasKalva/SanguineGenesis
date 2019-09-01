@@ -145,7 +145,8 @@ namespace wpfTest.GameLogic.Data.Abilities
             Vector2 animalPos = CommandedEntity.Position;
             Building blockingBuilding;
             if ((blockingBuilding = game.Map[(int)animalPos.X, (int)animalPos.Y].Building) != null
-                && blockingBuilding != Targ)
+                && blockingBuilding != Targ
+                && blockingBuilding.Physical)
             {
                 //go outside of node with building to be able to use flowmap
                 CommandedEntity.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos), game.Map);

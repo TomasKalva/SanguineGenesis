@@ -26,10 +26,6 @@ namespace wpfTest
         /// </summary>
         public Map Map { get; }
         /// <summary>
-        /// Used only for debugging. Can be set visible by GameplayOptions.
-        /// </summary>
-        public FlowMap FlowMap { get; set; }
-        /// <summary>
         /// True if the game is over.
         /// </summary>
         public bool GameEnded { get; set; }
@@ -64,15 +60,19 @@ namespace wpfTest
 
         public Game(BitmapImage mapBitmap)
         {
-            PixelColor[,] mapPC = mapBitmap.GetPixels();
-            Map=new Map(mapPC);
-            FlowMap = new FlowMap(Map.Width, Map.Height);
             GameEnded = false;
+
             //players
             Players = new Dictionary<Players, Player>();
             Players.Add(wpfTest.Players.PLAYER0, new Player(wpfTest.Players.PLAYER0));
             Players.Add(wpfTest.Players.PLAYER1, new Player(wpfTest.Players.PLAYER1));
             CurrentPlayer = Players[wpfTest.Players.PLAYER0];
+             //map
+            var mapLoader = new MapLoader();
+            Map = mapLoader.LoadMap("Images\\NewMap\\nutrients.png", "Images\\NewMap\\biomes.png",
+                 "Images\\NewMap\\terrain.png", this);
+            mapLoader.LoadBuildings(this, "Images\\NewMap\\buildings.png");
+
             foreach(var kvp in Players)
                 kvp.Value.InitializeMapView(Map);
 

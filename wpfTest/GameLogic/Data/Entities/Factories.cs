@@ -259,7 +259,7 @@ namespace wpfTest.GameLogic
     /// <summary>
     /// Loads and stores factories of the type AnimalFactory.
     /// </summary>
-    public class UnitFactories : Factories<AnimalFactory>
+    public class AnimalFactories : Factories<AnimalFactory>
     {
         public override void AddNewFactory(string description, Statuses statuses)
         {

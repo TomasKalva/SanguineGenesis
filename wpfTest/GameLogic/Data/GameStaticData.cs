@@ -14,7 +14,7 @@ namespace wpfTest.GameLogic
     {
         public TreeFactories TreeFactories { get; }
         public StructureFactories StructureFactories { get; }
-        public UnitFactories UnitFactories { get; }
+        public AnimalFactories AnimalFactories { get; }
         public Abilities Abilities { get; }
         public Statuses Statuses { get; }
 
@@ -26,14 +26,14 @@ namespace wpfTest.GameLogic
             StructureFactories.InitFactorys("GameLogic/Data/Entities/Structures.csv", Statuses);
             TreeFactories = new TreeFactories();
             TreeFactories.InitFactorys("GameLogic/Data/Entities/Trees.csv", Statuses);
-            UnitFactories = new UnitFactories();
-            UnitFactories.InitFactorys("GameLogic/Data/Entities/Animals.csv", Statuses);
+            AnimalFactories = new AnimalFactories();
+            AnimalFactories.InitFactorys("GameLogic/Data/Entities/Animals.csv", Statuses);
 
             Abilities = new Abilities(this);
 
             StructureFactories.InitAbilities(Abilities);
             TreeFactories.InitAbilities(Abilities);
-            UnitFactories.InitAbilities(Abilities);
+            AnimalFactories.InitAbilities(Abilities);
         }
     }
 }
