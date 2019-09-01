@@ -23,8 +23,6 @@ namespace wpfTest
         }
         public int Width => nodes.GetLength(0) - 2;
         public int Height => nodes.GetLength(1) - 2;
-        //color is in rgb format
-        private Dictionary<int, Node> colorToNode;
         /// <summary>
         /// Set to true after building was added or removed.
         /// </summary>
@@ -33,30 +31,6 @@ namespace wpfTest
         /// Obstacle maps for the current map. Is updated by the UpdateObstacleMaps.
         /// </summary>
         public Dictionary<Movement, ObstacleMap> ObstacleMaps { get; }
-
-        public Map(PixelColor[,] map)
-        {
-            int width = map.GetLength(0) + 2;
-            int height = map.GetLength(1) + 2;
-            nodes = new Node[width, height];
-            InitializeColorToTerrain();
-            for(int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    if(i<=0 || i>Width || j<=0 || j > Height)
-                        //nodes outside of the map have default biome and maximal nutrients
-                        nodes[i, j] = new Node(i - 1, j - 1, Node.MAX_NUTRIENTS, Biome.DEFAULT, Terrain.LAND);
-                    else
-                        nodes[i, j] = colorToNode[map[i - 1, j - 1].RGB].Copy(i - 1, j - 1);
-                }
-            }
-            ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
-            InitializeObstacleMaps();
-            MovementGenerator mg = MovementGenerator.GetMovementGenerator();
-            mg.SetMapChanged(wpfTest.Players.PLAYER0, ObstacleMaps);
-            mg.SetMapChanged(wpfTest.Players.PLAYER1, ObstacleMaps);
-        }
 
         internal Map(Node[,] nodes)
         {
@@ -87,25 +61,7 @@ namespace wpfTest
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
             InitializeObstacleMaps();
         }
-
-        private void InitializeColorToTerrain()
-        {
-            colorToNode = new Dictionary<int, Node>();
-            colorToNode.Add(new PixelColor(168, 142, 78).RGB, new Node(-1,-1, 0,Biome.DEFAULT,Terrain.LAND));
-            colorToNode.Add(new PixelColor(0, 155, 255).RGB, new Node(-1, -1, 0, Biome.DEFAULT, Terrain.SHALLOW_WATER));
-            colorToNode.Add(new PixelColor(0, 0, 255).RGB, new Node(-1, -1, 0, Biome.DEFAULT, Terrain.DEEP_WATER));
-            colorToNode.Add(new PixelColor(0, 255, 0).RGB, new Node(-1, -1, 
-                Terrain.LAND.Nutrients(Biome.RAINFOREST,SoilQuality.LOW), Biome.RAINFOREST, Terrain.LAND));
-            colorToNode.Add(new PixelColor(0, 160, 0).RGB, new Node(-1, -1,
-                Terrain.LAND.Nutrients(Biome.RAINFOREST, SoilQuality.MEDIUM), Biome.RAINFOREST, Terrain.LAND));
-            colorToNode.Add(new PixelColor(106, 103, 29).RGB, new Node(-1, -1,
-                Terrain.LAND.Nutrients(Biome.RAINFOREST,SoilQuality.HIGH), Biome.RAINFOREST, Terrain.LAND));
-            colorToNode.Add(new PixelColor(213, 180, 99).RGB, new Node(-1, -1,
-                Terrain.LAND.Nutrients(Biome.SAVANNA,SoilQuality.LOW), Biome.SAVANNA, Terrain.LAND));
-            colorToNode.Add(new PixelColor(0, 255, 137).RGB, new Node(-1, -1,
-                Terrain.LAND.Nutrients(Biome.SAVANNA,SoilQuality.MEDIUM), Biome.SAVANNA, Terrain.LAND));
-        }
-
+        
         /// <summary>
         /// Initializes obstacle maps with values based on the map terrain.
         /// </summary>

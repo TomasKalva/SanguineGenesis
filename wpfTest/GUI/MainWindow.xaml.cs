@@ -41,8 +41,7 @@ namespace wpfTest
         {
             InitializeComponent();
             
-            BitmapImage mapBitmap = (BitmapImage)FindResource("riverBuildingsMap");
-            Game = new Game(mapBitmap);
+            Game = new Game();
             var MapView = new MapView(0, 0, 60, Game.Map, Game);
             GameControls = new GameControls(MapView, Game);
             openGLControl1.FrameRate = 30;

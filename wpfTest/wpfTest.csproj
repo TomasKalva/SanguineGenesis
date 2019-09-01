@@ -115,7 +115,6 @@
     <Compile Include="GameLogic\Maps\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityMap.cs" />
     <Compile Include="GUI\WPFComponents\AdditionalInfo.cs" />
-    <Compile Include="GUI\BitmapImageExtensions.cs" />
     <Compile Include="GameLogic\Maps\FlowMap.cs" />
     <Compile Include="GameControls\GameControls.cs" />
     <Compile Include="GameLogic\GameQuerying.cs" />
@@ -183,7 +182,7 @@
     <None Include="GameLogic\Data\Entities\Animals.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\XMLSchema1.xsd">
+    <None Include="Images\XMLAtlasSchema.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
@@ -202,31 +201,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\vanilaMap.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\hugeMap.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\tileMap.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\frameMap.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Images\bigTileMap.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\riverMap.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\riverBuildingsMap.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\atlas0.xml">

@@ -4,12 +4,6 @@
              xmlns:local="clr-namespace:wpfTest"
              StartupUri="GUI/MainWindow.xaml">
     <Application.Resources>
-        <BitmapImage x:Key="vanilaMap" UriSource="Images/vanilaMap.png"/>
-        <BitmapImage x:Key="hugeMap" UriSource="Images/hugeMap.png"/>
-        <BitmapImage x:Key="frameMap" UriSource="Images/frameMap.png"/>
-        <BitmapImage x:Key="riverMap" UriSource="Images/riverMap.png"/>
-        <BitmapImage x:Key="riverBuildingsMap" UriSource="Images/riverBuildingsMap.png"/>
-        
         <Style x:Key="AbilitiesArrayStyle" TargetType="Grid">
             <Setter Property="Background" Value="Gray" />
             <Style.Resources>

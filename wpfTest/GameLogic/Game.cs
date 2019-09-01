@@ -58,7 +58,7 @@ namespace wpfTest
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
 
-        public Game(BitmapImage mapBitmap)
+        public Game()
         {
             GameEnded = false;
 
@@ -67,6 +67,7 @@ namespace wpfTest
             Players.Add(wpfTest.Players.PLAYER0, new Player(wpfTest.Players.PLAYER0));
             Players.Add(wpfTest.Players.PLAYER1, new Player(wpfTest.Players.PLAYER1));
             CurrentPlayer = Players[wpfTest.Players.PLAYER0];
+
              //map
             var mapLoader = new MapLoader();
             Map = mapLoader.LoadMap("Images\\NewMap\\nutrients.png", "Images\\NewMap\\biomes.png",
