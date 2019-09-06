@@ -49,6 +49,12 @@ namespace wpfTest.GameLogic
         {
             base.Die();
 
+            //remove roots from map
+            foreach(Node n in RootNodes)
+            {
+                n.Roots.Remove(this);
+            }
+
             //after physical tree dies and has energy left, spawn a dead tree
             if(Physical && Energy > 0)
                 Player.Entities.Add(

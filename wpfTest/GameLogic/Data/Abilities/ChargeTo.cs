@@ -59,5 +59,13 @@ namespace wpfTest.GameLogic.Data.Abilities
             //command doesn't finish until the animal finishes charging
             return false;
         }
+
+        public override void OnRemove()
+        {
+            //remove lock of movement for this entity
+            CommandedEntity.StateChangeLock = null;
+            //set physical of the animal to the base value - true
+            CommandedEntity.Physical = true;
+        }
     }
 }

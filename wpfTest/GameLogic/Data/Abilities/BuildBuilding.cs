@@ -12,7 +12,7 @@ namespace wpfTest.GameLogic.Data.Abilities
     public sealed class BuildBuilding : TargetAbility<Entity, Node>
     {
         internal BuildBuilding(BuildingFactory buildingFactory)
-            : base(20f, buildingFactory.EnergyCost, true, false)
+            : base(10f, buildingFactory.EnergyCost, true, false)
         {
             BuildingFactory = buildingFactory;
         }
@@ -48,7 +48,7 @@ namespace wpfTest.GameLogic.Data.Abilities
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            if (!CanBeUsed())
+            if (!CanBeUsed() || (Targ.Center - CommandedEntity.Center).Length > Ability.Distance)
                 //finish if the command can't be used
                 return true;
 

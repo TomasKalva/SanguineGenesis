@@ -116,14 +116,14 @@ namespace wpfTest.GameLogic.Maps
             {
                 GameStaticData gsd = game.Players[Players.PLAYER0].GameStaticData;
                 //create a new builder that will be used to build the building
-                Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.Players[Players.PLAYER0], new Vector2(0,0));
+                Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.Players[Players.PLAYER0], n.Center);
                 gsd.Abilities.BuildBuilding("BAOBAB").NewCommand(builder, n).PerformCommand(game, 0);
             }
             else if (c.R == red.R && c.G == red.G && c.B == red.B)
             {
                 GameStaticData gsd = game.Players[Players.PLAYER1].GameStaticData;
                 //create a new builder that will be used to build the building
-                Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.Players[Players.PLAYER1], new Vector2(0, 0));
+                Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.Players[Players.PLAYER1], n.Center);
                 gsd.Abilities.BuildBuilding("KAPOC").NewCommand(builder, n).PerformCommand(game, 0);
             }
         }

@@ -210,7 +210,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="GameLogic\AI\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Images\NewMap\biomes.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
