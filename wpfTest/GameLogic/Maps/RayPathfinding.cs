@@ -9,7 +9,7 @@ namespace wpfTest.GameLogic.Maps
     /// <summary>
     /// Used for generating flowmap using raycasting algorithm.
     /// </summary>
-    class RayPathfinding: IPathfinding
+    class RayPathfinding
     {
         private static RayPathfinding pathfinding;
         public static RayPathfinding GetPathfinding => pathfinding;

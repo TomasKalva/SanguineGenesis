@@ -123,6 +123,9 @@ namespace wpfTest
         {
             return (animal.Position - this).Length;
         }
+
+        public float AngleTo(Vector2 v)
+            => (float)Math.Atan2(v.Y - Y, v.X - X);
     }
 
     /// <summary>

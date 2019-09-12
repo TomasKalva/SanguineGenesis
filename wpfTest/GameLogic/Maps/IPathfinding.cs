@@ -8,6 +8,6 @@ namespace wpfTest.GameLogic.Maps
 {
     interface IPathfinding
     {
-        FlowMap GenerateFlowMap(ObstacleMap obst, Vector2 targetLocation);
+        FlowMap GenerateFlowMap();
     }
 }
