@@ -44,7 +44,7 @@ namespace wpfTest
             Game = new Game();
             var MapView = new MapView(0, 0, 60, Game.Map, Game);
             GameControls = new GameControls(MapView, Game);
-            openGLControl1.FrameRate = 30;
+            openGLControl1.FrameRate = 60;
 
             Thread t = new Thread(() =>
             {
@@ -100,12 +100,15 @@ namespace wpfTest
         /// </summary>
         private double TotalStepTime { get; set; }
 
+
+        private int StepsDone { get; set; }
+
         /// <summary>
         /// The main loop of the game.
         /// </summary>
         public void MainLoop()
         {
-            TotalTime = 0;
+            TotalTime = 0; StepsDone = 0;
             totalStopwatch.Start();
             while (true)
             {
@@ -129,7 +132,7 @@ namespace wpfTest
                 //Invoke could cause deadlock because drawing also locks game
                 Dispatcher.BeginInvoke(
                     (Action)(() =>
-                    GameControls.UpdateMapView(Game)));
+                GameControls.UpdateMapView(Game)));
 
                 GameControls.UpdateEntitiesByInput(Game);
 
@@ -149,6 +152,11 @@ namespace wpfTest
             int sleepTime = StepLength - (int)TotalStepTime;
             if ((int)TotalStepTime > 0)
                 TotalStepTime = TotalStepTime - (int)TotalStepTime;
+
+            StepsDone++;
+            Console.WriteLine("updates per second: " + StepsDone / TotalTime * 1000);
+            Console.WriteLine("draws per second: " + DrawingsDone / TotalTime * 1000);
+
             //sleep for the rest of the step time
             if (sleepTime > 0)
                 Thread.Sleep(sleepTime);
@@ -365,7 +373,7 @@ namespace wpfTest
             OpenGLAtlasDrawer.CreateSelectionFrame(gl);
         }
 
-
+        private int DrawingsDone { get; set; }
 
         /// <summary>
         /// Updates information about what should be drawn.
@@ -381,8 +389,10 @@ namespace wpfTest
             {
                 GameControls.MapView.SetActualExtents((float)openGLControl1.ActualWidth, (float)openGLControl1.ActualHeight);
                 OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, GameControls.MapView, Game);
-                if(Game.GameplayOptions.NutrientsVisible)
+                if (Game.GameplayOptions.NutrientsVisible)
                     OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
+                else
+                    OpenGLAtlasDrawer.TryClearNutrientsMapDataBuffers(gl);
                 OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
                 OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
                 OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
@@ -398,9 +408,14 @@ namespace wpfTest
                     {
                         OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, GameControls.MapView, flM);
                     }
+                    else
+                        OpenGLAtlasDrawer.TryClearFlowMapDataBuffers(gl);
                 }
+                else
+                    OpenGLAtlasDrawer.TryClearFlowMapDataBuffers(gl);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
                 UpdateBottomPanel();
+                DrawingsDone++;
             }
             OpenGLAtlasDrawer.Draw(gl, Game.GameplayOptions);
 
@@ -438,7 +453,6 @@ namespace wpfTest
         {
             if (GameControls.EntityCommandsInput.State== EntityCommandsInputState.SELECTING_UNITS)
             {
-
                 Point clickPos = e.GetPosition(openGLControl1);
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2((float)clickPos.X, (float)clickPos.Y));

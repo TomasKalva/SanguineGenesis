@@ -170,14 +170,14 @@ namespace wpfTest
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, map.VertexCount);
             
             //draw nutrients map
-            if (gameplayOptions.NutrientsVisible)
+            //if (gameplayOptions.NutrientsVisible)
             {
                 nutrientsMap.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, nutrientsMap.VertexCount);
             }
 
             //draw flowmap
-            if (gameplayOptions.ShowFlowmap)
+            //if (gameplayOptions.ShowFlowmap)
             {
                 flowMap.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, flowMap.VertexCount);
@@ -218,6 +218,11 @@ namespace wpfTest
             public float[] colors;
             public float[] texture;
             public float[] texAtlas;
+
+            /// <summary>
+            /// True if the buffers contains no data.
+            /// </summary>
+            public bool Clear { get; private set; }
 
             public MyBufferArray(OpenGL gl)
             {
@@ -263,6 +268,8 @@ namespace wpfTest
 
                 VertexDataBuffer.Bind(gl);
                 VertexDataBuffer.SetData(gl, attributeIndexPosition, vValues, false, vStride);
+                //gl.BufferData(OpenGL.GL_ARRAY_BUFFER, vValues, OpenGL.GL_STREAM_DRAW);
+                VertexDataBuffer.Unbind(gl);
 
                 ColorDataBuffer.Bind(gl);
                 ColorDataBuffer.SetData(gl, attributeIndexcolor, cValues, false, cStride);
@@ -274,6 +281,8 @@ namespace wpfTest
                 TexAtlasDataBuffer.SetData(gl, attributeIndexTexBL, aValues, false, aStride);
 
                 VertexBufferArray.Unbind(gl);
+
+                Clear = false;
             }
 
             /// <summary>
@@ -299,6 +308,15 @@ namespace wpfTest
             }
 
             public int VertexCount => vertices == null ? 0 : vertices.Length / 3;
+
+            public void ClearBuffers(OpenGL gl)
+            {
+                BindData(gl, 1, new float[1],
+                            1, new float[1],
+                            1, new float[1],
+                            1, new float[1]);
+                Clear = true;
+            }
         }
 
         //vertex buffer arrays which contain the buffers for vertex, 
@@ -407,6 +425,15 @@ namespace wpfTest
         public static void CreateNutrientsMap(OpenGL gl)
         {
             nutrientsMap = new MyBufferArray(gl);
+        }
+
+        /// <summary>
+        /// Clears all buffers representing nutrients map.
+        /// </summary>
+        public static void TryClearNutrientsMapDataBuffers(OpenGL gl)
+        {
+            if (!nutrientsMap.Clear)
+                nutrientsMap.ClearBuffers(gl);
         }
 
         /// <summary>
@@ -841,7 +868,16 @@ namespace wpfTest
         {
             flowMap = new MyBufferArray(gl);
         }
-        
+
+        /// <summary>
+        /// Clears all buffers representing flow map.
+        /// </summary>
+        public static void TryClearFlowMapDataBuffers(OpenGL gl)
+        {
+            if (!flowMap.Clear)
+                flowMap.ClearBuffers(gl);
+        }
+
         /// <summary>
         /// Updates buffers of vertexArrayBuffer with the information about the flow map
         /// from mapView.

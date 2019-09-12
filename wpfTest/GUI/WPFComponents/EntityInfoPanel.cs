@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Media;
 using wpfTest.GameLogic.Data.Entities;
 using static wpfTest.MainWindow;
 
@@ -54,8 +55,7 @@ namespace wpfTest.GUI
             Children.Add(StatusButtonArray);
             SetLeft(StatusButtonArray, 0);
             SetBottom(StatusButtonArray, 0);
-
-
+            
             CommandButtonArray = new CommandButtonArray(buttonArrayColumns, 1, Width - progressBarWidth, buttonArrayHeight);
             Children.Add(CommandButtonArray);
             SetLeft(CommandButtonArray, progressBarWidth);
@@ -71,6 +71,8 @@ namespace wpfTest.GUI
             SetLeft(FirstCommandProgress, 0);
             SetBottom(FirstCommandProgress, buttonArrayHeight);
             FirstCommandProgress.Value = 70;
+
+            Background = Brushes.Gray;
         }
 
         /// <summary>
