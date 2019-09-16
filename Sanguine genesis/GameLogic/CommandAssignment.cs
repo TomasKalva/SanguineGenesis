@@ -40,8 +40,8 @@ namespace wpfTest.GameLogic
         /// only be set to true and reading an incorrect value once has no negative effects.
         /// </summary>
         public bool Invalid { get { lock (this) return invalid; } set { lock (this) invalid = value; } }
-        private FlowField flowMap;
-        private FlowField FlowMap { get { lock (this) return flowMap; } set { lock (this) flowMap = value; } }
+        private FlowField flowField;
+        private FlowField FlowField { get { lock (this) return flowField; } set { lock (this) flowField = value; } }
 
         public MoveToCommandAssignment(Players player, List<Animal> units, Movement movement, IMovementTarget target, float goalDistance=0.1f, bool interruptable=true)
         {
@@ -53,7 +53,7 @@ namespace wpfTest.GameLogic
         }
 
         /// <summary>
-        /// Generate flowmap for the given obstacle map obst.
+        /// Generate flowfield for the given obstacle map obst.
         /// </summary>
         public void Process(ObstacleMap obst)
         {
@@ -105,33 +105,33 @@ namespace wpfTest.GameLogic
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            //FlowMap flM= RayPathfinding.GetPathfinding.GenerateFlowMap(forPathfinding, Target.Center);
-            FlowField flM = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowMap();
-            FlowMap = flM;
+            //FlowField flF= RayPathfinding.GetPathfinding.GenerateFlowField(forPathfinding, Target.Center);
+            FlowField flF = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowField();
+            FlowField = flF;
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
         }
 
         /// <summary>
-        /// Updates the flowmap of the commands. Used with the game locked.
+        /// Updates the flowfield of the commands. Used with the game locked.
         /// </summary>
         public virtual void UpdateCommands()
         {
-            FlowField flM = FlowMap;
+            FlowField flF = FlowField;
             foreach (Animal a in Animals)
             {
                 //find command from this assignment
                 foreach(Command c in a.CommandQueue)
                 {
                     if (c is MoveToCommand mtpc)
-                        //update its flowmap
+                        //update its flowfield
                         if (mtpc.Assignment == this)
-                            mtpc.FlowMap= flM;
+                            mtpc.FlowField= flF;
 
-                    //update flowmaps of follow commands
+                    //update flowfields of follow commands
                     if (c.FollowCommand != null &&
                         c.FollowCommand.Assignment == this)
-                        c.FollowCommand.FlowMap = flM;
+                        c.FollowCommand.FlowField = flF;
                 }
             }
             //if there is an obstacle on the target square, cancel this assignment

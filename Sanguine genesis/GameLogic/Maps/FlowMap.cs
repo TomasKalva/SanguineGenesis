@@ -10,7 +10,7 @@ namespace wpfTest
     public class FlowField:IMap<float?>
     {
         /// <summary>
-        /// Minimal valid value for an angle in flowmap.
+        /// Minimal valid value for an angle in flowfield.
         /// </summary>
         public const float MIN_VALID_VALUE= -0.01f;
 
@@ -58,7 +58,7 @@ namespace wpfTest
         }
 
         /// <summary>
-        /// True iff val is valid value in flowmap.
+        /// True iff val is valid value in flowfield.
         /// </summary>
         public static bool IsValidValue(float val) => val >= MIN_VALID_VALUE;
     }

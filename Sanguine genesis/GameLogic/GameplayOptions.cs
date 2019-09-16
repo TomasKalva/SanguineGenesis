@@ -51,21 +51,21 @@ namespace wpfTest.GameLogic
                     _nutrientsVisible = value;
             }
         }
-        private bool _showFlowmap;
+        private bool _showFlowfield;
         /// <summary>
         /// True if flowfield created by right click is visible.
         /// </summary>
-        public bool ShowFlowmap
+        public bool ShowFlowfield
         {
             get
             {
                 lock (this)
-                    return _showFlowmap;
+                    return _showFlowfield;
             }
             set
             {
                 lock (this)
-                    _showFlowmap = value;
+                    _showFlowfield = value;
             }
         }
     }

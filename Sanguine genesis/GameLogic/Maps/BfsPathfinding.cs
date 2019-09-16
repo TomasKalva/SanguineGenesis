@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace wpfTest.GameLogic.Maps
 {
     /// <summary>
-    /// Used for generating flowmap using bfs with raycasting heuristics. One instance of the class
+    /// Used for generating flowfield using bfs with raycasting heuristics. One instance of the class
     /// is one instance of the algorithm.
     /// </summary>
     class BfsPathfinding : IPathfinding
@@ -15,7 +15,7 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// The result of the algorithm.
         /// </summary>
-        private FlowField flowMap;
+        private FlowField flowField;
 
         /// <summary>
         /// Contains all discovered coordinates that weren't processed yet.
@@ -26,7 +26,7 @@ namespace wpfTest.GameLogic.Maps
         /// </summary>
         private ObstacleMap obstacleMap;
         /// <summary>
-        /// Ending point of the flowmap.
+        /// Ending point of the flowfield.
         /// </summary>
         private Vector2 targetLocation;
 
@@ -34,13 +34,13 @@ namespace wpfTest.GameLogic.Maps
         {
             int width = obst.Width;
             int height = obst.Height;
-            flowMap = new FlowField(width, height);
+            flowField = new FlowField(width, height);
             obstacleMap = obst;
             this.targetLocation = targetLocation;
             discovered = new Queue<Coords>();
         }
 
-        public FlowField GenerateFlowMap()
+        public FlowField GenerateFlowField()
         {
             int width = obstacleMap.Width;
             int height = obstacleMap.Height;
@@ -55,8 +55,8 @@ namespace wpfTest.GameLogic.Maps
             }
             else
             {
-                //return empty flowmap if target location is invalid
-                return flowMap;
+                //return empty flowfield if target location is invalid
+                return flowField;
             }
 
             while (discovered.Any())
@@ -79,7 +79,7 @@ namespace wpfTest.GameLogic.Maps
             //find straight path from squares visible from the center
             PointToCenter();
 
-            return flowMap;
+            return flowField;
         }
 
         /// <summary>
@@ -87,20 +87,20 @@ namespace wpfTest.GameLogic.Maps
         /// </summary>
         private void Relax(Coords relaxed, float angle)
         {
-            if (relaxed.Valid(flowMap.Width, flowMap.Height))
+            if (relaxed.Valid(flowField.Width, flowField.Height))
             {
                 int x = relaxed.X;
                 int y = relaxed.Y;
-                if (flowMap[x, y] == null)
+                if (flowField[x, y] == null)
                 {
-                    flowMap[x, y] = angle;
+                    flowField[x, y] = angle;
                     discovered.Enqueue(relaxed);
                 }
             }
         }
         
         /// <summary>
-        /// Sets squares of the flowmap that are visible from center to point to the center.
+        /// Sets squares of the flowfield that are visible from center to point to the center.
         /// </summary>
         private void PointToCenter()
         {
@@ -115,7 +115,7 @@ namespace wpfTest.GameLogic.Maps
                     rayLength,
                     obstacleMap);
                 while (rTop.Next(out int x, out int y))
-                    flowMap[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
+                    flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
 
                 //bottom
                 Ray rBottom = new Ray(targetLocation,
@@ -123,7 +123,7 @@ namespace wpfTest.GameLogic.Maps
                     rayLength,
                     obstacleMap);
                 while (rBottom.Next(out int x, out int y))
-                    flowMap[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
+                    flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
             }
             //cast rays to the lines on left and right of the map
             for (int j = 0; j <= obstacleMap.Height; j++)
@@ -134,7 +134,7 @@ namespace wpfTest.GameLogic.Maps
                     rayLength,
                     obstacleMap);
                 while (rLeft.Next(out int x, out int y))
-                    flowMap[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
+                    flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
 
                 //right
                 Ray rRight = new Ray(targetLocation,
@@ -142,7 +142,7 @@ namespace wpfTest.GameLogic.Maps
                     rayLength,
                     obstacleMap);
                 while (rRight.Next(out int x, out int y))
-                    flowMap[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
+                    flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
             }
         }
 

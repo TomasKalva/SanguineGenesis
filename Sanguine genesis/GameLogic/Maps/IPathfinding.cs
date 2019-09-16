@@ -8,6 +8,6 @@ namespace wpfTest.GameLogic.Maps
 {
     interface IPathfinding
     {
-        FlowField GenerateFlowMap();
+        FlowField GenerateFlowField();
     }
 }

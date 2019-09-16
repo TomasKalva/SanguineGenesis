@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace wpfTest.GameLogic.Maps
 {
     /// <summary>
-    /// Used for generating flowmap using raycasting algorithm.
+    /// Used for generating flowfield using raycasting algorithm.
     /// </summary>
     class RayPathfinding
     {
@@ -27,9 +27,9 @@ namespace wpfTest.GameLogic.Maps
             NOT_DISCOVERED
         }
 
-        public FlowField GenerateFlowMap(ObstacleMap obst, Vector2 targetLocation)
+        public FlowField GenerateFlowField(ObstacleMap obst, Vector2 targetLocation)
         {
-            FlowField flMap = new FlowField(obst.Width, obst.Height);
+            FlowField flFap = new FlowField(obst.Width, obst.Height);
             //distance from the target
             float[,] distance = new float[obst.Width, obst.Height];
             //squares that need to be explored
@@ -49,23 +49,23 @@ namespace wpfTest.GameLogic.Maps
             state[targX, targY] = SquareState.DISCOVERED;
 
             //first iteration
-            RelaxDistances(new Vector2(targetLocation.X, targetLocation.Y), obst, distance, state, flMap);
+            RelaxDistances(new Vector2(targetLocation.X, targetLocation.Y), obst, distance, state, flFap);
             NextIteration(state);
             int iterations = 0;
 
             //iterate until all unblocked squares are discovered
             while (FindClosest(targetLocation,state,distance, out int x, out int y))
             {
-                RelaxDistances(new Vector2(x + 0.5f, y + 0.5f), obst, distance, state, flMap);
+                RelaxDistances(new Vector2(x + 0.5f, y + 0.5f), obst, distance, state, flFap);
                 NextIteration(state);
-                InferSmoothly(distance, state, flMap);
+                InferSmoothly(distance, state, flFap);
                 iterations++;
             }
             //Console.WriteLine("Number of iterations: " + iterations);
             //remove vectors pointing to blocked squares
-            RepairEdges(flMap, obst);
+            RepairEdges(flFap, obst);
 
-            return flMap;
+            return flFap;
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// Raycast to find shorter paths.
         /// </summary>
-        private void RelaxDistances(Vector2 center, ObstacleMap obst, float[,] distance, SquareState[,] state, FlowField flMap)
+        private void RelaxDistances(Vector2 center, ObstacleMap obst, float[,] distance, SquareState[,] state, FlowField flFap)
         {
             //ray has no length limit
             float rayLength = obst.Width * obst.Height;
@@ -125,7 +125,7 @@ namespace wpfTest.GameLogic.Maps
                 while (rTop.Next(out int x, out int y) &&
                     RayStep(x, y, angle,(float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f),
                             centerDist + (new Vector2(x + 0.5f, y + 0.5f) -center).Length,
-                            distance, flMap, state))
+                            distance, flFap, state))
                     state[x, y] = SquareState.DISCOVERED_IN_CURRENT;
 
                 //bottom
@@ -137,7 +137,7 @@ namespace wpfTest.GameLogic.Maps
                 while (rBottom.Next(out int x, out int y) &&
                     RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f),
                             centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length,
-                            distance, flMap, state))
+                            distance, flFap, state))
                     state[x, y] = SquareState.DISCOVERED_IN_CURRENT;
             }
             //cast rays to the lines on left and right of the map
@@ -152,7 +152,7 @@ namespace wpfTest.GameLogic.Maps
                 while (rLeft.Next(out int x, out int y) &&
                     RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f), 
                             centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length, 
-                            distance, flMap, state))
+                            distance, flFap, state))
                     state[x, y] = SquareState.DISCOVERED_IN_CURRENT;
 
                 //right
@@ -164,7 +164,7 @@ namespace wpfTest.GameLogic.Maps
                 while (rRight.Next(out int x, out int y) &&
                     RayStep(x, y, angle, (float)Math.Atan2(center.Y - y - 0.5f, center.X - x - 0.5f),
                             centerDist + (new Vector2(x + 0.5f, y + 0.5f) - center).Length, 
-                            distance, flMap,state))
+                            distance, flFap,state))
                     state[x, y] = SquareState.DISCOVERED_IN_CURRENT;
             }
         }
@@ -174,12 +174,12 @@ namespace wpfTest.GameLogic.Maps
         /// </summary>
         /// <returns></returns>
         private bool RayStep(int x, int y, float rayAngle, float squaresAngle, float newDistance,
-                            float[,] distance, FlowField flMap, SquareState[,] state)
+                            float[,] distance, FlowField flFap, SquareState[,] state)
         {
             if (newDistance < distance[x, y])
             {
                 //found shorter path to the square
-                flMap[x, y] = rayAngle;
+                flFap[x, y] = rayAngle;
                 distance[x, y] = newDistance;
                 return true;
             }
@@ -187,12 +187,12 @@ namespace wpfTest.GameLogic.Maps
             {
                 //check if the path along this ray is more optimal
                 float sqRayAngle = NormaliseAngle(squaresAngle - rayAngle);
-                float sqFlMapAngle = NormaliseAngle(squaresAngle - flMap[x, y].Value);
+                float sqFlMapAngle = NormaliseAngle(squaresAngle - flFap[x, y].Value);
                 if (sqRayAngle<sqFlMapAngle)
                 {
                     //ray angle is closer to the angles between the two squares,
                     //than the original angle
-                    flMap[x, y] = rayAngle;
+                    flFap[x, y] = rayAngle;
                 }
                 return true;
             }
@@ -227,50 +227,50 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// Fill spaces that are surrounded by already discovered squares with their average angle.
         /// </summary>
-        private void InferSmoothly(float[,] distance, SquareState[,] state, FlowField flMap)
+        private void InferSmoothly(float[,] distance, SquareState[,] state, FlowField flFap)
         {
-            for(int i=1;i<flMap.Width-1;i++)
-                for(int j = 1; j < flMap.Height - 1; j++)
+            for(int i=1;i<flFap.Width-1;i++)
+                for(int j = 1; j < flFap.Height - 1; j++)
                 {
                     if (state[i, j] != SquareState.NOT_DISCOVERED)
                         continue;
 
-                    float dist = flMap.Width * flMap.Height;
+                    float dist = flFap.Width * flFap.Height;
                     float angle = 0;
                     int neigbCount = 0;
                     if (state[i - 1, j] == SquareState.DISCOVERED
-                        && flMap[i - 1, j]!=null)
+                        && flFap[i - 1, j]!=null)
                     {
                         neigbCount++;
-                        angle += flMap[i - 1, j].Value;
+                        angle += flFap[i - 1, j].Value;
                         dist = Math.Min(dist, distance[i - 1, j]);
                     }
                     if (state[i + 1, j] == SquareState.DISCOVERED
-                        && flMap[i + 1, j] != null)
+                        && flFap[i + 1, j] != null)
                     {
                         neigbCount++;
-                        angle += flMap[i + 1, j].Value;
+                        angle += flFap[i + 1, j].Value;
                         dist = Math.Min(dist, distance[i + 1, j]);
                     }
                     if (state[i, j - 1] == SquareState.DISCOVERED
-                        && flMap[i, j - 1] != null)
+                        && flFap[i, j - 1] != null)
                     {
                         neigbCount++;
-                        angle += flMap[i, j - 1].Value;
+                        angle += flFap[i, j - 1].Value;
                         dist = Math.Min(dist, distance[i, j - 1]);
                     }
                     if (state[i, j + 1] == SquareState.DISCOVERED
-                        && flMap[i, j + 1] != null)
+                        && flFap[i, j + 1] != null)
                     {
                         neigbCount++;
-                        angle += flMap[i, j + 1].Value;
+                        angle += flFap[i, j + 1].Value;
                         dist = Math.Min(dist, distance[i, j + 1]);
                     }
                     if (neigbCount >= 3)
                     {
                         distance[i, j] = dist+1;
                         state[i, j] = SquareState.DISCOVERED;
-                        flMap[i, j] = angle / neigbCount;
+                        flFap[i, j] = angle / neigbCount;
                     }
                 }
         }
@@ -279,16 +279,16 @@ namespace wpfTest.GameLogic.Maps
         /// When a component of a vector is pointing towards a blocked square, remove the component of
         /// the vecotr.
         /// </summary>
-        private void RepairEdges(FlowField flowMap, ObstacleMap obstMap)
+        private void RepairEdges(FlowField flowField, ObstacleMap obstMap)
         {
-            for(int i=0;i<flowMap.Width;i++)
-                for(int j=0;j<flowMap.Height;j++)
+            for(int i=0;i<flowField.Width;i++)
+                for(int j=0;j<flowField.Height;j++)
                 {
-                    //update only squares that are not blocked and have valid value of flowMap
-                    if (obstMap[i, j] || flowMap[i,j]==null)
+                    //update only squares that are not blocked and have valid value of flowField
+                    if (obstMap[i, j] || flowField[i,j]==null)
                         continue;
 
-                    float angle = flowMap[i, j].Value;
+                    float angle = flowField[i, j].Value;
                     //directions of the components
                     int dirX = Math.Sign(Math.Cos(angle));
                     int dirY = Math.Sign(Math.Sin(angle));
@@ -297,18 +297,18 @@ namespace wpfTest.GameLogic.Maps
                     int neibY = j + dirY;
 
                     //check if the vector is pointing to a blocked square
-                    if ((neibX >= flowMap.Width || neibX < 0) ||
+                    if ((neibX >= flowField.Width || neibX < 0) ||
                         obstMap[neibX, j])
                         //set new angle in the normal direction
-                        flowMap[i, j] = dirY > 0 ? (float)Math.PI * 1 / 2f //up
+                        flowField[i, j] = dirY > 0 ? (float)Math.PI * 1 / 2f //up
                                                  : (float)Math.PI * 3 / 2f;//down
 
 
                     //check if the vector is pointing to a blocked square
-                    if ((neibY >= flowMap.Height || neibY < 0) ||
+                    if ((neibY >= flowField.Height || neibY < 0) ||
                         obstMap[i, neibY])
                         //set new angle in the normal direction
-                        flowMap[i, j] = dirX > 0 ? 0f               //right
+                        flowField[i, j] = dirX > 0 ? 0f               //right
                                                 : (float)Math.PI;   //left
                 }
         }

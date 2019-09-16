@@ -369,7 +369,7 @@ namespace wpfTest
             OpenGLAtlasDrawer.CreateUnitCircles(gl);
             OpenGLAtlasDrawer.CreateEntities(gl);
             OpenGLAtlasDrawer.CreateEntitiesIndicators(gl);
-            OpenGLAtlasDrawer.CreateFlowMap(gl);
+            OpenGLAtlasDrawer.CreateFlowField(gl);
             OpenGLAtlasDrawer.CreateSelectionFrame(gl);
         }
 
@@ -396,23 +396,23 @@ namespace wpfTest
                 OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
                 OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
                 OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
-                //show flowmap of the selected animal if an animal is selected and player wants to show flowmap
-                if (Game.GameplayOptions.ShowFlowmap)
+                //show flowfield of the selected animal if an animal is selected and player wants to show flowfield
+                if (Game.GameplayOptions.ShowFlowfield)
                 {
                     Animal selected;
                     MoveToCommand command;
-                    FlowField flM = null;
+                    FlowField flF = null;
                     if ((selected = (EntityButtonArray.Selected as Animal)) != null &&
                         (command = (selected.CommandQueue.First() as MoveToCommand))!=null &&
-                        (flM =command.FlowMap)!=null)
+                        (flF =command.FlowField)!=null)
                     {
-                        OpenGLAtlasDrawer.UpdateFlowMapDataBuffers(gl, GameControls.MapView, flM);
+                        OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
                     }
                     else
-                        OpenGLAtlasDrawer.TryClearFlowMapDataBuffers(gl);
+                        OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
                 }
                 else
-                    OpenGLAtlasDrawer.TryClearFlowMapDataBuffers(gl);
+                    OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
                 UpdateBottomPanel();
                 DrawingsDone++;

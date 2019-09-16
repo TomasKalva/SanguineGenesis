@@ -176,11 +176,11 @@ namespace wpfTest
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, nutrientsMap.VertexCount);
             }
 
-            //draw flowmap
-            //if (gameplayOptions.ShowFlowmap)
+            //draw flowfield
+            //if (gameplayOptions.ShowFlowfield)
             {
-                flowMap.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, flowMap.VertexCount);
+                flowField.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, flowField.VertexCount);
             }
             
             //draw entities
@@ -322,7 +322,7 @@ namespace wpfTest
         //vertex buffer arrays which contain the buffers for vertex, 
         //color, texture and bottom left coordinates of textures
         private static MyBufferArray map;
-        private static MyBufferArray flowMap;
+        private static MyBufferArray flowField;
         private static MyBufferArray nutrientsMap;
         private static MyBufferArray entityCircles;
         private static MyBufferArray entities;
@@ -858,24 +858,24 @@ namespace wpfTest
 
         #endregion Entity indicators
 
-        #region Flowmap
+        #region Flowfield
 
         /// <summary>
         /// Creates vertex buffer array and its buffers for gl.
         /// </summary>
         /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateFlowMap(OpenGL gl)
+        public static void CreateFlowField(OpenGL gl)
         {
-            flowMap = new MyBufferArray(gl);
+            flowField = new MyBufferArray(gl);
         }
 
         /// <summary>
         /// Clears all buffers representing flow map.
         /// </summary>
-        public static void TryClearFlowMapDataBuffers(OpenGL gl)
+        public static void TryClearFlowFieldDataBuffers(OpenGL gl)
         {
-            if (!flowMap.Clear)
-                flowMap.ClearBuffers(gl);
+            if (!flowField.Clear)
+                flowField.ClearBuffers(gl);
         }
 
         /// <summary>
@@ -884,16 +884,16 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateFlowMapDataBuffers(OpenGL gl, MapView mapView, FlowField flowmap)
+        public static void UpdateFlowFieldDataBuffers(OpenGL gl, MapView mapView, FlowField flowfield)
         {
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
             float viewTop = mapView.Top;
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
-            float?[,] flowM = mapView.GetVisibleFlowMap(flowmap);
-            int width = flowM.GetLength(0);
-            int height = flowM.GetLength(1);
+            float?[,] flowF = mapView.GetVisibleFlowField(flowfield);
+            int width = flowF.GetLength(0);
+            int height = flowF.GetLength(1);
 
             //extents of one rectangle
             float sqW = nodeSize;
@@ -905,11 +905,11 @@ namespace wpfTest
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            flowMap.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
-            float[] vertices = flowMap.vertices;
-            float[] colors = flowMap.colors;
-            float[] texture = flowMap.texture;
-            float[] texAtlas = flowMap.texAtlas;
+            flowField.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            float[] vertices = flowField.vertices;
+            float[] colors = flowField.colors;
+            float[] texture = flowField.texture;
+            float[] texAtlas = flowField.texAtlas;
 
             //triangle
             vec2 triLB = new vec2(-0.25f, -0.15f);
@@ -933,14 +933,14 @@ namespace wpfTest
 
                     int offset = 0;
                     int texOffset = 0;
-                    if (flowM[i, j] == null)
+                    if (flowF[i, j] == null)
                     {
                         vertices[coord + 0] = vertices[coord + 1] = vertices[coord + 2]
                             = vertices[coord + 3] = vertices[coord + 4] = vertices[coord + 5] = 0;
                     }
                     else
                     {
-                        float angle = flowM[i, j].Value;
+                        float angle = flowF[i, j].Value;
 
                         //rotated triangle coordinates
                         vec2 rotTriLB = (Rotate(triLB, angle) + triOffset + leftBottom) * squareExt;
@@ -990,10 +990,10 @@ namespace wpfTest
                 }
             }
 
-            flowMap.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            flowField.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
         }
 
-        #endregion Flowmap
+        #endregion Flowfield
         
         #region Selection frame
         /// <summary>

@@ -87,15 +87,15 @@ namespace wpfTest.GameLogic.Data.Abilities
         /// If the distance to the target is higher than this, flowfield will be used. 
         /// Otherwise unit will walk straight to the target.
         /// </summary>
-        private const float FLOWMAP_DISTANCE = 1.41f;
+        private const float FLOWFIELD_DISTANCE = 1.41f;
         /// <summary>
         /// Assignment for generating flowfield in other thread.
         /// </summary>
         public MoveToCommandAssignment Assignment { get; set; }
         /// <summary>
-        /// Flowmap used for navigation. It can be set after the command was assigned.
+        /// Flowfield used for navigation. It can be set after the command was assigned.
         /// </summary>
-        public FlowField FlowMap { get; set; }
+        public FlowField FlowField { get; set; }
         /// <summary>
         /// Distance from the target when unit can stop if it gets stuck.
         /// </summary>
@@ -139,7 +139,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             }
 
             //check if the map was set yet
-            if (FlowMap == null)
+            if (FlowField == null)
                 return false;
 
             Vector2 animalPos = CommandedEntity.Position;
@@ -151,10 +151,10 @@ namespace wpfTest.GameLogic.Data.Abilities
                 //go outside of node with building to be able to use flowfield
                 CommandedEntity.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos), game.Map);
             }
-            else if (Targ.DistanceTo(CommandedEntity) > FLOWMAP_DISTANCE)
+            else if (Targ.DistanceTo(CommandedEntity) > FLOWFIELD_DISTANCE)
             {
                 //use flowfield
-                CommandedEntity.Accelerate(FlowMap.GetIntensity(CommandedEntity.Center, 1), game.Map);
+                CommandedEntity.Accelerate(FlowField.GetIntensity(CommandedEntity.Center, 1), game.Map);
             }
             else
             {
@@ -224,7 +224,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         /// If the distance to the target is higher than this, flowfield will be used. 
         /// Otherwise unit will walk straight to the target.
         /// </summary>
-        private const float FLOWMAP_DISTANCE = 1.41f;
+        private const float FLOWFIELD_DISTANCE = 1.41f;
 
         /// <summary>
         /// Moving unit.
@@ -235,9 +235,9 @@ namespace wpfTest.GameLogic.Data.Abilities
         /// </summary>
         public IMovementTarget TargetPoint { get; }
         /// <summary>
-        /// Flowmap used for navigation. It can be set after the command was assigned.
+        /// Flowfield used for navigation. It can be set after the command was assigned.
         /// </summary>
-        private FlowMap flowField;
+        private FlowField flowField;
         /// <summary>
         /// Distance from the target when unit can stop if it gets stuck.
         /// </summary>
@@ -245,7 +245,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         private IMovementParametrizing movementParametrizing;
         private NoMovementDetection noMovementDetection;
 
-        public MoveToLogic(Animal unit, FlowMap flowField, float minStoppingDistance, IMovementTarget target, IMovementParametrizing movementParametrizing)
+        public MoveToLogic(Animal unit, FlowField flowField, float minStoppingDistance, IMovementTarget target, IMovementParametrizing movementParametrizing)
         {
             this.unit = unit;
             this.flowField = flowField;
@@ -255,7 +255,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             this.movementParametrizing = movementParametrizing;
         }
 
-        public bool Step(Game game, float deltaT, FlowMap flowField, MoveToCommand command)
+        public bool Step(Game game, float deltaT, FlowField flowField, MoveToCommand command)
         {
             //set the command assignment to be active to increase its priority
             if (!command.Assignment.Active)
@@ -290,7 +290,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             {
                 unit.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos), game.Map);
             }
-            else if (dist > FLOWMAP_DISTANCE)//todo: if animal is standing on node with building - push it out
+            else if (dist > FLOWFIELD_DISTANCE)//todo: if animal is standing on node with building - push it out
             {
                 //use flowfield
                 unit.Accelerate(flowField.GetIntensity(unit.Center, 1), game.Map);
@@ -327,7 +327,7 @@ namespace wpfTest.GameLogic.Data.Abilities
                 return TargetPoint.DistanceTo(unit) <= movementParametrizing.GoalDistance;
         }
 
-        public void UpdateFlowMap(FlowMap flFap)
+        public void UpdateFlowField(FlowField flFap)
         {
             this.flowField = flFap;
         }

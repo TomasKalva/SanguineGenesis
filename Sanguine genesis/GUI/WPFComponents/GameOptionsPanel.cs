@@ -83,13 +83,13 @@ namespace wpfTest.GUI
             optionCheckboxes[1].Unchecked += evHand;
             optionCheckboxes[1].Checked += evHand;
 
-            optionCheckboxes[2].Content = "Show flowmap";
+            optionCheckboxes[2].Content = "Show flowfield";
             evHand = (s, e) =>
             {
                 lock (gameplayOptions)
                 {
                     if (optionCheckboxes[2].IsChecked != null)
-                        gameplayOptions.ShowFlowmap = (bool)optionCheckboxes[2].IsChecked;
+                        gameplayOptions.ShowFlowfield = (bool)optionCheckboxes[2].IsChecked;
                 }
             };
             optionCheckboxes[2].Unchecked += evHand;
