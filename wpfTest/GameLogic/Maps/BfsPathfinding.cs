@@ -15,7 +15,7 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// The result of the algorithm.
         /// </summary>
-        private FlowMap flowMap;
+        private FlowField flowMap;
 
         /// <summary>
         /// Contains all discovered coordinates that weren't processed yet.
@@ -34,13 +34,13 @@ namespace wpfTest.GameLogic.Maps
         {
             int width = obst.Width;
             int height = obst.Height;
-            flowMap = new FlowMap(width, height);
+            flowMap = new FlowField(width, height);
             obstacleMap = obst;
             this.targetLocation = targetLocation;
             discovered = new Queue<Coords>();
         }
 
-        public FlowMap GenerateFlowMap()
+        public FlowField GenerateFlowMap()
         {
             int width = obstacleMap.Width;
             int height = obstacleMap.Height;

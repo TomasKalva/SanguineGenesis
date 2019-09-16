@@ -884,7 +884,7 @@ namespace wpfTest
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateFlowMapDataBuffers(OpenGL gl, MapView mapView, FlowMap flowmap)
+        public static void UpdateFlowMapDataBuffers(OpenGL gl, MapView mapView, FlowField flowmap)
         {
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;

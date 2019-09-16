@@ -7,7 +7,7 @@ using wpfTest.GameLogic;
 
 namespace wpfTest
 {
-    public class FlowMap:IMap<float?>
+    public class FlowField:IMap<float?>
     {
         /// <summary>
         /// Minimal valid value for an angle in flowmap.
@@ -31,7 +31,7 @@ namespace wpfTest
         /// </summary>
         public int Height => directions.GetLength(1);
 
-        internal FlowMap(int width, int height)
+        internal FlowField(int width, int height)
         {
             directions = new float?[width, height];
         }

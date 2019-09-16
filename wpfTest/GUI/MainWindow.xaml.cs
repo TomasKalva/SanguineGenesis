@@ -401,7 +401,7 @@ namespace wpfTest
                 {
                     Animal selected;
                     MoveToCommand command;
-                    FlowMap flM = null;
+                    FlowField flM = null;
                     if ((selected = (EntityButtonArray.Selected as Animal)) != null &&
                         (command = (selected.CommandQueue.First() as MoveToCommand))!=null &&
                         (flM =command.FlowMap)!=null)

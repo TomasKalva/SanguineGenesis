@@ -40,8 +40,8 @@ namespace wpfTest.GameLogic
         /// only be set to true and reading an incorrect value once has no negative effects.
         /// </summary>
         public bool Invalid { get { lock (this) return invalid; } set { lock (this) invalid = value; } }
-        private FlowMap flowMap;
-        private FlowMap FlowMap { get { lock (this) return flowMap; } set { lock (this) flowMap = value; } }
+        private FlowField flowMap;
+        private FlowField FlowMap { get { lock (this) return flowMap; } set { lock (this) flowMap = value; } }
 
         public MoveToCommandAssignment(Players player, List<Animal> units, Movement movement, IMovementTarget target, float goalDistance=0.1f, bool interruptable=true)
         {
@@ -106,7 +106,7 @@ namespace wpfTest.GameLogic
             Stopwatch sw = new Stopwatch();
             sw.Start();
             //FlowMap flM= RayPathfinding.GetPathfinding.GenerateFlowMap(forPathfinding, Target.Center);
-            FlowMap flM = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowMap();
+            FlowField flM = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowMap();
             FlowMap = flM;
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
@@ -117,7 +117,7 @@ namespace wpfTest.GameLogic
         /// </summary>
         public virtual void UpdateCommands()
         {
-            FlowMap flM = FlowMap;
+            FlowField flM = FlowMap;
             foreach (Animal a in Animals)
             {
                 //find command from this assignment

@@ -27,9 +27,9 @@ namespace wpfTest.GameLogic.Maps
             NOT_DISCOVERED
         }
 
-        public FlowMap GenerateFlowMap(ObstacleMap obst, Vector2 targetLocation)
+        public FlowField GenerateFlowMap(ObstacleMap obst, Vector2 targetLocation)
         {
-            FlowMap flMap = new FlowMap(obst.Width, obst.Height);
+            FlowField flMap = new FlowField(obst.Width, obst.Height);
             //distance from the target
             float[,] distance = new float[obst.Width, obst.Height];
             //squares that need to be explored
@@ -108,7 +108,7 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// Raycast to find shorter paths.
         /// </summary>
-        private void RelaxDistances(Vector2 center, ObstacleMap obst, float[,] distance, SquareState[,] state, FlowMap flMap)
+        private void RelaxDistances(Vector2 center, ObstacleMap obst, float[,] distance, SquareState[,] state, FlowField flMap)
         {
             //ray has no length limit
             float rayLength = obst.Width * obst.Height;
@@ -174,7 +174,7 @@ namespace wpfTest.GameLogic.Maps
         /// </summary>
         /// <returns></returns>
         private bool RayStep(int x, int y, float rayAngle, float squaresAngle, float newDistance,
-                            float[,] distance, FlowMap flMap, SquareState[,] state)
+                            float[,] distance, FlowField flMap, SquareState[,] state)
         {
             if (newDistance < distance[x, y])
             {
@@ -227,7 +227,7 @@ namespace wpfTest.GameLogic.Maps
         /// <summary>
         /// Fill spaces that are surrounded by already discovered squares with their average angle.
         /// </summary>
-        private void InferSmoothly(float[,] distance, SquareState[,] state, FlowMap flMap)
+        private void InferSmoothly(float[,] distance, SquareState[,] state, FlowField flMap)
         {
             for(int i=1;i<flMap.Width-1;i++)
                 for(int j = 1; j < flMap.Height - 1; j++)
@@ -279,7 +279,7 @@ namespace wpfTest.GameLogic.Maps
         /// When a component of a vector is pointing towards a blocked square, remove the component of
         /// the vecotr.
         /// </summary>
-        private void RepairEdges(FlowMap flowMap, ObstacleMap obstMap)
+        private void RepairEdges(FlowField flowMap, ObstacleMap obstMap)
         {
             for(int i=0;i<flowMap.Width;i++)
                 for(int j=0;j<flowMap.Height;j++)

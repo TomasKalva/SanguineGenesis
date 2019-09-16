@@ -53,7 +53,7 @@ namespace wpfTest.GameLogic
         }
         private bool _showFlowmap;
         /// <summary>
-        /// True if flowmap created by right click is visible.
+        /// True if flowfield created by right click is visible.
         /// </summary>
         public bool ShowFlowmap
         {

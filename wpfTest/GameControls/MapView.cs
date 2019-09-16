@@ -97,16 +97,16 @@ namespace wpfTest
         }
 
         /// <summary>
-        /// Returns sub-rectangle of game's FlowMap visible by this MapView.
+        /// Returns sub-rectangle of game's FlowField visible by this MapView.
         /// </summary>
         /// <exception cref="InvalidOperationException">If actual extens haven't been set.</exception>
-        public float?[,] GetVisibleFlowMap(FlowMap flowMap)
+        public float?[,] GetVisibleFlowField(FlowField flowField)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 throw new InvalidOperationException(
                     "The actual extents have to be specified before calling this method");
 
-            return GameQuerying.GetGameQuerying().SelectPartOfMap(flowMap, ((IRectangle)this).GetRect());
+            return GameQuerying.GetGameQuerying().SelectPartOfMap(flowField, ((IRectangle)this).GetRect());
         }
 
         /// <summary>

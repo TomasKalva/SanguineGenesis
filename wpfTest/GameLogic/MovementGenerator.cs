@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace wpfTest.GameLogic
 {
     /// <summary>
-    /// Generates movement flowmaps in other thread.
+    /// Generates movement flowfields in other thread.
     /// </summary>
     public class MovementGenerator
     {
@@ -28,7 +28,7 @@ namespace wpfTest.GameLogic
         private Players NextPlayer { get; set; }
 
         /// <summary>
-        /// Calculates movement flowmaps for one player.
+        /// Calculates movement flowfields for one player.
         /// </summary>
         private class PlayerMovementGenerator
         {
@@ -198,7 +198,7 @@ namespace wpfTest.GameLogic
                 else
                     repeatedInputs.Remove(current);
 
-                //animal targets can move so the flowmap needs to be repeatedly recalculated
+                //animal targets can move so the flowfield needs to be repeatedly recalculated
                 if (current.Target is Animal && current.Animals.Any())
                     repeatedInputs.Add(current);
 
@@ -286,7 +286,7 @@ namespace wpfTest.GameLogic
             }
         }
         /// <summary>
-        /// Update commands with the newly created flowmaps.
+        /// Update commands with the newly created flowfields.
         /// </summary>
         public void UseProcessedCommands()
         {
