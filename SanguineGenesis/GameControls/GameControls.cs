@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Abilities;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Takes player's input and performs corresponding action in the game.

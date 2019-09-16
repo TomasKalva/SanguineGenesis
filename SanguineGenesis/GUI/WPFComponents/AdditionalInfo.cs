@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using static wpfTest.MainWindow;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GUI
+namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Shows info about IShowable.

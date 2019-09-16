@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Data.Abilities;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Used to set commands to entities.
@@ -29,9 +29,10 @@ namespace wpfTest.GameLogic
         }
 
         /// <summary>
-        /// Maximal distance from the target where the ability can be cast.
+        /// Maximal distance from the target where the ability can be cast. If null, the attack distance of animal
+        /// should be used.
         /// </summary>
-        public float Distance { get; }
+        public float? Distance { get; }
         /// <summary>
         /// Energy required to use this ability.
         /// </summary>
@@ -74,7 +75,7 @@ namespace wpfTest.GameLogic
         /// <exception cref="InvalidCastException">If caster or target has incompatible type.</exception>
         public abstract Command NewCommand(Entity caster, ITargetable target);
 
-        public Ability(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable, float duration)
+        public Ability(float? distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable, float duration)
         {
             Distance = distance;
             EnergyCost = energyCost;
@@ -98,7 +99,7 @@ namespace wpfTest.GameLogic
     public abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
-        public TargetAbility(float distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
+        public TargetAbility(float? distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
             :base(distance, energyCost, onlyOne, selfCastable, interruptable, duration)
         {
         }
@@ -201,7 +202,6 @@ namespace wpfTest.GameLogic
                     com.FollowCommand = followCommand;
                 }
 
-
                 c.AddCommand(com);
             }
         }
@@ -212,7 +212,7 @@ namespace wpfTest.GameLogic
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
-            new Stat( "Distance", Distance.ToString()),
+            new Stat( "Distance", Distance==null?"att dist" : Distance.ToString()),
             new Stat( "Self castable", SelfCastable.ToString()),
             new Stat("Only one", OnlyOne.ToString()),
             new Stat( "Target type", TargetType.ToString()),

@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Data.Abilities;
-using wpfTest.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     public class MoveToCommandAssignment
     {

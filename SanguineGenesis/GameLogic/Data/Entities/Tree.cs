@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Data.Abilities;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     public class Tree:Building, IHerbivoreFood
     {
@@ -109,7 +109,7 @@ namespace wpfTest.GameLogic
         {
             List<Stat> stats = new List<Stat>()
             {
-                new Stat( "Player", Player.ToString()),
+                new Stat( "Player", Player.PlayerID.ToString()),
             new Stat( "EntityType", EntityType),
             new Stat( "Health", Health.ToString()),
             new Stat("Energy", Energy.ToString()),

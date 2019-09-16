@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Entities;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Loads and stores factories of the type EntityFactory.

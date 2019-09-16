@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace wpfTest.GameLogic.Data.Entities
+namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
     /// Represent entity that isn't bound to the square grid.

@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
-using wpfTest.GameLogic.Data.Entities;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic.Data.Entities;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GUI
+namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Shows info about entity.

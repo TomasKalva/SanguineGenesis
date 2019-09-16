@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Schema;
 
-namespace wpfTest.GUI
+namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Describes the contents of the tile map. All images are aligned to a square grid.
@@ -130,11 +131,14 @@ namespace wpfTest.GUI
                     float centerY = float.Parse(animation.GetAttribute("CenterY"), CultureInfo.InvariantCulture);
                     float animWidth = float.Parse(firstImage.GetAttribute("Width"), CultureInfo.InvariantCulture);
                     float animHeight = float.Parse(firstImage.GetAttribute("Height"), CultureInfo.InvariantCulture);
-                    
+                    string action = animation.GetAttribute("Action");
+
                     //iterate over all images of the animation
                     var animationImages = new List<Rect>();
+                    var animChangeTime = new List<float>(animationImages.Count);
                     foreach (XmlElement image in animation.ChildNodes)
                     {
+                        //load extents of the image
                         float x = float.Parse(image.GetAttribute("X"), CultureInfo.InvariantCulture);
                         float y = float.Parse(image.GetAttribute("Y"), CultureInfo.InvariantCulture);
                         float width = float.Parse(image.GetAttribute("Width"), CultureInfo.InvariantCulture);
@@ -142,12 +146,24 @@ namespace wpfTest.GUI
                         animationImages.Add(
                             ToRelative(
                                 GridToCoordinates(x, y, width, height)));
+                        
+                        //load duration of the image
+                        string dur = image.GetAttribute("Duration");
+                        if (dur != "")
+                        {
+                            float duration = float.Parse(dur, CultureInfo.InvariantCulture);
+                            animChangeTime.Add(duration);
+                        }
+                        else
+                        {
+                            animChangeTime.Add(0.5f);
+                        }
                     }
 
-                    float animChangeTime = 0.5f;
+                    string animationName = AnimationName(entityType, action);
 
                     //add new animation to the animation dictionary
-                    AddEntitiesAnimation(entityType, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
+                    AddEntitiesAnimation(animationName, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
                 }
             }
             }catch(Exception e)
@@ -158,12 +174,14 @@ namespace wpfTest.GUI
 
         }
 
+        private string AnimationName(string entityType, string action)  => entityType + "__" + action;
+
         /// <summary>
         /// Creates new Animation for the entity with the given parameters and adds it to entitiesAnimations.
         /// </summary>
-        private void AddEntitiesAnimation(string entity, Vector2 leftBottom,float width, float height, float animChangeTimeS, List<Rect> images)
+        private void AddEntitiesAnimation(string animationName, Vector2 leftBottom,float width, float height, List<float> animChangeTimes, List<Rect> images)
         {
-            entitiesAnimations.Add(entity, new Animation(leftBottom,width, height, animChangeTimeS, images));
+            entitiesAnimations.Add(animationName, new Animation(leftBottom,width, height, animChangeTimes, images));
         }
 
         /// <summary>
@@ -274,14 +292,15 @@ namespace wpfTest.GUI
         }
 
         /// <summary>
-        /// Get animation for the unit.
+        /// Get animation for the entity.
         /// </summary>
-        public Animation GetAnimation(string unitType)
+        public Animation GetAnimation(string entityType, string action)
         {
-            if (entitiesAnimations.TryGetValue(unitType, out Animation anim))
+            string animationName = AnimationName(entityType, action);
+            if (entitiesAnimations.TryGetValue(animationName, out Animation anim))
                 return anim;
             else
-                return GetAnimation("WHISTLING_THORN");
+                return GetAnimation("NO_ENTITY","NO_ACTION");
         }
 
         /// <summary>
@@ -321,9 +340,9 @@ namespace wpfTest.GUI
         /// </summary>
         public float Height { get; }
         /// <summary>
-        /// The time it takes for images to change.
+        /// The time in seconds it takes for images to change.
         /// </summary>
-        public float ChangeTimeS { get; }
+        public List<float> ChangeTimes { get; }
         /// <summary>
         /// Number of images in animation.
         /// </summary>
@@ -335,15 +354,15 @@ namespace wpfTest.GUI
         /// <param name="leftBottom">Left bottom coordinate in the atlas.</param>
         /// <param name="width">Width of the images in animation.</param>
         /// <param name="height">Height of the images in animation.</param>
-        /// <param name="animChangeTimeS">Time it takes to change images.</param>
+        /// <param name="animChangeTimes">Time it takes to change images.</param>
         /// <param name="images">First two numbers represent left bottom position of the image, second two represent width and height.</param>
-        public Animation(Vector2 leftBottom, float width, float height, float animChangeTimeS, List<Rect> images)
+        public Animation(Vector2 leftBottom, float width, float height, List<float> animChangeTimes, List<Rect> images)
         {
             LeftBottom = leftBottom;
             Images = images;
             Width = width;
             Height = height;
-            ChangeTimeS = animChangeTimeS;
+            ChangeTimes = animChangeTimes;
         }
     }
 }

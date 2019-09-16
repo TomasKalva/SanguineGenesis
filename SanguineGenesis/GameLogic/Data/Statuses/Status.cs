@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GameLogic.Data.Entities
+namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
     /// Can be applied to Entity. Does something.

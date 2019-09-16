@@ -1,8 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Entities xmlns="http://tempuri.org/XMLSchema1.xsd">
+  <Entity EntityType="NO_ENTITY">
+    <Animation Action="NO_ACTION" CenterX="0.5" CenterY="0.2">
+      <Image X="28" Y="11"  Width="2" Height="1"/>
+    </Animation>
+  </Entity>
   <Entity EntityType="BAOBAB">
     <Animation Action="IDLE" CenterX="2.5" CenterY="1.5">
       <Image X="10" Y="0" Width="5" Height="6"></Image>
+      <Image X="15" Y="0" Width="5" Height="6"></Image>
+      <Image X="10" Y="0" Width="5" Height="6"></Image>
+      <Image X="20" Y="0" Width="5" Height="6"></Image>
     </Animation>
   </Entity>
   <Entity EntityType="RHODE_GRASS">
@@ -167,8 +175,19 @@
   </Entity>
   <Entity EntityType="TIGER">
     <Animation Action="IDLE" CenterX="1" CenterY="0.2">
-      <Image X="25" Y="6"  Width="2" Height="1"/>
-      <Image X="27" Y="6"  Width="2" Height="1"/>
+      <Image X="25" Y="6"  Width="2" Height="1" Duration="0.5"/>
+      <Image X="27" Y="6"  Width="2" Height="1" Duration="0.5"/>
+    </Animation>
+    <Animation Action="RUNNING" CenterX="1" CenterY="0.2">
+      <Image X="24" Y="10"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="26" Y="10"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="28" Y="10"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="26" Y="10"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="30" Y="10"  Width="2" Height="1" Duration="0.1"/>
+    </Animation>
+    <Animation Action="ATTACKING" CenterX="1" CenterY="0.2">
+      <Image X="24" Y="11"  Width="2" Height="1" Duration="0.2"/>
+      <Image X="26" Y="11"  Width="2" Height="1" Duration="0.3"/>
     </Animation>
   </Entity>
   <Entity EntityType="ZEBRA">

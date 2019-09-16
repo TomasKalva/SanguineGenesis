@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps
 {
     interface IPathfinding
     {

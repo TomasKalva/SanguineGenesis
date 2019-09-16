@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Abilities;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GameLogic.Maps;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Represents an object on the map.
@@ -100,7 +100,7 @@ namespace wpfTest
                 Energy = new DecRange(maxEnergy,maxEnergy);
             else
                 Energy = new DecRange(maxEnergy, maxEnergy);
-            AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(entityType));
+            SetAnimation("IDLE");
             Physical = physical;
             Abilities = abilities;
             Statuses = new List<Status>();
@@ -115,9 +115,9 @@ namespace wpfTest
             => Math.Min(Center.X - Range, Center.X - imageLeft);
         public float GetActualRight(float imageWidth, float imageLeft)
             => Math.Max(Center.X + Range, Center.X - imageLeft + imageWidth);
-        public Rect GetActualRect(ImageAtlas atlas)
+        public Rect GetActualRect()
         {
-            Animation anim = atlas.GetAnimation(EntityType);
+            Animation anim = AnimationState.Animation;
             return new Rect(
                 Math.Min(Center.X - Range, Center.X - anim.LeftBottom.X),
                 Math.Min(Center.Y - Range, Center.Y - anim.LeftBottom.Y),
@@ -131,6 +131,14 @@ namespace wpfTest
         public void AnimationStep(float deltaT)
         {
             AnimationState.Step(deltaT);
+        }
+
+        /// <summary>
+        /// Sets animation of corresponding action to this entity.
+        /// </summary>
+        public void SetAnimation(string action)
+        {
+            AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(EntityType, action));
         }
         #endregion Animation
         

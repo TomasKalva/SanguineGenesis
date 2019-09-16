@@ -10,11 +10,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GameLogic.Maps;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Represents game state.
@@ -64,9 +64,9 @@ namespace wpfTest
 
             //players
             Players = new Dictionary<Players, Player>();
-            Players.Add(wpfTest.Players.PLAYER0, new Player(wpfTest.Players.PLAYER0));
-            Players.Add(wpfTest.Players.PLAYER1, new Player(wpfTest.Players.PLAYER1));
-            CurrentPlayer = Players[wpfTest.Players.PLAYER0];
+            Players.Add(SanguineGenesis.Players.PLAYER0, new Player(SanguineGenesis.Players.PLAYER0));
+            Players.Add(SanguineGenesis.Players.PLAYER1, new Player(SanguineGenesis.Players.PLAYER1));
+            CurrentPlayer = Players[SanguineGenesis.Players.PLAYER0];
 
              //map
             var mapLoader = new MapLoader();
@@ -80,7 +80,7 @@ namespace wpfTest
             GameQuerying = GameQuerying.GetGameQuerying();
             physics = Physics.GetPhysics();
             visibilityGenerator = new VisibilityGenerator();
-            nextVisibilityPlayer = wpfTest.Players.PLAYER0;
+            nextVisibilityPlayer = SanguineGenesis.Players.PLAYER0;
             GameplayOptions = new GameplayOptions();
             GameplayOptions.WholeMapVisible = false;
             foreach (Animal u in CurrentPlayer.GetAll<Unit>())
@@ -201,9 +201,9 @@ namespace wpfTest
             if (visibilityGenerator.Done)
             {
                 Players current = nextVisibilityPlayer;
-                Players other = nextVisibilityPlayer == wpfTest.Players.PLAYER0 ?
-                                        wpfTest.Players.PLAYER1 :
-                                        wpfTest.Players.PLAYER0;
+                Players other = nextVisibilityPlayer == SanguineGenesis.Players.PLAYER0 ?
+                                        SanguineGenesis.Players.PLAYER1 :
+                                        SanguineGenesis.Players.PLAYER0;
 
                 //update current player's visibility map
                 Players[current].SetVisibilityMap(visibilityGenerator.VisibilityMap, allBuildings);

@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Abilities;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GameLogic.Maps;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Tells entity what to do.
     /// </summary>
-    public abstract class Command: IShowable
+    public abstract class Command : IShowable
     {
         /// <summary>
         /// True iff the command can be removed from the first place in the command queue.
@@ -25,7 +25,7 @@ namespace wpfTest
         /// How much of the command is done. From the interval [0,100]. Used only for player's information.
         /// </summary>
         public abstract int Progress { get; }
-        
+
         /// <summary>
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
@@ -36,7 +36,7 @@ namespace wpfTest
         public List<Stat> Stats()
         {
             List<Stat> stats = new List<Stat>()
-            {};
+            { };
             return stats;
         }
         public abstract string Description();
@@ -68,7 +68,7 @@ namespace wpfTest
 
     public abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
                                                                     where Target : ITargetable
-                                                                    where Abil:TargetAbility<Caster,Target>
+                                                                    where Abil : TargetAbility<Caster, Target>
     {
         /// <summary>
         /// The ability this command is performing.
@@ -82,6 +82,25 @@ namespace wpfTest
         /// Target of the ability.
         /// </summary>
         public Target Targ { get; }
+        /// <summary>
+        /// Required distance between the animal and the target.
+        /// </summary>
+        public float Distance
+        {
+            get
+            {
+                if (Ability.Distance != null)
+                    return Ability.Distance.Value;
+                else
+                {
+                    Animal a = CommandedEntity as Animal;
+                    if (a != null)
+                        return a.AttackDistance;
+                    else
+                        return 0;
+                }
+            }
+        }
         /// <summary>
         /// True iff the ability was paid.
         /// </summary>
@@ -185,24 +204,9 @@ namespace wpfTest
                 return true;
 
             //follow the target animal if caster is animal and too far away
-            Animal animal = CommandedEntity as Animal;
-            if (FollowCommand != null &&
-                FollowTarget() &&
-                Targ.GetType() != typeof(Nothing) &&
-                animal != null)
-            {
-                float distance = ((IMovementTarget)Targ).DistanceTo(animal);
-                if (distance > animal.AttackDistance)
-                {
-                    ElapsedTime = 0;
-                    FollowCommand.PerformCommandLogic(game, deltaT);
-                    return false;
-                }
-                else
-                {
-                    animal.StopMoving = true;
-                }
-            }
+            bool moving = TryFollowTarget(game, deltaT);
+            if (moving)
+                return false;
 
             ElapsedTime += deltaT;
             bool finished = PerformCommandLogic(game, deltaT);
@@ -211,6 +215,41 @@ namespace wpfTest
                 OnRemove();
             }
             return finished;
+        }
+
+        /// <summary>
+        /// Follow the target animal if caster is animal and too far away.
+        /// </summary>
+        private bool TryFollowTarget(Game game, float deltaT)
+        {
+            Animal animal = CommandedEntity as Animal;
+            if (FollowCommand != null &&
+                FollowTarget() &&
+                Targ.GetType() != typeof(Nothing) &&
+                animal != null)
+            {
+                float distance = ((IMovementTarget)Targ).DistanceTo(animal);
+                if (distance > Distance)
+                {
+                    ElapsedTime = 0;
+                    if (!animal.WantsToMove)
+                        animal.SetAnimation("RUNNING");
+                    FollowCommand.PerformCommandLogic(game, deltaT);
+                    return true;
+                }
+                else
+                {
+                    if (animal.WantsToMove)
+                    {
+                        if (this is AttackCommand)
+                            animal.SetAnimation("ATTACKING");
+                        else
+                            animal.SetAnimation("IDLE");
+                        animal.StopMoving = true;
+                    }
+                }
+            }
+            return false;
         }
 
         /// <summary>

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GameLogic.Maps;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Used for handling collisions.

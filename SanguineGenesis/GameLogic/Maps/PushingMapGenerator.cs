@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Generates PushingMap for Map.

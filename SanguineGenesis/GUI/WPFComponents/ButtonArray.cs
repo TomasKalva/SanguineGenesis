@@ -7,11 +7,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Entities;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Entities;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GUI
+namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Control for drawing rectangle array of buttons.

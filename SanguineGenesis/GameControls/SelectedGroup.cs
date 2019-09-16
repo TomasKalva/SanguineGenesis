@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
+using SanguineGenesis.GameLogic;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Represents entities selected by player.

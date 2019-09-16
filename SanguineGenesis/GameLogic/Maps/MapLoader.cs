@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps
 {
     /// <summary>
     /// Used for loading map from files.

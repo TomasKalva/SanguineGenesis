@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Generates movement flowfields in other thread.

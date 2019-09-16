@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Abilities;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Contains abilities that are used in the game.

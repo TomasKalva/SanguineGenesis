@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Maps;
-using wpfTest.GUI;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Represent entity that is bound to the square grid.

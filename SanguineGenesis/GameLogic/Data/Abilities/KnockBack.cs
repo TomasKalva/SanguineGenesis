@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Entities;
 
-namespace wpfTest.GameLogic.Data.Abilities
+namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
     /// Knock the target back.

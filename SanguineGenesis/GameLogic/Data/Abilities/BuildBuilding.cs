@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic.Data.Abilities
+namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
     /// Build a building at the target node.

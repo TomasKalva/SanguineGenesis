@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic.Data.Abilities
+namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
     /// Attack the target.
@@ -31,6 +31,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         public AttackCommand(Animal commandedEntity, Entity target, Attack attack)
             : base(commandedEntity, target, attack)
         {
+            CommandedEntity.SetAnimation("ATTACKING");
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
@@ -67,6 +68,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         public override void OnRemove()
         {
             base.OnRemove();
+            CommandedEntity.SetAnimation("IDLE");
             CommandedEntity.CanBeMoved = true;
         }
 

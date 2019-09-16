@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GUI;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GUI;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Used for extracting information about the game.
@@ -41,7 +41,7 @@ namespace wpfTest
             List<Unit> selected = new List<Unit>();
             foreach (Unit unit in SelectRectEntities(game, area, (e)=>e is Unit))
             {
-                Rect unitRect = unit.GetActualRect(ImageAtlas.GetImageAtlas);
+                Rect unitRect = unit.GetActualRect();
                 unitRect = ((IRectangle)unit).GetRect();
                 //todo: select units by circles on the ground
                 if (area.IntersectsWith(unitRect) && condition(unit))

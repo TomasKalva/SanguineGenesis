@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Represents areas that can't be passed through. Around the map is a

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps
 {
     /// <summary>
     /// Represents ray from one point to another. It returns indices of

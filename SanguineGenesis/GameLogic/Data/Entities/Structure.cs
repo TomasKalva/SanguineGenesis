@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Represent building that doesn't do anything special.
@@ -24,10 +24,10 @@ namespace wpfTest.GameLogic
         {
             List<Stat> stats = new List<Stat>()
             {
-                new Stat( "Player", Player.ToString()),
+                new Stat( "Player", Player.PlayerID.ToString()),
                 new Stat( "EntityType", EntityType),
                 new Stat( "Health", Health.ToString()),
-                new Stat("Energy", Energy.ToString()),
+                new Stat( "Energy", Energy.ToString()),
                 new Stat( "Size", Size.ToString()),
                 new Stat( "Biome", Biome.ToString()),
                 new Stat( "Terrain", Terrain.ToString()),

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Represents one square of the map.

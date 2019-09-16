@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GUI;
+using SanguineGenesis.GUI;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Animation with current image and timer.
@@ -42,10 +42,10 @@ namespace wpfTest.GameLogic
         public void Step(float deltaT)
         {
             progress += deltaT;
-            if (progress >= Animation.ChangeTimeS)
+            if (progress >= Animation.ChangeTimes[image])
             {
                 //move to the next image
-                progress -= Animation.ChangeTimeS;
+                progress -= Animation.ChangeTimes[image];
                 image = (image + 1) % Animation.Length;
             }
         }

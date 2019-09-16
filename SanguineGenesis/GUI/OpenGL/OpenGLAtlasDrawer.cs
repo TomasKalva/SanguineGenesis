@@ -13,12 +13,12 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Maps;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Used for drawing objects in game to the OpenGL control.

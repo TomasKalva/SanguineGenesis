@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using wpfTest;
-using wpfTest.GameLogic.Maps;
+using SanguineGenesis;
+using SanguineGenesis.GameLogic.Maps;
 
 namespace GameLogicTests
 {

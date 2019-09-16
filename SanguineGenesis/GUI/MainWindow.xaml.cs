@@ -24,13 +24,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Abilities;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GameLogic.Maps;
-using wpfTest.GUI;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Interakční logika pro MainWindow.xaml

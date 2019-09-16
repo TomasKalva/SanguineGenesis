@@ -1,28 +1,29 @@
-﻿using System;
+﻿using SanguineGenesis.GUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic.Data.Abilities
+namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
     /// The animal moves to the target.
     /// </summary>
     public sealed class MoveTo : TargetAbility<Animal, IMovementTarget>
     {
-        internal MoveTo(float goalDistance, bool interruptable, bool usesAttackDistance)
-            : base(-1, 0, false, false)
+        internal MoveTo(float? goalDistance, bool attackEnemyInstead, bool usesAttackDistance)
+            : base(null, 0, false, false)
         {
             GoalDistance = goalDistance;
-            AttackEnemyInstead = interruptable;
-            UsesAttackDistance = usesAttackDistance;
+            AttackEnemyInstead = attackEnemyInstead;
         }
-
-        //interface IMovementParametrizing properties
-        public float GoalDistance { get; }
+        
+        /// <summary>
+        /// Null iff attack distance of commanded entity should be used.
+        /// </summary>
+        public float? GoalDistance { get; }
         public bool AttackEnemyInstead { get; }
-        public bool UsesAttackDistance { get; }
 
         public override void SetCommands(IEnumerable<Animal> casters, IMovementTarget target, bool resetCommandQueue)
         {
@@ -35,15 +36,15 @@ namespace wpfTest.GameLogic.Data.Abilities
                 foreach (Animal c in casters)
                     c.ResetCommands();
 
-            //player whose units are receiving commands
+            //player whose animals are receiving commands
             Players player = casters.First().Player.PlayerID;
 
-            //separete units to different groups by their movement
+            //separete animals to different groups by their movement
             var castersGroups = casters.ToLookup((unit) => unit.Movement);
 
-            //volume of all units' circles /pi
+            //volume of all animals' circles /pi
             float volume = casters.Select((e) => e.Range * e.Range).Sum();
-            //distance from the target when unit can stop if it gets stuck
+            //distance from the target when animal can stop if it gets stuck
             float minStoppingDistance = (float)Math.Sqrt(volume) * 1.3f;
 
             foreach (Movement m in Enum.GetValues(typeof(Movement)))
@@ -97,6 +98,10 @@ namespace wpfTest.GameLogic.Data.Abilities
         /// </summary>
         public FlowField FlowField { get; set; }
         /// <summary>
+        /// Required distance between the animal and the target.
+        /// </summary>
+        public float GoalDistance => Ability.GoalDistance != null ? Ability.GoalDistance.Value : CommandedEntity.AttackDistance;
+        /// <summary>
         /// Distance from the target when unit can stop if it gets stuck.
         /// </summary>
         private float MinStoppingDistance { get; }
@@ -110,6 +115,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         {
             MinStoppingDistance = minStoppingDistance;
             NoMovementDetection = new NoMovementDetection();
+            CommandedEntity.SetAnimation("RUNNING");
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
@@ -142,6 +148,7 @@ namespace wpfTest.GameLogic.Data.Abilities
             if (FlowField == null)
                 return false;
 
+            //accelerate animal
             Vector2 animalPos = CommandedEntity.Position;
             Building blockingBuilding;
             if ((blockingBuilding = game.Map[(int)animalPos.X, (int)animalPos.Y].Building) != null
@@ -162,11 +169,13 @@ namespace wpfTest.GameLogic.Data.Abilities
                 Vector2 direction = CommandedEntity.Center.UnitDirectionTo(Targ.Center);
                 CommandedEntity.Accelerate(direction, game.Map);
             }
+
             //update last four positions
             NoMovementDetection.AddNextPosition(CommandedEntity.Center);
 
             //set that unit wants to move
-            CommandedEntity.WantsToMove = true;
+            if(!CommandedEntity.WantsToMove)
+                CommandedEntity.WantsToMove = true;
             
             //command is finished if unit reached the goal distance or if it was standing at one
             //place near the target position for a long time
@@ -185,12 +194,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         /// </summary>
         public bool Finished()
         {
-            if (Ability.UsesAttackDistance)
-                //using attack distance
-                return Targ.DistanceTo(CommandedEntity) <= CommandedEntity.AttackDistance;
-            else
-                //using ability distance
-                return Targ.DistanceTo(CommandedEntity) <= Ability.GoalDistance;
+             return Targ.DistanceTo(CommandedEntity) <= GoalDistance;
         }
 
         /// <summary>
@@ -214,6 +218,7 @@ namespace wpfTest.GameLogic.Data.Abilities
         public override void OnRemove()
         {
             CommandedEntity.StopMoving = true;
+            CommandedEntity.SetAnimation("IDLE");
             RemoveFromAssignment();
         }
     }

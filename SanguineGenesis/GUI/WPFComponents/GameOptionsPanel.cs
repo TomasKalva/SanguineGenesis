@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using wpfTest.GameLogic;
+using SanguineGenesis.GameLogic;
 
-namespace wpfTest.GUI
+namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Panel for enabling and disabling game options.

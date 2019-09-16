@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Used for asynchronous creating of visibility maps. Lock for accessing public properties

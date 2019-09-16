@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GameLogic.Maps;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// The class describes player's view of the map.

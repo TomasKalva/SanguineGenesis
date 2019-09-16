@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Data.Entities;
-using wpfTest.GameLogic.Maps;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GameLogic
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Represent unit that can move.
@@ -151,7 +151,7 @@ namespace wpfTest.GameLogic
         {
             List<Stat> stats = new List<Stat>()
             {
-                new Stat( "Player", Player.ToString()),
+                new Stat( "Player", Player.PlayerID.ToString()),
             new Stat( "EntityType", EntityType),
             new Stat( "Health", Health.ToString()),
             new Stat("Energy", Energy.ToString()),
@@ -182,17 +182,17 @@ namespace wpfTest.GameLogic
         /// </summary>
         public void Move(Map map, float deltaT)
         {
-            Position = new Vector2(
-                Math.Max(Range, Math.Min(Center.X + deltaT * Velocity.X, map.Width - Range)),
-                Math.Max(Range, Math.Min(Center.Y + deltaT * Velocity.Y, map.Height - Range)));
-            if (WantsToMove && Velocity.Length != 0)
-                Direction = Velocity.UnitVector();
             if (StopMoving)
             {
                 StopMoving = false;
                 WantsToMove = false;
                 Velocity = new Vector2(0, 0);
             }
+            Position = new Vector2(
+                Math.Max(Range, Math.Min(Center.X + deltaT * Velocity.X, map.Width - Range)),
+                Math.Max(Range, Math.Min(Center.Y + deltaT * Velocity.Y, map.Height - Range)));
+            if (WantsToMove && Velocity.Length != 0)
+                Direction = Velocity.UnitVector();
         }
 
         /// <summary>

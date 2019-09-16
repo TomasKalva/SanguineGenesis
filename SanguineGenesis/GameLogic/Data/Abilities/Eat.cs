@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic.Data.Abilities
+namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
     /// Eat a node or tree to regenerate energy.

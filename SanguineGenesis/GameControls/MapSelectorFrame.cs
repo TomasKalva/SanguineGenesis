@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest
+namespace SanguineGenesis
 {
     /// <summary>
     /// Represents rectangle for selecting units.

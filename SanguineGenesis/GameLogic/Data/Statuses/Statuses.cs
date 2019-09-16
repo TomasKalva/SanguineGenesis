@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace wpfTest.GameLogic.Data.Entities
+namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
     /// Contains statuses that are used in the game.

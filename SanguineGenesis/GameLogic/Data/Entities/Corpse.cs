@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using wpfTest.GameLogic.Data.Abilities;
-using wpfTest.GameLogic.Maps;
-using wpfTest.GUI;
-using static wpfTest.MainWindow;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
+using static SanguineGenesis.MainWindow;
 
-namespace wpfTest.GameLogic.Data.Entities
+namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
     /// Represents a dead animal. Can be used as food for carnivores.
@@ -43,7 +43,7 @@ namespace wpfTest.GameLogic.Data.Entities
         {
             List<Stat> stats = new List<Stat>()
             {
-                new Stat( "player", Player.ToString()),
+                new Stat( "player", Player.PlayerID.ToString()),
                 new Stat( "EntityType", EntityType),
                 new Stat( "Health", Health.ToString()),
             };
