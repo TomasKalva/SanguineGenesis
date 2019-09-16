@@ -288,12 +288,12 @@ namespace SanguineGenesis
         public float Speed { get; }
         private float timer;
 
-        public MoveAnimalToPoint(Animal animal, IMovementTarget point, float speed)
+        public MoveAnimalToPoint(Animal animal, IMovementTarget point, float speed, float maxWaitTime)
         {
             Animal = animal;
             Target = point;
             Speed = speed;
-            MaxWaitTime = Target.DistanceTo(Animal) / speed;
+            MaxWaitTime = maxWaitTime;
             timer = 0f;
         }
 

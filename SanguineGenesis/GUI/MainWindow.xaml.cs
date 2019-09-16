@@ -154,8 +154,8 @@ namespace SanguineGenesis
                 TotalStepTime = TotalStepTime - (int)TotalStepTime;
 
             StepsDone++;
-            Console.WriteLine("updates per second: " + StepsDone / TotalTime * 1000);
-            Console.WriteLine("draws per second: " + DrawingsDone / TotalTime * 1000);
+            //Console.WriteLine("updates per second: " + StepsDone / TotalTime * 1000);
+            //Console.WriteLine("draws per second: " + DrawingsDone / TotalTime * 1000);
 
             //sleep for the rest of the step time
             if (sleepTime > 0)

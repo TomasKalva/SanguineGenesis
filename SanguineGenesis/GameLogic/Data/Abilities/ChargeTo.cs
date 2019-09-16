@@ -41,7 +41,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public ChargeToCommand(Animal commandedEntity, Entity target, ChargeTo chargeTo)
             : base(commandedEntity, target, chargeTo)
         {
-            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.ChargeSpeed);
+            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.ChargeSpeed, Distance/Ability.ChargeSpeed);
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)

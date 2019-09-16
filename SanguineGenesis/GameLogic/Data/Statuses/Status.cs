@@ -453,7 +453,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             : base(affectedEntity, knockBackInfo)
         {
             Vector2 targetPoint = affectedEntity.Position + StatusInfo.Distance * StatusInfo.Direction;
-            moveAnimalToPoint = new MoveAnimalToPoint(affectedEntity, targetPoint, StatusInfo.Speed);
+            moveAnimalToPoint = new MoveAnimalToPoint(affectedEntity, targetPoint, StatusInfo.Speed, StatusInfo.Distance / StatusInfo.Speed);
         }
 
         public override void Added()

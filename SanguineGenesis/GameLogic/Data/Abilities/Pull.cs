@@ -47,7 +47,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             pulling = false;
             CommandedEntity.TurnToPoint(Targ.Position);
             Vector2 frontOfAnimal = commandedEntity.Position + (commandedEntity.Range + target.Range) * commandedEntity.Direction;
-            moveAnimalToPoint = new MoveAnimalToPoint(target, frontOfAnimal, Ability.PullSpeed);
+            moveAnimalToPoint = new MoveAnimalToPoint(target, frontOfAnimal, Ability.PullSpeed, Distance/Ability.PullSpeed);
             firstPullingStep = true;
         }
 
@@ -61,7 +61,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             ElapsedTime += deltaT;
             if (!pulling)
             {
-                //animal is preparing to jump
+                //animal is preparing to pull
                 if (ElapsedTime >= Ability.Duration)
                 {
                     pulling = true;
@@ -73,10 +73,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 if (firstPullingStep)
                 {
-                    //if(!Targ.CanBeTarget)
-                    //target can't be used as target => fail the ability
-                    //  return true;
-
                     firstPullingStep = false;
                 }
                 if (moveAnimalToPoint.Step(deltaT))

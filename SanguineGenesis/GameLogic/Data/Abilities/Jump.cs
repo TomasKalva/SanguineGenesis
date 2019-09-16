@@ -44,7 +44,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             : base(commandedEntity, target, jump)
         {
             jumping = false;
-            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.JumpSpeed);
+            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.JumpSpeed, Distance / Ability.JumpSpeed);
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
