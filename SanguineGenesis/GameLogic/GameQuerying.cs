@@ -129,5 +129,52 @@ namespace SanguineGenesis
                 (int)(map.Height - area.Bottom));
             return SelectPartOfMap(map, (int)area.Left, (int)area.Bottom, (int)area.Right+1, (int)area.Top+1);
         }
+
+        /// <summary>
+        /// Select neighbors of the given rectangle of squares T.
+        /// _++++_
+        /// +rrrr+
+        /// +rrrr+
+        /// _++++_
+        /// </summary>
+        public IEnumerable<T> SelectNeighbors<T>(IMap<T> map, int left, int bottom, int right, int top)
+        {
+            return HorizontalLine(map, bottom - 1, left, right)
+                .Concat(VerticalLine(map, right + 1, bottom, top))
+                .Concat(VerticalLine(map, left - 1, bottom, top))
+                .Concat(HorizontalLine(map, top + 1, left, right));
+        }
+
+        /// <summary>
+        /// Select vertical line of squares T given by the coordinates.
+        /// </summary>
+        public List<T> VerticalLine<T>(IMap<T> map, int x, int bottom, int top)
+        {
+            List<T> line = new List<T>();
+            if (x >= 0 && x < map.Width)
+            {
+                for (int i = bottom; i < top; i++)
+                {
+                    line.Add(map[x, i]);
+                }
+            }
+            return line;
+        }
+
+        /// <summary>
+        /// Select horizontal line of squares T given by the coordinates.
+        /// </summary>
+        public List<T> HorizontalLine<T>(IMap<T> map, int y, int left, int right)
+        {
+            List<T> line = new List<T>();
+            if (y >= 0 && y < map.Height)
+            {
+                for (int i = left; i < right; i++)
+                {
+                    line.Add(map[i, y]);
+                }
+            }
+            return line;
+        }
     }
 }

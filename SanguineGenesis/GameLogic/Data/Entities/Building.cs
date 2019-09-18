@@ -66,6 +66,13 @@ namespace SanguineGenesis.GameLogic
         /// Point to which created units go after they spawn.
         /// </summary>
         public Vector2 RallyPoint { get; set; }
+        // Map extents
+        public new int Left => NodeLeft;
+        public new int Right => Left + Nodes.GetLength(0);
+        public new int Bottom => NodeBottom;
+        public new int Top => Bottom + Nodes.GetLength(1);
+        public new int Width => Right - Left;
+        public new int Height => Top - Bottom;
 
         public Building(Player player, string buildingType, Node[,] nodes, decimal maxHealth, decimal maxEnergy, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)

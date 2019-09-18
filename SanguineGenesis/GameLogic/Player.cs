@@ -75,9 +75,9 @@ namespace SanguineGenesis
                 //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
             UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 0; i++)
             {
-                for (int j = 0; j < 10; j++)
+                for (int j = 0; j < 0; j++)
                 {
                     Entities.Add(normalUnits.NewInstance(this, new Vector2(20 + i*.25f,10+ j*.25f)));
                 }
