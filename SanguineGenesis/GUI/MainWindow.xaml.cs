@@ -257,7 +257,7 @@ namespace SanguineGenesis
             if (changed)
             {
                 GameControls.SelectedEntities.Changed = false;
-                selectedEntities.Sort((u, v) => u.GetHashCode() - v.GetHashCode());
+                selectedEntities.Sort((u, v) => u.EntityType.GetHashCode() - v.EntityType.GetHashCode());
                 EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
                 EntityButtonArray.InfoSources = selectedEntities;
             }

@@ -78,6 +78,9 @@ namespace SanguineGenesis.GameLogic.Maps
 
             //find straight path from squares visible from the center
             PointToCenter();
+            RepairEdges();
+
+            flowField[target.X, target.Y] = null;
 
             return flowField;
         }
@@ -144,6 +147,44 @@ namespace SanguineGenesis.GameLogic.Maps
                 while (rRight.Next(out int x, out int y))
                     flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
             }
+        }
+        
+        /// <summary>
+        /// When a component of a vector is pointing towards a blocked square, remove the component of
+        /// the vecotr.
+        /// </summary>
+        private void RepairEdges()
+        {
+            for (int i = 0; i < flowField.Width; i++)
+                for (int j = 0; j < flowField.Height; j++)
+                {
+                    //update only squares that are not blocked and have valid value of flowField
+                    if (obstacleMap[i, j] || flowField[i, j] == null)
+                        continue;
+
+                    float angle = flowField[i, j].Value;
+                    //directions of the components
+                    int dirX = Math.Sign(Math.Cos(angle));
+                    int dirY = Math.Sign(Math.Sin(angle));
+                    //coordinate of vertical and horizontal neighbor
+                    int neibX = i + dirX;
+                    int neibY = j + dirY;
+
+                    //check if the vector is pointing to a blocked square
+                    if ((neibX >= flowField.Width || neibX < 0) ||
+                        obstacleMap[neibX, j])
+                        //set new angle in the normal direction
+                        flowField[i, j] = dirY > 0 ? (float)Math.PI * 1 / 2f //up
+                                                 : (float)Math.PI * 3 / 2f;//down
+
+
+                    //check if the vector is pointing to a blocked square
+                    if ((neibY >= flowField.Height || neibY < 0) ||
+                        obstacleMap[i, neibY])
+                        //set new angle in the normal direction
+                        flowField[i, j] = dirX > 0 ? 0f               //right
+                                                : (float)Math.PI;   //left
+                }
         }
 
         /// <summary>

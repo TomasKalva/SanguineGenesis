@@ -85,11 +85,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     public class MoveToCommand : Command<Animal, IMovementTarget, MoveTo>, IComputable
     {
         /// <summary>
-        /// If the distance to the target is higher than this, flowfield will be used. 
-        /// Otherwise unit will walk straight to the target.
-        /// </summary>
-        private const float FLOWFIELD_DISTANCE = 1.41f;
-        /// <summary>
         /// Assignment for generating flowfield in other thread.
         /// </summary>
         public MoveToCommandAssignment Assignment { get; set; }
@@ -158,7 +153,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 //go outside of node with building to be able to use flowfield
                 CommandedEntity.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos), game.Map);
             }
-            else if (Targ.DistanceTo(CommandedEntity) > FLOWFIELD_DISTANCE)
+            else if (((int)Targ.Center.X != (int)CommandedEntity.Center.X ||
+                 (int)Targ.Center.Y != (int)CommandedEntity.Center.Y))
             {
                 //use flowfield
                 CommandedEntity.Accelerate(FlowField.GetIntensity(CommandedEntity.Center, 1), game.Map);
