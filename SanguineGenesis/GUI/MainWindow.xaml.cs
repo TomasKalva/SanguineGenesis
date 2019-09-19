@@ -281,7 +281,12 @@ namespace SanguineGenesis
             AbilityButtonArray.Update();
             EntityInfoPanel.Update();
             
+            //update air
             airTakenL.Content = Game.CurrentPlayer.AirTaken+"/"+Game.CurrentPlayer.MaxAirTaken;
+
+            //show winner window if a player won
+            if(Game.Winner!=null)
+                ShowWinnerPanel(Game.Winner.Value);
         }
 
         /// <summary>
@@ -505,6 +510,37 @@ namespace SanguineGenesis
         private void menu_exit_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        bool victoryPanelShown = false;
+        /// <summary>
+        /// Shows panel anouncing winner of the game. Disables other ui. Only shows the panel once.
+        /// </summary>
+        private void ShowWinnerPanel(Players Winner)
+        {
+            //show the panel only once
+            if (victoryPanelShown)
+                return;
+
+            victoryPanel.Visibility = Visibility.Visible;
+            gui.IsEnabled = false;
+            menuLayer.IsEnabled = false;
+            openGLControl1.IsEnabled = false;
+            victoryL.Content = Winner + " won!";
+            victoryPanelShown = true;
+        }
+
+        /// <summary>
+        /// Close victory panel.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void VictoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            gui.IsEnabled = true;
+            menuLayer.IsEnabled = true;
+            openGLControl1.IsEnabled = true;
+            victoryPanel.Visibility = Visibility.Hidden;
         }
 
         #endregion User interface

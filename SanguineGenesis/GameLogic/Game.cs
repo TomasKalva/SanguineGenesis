@@ -30,6 +30,10 @@ namespace SanguineGenesis
         /// </summary>
         public bool GameEnded { get; set; }
         /// <summary>
+        /// The player who won this game.
+        /// </summary>
+        public Players? Winner { get; set; }
+        /// <summary>
         /// Dictionary of all players.
         /// </summary>
         public Dictionary<Players,Player> Players { get; }
@@ -61,6 +65,7 @@ namespace SanguineGenesis
         public Game()
         {
             GameEnded = false;
+            Winner = null;
 
             //players
             Players = new Dictionary<Players, Player>();
@@ -191,6 +196,15 @@ namespace SanguineGenesis
 
             //set and refresh movement commands
             MovementGeneratorInteraction();
+
+            //test if someone won the game
+            if (Winner == null)
+            {
+                if (!Players[SanguineGenesis.Players.PLAYER0].GetAll<Tree>().Any())
+                    Winner = SanguineGenesis.Players.PLAYER1;
+                else if (!Players[SanguineGenesis.Players.PLAYER1].GetAll<Tree>().Any())
+                    Winner = SanguineGenesis.Players.PLAYER0;
+            }
         }
 
         /// <summary>

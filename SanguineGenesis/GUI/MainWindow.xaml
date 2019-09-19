@@ -14,21 +14,21 @@
             <sharpGL:OpenGLControl Name="openGLControl1" OpenGLDraw="OpenGLControl_OpenGLDraw" RenderContextType="FBO"
                                    MouseLeftButtonDown="openGLControl1_MouseLeftButtonDown" MouseLeftButtonUp="openGLControl1_MouseLeftButtonUp"
                                    MouseMove="openGLControl1_MouseMove" MouseRightButtonDown="openGLControl1_MouseRightButtonDown"/>
-            
+
             <Canvas Name="gui">
                 <Grid Name="resourcesL" Width="100" Height="20" Background="Black">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    
+
                     <Label Grid.Row="0" Grid.Column="0" Style="{StaticResource AirIndicatorStyle}">Air:</Label>
                     <Label Name="airTakenL" Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Center" Style="{StaticResource AirIndicatorStyle}">500</Label>
                 </Grid>
                 <Button Name="menuB" Content="Menu" Click="menuB_Click" HorizontalAlignment="Center"
                         Width="80" Height="40"/>
             </Canvas>
-            
+
             <Grid Name="menuLayer" Visibility="Hidden">
                 <Grid Name="menu" HorizontalAlignment="Center" VerticalAlignment="Center"
                       Width="150" Height="200" Style="{StaticResource GameMenuStyle}">
@@ -54,10 +54,16 @@
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
 
-                    <Label Content="Show nutrients" Grid.Row="0" Grid.Column="0" />
-                    <CheckBox Name="showNutrientsCB" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1" />
                 </Grid>
             </Grid>
+        </Grid>
+        <Grid Name="victoryPanel" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Width="200" Height="150" Style="{StaticResource GameMenuStyle}" Visibility="Hidden" >
+
+            <Label Name="victoryL" Content="Player0 won!" Width="200" Height="80" Margin="0,5,0,65" 
+                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                        FontSize="25" FontWeight="Bold"/>
+            <Button Content="Ok" Width="80" Height="50" Margin="60,90,60,10" Click="VictoryButton_Click"/>
         </Grid>
     </Grid>
 </Window>
