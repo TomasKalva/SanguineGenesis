@@ -161,7 +161,7 @@ namespace SanguineGenesis.GameLogic
             new Stat( "Att damage", AttackDamage.ToString()),
             new Stat( "Att period", AttackPeriod.ToString()),
             new Stat( "Att Distance", AttackDistance.ToString()),
-            new Stat( "Mechanical damage", MechanicalDamage.ToString()),
+            new Stat( "Mech dmg", MechanicalDamage.ToString()),
             new Stat( "Speed land", MaxSpeedLand.ToString()),
             new Stat( "Speed water", MaxSpeedWater.ToString()),
             new Stat( "Movement", Movement.ToString()),

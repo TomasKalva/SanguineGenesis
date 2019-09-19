@@ -101,7 +101,11 @@ namespace SanguineGenesis
             //enable alpha channel for textures
             gl.Enable(OpenGL.GL_BLEND);
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
+            //loads the texture to gl
             LoadTexture("Images/bigTileMap.png", gl, shaderProgram);
+
+            //depth testing is not needed for drawing 2d images
+            gl.Disable(OpenGL.GL_DEPTH);
 
             //set linear filtering
             gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR);
@@ -164,7 +168,7 @@ namespace SanguineGenesis
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
 
             //draw vertex array buffers
-
+            
             //draw map
             map.VertexBufferArray.Bind(gl);
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, map.VertexCount);

@@ -44,7 +44,7 @@ namespace SanguineGenesis
             Game = new Game();
             var MapView = new MapView(0, 0, 60, Game.Map, Game);
             GameControls = new GameControls(MapView, Game);
-            openGLControl1.FrameRate = 60;
+            openGLControl1.FrameRate = 1500;
 
             Thread t = new Thread(() =>
             {
@@ -154,8 +154,8 @@ namespace SanguineGenesis
                 TotalStepTime = TotalStepTime - (int)TotalStepTime;
 
             StepsDone++;
-            //Console.WriteLine("updates per second: " + StepsDone / TotalTime * 1000);
-            //Console.WriteLine("draws per second: " + DrawingsDone / TotalTime * 1000);
+            Console.WriteLine("updates per second: " + StepsDone / TotalTime * 1000);
+            Console.WriteLine("draws per second: " + DrawingsDone / TotalTime * 1000);
 
             //sleep for the rest of the step time
             if (sleepTime > 0)
@@ -417,13 +417,13 @@ namespace SanguineGenesis
                         OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
                 }
                 else
-                    OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+                OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
                 UpdateBottomPanel();
-                DrawingsDone++;
             }
             OpenGLAtlasDrawer.Draw(gl, Game.GameplayOptions);
 
+            DrawingsDone++;
             sw.Stop();
             //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
         }
@@ -533,8 +533,6 @@ namespace SanguineGenesis
         /// <summary>
         /// Close victory panel.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void VictoryButton_Click(object sender, RoutedEventArgs e)
         {
             gui.IsEnabled = true;
