@@ -110,7 +110,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             MinStoppingDistance = minStoppingDistance;
             NoMovementDetection = new NoMovementDetection();
-            CommandedEntity.SetAnimation("RUNNING");
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
@@ -122,6 +121,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             //set the command assignment to be active to increase its priority
             if (!Assignment.Active)
                 Assignment.Active = true;
+
+            //set correct animation
+            if (CommandedEntity.AnimationState.Animation.Action!="RUNNING")
+                CommandedEntity.SetAnimation("RUNNING");
 
             //if an enemy is in attack range, attack it instead of other commands
             if (Ability.AttackEnemyInstead)

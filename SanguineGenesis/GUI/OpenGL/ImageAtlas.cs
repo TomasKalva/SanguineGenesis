@@ -163,7 +163,7 @@ namespace SanguineGenesis.GUI
                     string animationName = AnimationName(entityType, action);
 
                     //add new animation to the animation dictionary
-                    AddEntitiesAnimation(animationName, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
+                    AddEntitiesAnimation(animationName, action, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
                 }
             }
             }catch(Exception e)
@@ -179,9 +179,9 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Creates new Animation for the entity with the given parameters and adds it to entitiesAnimations.
         /// </summary>
-        private void AddEntitiesAnimation(string animationName, Vector2 leftBottom,float width, float height, List<float> animChangeTimes, List<Rect> images)
+        private void AddEntitiesAnimation(string animationName, string action, Vector2 leftBottom,float width, float height, List<float> animChangeTimes, List<Rect> images)
         {
-            entitiesAnimations.Add(animationName, new Animation(leftBottom,width, height, animChangeTimes, images));
+            entitiesAnimations.Add(animationName, new Animation(action, leftBottom,width, height, animChangeTimes, images));
         }
 
         /// <summary>
@@ -347,6 +347,10 @@ namespace SanguineGenesis.GUI
         /// Number of images in animation.
         /// </summary>
         public int Length => Images.Count;
+        /// <summary>
+        /// Action that this animation represents.
+        /// </summary>
+        public string Action { get; }
 
         /// <summary>
         /// Creates new animation.
@@ -356,8 +360,9 @@ namespace SanguineGenesis.GUI
         /// <param name="height">Height of the images in animation.</param>
         /// <param name="animChangeTimes">Time it takes to change images.</param>
         /// <param name="images">First two numbers represent left bottom position of the image, second two represent width and height.</param>
-        public Animation(Vector2 leftBottom, float width, float height, List<float> animChangeTimes, List<Rect> images)
+        public Animation(string action, Vector2 leftBottom, float width, float height, List<float> animChangeTimes, List<Rect> images)
         {
+            Action = action;
             LeftBottom = leftBottom;
             Images = images;
             Width = width;
