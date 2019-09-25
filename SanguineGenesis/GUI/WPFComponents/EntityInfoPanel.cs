@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Media;
+using System.Windows.Forms;
 using SanguineGenesis.GameLogic.Data.Entities;
-using static SanguineGenesis.MainWindow;
 
 namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Shows info about entity.
     /// </summary>
-    class EntityInfoPanel : Canvas
+    class EntityInfoPanel : Panel
     {
         /// <summary>
         /// Button array showing statuses.
@@ -43,51 +42,49 @@ namespace SanguineGenesis.GUI
             Height = height;
 
             int buttonArrayColumns = 6;
-            double buttonArrayHeight = Height / buttonArrayColumns;
-            double progressBarWidth = Width / 15;
+            int buttonArrayHeight = Height / buttonArrayColumns;
+            int progressBarWidth = Width / 15;
 
-            EntityStatsTable = new StatsTable(8, 2, Width, Height - 2 * buttonArrayHeight);
-            Children.Add(EntityStatsTable);
-            SetLeft(EntityStatsTable, 0);
-            SetTop(EntityStatsTable, 0);
 
-            StatusButtonArray = new StatusButtonArray(buttonArrayColumns, 1, Width, buttonArrayHeight);
-            Children.Add(StatusButtonArray);
-            SetLeft(StatusButtonArray, 0);
-            SetBottom(StatusButtonArray, 0);
-            
-            CommandButtonArray = new CommandButtonArray(buttonArrayColumns, 1, Width - progressBarWidth, buttonArrayHeight);
-            Children.Add(CommandButtonArray);
-            SetLeft(CommandButtonArray, progressBarWidth);
-            SetBottom(CommandButtonArray, buttonArrayHeight);
+            StatusButtonArray = new StatusButtonArray(buttonArrayColumns, 1, Width);
+            Controls.Add(StatusButtonArray);
+            StatusButtonArray.Location = new System.Drawing.Point(0, Height - StatusButtonArray.Height);
+
+            CommandButtonArray = new CommandButtonArray(buttonArrayColumns, 1, Width - progressBarWidth);
+            Controls.Add(CommandButtonArray);
+            CommandButtonArray.Location = new System.Drawing.Point(progressBarWidth, Height - (CommandButtonArray.Height + CommandButtonArray.Height));
+
+            EntityStatsTable = new StatsTable(8, 2, Width, Height - (CommandButtonArray.Height + StatusButtonArray.Height));
+            Controls.Add(EntityStatsTable);
+            EntityStatsTable.Location = new System.Drawing.Point(0, 0);
 
             FirstCommandProgress = new ProgressBar()
             {
                 Width = progressBarWidth,
-                Height = buttonArrayHeight
+                Height = CommandButtonArray.Height
             };
-            Children.Add(FirstCommandProgress);
-            FirstCommandProgress.Orientation = Orientation.Vertical;
-            SetLeft(FirstCommandProgress, 0);
-            SetBottom(FirstCommandProgress, buttonArrayHeight);
+            Controls.Add(FirstCommandProgress);
+            FirstCommandProgress.Maximum = 100;
+            //todo: FirstCommandProgress.Orientation = Orientation.Vertical;
+            FirstCommandProgress.Location = new System.Drawing.Point(0, Height - (CommandButtonArray.Height + StatusButtonArray.Height));
             FirstCommandProgress.Value = 70;
 
-            Background = Brushes.Gray;
+            BackColor = Color.Gray;
         }
 
         /// <summary>
         /// Update the components with the SelectedEntity info.
         /// </summary>
-        public void Update()
+        public void UpdateData()
         {
             if (SelectedEntity == null || SelectedEntity.IsDead)
             {
                 //reset window if SelectedEntity doesn't exist or is dead
                 EntityStatsTable.SetStats(new List<Stat>());
                 StatusButtonArray.InfoSources = new List<Status>();
-                StatusButtonArray.Update();
+                StatusButtonArray.UpdateData();
                 CommandButtonArray.InfoSources = new List<Command>();
-                CommandButtonArray.Update();
+                CommandButtonArray.UpdateData();
                 FirstCommandProgress.Value = 0;
             }
             else
@@ -95,16 +92,19 @@ namespace SanguineGenesis.GUI
                 //show info about SelectedEntity
                 EntityStatsTable.SetStats(SelectedEntity.Stats());
                 StatusButtonArray.InfoSources = SelectedEntity.Statuses;
-                StatusButtonArray.Update();
+                StatusButtonArray.UpdateData();
                 List<Command> commandQueue= SelectedEntity.CommandQueue.Queue;
                 CommandButtonArray.InfoSources = commandQueue;
-                CommandButtonArray.Update();
+                CommandButtonArray.UpdateData();
                 if (commandQueue.Any())
-                    FirstCommandProgress.Value = commandQueue[0].Progress;
+                {
+                    //the animation of progress bar is too slow, reducing progress skips animation
+                    FirstCommandProgress.Value = Math.Min(100, commandQueue[0].Progress+1);
+                    FirstCommandProgress.Value = Math.Max(0, commandQueue[0].Progress);
+                }
                 else
                     FirstCommandProgress.Value = 0;
             }
         }
     }
-
 }

@@ -1,54 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using static SanguineGenesis.MainWindow;
+using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Shows list of Stats.
     /// </summary>
-    public class StatsTable : Grid
+    public class StatsTable : TableLayoutPanel
     {
-        public int Rows { get; }
-        public int Columns { get; }
+        private Label[,] Stats { get; }
 
-        public StatsTable(int rows, int columns, double width, double height)
+        public StatsTable(int rows, int columns, int width, int height)
         {
-            Rows = rows;
-            Columns = columns;
             Width = width;
             Height = height;
+            RowCount = rows;
+            ColumnCount = 2 * columns;
+            Stats = new Label[ColumnCount, RowCount];
 
-            for (int i = 0; i < 2 * columns; i++)
-            {
-                ColumnDefinitions.Add(new ColumnDefinition());
-            }
-            for (int i = 0; i < rows; i++)
-            {
-                RowDefinitions.Add(new RowDefinition());
-            }
+            int labelWidth = width / ColumnCount;
+            int labelHeight = height / RowCount;
+            for (int j = 0; j < RowCount; j++)
+                for (int i = 0; i < ColumnCount; i++)
+                {
+                    Label l = new Label();
+                    l.Width = labelWidth;
+                    l.Height = labelHeight;
+                    l.Padding = Padding.Empty;
+                    l.Margin = Padding.Empty;
+                    Stats[i, j] = l;
+                    if (i % 2 == 0)
+                        l.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+                    else
+                        l.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+                    Controls.Add(l);
+                }
 
-            for (int i = 0; i < (2 * columns) * rows; i++)
-            {
-                Label l = new Label();
-                int row = i % (2 * Rows) / 2;
-                int column = i % 2 == 0 ? 2 * (i / (2 * Rows)) : 2 * (i / (2 * Rows)) + 1;
-                l.SetValue(ColumnProperty, column);
-                l.SetValue(RowProperty, row);
-                l.Focusable = false;
-                if (i % 2 == 0)
-                    l.HorizontalAlignment = HorizontalAlignment.Left;
-                else
-                    l.HorizontalAlignment = HorizontalAlignment.Center;
-                Children.Add(l);
-            }
-
-            Style = (Style)Application.Current.FindResource("StatsTableStyle");
+            BackColor = Color.Beige;
         }
 
         /// <summary>
@@ -56,20 +50,22 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public void SetStats(List<Stat> stats)
         {
-            for (int i = 0; i < Rows * Columns; i++)
-            {
-                Label name = (Label)Children[2 * i];
-                Label value = (Label)Children[2 * i + 1];
-                if (i < stats.Count)
+            for (int i = 0; i < ColumnCount / 2; i++)
+                for (int j = 0; j < RowCount; j++)
                 {
-                    Stat s = stats[i];
-                    name.Content = s.Name;
-                    value.Content = s.Value;
+                Label name = Stats[2 * i, j];
+                Label value = Stats[2 * i + 1, j];
+                    int statsIndex = i * RowCount + j;
+                if (statsIndex < stats.Count)
+                {
+                    Stat s = stats[statsIndex];
+                    name.Text = s.Name;
+                    value.Text = s.Value;
                 }
                 else
                 {
-                    name.Content = "";
-                    value.Content = "";
+                    name.Text = "";
+                    value.Text = "";
                 }
             }
         }

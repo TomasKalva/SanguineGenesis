@@ -161,6 +161,8 @@ namespace SanguineGenesis
             //physics
             List<Entity> physicalEntities = entities.Where((e) => e.Physical).ToList();
             physics.MoveAnimals(Map, animals, deltaT);
+            //perform two steps of collision checking
+            physics.PushAway(Map, animals, physicalEntities);
             physics.PushAway(Map, animals, physicalEntities);
             physics.PushOutsideOfObstacles(Map, animals);
 

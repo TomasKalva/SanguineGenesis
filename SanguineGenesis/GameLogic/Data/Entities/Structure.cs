@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GUI;
-using static SanguineGenesis.MainWindow;
 
 namespace SanguineGenesis.GameLogic
 {

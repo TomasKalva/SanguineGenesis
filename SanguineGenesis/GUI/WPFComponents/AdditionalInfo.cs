@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using static SanguineGenesis.MainWindow;
+using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Shows info about IShowable.
     /// </summary>
-    class AdditionalInfo : Canvas
+    class AdditionalInfo : Panel
     {
         /// <summary>
         /// The instance whose info is shown.
@@ -28,46 +28,46 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public StatsTable Stats { get; }
         /// <summary>
-        /// TextBlock with the description of Shown.
+        /// Label with the description of Shown.
         /// </summary>
-        public TextBlock Description { get; }
+        public Label Description { get; }
 
         public AdditionalInfo(int width, int height)
         {
             Width = width;
             Height = height;
 
-            double captionHeight = Height / 7;
-            double statsHeight = Height / 3;
-            double descriptionHeight = Height - (captionHeight + statsHeight);
+            int captionHeight = Height / 7;
+            int statsHeight = Height * 2 / 5;
+            int descriptionHeight = Height - (captionHeight + statsHeight);
 
             //caption
             Caption = new Label()
             {
                 Width = Width,
-                Height = captionHeight
+                Height = captionHeight,
+                TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
+                Font = new Font(Label.DefaultFont, System.Drawing.FontStyle.Bold)
             };
-            Children.Add(Caption);
-            SetLeft(Caption, 0);
-            SetTop(Caption, 0);
+            Controls.Add(Caption);
+            Caption.Location = new System.Drawing.Point(0, 0);
 
             //stats
             Stats = new StatsTable(6, 1, Width, statsHeight);
-            Children.Add(Stats);
-            SetLeft(Stats, 0);
-            SetTop(Stats, captionHeight);
+            Controls.Add(Stats);
+            Stats.Location = new System.Drawing.Point(0, captionHeight);
 
             //description
-            Description = new TextBlock()
+            Description = new Label()
             {
                 Width = Width,
                 Height = descriptionHeight
             };
-            Children.Add(Description);
-            SetLeft(Description, 0);
-            SetTop(Description, captionHeight + statsHeight);
-
-            Style = (Style)Application.Current.FindResource("AdditionalInfoStyle");
+            Description.Enabled = false;
+            Controls.Add(Description);
+            Description.Location = new System.Drawing.Point(0, captionHeight + statsHeight);
+            
+            BackColor = Color.LightGray;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace SanguineGenesis.GUI
         public void Update(IShowable showable)
         {
             Shown = showable;
-            Caption.Content = showable.GetName();
+            Caption.Text = showable.GetName();
             Stats.SetStats(showable.Stats());
             Description.Text = showable.Description();
         }
@@ -87,7 +87,7 @@ namespace SanguineGenesis.GUI
         public void Reset()
         {
             Shown = null;
-            Caption.Content = "";
+            Caption.Text = "";
             Stats.SetStats(new List<Stat>());
             Description.Text = "";
         }

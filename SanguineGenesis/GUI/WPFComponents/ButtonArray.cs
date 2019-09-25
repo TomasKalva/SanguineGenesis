@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
+using SanguineGenesis;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
-using static SanguineGenesis.MainWindow;
+using SanguineGenesis.GUI;
 
 namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Control for drawing rectangle array of buttons.
     /// </summary>
-    abstract class ButtonArray<InfoSource> : Grid where InfoSource:IShowable
+    abstract class ButtonArray<InfoSource> : TableLayoutPanel where InfoSource : IShowable
     {
         /// <summary>
         /// InfoSources corresponding to the button indexes.
@@ -28,7 +29,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public InfoSource GetInfoSource(int index)
         {
-            if (InfoSources!=null && index < InfoSources.Count)
+            if (InfoSources != null && index < InfoSources.Count)
                 return InfoSources[index];
             else
                 return default(InfoSource);
@@ -37,48 +38,39 @@ namespace SanguineGenesis.GUI
         /// Selected InfoSource.
         /// </summary>
         public InfoSource Selected { get; set; }
-        /// <summary>
-        /// Number of columns.
-        /// </summary>
-        public int Columns { get; }
-        /// <summary>
-        /// Number of rows.
-        /// </summary>
-        public int Rows { get; }
+
+        protected Button[,] Buttons { get; }
 
         /// <summary>
         /// Creates new ButtonArray with the given extents and number of rows and columns.
         /// </summary>
-        public ButtonArray(int columns, int rows, double width, double height)
+        public ButtonArray(int columns, int rows, int preferedWidth)
         {
-            Columns = columns;
-            Rows = rows;
-            Width = width;
-            Height = height;
-            
-            for (int i = 0; i < columns; i++)
-            {
-                ColumnDefinitions.Add(new ColumnDefinition());
-            }
-            for (int i = 0; i < rows; i++)
-            {
-                RowDefinitions.Add(new RowDefinition());
-            }
+            RowCount = rows;
+            ColumnCount = columns;
+            int buttonSize = preferedWidth / ColumnCount;
+            Width = buttonSize * ColumnCount;
+            Height = buttonSize * RowCount;
 
-            for (int i = 0; i < columns * rows; i++)
-            {
-                Button b = new Button();
-                b.SetValue(Grid.ColumnProperty, i % Columns);
-                b.SetValue(Grid.RowProperty, i / Columns);
-                b.Focusable = false;
-
-                //add text block for the button
-                TextBlock t = new TextBlock();
-                t.TextWrapping = TextWrapping.Wrap;
-                t.TextAlignment = TextAlignment.Center;
-                b.Content = t;
-                Children.Add(b);
-            }
+            Buttons = new Button[ColumnCount, RowCount];
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
+                {
+                    Button b = new Button();
+                    b.Width = buttonSize;
+                    b.Height = buttonSize;
+                    b.Padding = Padding.Empty;
+                    b.Margin = Padding.Empty;
+                    // b.Location = new System.Drawing.Point(i, j);
+                    //b.SetValue(Grid.ColumnProperty, i % Columns);
+                    //b.SetValue(Grid.RowProperty, i / Columns);
+                    //b.Focusable = false;
+                    Buttons[i, j] = b;
+                    //add text block for the button
+                    //t.TextWrapping = TextWrapping.Wrap;
+                    //t.TextAlignment = TextAlignment.Center;
+                    Controls.Add(b);
+                }
         }
 
         /// <summary>
@@ -87,70 +79,90 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public void ShowInfoOnMouseOver(AdditionalInfo additionalInfo)
         {
-            for (int i = 0; i < Columns * Rows; i++)
-            {
-                Button b = (Button)Children[i];
-                int buttonInd = i;//capture by value
-                bool mouseOverButton = false;
-                b.MouseEnter += (sender, ev) =>
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
                 {
-                    mouseOverButton = true;
-                    InfoSource info;
-                    if ((info = GetInfoSource(buttonInd)) != null)
-                        additionalInfo.Update(info);
-                };
-
-                b.MouseLeave += (sender, ev) =>
-                {
-                    mouseOverButton = false;
-                    additionalInfo.Reset();
-                };
-                b.IsVisibleChanged += (sender, ev) =>
-                {
-                    InfoSource info = GetInfoSource(buttonInd);
-                    if (b.IsVisible)
+                    Button b = Buttons[i, j];
+                    int buttonInd = ButtonIndex(j, i);//capture by value
+                    bool mouseOverButton = false;
+                    b.MouseEnter += (sender, ev) =>
                     {
-                        //show info if button appeared under mouse
-                        if(mouseOverButton && info!=null)
+                        mouseOverButton = true;
+                        InfoSource info;
+                        if ((info = GetInfoSource(buttonInd)) != null)
                             additionalInfo.Update(info);
-                    }
-                    else
+                    };
+
+                    b.MouseLeave += (sender, ev) =>
                     {
-                        //reset info shown in additional info if its button disappeared
-                        if(info!=null && info.Equals(additionalInfo.Shown))
-                            additionalInfo.Reset();
-                    }
-                };
-            }
+                        mouseOverButton = false;
+                        additionalInfo.Reset();
+                    };
+                    b.VisibleChanged += (sender, ev) =>
+                    {
+                        InfoSource info = GetInfoSource(buttonInd);
+                        if (b.Visible)
+                        {
+                            //show info if button appeared under mouse
+                            if (mouseOverButton && info != null)
+                                additionalInfo.Update(info);
+                        }
+                        else
+                        {
+                            //reset info shown in additional info if its button disappeared
+                            if (info != null && info.Equals(additionalInfo.Shown))
+                                additionalInfo.Reset();
+                        }
+                    };
+                }
         }
 
         /// <summary>
         /// Update the info on the buttons, hide buttons without info, show buttons
         /// with info.
         /// </summary>
-        public void Update()
+        public void UpdateData()
         {
             if (InfoSources == null)
                 return;
-            //update units panel
-            for (int i = 0; i < Children.Count; i++)
-            {
-                Button b = (Button)Children[i];
-                if (i >= InfoSources.Count)
+
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
                 {
-                    b.Visibility = Visibility.Hidden;
-                }
-                else
-                {
-                    ((TextBlock)b.Content).Text = InfoSources[i].GetName();
-                    b.Visibility = Visibility.Visible;
-                    //highlight selected
-                    if (InfoSources[i].Equals(Selected))
-                        b.Background = Brushes.DarkGreen;
+                    Button b = Buttons[i, j];
+                    int index = ButtonIndex(j, i);
+                    if (index >= InfoSources.Count)
+                    {
+                        b.Text = "";
+                        if (b.BackColor != Color.White)
+                            b.BackColor = Color.White;
+                    }
                     else
-                        b.ClearValue(BackgroundProperty);
+                    {
+                        b.Text = InfoSources[index].GetName();
+                        //highlight selected
+                        if (InfoSources[index].Equals(Selected))
+                        {
+                            if (b.BackColor != Color.DarkGreen)
+                                b.BackColor = Color.DarkGreen;
+                        }
+                        else if (b.BackColor != Color.Orange)
+                            b.BackColor = Color.Orange;
+                    }
                 }
-            }
+        }
+
+        protected int ButtonIndex(int row, int column) => row + column * RowCount;
+
+        /// <summary>
+        /// Makes buttons give focus to focusTarget on click.
+        /// </summary>
+        /// <param name="focusTarget">After button is clicked, this component receives focus.</param>
+        public void GiveFocusTo(Control focusTarget)
+        {
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
+                    Buttons[i, j].GotFocus += (_s, _e)=>focusTarget.Focus();
         }
     }
 
@@ -159,10 +171,12 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class EntityButtonArray : ButtonArray<Entity>
     {
-        public EntityButtonArray(int colulmns, int rows, double width, double height)
-            : base(colulmns, rows, width, height)
+        public EntityButtonArray(int colulmns, int rows, int width)
+            : base(colulmns, rows, width)
         {
-            Style = (Style)Application.Current.FindResource("EntitiesArrayStyle");
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
+                    Buttons[i, j].Font = new Font(Button.DefaultFont.FontFamily, 6 , System.Drawing.FontStyle.Regular);
         }
 
         /// <summary>
@@ -172,28 +186,29 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public void ShowInfoOnClick(EntityInfoPanel entityInfoPanel, AbilityButtonArray abilityButtonArray, GameControls gameControls)
         {
-            for (int i = 0; i < Columns * Rows; i++)
-            {
-                Button b = (Button)Children[i];
-                int buttonInd = i;//capture by value
-                b.PreviewMouseDown += (sender, ev) =>
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
                 {
-                    Entity info;
-                    if ((info = GetInfoSource(buttonInd)) != null)
+                    Button b = Buttons[i, j];
+                    int buttonInd = ButtonIndex(j, i);//capture by value
+                    b.MouseDown += (sender, ev) =>
                     {
-                        if (ev.RightButton == MouseButtonState.Pressed)
+                        Entity info;
+                        if ((info = GetInfoSource(buttonInd)) != null)
                         {
-                            //remove the entity corresponding to the clicked button from selection
-                            gameControls.SelectedEntities.RemoveEntity(info);
+                            if (ev.Button == MouseButtons.Right)
+                            {
+                                //remove the entity corresponding to the clicked button from selection
+                                gameControls.SelectedEntities.RemoveEntity(info);
+                            }
+                            else
+                            {
+                                //select this entity
+                                Selected = info;
+                            }
                         }
-                        else
-                        {
-                            //select this entity
-                            Selected = info;
-                        }
-                    }
-                };
-            }
+                    };
+                }
         }
     }
 
@@ -202,10 +217,10 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class AbilityButtonArray : ButtonArray<Ability>
     {
-        public AbilityButtonArray(int columns, int rows, double width, double height)
-            : base(columns, rows, width, height)
+        public AbilityButtonArray(int columns, int rows, int width)
+            : base(columns, rows, width)
         {
-            Style = (Style)Application.Current.FindResource("AbilitiesArrayStyle");
+            BackColor = Color.Gray;
         }
         
         /// <summary>
@@ -213,21 +228,23 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public void SelectAbilityOnClick(GameControls gameControls)
         {
-            for (int i = 0; i < Columns * Rows; i++)
-            {
-                Button b = (Button)Children[i];
-                int buttonInd = i;//capture by value
-                b.Click += (sender, ev) =>
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
                 {
-                    Ability selectedAbility;
-                    if ((selectedAbility = GetInfoSource(buttonInd)) != null)
-                        lock (gameControls.EntityCommandsInput)
-                        {
-                            gameControls.EntityCommandsInput.SelectedAbility = selectedAbility;
-                        }
-                };
-            }
+                    Button b = Buttons[i, j];
+                    int buttonInd = ButtonIndex(j, i);//capture by value
+                    b.Click += (sender, ev) =>
+                    {
+                        Ability selectedAbility;
+                        if ((selectedAbility = GetInfoSource(buttonInd)) != null)
+                            lock (gameControls.EntityCommandsInput)
+                            {
+                                gameControls.EntityCommandsInput.SelectedAbility = selectedAbility;
+                            }
+                    };
+                }
         }
+
     }
 
     /// <summary>
@@ -235,10 +252,10 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class StatusButtonArray : ButtonArray<Status>
     {
-        public StatusButtonArray(int columns, int rows, double width, double height)
-            : base(columns, rows, width, height)
+        public StatusButtonArray(int columns, int rows, int width)
+            : base(columns, rows, width)
         {
-            Style = (Style)Application.Current.FindResource("StatusArrayStyle");
+            //style = (Style)Application.Current.FindResource("StatusArrayStyle");
         }
     }
 
@@ -247,12 +264,12 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class CommandButtonArray : ButtonArray<Command>
     {
-        public CommandButtonArray(int colulmns, int rows, double width, double height)
-            : base(colulmns, rows, width, height)
+        public CommandButtonArray(int colulmns, int rows, int width)
+            : base(colulmns, rows, width)
         {
-            if (Children.Count > 0)
-                ((Button)Children[0]).Background = Brushes.Green;
-            Style = (Style)Application.Current.FindResource("CommandsArrayStyle");
+            if (Buttons.Length > 0)
+                Buttons[0,0].BackColor = Color.Green;
+            //Style = (Style)Application.Current.FindResource("CommandsArrayStyle");
         }
 
         /// <summary>
@@ -260,23 +277,24 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public void RemoveCommandOnClick()
         {
-            for (int i = 0; i < Columns * Rows; i++)
-            {
-                Button b = (Button)Children[i];
-                int buttonInd = i;//capture by value
-                b.PreviewMouseDown += (sender, ev) =>
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
                 {
-                    Command command;
-                    if ((command = GetInfoSource(buttonInd)) != null)
+                    Button b = Buttons[i, j];
+                    int buttonInd = ButtonIndex(j, i);//capture by value
+                    b.MouseDown += (sender, ev) =>
                     {
-                        if (ev.RightButton == MouseButtonState.Pressed)
+                        Command command;
+                        if ((command = GetInfoSource(buttonInd)) != null)
                         {
-                            //remove the command corresponding to the clicked button from selection
-                            command.Remove();
+                            if (ev.Button == MouseButtons.Right)
+                            {
+                                //remove the command corresponding to the clicked button from selection
+                                command.Remove();
+                            }
                         }
-                    }
-                };
-            }
+                    };
+                }
         }
     }
 

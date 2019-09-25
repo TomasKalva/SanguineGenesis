@@ -34,18 +34,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>SanguineGenesis.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GlmNet, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\GlmNet.0.7.0\lib\net40\GlmNet.dll</HintPath>
     </Reference>
-    <Reference Include="SharpGL, Version=2.4.0.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpGL.2.4.0.0\lib\net40\SharpGL.dll</HintPath>
+    <Reference Include="SharpGL, Version=2.4.1.2, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpGL.2.4.1.2\lib\net40-client\SharpGL.dll</HintPath>
     </Reference>
-    <Reference Include="SharpGL.SceneGraph, Version=2.4.0.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpGL.2.4.0.0\lib\net40\SharpGL.SceneGraph.dll</HintPath>
+    <Reference Include="SharpGL.WinForms, Version=2.4.1.2, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpGL.WinForms.2.4.1.2\lib\net40\SharpGL.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="SharpGL.WPF, Version=2.4.0.0, Culture=neutral, PublicKeyToken=27fc851303210b27, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpGL.WPF.2.4.0.0\lib\net40\SharpGL.WPF.dll</HintPath>
@@ -53,6 +52,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -62,15 +62,13 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
     <Compile Include="GameLogic\Data\Abilities\Abilities.cs" />
     <Compile Include="GameLogic\Data\Abilities\ApplyStatus.cs" />
     <Compile Include="GameLogic\Data\Abilities\Attack.cs" />
@@ -118,15 +116,29 @@
     <Compile Include="GameLogic\Maps\RayPathfinding.cs" />
     <Compile Include="GameLogic\Maps\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityMap.cs" />
-    <Compile Include="GUI\WPFComponents\AdditionalInfo.cs" />
+    <Compile Include="GUI\MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\WPFComponents\AdditionalInfo.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GameLogic\Maps\FlowMap.cs" />
     <Compile Include="GameControls\GameControls.cs" />
     <Compile Include="GameLogic\GameQuerying.cs" />
     <Compile Include="GameControls\SelectedGroup.cs" />
     <Compile Include="GameLogic\Command.cs" />
-    <Compile Include="GUI\WPFComponents\ButtonArray.cs" />
-    <Compile Include="GUI\WPFComponents\EntityInfoPanel.cs" />
-    <Compile Include="GUI\WPFComponents\GameOptionsPanel.cs" />
+    <Compile Include="GUI\WPFComponents\ButtonArray.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\WPFComponents\EntityInfoPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\WPFComponents\GameOptionsMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GUI\IRectangle.cs" />
     <Compile Include="GameLogic\Maps\IMap.cs" />
     <Compile Include="GameControls\MapMovementInput.cs" />
@@ -142,24 +154,22 @@
     <Compile Include="GameControls\EntityCommandsInput.cs" />
     <Compile Include="GameLogic\Terrain.cs" />
     <Compile Include="GameLogic\Data\Entities\Entity.cs" />
-    <Page Include="GUI\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
+    <Compile Include="GUI\WPFComponents\GameMenu.cs">
+      <SubType>Component</SubType>
     </Compile>
+    <Compile Include="GUI\WPFComponents\PlayerPropertiesPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SharpGL\SceneGraph.cs" />
     <Compile Include="GameLogic\Game.cs" />
-    <Compile Include="GUI\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameLogic\Maps\Map.cs" />
     <Compile Include="GameLogic\Node.cs" />
-    <Compile Include="GUI\WPFComponents\StatsTable.cs" />
+    <Compile Include="GUI\WPFComponents\StatsTable.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -173,6 +183,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="GUI\MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -230,6 +243,12 @@
     <None Include="Images\NewMap\terrain.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="SharpGL.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="SharpGL.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

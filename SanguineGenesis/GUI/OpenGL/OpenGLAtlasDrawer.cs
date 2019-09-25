@@ -16,7 +16,6 @@ using System.Windows.Media;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
-using static SanguineGenesis.MainWindow;
 
 namespace SanguineGenesis
 {

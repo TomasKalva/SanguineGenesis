@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GUI;
-using static SanguineGenesis.MainWindow;
 
 namespace SanguineGenesis.GameLogic
 {

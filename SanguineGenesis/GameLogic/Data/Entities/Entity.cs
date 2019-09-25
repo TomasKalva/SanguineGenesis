@@ -9,7 +9,6 @@ using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
-using static SanguineGenesis.MainWindow;
 
 namespace SanguineGenesis
 {

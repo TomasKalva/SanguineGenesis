@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
-using static SanguineGenesis.MainWindow;
 
 namespace SanguineGenesis
 {
@@ -72,7 +71,7 @@ namespace SanguineGenesis
 
 
         public MapView(float top, float left, float nodeSize, Map map, Game game,
-            float minNodeSize = 30, float maxNodeSize = 70, float scrollSpeed = 0.5f, float zoomSpeed = 20)
+            float minNodeSize = 50, float maxNodeSize = 70, float scrollSpeed = 0.5f, float zoomSpeed = 20)
         {
             Bottom = top;
             Left = left;
