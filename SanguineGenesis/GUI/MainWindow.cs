@@ -163,6 +163,7 @@ namespace SanguineGenesis.GUI
         private Button MenuButton { get; set; }
         private GameMenu GameMenu { get; set; }
         private PlayerPropertiesPanel PlayerPropertiesPanel { get; set; }
+        private VictoryPanel VictoryPanel { get; set; }
 
         /// <summary>
         /// Initializes user interface.
@@ -188,14 +189,6 @@ namespace SanguineGenesis.GUI
             Controls.Add(AdditionalInfo);
             AdditionalInfo.Stats.SetStats(
                 new List<Stat>());
-
-            //game options panel
-            GameOptionsMenu = new GameOptionsMenu(250, 300, Game.GameplayOptions);
-            GameOptionsMenu.Anchor = AnchorStyles.None;
-            GameOptionsMenu.Left = (ClientSize.Width - GameOptionsMenu.Width) / 2;
-            GameOptionsMenu.Top = (ClientSize.Height - GameOptionsMenu.Height) / 2;
-            Controls.Add(GameOptionsMenu);
-            Controls.SetChildIndex(GameOptionsMenu, 0);
 
             //add listeners to the buttons
             EntityButtonArray.ShowInfoOnClick(EntityInfoPanel, AbilityButtonArray, GameControls);
@@ -255,6 +248,22 @@ namespace SanguineGenesis.GUI
             Controls.Add(GameMenu);
             Controls.SetChildIndex(GameMenu, 10);
 
+            //game options panel
+            GameOptionsMenu = new GameOptionsMenu(250, 300, Game.GameplayOptions);
+            GameOptionsMenu.Anchor = AnchorStyles.None;
+            GameOptionsMenu.Left = (ClientSize.Width - GameOptionsMenu.Width) / 2;
+            GameOptionsMenu.Top = (ClientSize.Height - GameOptionsMenu.Height) / 2;
+            Controls.Add(GameOptionsMenu);
+            Controls.SetChildIndex(GameOptionsMenu, 5);
+
+            //victory panel
+            VictoryPanel = new VictoryPanel(200, 150);
+            VictoryPanel.Left = (ClientSize.Width - VictoryPanel.Width) / 2;
+            VictoryPanel.Top = (ClientSize.Height - VictoryPanel.Height) / 2;
+            VictoryPanel.Ok.Click += (_s, _e) => HideVictoryPanel();
+            Controls.Add(VictoryPanel);
+            Controls.SetChildIndex(VictoryPanel, 0);
+
             //players properties
             PlayerPropertiesPanel = new PlayerPropertiesPanel(120, 20);
             Controls.Add(PlayerPropertiesPanel);
@@ -263,7 +272,8 @@ namespace SanguineGenesis.GUI
             Controls.SetChildIndex(openGLControl1, 100);
             openGLControl1.Focus();
 
-            //GameOptionsMenu.Visible = false;
+            VictoryPanel.Visible = false;
+            GameOptionsMenu.Visible = false;
             GameMenu.Visible = false;
         }
         
@@ -313,8 +323,8 @@ namespace SanguineGenesis.GUI
             PlayerPropertiesPanel.AirValue.Text = Game.CurrentPlayer.AirTaken + "/" + Game.CurrentPlayer.MaxAirTaken;
             
             //show winner window if a player won
-            //if (Game.Winner != null)
-            //    ShowWinnerPanel(Game.Winner.Value);
+            if (Game.Winner != null)
+                ShowVictoryPanel(Game.Winner.Value);
         }
         
         /// <summary>
@@ -351,7 +361,7 @@ namespace SanguineGenesis.GUI
                 case Keys.W: GameControls.MapMovementInput.AddDirection(Direction.UP); break;
                 case Keys.A: GameControls.MapMovementInput.AddDirection(Direction.LEFT); break;
                 case Keys.D: GameControls.MapMovementInput.AddDirection(Direction.RIGHT); break;
-                case Keys.Shift:
+                case Keys.ShiftKey:
                     lock (GameControls.EntityCommandsInput)
                         GameControls.EntityCommandsInput.ResetCommandsQueue = false; break;
             }
@@ -368,7 +378,7 @@ namespace SanguineGenesis.GUI
                 case Keys.W: GameControls.MapMovementInput.RemoveDirection(Direction.UP); break;
                 case Keys.A: GameControls.MapMovementInput.RemoveDirection(Direction.LEFT); break;
                 case Keys.D: GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT); break;
-                case Keys.Shift:
+                case Keys.ShiftKey:
                     lock (GameControls.EntityCommandsInput)
                         GameControls.EntityCommandsInput.ResetCommandsQueue = true; break;
             }
@@ -417,9 +427,7 @@ namespace SanguineGenesis.GUI
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
-
-                //hide gui so that player can select from the whole screen
-                //gui.Visibility = Visibility.Hidden;
+                
                 //set selected entity
                 SelectEntity();
             }
@@ -438,9 +446,7 @@ namespace SanguineGenesis.GUI
                 Vector2 mapCoordinates = GameControls.MapView
                 .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.EndSelection(mapCoordinates);
-
-                //turn gui back on
-                //gui.Visibility = Visibility.Visible;
+                
                 //set selected entity
                 SelectEntity();
             }
@@ -465,17 +471,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void OpenMenu()
         {
-            //disable game and game info
-            openGLControl1.Enabled = false;
-            MenuButton.Enabled = false;
-            EntityButtonArray.Enabled=false;
-            AbilityButtonArray.Enabled=false;
-            EntityInfoPanel.Enabled=false;
-            AdditionalInfo.Enabled=false;
-            GameOptionsMenu.Visible=false;
-
-            //put focus to the main window
-            Focus();
+            DisableGameControls();
 
             //show menu
             GameMenu.Visible = true;
@@ -486,31 +482,12 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void CloseMenu()
         {
-            //enable game and game info
-            openGLControl1.Enabled = true;
-            MenuButton.Enabled = true;
-            EntityButtonArray.Enabled = true;
-            AbilityButtonArray.Enabled = true;
-            EntityInfoPanel.Enabled = true;
-            AdditionalInfo.Enabled = true;
-            GameOptionsMenu.Visible = false;
-            openGLControl1.Focus();
+            EnableGameControls();
 
             //hide menu
             GameMenu.Visible = false;
         }
-
-        /*
-        /// <summary>
-        /// Closes menu and enables interaction with the game.
-        /// </summary>
-        private void menu_resume_Click(object sender, RoutedEventArgs e)
-        {
-            gui.IsEnabled = true;
-            openGLControl1.IsEnabled = true;
-            menuLayer.Visibility = Visibility.Hidden;
-        }
-        */
+        
         /// <summary>
         /// Opens options menu.
         /// </summary>
@@ -527,48 +504,74 @@ namespace SanguineGenesis.GUI
             GameOptionsMenu.Visible = false;
         }
 
+        private void DisableGameControls()
+        {
+            //disable game and game info
+            openGLControl1.Enabled = false;
+            MenuButton.Enabled = false;
+            EntityButtonArray.Enabled = false;
+            AbilityButtonArray.Enabled = false;
+            EntityInfoPanel.Enabled = false;
+            AdditionalInfo.Enabled = false;
+            GameOptionsMenu.Visible = false;
+
+            //put focus to the main window
+            Focus();
+        }
+
+        private void EnableGameControls()
+        {
+            //enable game and game info
+            openGLControl1.Enabled = true;
+            MenuButton.Enabled = true;
+            EntityButtonArray.Enabled = true;
+            AbilityButtonArray.Enabled = true;
+            EntityInfoPanel.Enabled = true;
+            AdditionalInfo.Enabled = true;
+            GameOptionsMenu.Visible = false;
+
+            //put focus to the game
+            openGLControl1.Focus();
+        }
+
         /// <summary>
         /// Closes the game.
         /// </summary>
         private void CloseWindow()
         {
             Close();
-        }/*
+        }
 
-        bool victoryPanelShown = false;
         /// <summary>
         /// Shows panel anouncing winner of the game. Disables other ui. Only shows the panel once.
         /// </summary>
-        private void ShowWinnerPanel(Players Winner)
+        private void ShowVictoryPanel(Players Winner)
         {
             //show the panel only once
-            if (victoryPanelShown)
+            if (VictoryPanel.AlreadyShown)
                 return;
 
-            victoryPanel.Visibility = Visibility.Visible;
-            gui.IsEnabled = false;
-            menuLayer.IsEnabled = false;
-            openGLControl1.IsEnabled = false;
-            victoryL.Content = Winner + " won!";
-            victoryPanelShown = true;
+            VictoryPanel.Visible = true;
+            DisableGameControls();
+            GameMenu.Visible = false;
+            VictoryPanel.Message.Text = Winner + " won!";
+            VictoryPanel.AlreadyShown = true;
         }
 
         /// <summary>
         /// Close victory panel.
         /// </summary>
-        private void VictoryButton_Click(object sender, RoutedEventArgs e)
+        private void HideVictoryPanel()
         {
-            gui.IsEnabled = true;
-            menuLayer.IsEnabled = true;
-            openGLControl1.IsEnabled = true;
-            victoryPanel.Visibility = Visibility.Hidden;
+            EnableGameControls();
+            VictoryPanel.Visible = false;
         }
-        */
+        
 
         /// <summary>
-        /// Updates information about what should be drawn.
+        /// Updates the game and information about what should be drawn.
         /// </summary>
-        private void openGLControl1_OpenGLDraw(object sender, RenderEventArgs args)
+        private void TickAndDraw(object sender, RenderEventArgs args)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -589,7 +592,7 @@ namespace SanguineGenesis.GUI
                 OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
                 OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
                 //show flowfield of the selected animal if an animal is selected and player wants to show flowfield
-                /*if (Game.GameplayOptions.ShowFlowfield)
+                if (Game.GameplayOptions.ShowFlowfield)
                 {
                     Animal selected;
                     MoveToCommand command;
@@ -604,7 +607,7 @@ namespace SanguineGenesis.GUI
                         OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
                 }
                 else
-                    OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);*/
+                    OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
                 OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
                 UpdateBottomPanel();
             }

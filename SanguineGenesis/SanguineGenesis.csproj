@@ -160,13 +160,15 @@
     <Compile Include="GUI\WPFComponents\PlayerPropertiesPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SharpGL\SceneGraph.cs" />
     <Compile Include="GameLogic\Game.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameLogic\Maps\Map.cs" />
     <Compile Include="GameLogic\Node.cs" />
     <Compile Include="GUI\WPFComponents\StatsTable.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GUI\WPFComponents\VictoryPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />
@@ -243,12 +245,6 @@
     <None Include="Images\NewMap\terrain.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="SharpGL.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="SharpGL.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
