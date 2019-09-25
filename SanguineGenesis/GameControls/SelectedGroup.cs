@@ -12,11 +12,10 @@ namespace SanguineGenesis
     /// </summary>
     public class SelectedGroup
     {
-        private List<Entity> entities;
         /// <summary>
         /// List of currently selected entities. Shouldn't be set to null.
         /// </summary>
-        public List<Entity> Entities { get { lock (this) return entities; } private set { entities = value; } }
+        public List<Entity> Entities { get ; private set ;  }
         /// <summary>
         /// Set to true after Entities was changed.
         /// </summary>
@@ -24,7 +23,7 @@ namespace SanguineGenesis
 
         public SelectedGroup()
         {
-            entities = new List<Entity>();
+            Entities = new List<Entity>();
             Changed = true;
         }
 
@@ -33,18 +32,15 @@ namespace SanguineGenesis
         /// </summary>
         public void SetEntities(List<Entity> entities)
         {
-            lock (this)
+            foreach (Entity e in Entities)
+                e.Selected = false;
+            Entities.Clear();
+            foreach (Entity e in entities)
             {
-                foreach (Entity e in Entities)
-                    e.Selected = false;
-                Entities.Clear();
-                foreach (Entity e in entities)
-                {
-                    Entities.Add(e);
-                    e.Selected = true;
-                }
-                Changed = true;
+                Entities.Add(e);
+                e.Selected = true;
             }
+            Changed = true;
         }
 
         /// <summary>
@@ -52,16 +48,13 @@ namespace SanguineGenesis
         /// </summary>
         public void AddEntities(List<Entity> entities)
         {
-            lock (this)
-            {
-                foreach(Entity u in entities)
-                    if (!Entities.Contains(u))
-                    {
-                        Entities.Add(u);
-                        u.Selected = true;
-                    }
-                Changed = true;
-            }
+            foreach(Entity u in entities)
+                if (!Entities.Contains(u))
+                {
+                    Entities.Add(u);
+                    u.Selected = true;
+                }
+            Changed = true;
         }
 
         /// <summary>
@@ -69,12 +62,9 @@ namespace SanguineGenesis
         /// </summary>
         public void RemoveEntity(Entity entity)
         {
-            lock (this)
-            {
-                entity.Selected = false;
-                Entities.Remove(entity);
-                Changed = true;
-            }
+            entity.Selected = false;
+            Entities.Remove(entity);
+            Changed = true;
         }
 
         /// <summary>
@@ -82,13 +72,10 @@ namespace SanguineGenesis
         /// </summary>
         public void RemoveDead()
         {
-            lock (this)
-            {
-                int count = Entities.Count;
-                Entities.RemoveAll((u) => u.IsDead);
-                if (count != Entities.Count)
-                    Changed = true;
-            }
+            int count = Entities.Count;
+            Entities.RemoveAll((u) => u.IsDead);
+            if (count != Entities.Count)
+                Changed = true;
         }
 
         /// <summary>
@@ -96,13 +83,10 @@ namespace SanguineGenesis
         /// </summary>
         public void Clear()
         {
-            lock (this)
-            {
-                foreach (Entity e in Entities)
-                    e.Selected = false;
-                Entities.Clear();
-                Changed = true;
-            }
+            foreach (Entity e in Entities)
+                e.Selected = false;
+            Entities.Clear();
+            Changed = true;
         }
     }
 }

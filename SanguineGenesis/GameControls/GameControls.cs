@@ -45,7 +45,6 @@ namespace SanguineGenesis
         /// <summary>
         /// Selects entities based on EntityCommandsInput and MapSelector frame. Sets commands
         /// to SelectedEntities.
-        /// Has to be called from the main loop of the game, with game being locked.
         /// </summary>
         public void UpdateEntitiesByInput(Game game)
         {
@@ -55,13 +54,10 @@ namespace SanguineGenesis
                 case EntityCommandsInputState.SELECTING_UNITS:
                     {
                         Vector2 mapPoint;
-                        lock (EntityCommandsInput)
-                        {
                             mapPoint = EntityCommandsInput.SelectingCoordinates;
                             if(MapSelectorFrame==null)
                                 //reset selected ability
                                 EntityCommandsInput.IsAbilitySelected = false;
-                        }
 
                         if (MapSelectorFrame == null)
                         {
@@ -87,8 +83,6 @@ namespace SanguineGenesis
                         Ability noTargetAbility = null;
                         bool selectedNoTargetAbility = false;
                         bool resetCommandsQueue=false;
-                        lock (EntityCommandsInput)
-                        {
                             if (EntityCommandsInput.IsAbilitySelected)
                             {
                                 noTargetAbility = EntityCommandsInput.SelectedAbility;
@@ -98,7 +92,6 @@ namespace SanguineGenesis
                                 if (selectedNoTargetAbility)
                                     EntityCommandsInput.IsAbilitySelected = false;
                             }
-                        }
                         if (selectedNoTargetAbility)
                         {
                             //use the ability with no target
@@ -118,8 +111,6 @@ namespace SanguineGenesis
                         bool isAbilitySelected;
                         Ability ability;
                         bool resetCommandsQueue;
-                        lock (EntityCommandsInput)
-                        {
                             targetCoords = EntityCommandsInput.TargetCoordinates;
                             isAbilitySelected = EntityCommandsInput.IsAbilitySelected;
                             ability = EntityCommandsInput.SelectedAbility;
@@ -128,7 +119,6 @@ namespace SanguineGenesis
                             //reset ability selection, regargless of success of using selected ability
                             EntityCommandsInput.IsAbilitySelected = false;
                             EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
-                        }
 
                         if (!isAbilitySelected)
                         //ability wasn't selected, use default abilities

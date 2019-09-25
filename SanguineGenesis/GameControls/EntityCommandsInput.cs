@@ -8,16 +8,11 @@ using SanguineGenesis.GameLogic;
 
 namespace SanguineGenesis
 {
-    /// <summary>
-    /// 
-    /// </summary>
     class EntityCommandsInput
     {
-        //immutable
         public Vector2 INVALID_MAP_COORDINATES => new Vector2(-1, -1);
         private Dictionary<Key, Ability> keyToAbility;
-
-        //lock is this instance
+        
         public EntityCommandsInputState State { get; set; }
         public Vector2 SelectingCoordinates { get; private set; }
         public Vector2 TargetCoordinates { get; private set; }
@@ -48,11 +43,8 @@ namespace SanguineGenesis
         /// </summary>
         public void NewPoint(Vector2 mousePos)
         {
-            lock (this)
-            { 
-                State = EntityCommandsInputState.SELECTING_UNITS;
-                SelectingCoordinates = mousePos;
-            }
+            State = EntityCommandsInputState.SELECTING_UNITS;
+            SelectingCoordinates = mousePos;
         }
 
         /// <summary>
@@ -60,11 +52,8 @@ namespace SanguineGenesis
         /// </summary>
         public void EndSelection(Vector2 mousePos)
         {
-            lock (this)
-            {
-                State = EntityCommandsInputState.UNITS_SELECTED;
-                SelectingCoordinates = mousePos;
-            }
+            State = EntityCommandsInputState.UNITS_SELECTED;
+            SelectingCoordinates = mousePos;
         }
 
         /// <summary>
@@ -72,13 +61,10 @@ namespace SanguineGenesis
         /// </summary>
         public void SetTarget(Vector2 mousePos)
         {
-            lock (this)
+            if (State == EntityCommandsInputState.UNITS_SELECTED)
             {
-                if (State == EntityCommandsInputState.UNITS_SELECTED)
-                {
-                    TargetCoordinates = mousePos;
-                    State = EntityCommandsInputState.ABILITY_TARGET_SELECTED;
-                }
+                TargetCoordinates = mousePos;
+                State = EntityCommandsInputState.ABILITY_TARGET_SELECTED;
             }
         }
     }

@@ -237,10 +237,7 @@ namespace SanguineGenesis.GUI
                     {
                         Ability selectedAbility;
                         if ((selectedAbility = GetInfoSource(buttonInd)) != null)
-                            lock (gameControls.EntityCommandsInput)
-                            {
-                                gameControls.EntityCommandsInput.SelectedAbility = selectedAbility;
-                            }
+                            gameControls.EntityCommandsInput.SelectedAbility = selectedAbility;
                     };
                 }
         }

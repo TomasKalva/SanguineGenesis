@@ -112,26 +112,20 @@ namespace SanguineGenesis.GUI
         private void MainLoopStep()
         {
             stepStopwatch.Start();
+            
+            if (Game.GameEnded)
+                return;
+            
+            GameControls.UpdateMapView(Game);
 
-            lock (Game)
-            {
-                if (Game.GameEnded)
-                    return;
 
-                //process player's input
-                //Invoke could cause deadlock because drawing also locks game
-                //Dispatcher.BeginInvoke(
-                //    (Action)(() =>
-                GameControls.UpdateMapView(Game);//));
+            GameControls.UpdateEntitiesByInput(Game);
 
-                GameControls.UpdateEntitiesByInput(Game);
-
-                //update the state of the game
-                long totalEl = totalStopwatch.ElapsedMilliseconds;
-                float deltaT = (totalEl - (float)TotalTime) / 1000f;
-                TotalTime = totalEl;
-                Game.Update(deltaT);
-            }
+            //update the state of the game
+            long totalEl = totalStopwatch.ElapsedMilliseconds;
+            float deltaT = (totalEl - (float)TotalTime) / 1000f;
+            TotalTime = totalEl;
+            Game.Update(deltaT);
 
             stepStopwatch.Stop();
 
@@ -286,12 +280,9 @@ namespace SanguineGenesis.GUI
             SelectedGroup selected = GameControls.SelectedEntities;
             List<Entity> selectedEntities = null;
             bool changed;
-            lock (selected)
-            {
-                changed = GameControls.SelectedEntities.Changed;
-                if (changed)
-                    selectedEntities = selected.Entities.ToList();
-            }
+            changed = GameControls.SelectedEntities.Changed;
+            if (changed)
+                selectedEntities = selected.Entities.ToList();
             if (changed)
             {
                 GameControls.SelectedEntities.Changed = false;
@@ -299,14 +290,11 @@ namespace SanguineGenesis.GUI
                 EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
                 EntityButtonArray.InfoSources = selectedEntities;
             }
-            lock (GameControls.EntityCommandsInput)
-            {
-                //set selected ability
-                if (GameControls.EntityCommandsInput.IsAbilitySelected)
-                    AbilityButtonArray.Selected = GameControls.EntityCommandsInput.SelectedAbility;
-                else
-                    AbilityButtonArray.Selected = null;
-            }
+            //set selected ability
+            if (GameControls.EntityCommandsInput.IsAbilitySelected)
+                AbilityButtonArray.Selected = GameControls.EntityCommandsInput.SelectedAbility;
+            else
+                AbilityButtonArray.Selected = null;
 
             if (EntityButtonArray.Selected != null)
                 AbilityButtonArray.InfoSources = EntityButtonArray.Selected.Abilities;
@@ -346,8 +334,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            lock (Game)
-                Game.GameEnded = true;
+            Game.GameEnded = true;
         }
 
         /// <summary>
@@ -362,8 +349,7 @@ namespace SanguineGenesis.GUI
                 case Keys.A: GameControls.MapMovementInput.AddDirection(Direction.LEFT); break;
                 case Keys.D: GameControls.MapMovementInput.AddDirection(Direction.RIGHT); break;
                 case Keys.ShiftKey:
-                    lock (GameControls.EntityCommandsInput)
-                        GameControls.EntityCommandsInput.ResetCommandsQueue = false; break;
+                            GameControls.EntityCommandsInput.ResetCommandsQueue = false; break;
             }
         }
 
@@ -379,8 +365,7 @@ namespace SanguineGenesis.GUI
                 case Keys.A: GameControls.MapMovementInput.RemoveDirection(Direction.LEFT); break;
                 case Keys.D: GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT); break;
                 case Keys.ShiftKey:
-                    lock (GameControls.EntityCommandsInput)
-                        GameControls.EntityCommandsInput.ResetCommandsQueue = true; break;
+                            GameControls.EntityCommandsInput.ResetCommandsQueue = true; break;
             }
         }
         
@@ -579,38 +564,34 @@ namespace SanguineGenesis.GUI
             MainLoopStep();
 
             OpenGL gl = openGLControl1.OpenGL;
-            //Game has to be locked, because it can be used from the main loop
-            lock (Game)
+            GameControls.MapView.SetActualExtents((float)openGLControl1.Width, (float)openGLControl1.Height);
+            OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, GameControls.MapView, Game);
+            if (Game.GameplayOptions.NutrientsVisible)
+                OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
+            else
+                OpenGLAtlasDrawer.TryClearNutrientsMapDataBuffers(gl);
+            OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
+            OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
+            OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
+            //show flowfield of the selected animal if an animal is selected and player wants to show flowfield
+            if (Game.GameplayOptions.ShowFlowfield)
             {
-                GameControls.MapView.SetActualExtents((float)openGLControl1.Width, (float)openGLControl1.Height);
-                OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, GameControls.MapView, Game);
-                if (Game.GameplayOptions.NutrientsVisible)
-                    OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
-                else
-                    OpenGLAtlasDrawer.TryClearNutrientsMapDataBuffers(gl);
-                OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
-                OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
-                OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
-                //show flowfield of the selected animal if an animal is selected and player wants to show flowfield
-                if (Game.GameplayOptions.ShowFlowfield)
+                Animal selected;
+                MoveToCommand command;
+                FlowField flF = null;
+                if ((selected = (EntityButtonArray.Selected as Animal)) != null &&
+                    (command = (selected.CommandQueue.First() as MoveToCommand)) != null &&
+                    (flF = command.FlowField) != null)
                 {
-                    Animal selected;
-                    MoveToCommand command;
-                    FlowField flF = null;
-                    if ((selected = (EntityButtonArray.Selected as Animal)) != null &&
-                        (command = (selected.CommandQueue.First() as MoveToCommand)) != null &&
-                        (flF = command.FlowField) != null)
-                    {
-                        OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
-                    }
-                    else
-                        OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+                    OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
                 }
                 else
                     OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
-                OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
-                UpdateBottomPanel();
             }
+            else
+                OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+            OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
+            UpdateBottomPanel();
             OpenGLAtlasDrawer.Draw(gl, Game.GameplayOptions);
 
             DrawingsDone++;
