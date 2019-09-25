@@ -75,16 +75,16 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Update the components with the SelectedEntity info.
         /// </summary>
-        public void UpdateData()
+        public void UpdateControl()
         {
             if (SelectedEntity == null || SelectedEntity.IsDead)
             {
                 //reset window if SelectedEntity doesn't exist or is dead
                 EntityStatsTable.SetStats(new List<Stat>());
                 StatusButtonArray.InfoSources = new List<Status>();
-                StatusButtonArray.UpdateData();
+                StatusButtonArray.UpdateControl();
                 CommandButtonArray.InfoSources = new List<Command>();
-                CommandButtonArray.UpdateData();
+                CommandButtonArray.UpdateControl();
                 FirstCommandProgress.Value = 0;
             }
             else
@@ -92,15 +92,15 @@ namespace SanguineGenesis.GUI
                 //show info about SelectedEntity
                 EntityStatsTable.SetStats(SelectedEntity.Stats());
                 StatusButtonArray.InfoSources = SelectedEntity.Statuses;
-                StatusButtonArray.UpdateData();
+                StatusButtonArray.UpdateControl();
                 List<Command> commandQueue= SelectedEntity.CommandQueue.Queue;
                 CommandButtonArray.InfoSources = commandQueue;
-                CommandButtonArray.UpdateData();
+                CommandButtonArray.UpdateControl();
                 if (commandQueue.Any())
                 {
                     //the animation of progress bar is too slow, reducing progress skips animation
                     FirstCommandProgress.Value = Math.Min(100, commandQueue[0].Progress+1);
-                    FirstCommandProgress.Value = Math.Max(0, commandQueue[0].Progress);
+                    FirstCommandProgress.Value = Math.Min(100, commandQueue[0].Progress);
                 }
                 else
                     FirstCommandProgress.Value = 0;

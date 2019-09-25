@@ -16,17 +16,16 @@ namespace SanguineGenesis
         public MapMovementInput MapMovementInput { get; }
         public MapView MapView { get; }
 
-        public MapSelectorFrame MapSelectorFrame { get; set; }
-
         public EntityCommandsInput EntityCommandsInput { get; }
+        public MapSelectorFrame MapSelectorFrame { get; set; }
         public SelectedGroup SelectedEntities { get; }
 
 
-        public GameControls(MapView mapView, Game game)
+        public GameControls(Map map)
         {
-            MapView = mapView;
+            MapView = new MapView(0, 0, 60, map);
             MapMovementInput = new MapMovementInput();
-            EntityCommandsInput = new EntityCommandsInput(game);
+            EntityCommandsInput = new EntityCommandsInput();
             MapSelectorFrame = null;
             SelectedEntities = new SelectedGroup();
         }
@@ -34,12 +33,12 @@ namespace SanguineGenesis
         /// <summary>
         /// Has to be called from the window thread.
         /// </summary>
-        public void UpdateMapView(Game game)
+        public void UpdateMapView(Map map)
         {
             //move map view only if player isn't currently selecting units
             if (EntityCommandsInput.State != EntityCommandsInputState.SELECTING_UNITS)
                 foreach (Direction d in MapMovementInput.MapDirection)
-                    MapView.Move(d, game.Map);
+                    MapView.Move(d, map);
         }
 
         /// <summary>
@@ -48,99 +47,84 @@ namespace SanguineGenesis
         /// </summary>
         public void UpdateEntitiesByInput(Game game)
         {
-
             switch (EntityCommandsInput.State)
             {
                 case EntityCommandsInputState.SELECTING_UNITS:
+                case EntityCommandsInputState.FINISH_SELECTING_UNITS:
                     {
-                        Vector2 mapPoint;
-                            mapPoint = EntityCommandsInput.SelectingCoordinates;
-                            if(MapSelectorFrame==null)
-                                //reset selected ability
-                                EntityCommandsInput.IsAbilitySelected = false;
+                        Vector2 mapPoint = EntityCommandsInput.SelectingCoordinates;
 
+                        //initialize map selector frame
                         if (MapSelectorFrame == null)
                         {
+                            //create new map selector frame
                             MapSelectorFrame = new MapSelectorFrame(mapPoint);
+
+                            //remove all previously selected entities
                             SelectedEntities.Clear();
+
+                            //reset selected ability
+                            EntityCommandsInput.SelectedAbility = null;
                         }
-                        else
+                        
+                        //update selected entities
+                        MapSelectorFrame.SetEndPoint(mapPoint);
+                        List<Entity> selected = MapSelectorFrame.GetSelectedUnits(game).ToList();
+                        SelectedEntities.SetEntities(selected);
+                        MapSelectorFrame.Update();
+
+                        //finish selecting
+                        if (EntityCommandsInput.State == EntityCommandsInputState.FINISH_SELECTING_UNITS)
                         {
-                            MapSelectorFrame.SetEndPoint(mapPoint);
-                            List<Entity> selected = MapSelectorFrame.GetSelectedUnits(game).ToList();
-                            SelectedEntities.SetEntities(selected);
-                            MapSelectorFrame.Update();
+                            MapSelectorFrame = null;
+                            if(SelectedEntities.Entities.Any())
+                                EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
+                            else
+                                EntityCommandsInput.State = EntityCommandsInputState.IDLE;
                         }
                         break;
                     }
                 case EntityCommandsInputState.UNITS_SELECTED:
                     { 
-                        //remove map selector frame
-                        if (MapSelectorFrame != null)
-                            MapSelectorFrame = null;
-
-                        //use ability that doesn't require target
-                        Ability noTargetAbility = null;
-                        bool selectedNoTargetAbility = false;
-                        bool resetCommandsQueue=false;
-                            if (EntityCommandsInput.IsAbilitySelected)
-                            {
-                                noTargetAbility = EntityCommandsInput.SelectedAbility;
-                                selectedNoTargetAbility = (noTargetAbility != null) && noTargetAbility.TargetType == typeof(Nothing);
-                                resetCommandsQueue = EntityCommandsInput.ResetCommandsQueue;
-                                //reset ability selection
-                                if (selectedNoTargetAbility)
-                                    EntityCommandsInput.IsAbilitySelected = false;
-                            }
-                        if (selectedNoTargetAbility)
+                        Ability selectedAbility = EntityCommandsInput.SelectedAbility;
+                        //if the selected ability requires no target, use it
+                        if (EntityCommandsInput.IsAbilitySelected 
+                            && selectedAbility.TargetType == typeof(Nothing))
                         {
-                            //use the ability with no target
-                            IEnumerable<Entity> entitiesWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(noTargetAbility));
+                            //use the ability
+                            IEnumerable<Entity> entitiesWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(selectedAbility));
                             if (entitiesWithAbil != null)
                             {
-                                noTargetAbility.SetCommands(entitiesWithAbil, Nothing.Get, resetCommandsQueue);
+                                selectedAbility.SetCommands(entitiesWithAbil, Nothing.Get, EntityCommandsInput.ResetCommandsQueue);
                             }
+                            //reset ability selection
+                            EntityCommandsInput.SelectedAbility = null;
                         }
                         break;
                     }
                 case EntityCommandsInputState.ABILITY_TARGET_SELECTED:
                     {
-
-                        //get information about selected ability and target
-                        Vector2 targetCoords;
-                        bool isAbilitySelected;
-                        Ability ability;
-                        bool resetCommandsQueue;
-                            targetCoords = EntityCommandsInput.TargetCoordinates;
-                            isAbilitySelected = EntityCommandsInput.IsAbilitySelected;
-                            ability = EntityCommandsInput.SelectedAbility;
-                            resetCommandsQueue = EntityCommandsInput.ResetCommandsQueue;
-
-                            //reset ability selection, regargless of success of using selected ability
-                            EntityCommandsInput.IsAbilitySelected = false;
-                            EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
-
-                        if (!isAbilitySelected)
+                        if (!EntityCommandsInput.IsAbilitySelected)
                         //ability wasn't selected, use default abilities
                         {
-                            UseDefaultAbility(game, targetCoords, resetCommandsQueue);
+                            UseDefaultAbility(game, EntityCommandsInput.TargetCoordinates, EntityCommandsInput.ResetCommandsQueue);
                         }
                         else
                         //ability was selected
                         {
-                            //determine target
-                            ITargetable target=FindAbilityTarget(game, ability,targetCoords);
-
+                            Ability ability = EntityCommandsInput.SelectedAbility;
+                            ITargetable target=FindAbilityTarget(game, ability, EntityCommandsInput.TargetCoordinates);
                             if (target != null)
                             {
                                 //use the ability if a valid target was selected
                                 IEnumerable<Entity> entitiesWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(ability));
-                                if (entitiesWithAbil != null)
-                                {
-                                    ability.SetCommands(entitiesWithAbil, target, resetCommandsQueue);
-                                }
+                                ability.SetCommands(entitiesWithAbil, target, EntityCommandsInput.ResetCommandsQueue);
                             }
                         }
+
+                        //reset ability selection, regargless of success of using selected ability
+                        EntityCommandsInput.SelectedAbility = null;
+                        EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
                         break;
                     }
             }
@@ -148,7 +132,7 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Use default ability by entities on with the targetCoords.
+        /// Make entities use default ability on the target at targetCoords.
         /// </summary>
         /// <param name="resetQueue">True if the entities command queue should be reset.</param>
         private void UseDefaultAbility(Game game, Vector2 targetCoords, bool resetQueue)

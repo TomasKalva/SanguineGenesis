@@ -15,7 +15,7 @@ namespace SanguineGenesis
         /// <summary>
         /// List of currently selected entities. Shouldn't be set to null.
         /// </summary>
-        public List<Entity> Entities { get ; private set ;  }
+        public List<Entity> Entities { get ; }
         /// <summary>
         /// Set to true after Entities was changed.
         /// </summary>

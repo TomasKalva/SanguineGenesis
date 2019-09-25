@@ -70,7 +70,7 @@ namespace SanguineGenesis
         public float Top => Bottom + Height;
 
 
-        public MapView(float top, float left, float nodeSize, Map map, Game game,
+        public MapView(float top, float left, float nodeSize, Map map,
             float minNodeSize = 50, float maxNodeSize = 70, float scrollSpeed = 0.5f, float zoomSpeed = 20)
         {
             Bottom = top;
@@ -166,7 +166,7 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Decreases size of viewed area.
+        /// Decreases size of viewed area. Returns true iff zoom was succesfull.
         /// </summary>
         public bool ZoomIn(Map map)
         {
@@ -181,7 +181,7 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Increases size of viewed area.
+        /// Increases size of viewed area. Returns true iff zoom was succesfull.
         /// </summary>
         public bool ZoomOut(Map map)
         {

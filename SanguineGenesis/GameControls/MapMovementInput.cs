@@ -25,7 +25,6 @@ namespace SanguineGenesis
         /// Adds movement direction dir. If the opposite direction is in list of movement directions,
         /// remove it.
         /// </summary>
-        /// <param name="dir"></param>
         public void AddDirection(Direction dir)
         {
             //don't add direction twice

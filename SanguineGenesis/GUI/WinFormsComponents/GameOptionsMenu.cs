@@ -62,25 +62,16 @@ namespace SanguineGenesis.GUI
             Controls.Add(okButton);
 
             optionCheckboxes[0].Text = "Whole map visible";
-            EventHandler evHand = (s, e) =>
-            {
+            optionCheckboxes[0].CheckedChanged += (_s, _e) =>
                 gameplayOptions.WholeMapVisible = (bool)optionCheckboxes[0].Checked;
-            };
-            optionCheckboxes[0].CheckedChanged += evHand;
 
             optionCheckboxes[1].Text = "Nutrients visible";
-            evHand = (s, e) =>
-            {
+            optionCheckboxes[1].CheckedChanged += (_s, _e) =>
                 gameplayOptions.NutrientsVisible = (bool)optionCheckboxes[1].Checked;
-            };
-            optionCheckboxes[1].CheckedChanged += evHand;
 
             optionCheckboxes[2].Text = "Show flowfield";
-            evHand = (s, e) =>
-            {
+            optionCheckboxes[2].CheckedChanged +=(_s, _e) =>
                 gameplayOptions.ShowFlowfield = (bool)optionCheckboxes[2].Checked;
-            };
-            optionCheckboxes[2].CheckedChanged += evHand;
 
             BackColor = Color.Gray;
         }

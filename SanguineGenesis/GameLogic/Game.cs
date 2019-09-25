@@ -87,7 +87,6 @@ namespace SanguineGenesis
             visibilityGenerator = new VisibilityGenerator();
             nextVisibilityPlayer = SanguineGenesis.Players.PLAYER0;
             GameplayOptions = new GameplayOptions();
-            GameplayOptions.WholeMapVisible = false;
             foreach (Animal u in CurrentPlayer.GetAll<Unit>())
             {
                 u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);

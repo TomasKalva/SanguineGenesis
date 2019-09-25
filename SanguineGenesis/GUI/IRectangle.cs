@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SanguineGenesis
 {
     /// <summary>
-    /// Implemented by classes that can be seen as a rectangle.
+    /// Implemented by classes that can be considered a rectangle.
     /// </summary>
     interface IRectangle
     {

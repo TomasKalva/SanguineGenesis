@@ -11,62 +11,24 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     public class GameplayOptions
     {
-        static GameplayOptions Get { get; }
-        static GameplayOptions()
+        public GameplayOptions()
         {
-            Get = new GameplayOptions();
+            WholeMapVisible = false;
+            NutrientsVisible = false;
+            ShowFlowfield = false;
         }
 
-        private bool _wholeMapVisible;
         /// <summary>
         /// True if both players can see the whole map.
         /// </summary>
-        public bool WholeMapVisible
-        {
-            get
-            {
-                lock (this)
-                    return _wholeMapVisible;
-            }
-            set
-            {
-                lock (this)
-                    _wholeMapVisible = value;
-            }
-        }
-        private bool _nutrientsVisible;
+        public bool WholeMapVisible { get; set; }
         /// <summary>
         /// True if nutrients numbers for each node are visible.
         /// </summary>
-        public bool NutrientsVisible
-        {
-            get
-            {
-                lock (this)
-                    return _nutrientsVisible;
-            }
-            set
-            {
-                lock (this)
-                    _nutrientsVisible = value;
-            }
-        }
-        private bool _showFlowfield;
+        public bool NutrientsVisible { get; set; }
         /// <summary>
         /// True if flowfield created by right click is visible.
         /// </summary>
-        public bool ShowFlowfield
-        {
-            get
-            {
-                lock (this)
-                    return _showFlowfield;
-            }
-            set
-            {
-                lock (this)
-                    _showFlowfield = value;
-            }
-        }
+        public bool ShowFlowfield { get; set; }
     }
 }

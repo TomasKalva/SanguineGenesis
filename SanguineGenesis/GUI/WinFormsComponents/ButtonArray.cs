@@ -61,14 +61,10 @@ namespace SanguineGenesis.GUI
                     b.Height = buttonSize;
                     b.Padding = Padding.Empty;
                     b.Margin = Padding.Empty;
-                    // b.Location = new System.Drawing.Point(i, j);
-                    //b.SetValue(Grid.ColumnProperty, i % Columns);
-                    //b.SetValue(Grid.RowProperty, i / Columns);
-                    //b.Focusable = false;
+                    b.FlatStyle = FlatStyle.Flat;
+                    b.FlatAppearance.BorderSize = 1;
+                    b.Font = new Font(Button.DefaultFont.FontFamily, 6, System.Drawing.FontStyle.Regular);
                     Buttons[i, j] = b;
-                    //add text block for the button
-                    //t.TextWrapping = TextWrapping.Wrap;
-                    //t.TextAlignment = TextAlignment.Center;
                     Controls.Add(b);
                 }
         }
@@ -121,7 +117,7 @@ namespace SanguineGenesis.GUI
         /// Update the info on the buttons, hide buttons without info, show buttons
         /// with info.
         /// </summary>
-        public void UpdateData()
+        public void UpdateControl()
         {
             if (InfoSources == null)
                 return;

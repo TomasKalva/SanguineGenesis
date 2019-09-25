@@ -10,32 +10,29 @@ namespace SanguineGenesis
 {
     class EntityCommandsInput
     {
-        public Vector2 INVALID_MAP_COORDINATES => new Vector2(-1, -1);
         private Dictionary<Key, Ability> keyToAbility;
         
         public EntityCommandsInputState State { get; set; }
         public Vector2 SelectingCoordinates { get; private set; }
         public Vector2 TargetCoordinates { get; private set; }
         public Entity TargetedEntity { get; private set; }
-        private Ability selectedAbility;
-        public Ability SelectedAbility { get { return selectedAbility; } set { selectedAbility = value; IsAbilitySelected = true; } }
-        public bool IsAbilitySelected { get; set; }
+        public Ability SelectedAbility { get; set; }
+        public bool IsAbilitySelected => SelectedAbility != null;
         /// <summary>
         /// True iff before setting new commands, the old should be removed.
         /// </summary>
         public bool ResetCommandsQueue { get; set; }
 
-        internal EntityCommandsInput(Game game)
+        internal EntityCommandsInput()
         {
             State = EntityCommandsInputState.IDLE;
             SelectingCoordinates = new Vector2();
-            SelectedAbility = game.CurrentPlayer.GameStaticData.Abilities.MoveTo;
-            IsAbilitySelected = false;
+            //SelectedAbility = game.CurrentPlayer.GameStaticData.Abilities.MoveTo;
             ResetCommandsQueue = true;
 
             //initialize keyToAbilityType
             keyToAbility = new Dictionary<Key, Ability>();
-            keyToAbility.Add(Key.Escape, game.CurrentPlayer.GameStaticData.Abilities.MoveTo);
+            //keyToAbility.Add(Key.Escape, game.CurrentPlayer.GameStaticData.Abilities.MoveTo);
         }
 
         /// <summary>
@@ -52,7 +49,7 @@ namespace SanguineGenesis
         /// </summary>
         public void EndSelection(Vector2 mousePos)
         {
-            State = EntityCommandsInputState.UNITS_SELECTED;
+            State = EntityCommandsInputState.FINISH_SELECTING_UNITS;
             SelectingCoordinates = mousePos;
         }
 
@@ -76,6 +73,7 @@ namespace SanguineGenesis
     {
         IDLE,
         SELECTING_UNITS,
+        FINISH_SELECTING_UNITS,
         UNITS_SELECTED,
         ABILITY_TARGET_SELECTED
     }

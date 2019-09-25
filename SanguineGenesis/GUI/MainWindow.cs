@@ -23,31 +23,17 @@ namespace SanguineGenesis.GUI
             InitializeComponent();
 
             Game = new Game();
-            var MapView = new MapView(0, 0, 60, Game.Map, Game);
-            GameControls = new GameControls(MapView, Game);
-            openGLControl1.FrameRate = 60;
-            totalStopwatch.Start();
+            GameControls = new GameControls(Game.Map);
+            TotalStopwatch = new Stopwatch();
+            TotalStopwatch.Start();
 
-            MouseWheel += Window_MouseWheel;
 
+            //waint until the window initializes and then initialize bottom panel and opengl
             Shown += (s, e) =>
             {
                 InitializeOpenGL();
-                InitializeBottomPanel();
+                InitializeUserInterface();
             };
-            /*
-            Thread t = new Thread(() =>
-            {
-                Dispatcher.Invoke(DispatcherPriority.Render, new Action(() =>
-                {
-                    //wait for window layout initialization
-                }));
-                Dispatcher.Invoke(InitializeOpenGL);
-                Dispatcher.Invoke(InitializeBottomPanel);
-                MainLoop();
-            });
-            t.IsBackground = true;
-            t.Start();*/
         }
 
         #region Game logic
@@ -62,93 +48,40 @@ namespace SanguineGenesis.GUI
         private GameControls GameControls { get; }
 
         /// <summary>
-        /// Number of updates of the game per second.
-        /// </summary>
-        private int WantedGameUps => 50;
-        /// <summary>
-        /// Time between two game updates.
-        /// </summary>
-        private int StepLength => 1000 / WantedGameUps;
-
-        /// <summary>
         /// Measures time from the start of the game.
         /// </summary>
-        private Stopwatch totalStopwatch = new Stopwatch();
+        private Stopwatch TotalStopwatch { get; }
         /// <summary>
         /// Total time elapsed since the start of the game. Is set in
         /// the main loop.
         /// </summary>
         private double TotalTime { get; set; }
-
         /// <summary>
-        /// Measures time from the start of the step.
+        /// Total number of game updates.
         /// </summary>
-        private Stopwatch stepStopwatch = new Stopwatch();
-        /// <summary>
-        /// Total time elapsed since the start of the step. Is set in
-        /// the main loop.
-        /// </summary>
-        private double TotalStepTime { get; set; }
-
-
-        private int StepsDone { get; set; }
-
-        /// <summary>
-        /// The main loop of the game.
-        /// </summary>
-        public void MainLoop()
-        {
-            TotalTime = 0; StepsDone = 0;
-            totalStopwatch.Start();
-            while (true)
-            {
-                MainLoopStep();
-            }
-        }
+        private int UpdatesDone { get; set; }
 
         /// <summary>
         /// One update of the game.
         /// </summary>
         private void MainLoopStep()
         {
-            stepStopwatch.Start();
-            
             if (Game.GameEnded)
                 return;
-            
-            GameControls.UpdateMapView(Game);
 
-
+            GameControls.UpdateMapView(Game.Map);
             GameControls.UpdateEntitiesByInput(Game);
 
             //update the state of the game
-            long totalEl = totalStopwatch.ElapsedMilliseconds;
+            long totalEl = TotalStopwatch.ElapsedMilliseconds;
             float deltaT = (totalEl - (float)TotalTime) / 1000f;
             TotalTime = totalEl;
             Game.Update(deltaT);
 
-            stepStopwatch.Stop();
-
-            //calculate sleep time
-            double diff = stepStopwatch.Elapsed.TotalMilliseconds;
-            stepStopwatch.Reset();
-            TotalStepTime += diff;
-            int sleepTime = StepLength - (int)TotalStepTime;
-            if ((int)TotalStepTime > 0)
-                TotalStepTime = TotalStepTime - (int)TotalStepTime;
-
-            StepsDone++;
-            Console.WriteLine("updates per second: " + StepsDone / TotalTime * 1000);
-            Console.WriteLine("draws per second: " + DrawingsDone / TotalTime * 1000);
-
-            //sleep for the rest of the step time
-            if (sleepTime > 0)
-                Thread.Sleep(sleepTime);
         }
         #endregion Game logic
 
         #region User interface
-        
         private EntityButtonArray EntityButtonArray { get; set; }
         private AbilityButtonArray AbilityButtonArray { get; set; }
         private EntityInfoPanel EntityInfoPanel { get; set; }
@@ -159,65 +92,15 @@ namespace SanguineGenesis.GUI
         private PlayerPropertiesPanel PlayerPropertiesPanel { get; set; }
         private VictoryPanel VictoryPanel { get; set; }
 
+        #region Initialization
         /// <summary>
         /// Initializes user interface.
         /// </summary>
-        private void InitializeBottomPanel()
+        private void InitializeUserInterface()
         {
+            MouseWheel += Window_MouseWheel;
 
-            //fill ui elements with buttons
-            //units panel
-            EntityButtonArray = new EntityButtonArray(8, 5, 300);
-            Controls.Add(EntityButtonArray);
-
-            //abilities panel
-            AbilityButtonArray = new AbilityButtonArray(4, 4, 200);
-            Controls.Add(AbilityButtonArray);
-
-            //unit info panel
-            EntityInfoPanel = new EntityInfoPanel(250, 200);
-            Controls.Add(EntityInfoPanel);
-
-            //additional info
-            AdditionalInfo = new AdditionalInfo(100, 200);
-            Controls.Add(AdditionalInfo);
-            AdditionalInfo.Stats.SetStats(
-                new List<Stat>());
-
-            //add listeners to the buttons
-            EntityButtonArray.ShowInfoOnClick(EntityInfoPanel, AbilityButtonArray, GameControls);
-            AbilityButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
-            EntityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
-            EntityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
-            EntityInfoPanel.StatusButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
-            AbilityButtonArray.SelectAbilityOnClick(GameControls);
-
-            EntityButtonArray.GiveFocusTo(openGLControl1);
-            AbilityButtonArray.GiveFocusTo(openGLControl1);
-            EntityInfoPanel.CommandButtonArray.GiveFocusTo(openGLControl1);
-            EntityInfoPanel.StatusButtonArray.GiveFocusTo(openGLControl1);
-
-            //set position of ui elements
-            //bottom panel
-            int entityInfoW = EntityInfoPanel.Width;
-            int entityButtonArrayW = EntityButtonArray.Width;
-            int abilityButtonArrayW = AbilityButtonArray.Width;
-            int additionalInfoW = AdditionalInfo.Width;
-            int windowWidth = openGLControl1.Width;
-            int windowHeight = openGLControl1.Height;
-            int offsetX = (windowWidth - (entityInfoW + entityButtonArrayW + abilityButtonArrayW + additionalInfoW)) / 2;
-
-            int entityInfoX = offsetX;
-            EntityInfoPanel.Location = new Point(entityInfoX, windowHeight - EntityInfoPanel.Height);
-
-            int entityButtonArrayX = entityInfoX + entityInfoW;
-            EntityButtonArray.Location = new Point(entityButtonArrayX, windowHeight - EntityButtonArray.Height);
-
-            int abilityPanelX = entityButtonArrayX + entityButtonArrayW;
-            AbilityButtonArray.Location = new Point(abilityPanelX, windowHeight - AbilityButtonArray.Height);
-
-            int additionalInfoX = abilityPanelX + abilityButtonArrayW;
-            AdditionalInfo.Location = new Point(additionalInfoX, windowHeight - AdditionalInfo.Height);
+            InitializeBottomPanel();
 
             //menu button
             MenuButton = new Button()
@@ -225,9 +108,9 @@ namespace SanguineGenesis.GUI
                 Width = 80,
                 Height = 40,
                 Text = "Menu",
-                Location = new Point(windowWidth - 80, 0)
+                Location = new Point(ClientSize.Width - 80, 0)
             };
-            MenuButton.GotFocus += (_s,_e)=>openGLControl1.Focus();
+            MenuButton.GotFocus += (_s,_e)=>openGLControl.Focus();
             MenuButton.Click += (_s, _e)=>OpenMenu();
             Controls.Add(MenuButton);
 
@@ -263,76 +146,187 @@ namespace SanguineGenesis.GUI
             Controls.Add(PlayerPropertiesPanel);
 
             //put openGLFocus to the background and set focus to it
-            Controls.SetChildIndex(openGLControl1, 100);
-            openGLControl1.Focus();
+            Controls.SetChildIndex(openGLControl, 100);
+            openGLControl.Focus();
 
             VictoryPanel.Visible = false;
             GameOptionsMenu.Visible = false;
             GameMenu.Visible = false;
         }
-        
+
+        /// <summary>
+        /// Initialize controls of the bottom panel.
+        /// </summary>
+        private void InitializeBottomPanel()
+        {
+            //initialize ui elements
+            //units panel
+            EntityButtonArray = new EntityButtonArray(8, 5, 300);
+            Controls.Add(EntityButtonArray);
+
+            //abilities panel
+            AbilityButtonArray = new AbilityButtonArray(4, 4, 200);
+            Controls.Add(AbilityButtonArray);
+
+            //unit info panel
+            EntityInfoPanel = new EntityInfoPanel(250, 200);
+            Controls.Add(EntityInfoPanel);
+
+            //additional info
+            AdditionalInfo = new AdditionalInfo(100, 200);
+            Controls.Add(AdditionalInfo);
+            AdditionalInfo.Stats.SetStats(
+                new List<Stat>());
+
+            //add listeners to the buttons
+            EntityButtonArray.ShowInfoOnClick(EntityInfoPanel, AbilityButtonArray, GameControls);
+            AbilityButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
+            EntityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
+            EntityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
+            EntityInfoPanel.StatusButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
+            AbilityButtonArray.SelectAbilityOnClick(GameControls);
+
+            EntityButtonArray.GiveFocusTo(openGLControl);
+            AbilityButtonArray.GiveFocusTo(openGLControl);
+            EntityInfoPanel.CommandButtonArray.GiveFocusTo(openGLControl);
+            EntityInfoPanel.StatusButtonArray.GiveFocusTo(openGLControl);
+
+            //set position of ui elements
+            //bottom panel
+            int entityInfoW = EntityInfoPanel.Width;
+            int entityButtonArrayW = EntityButtonArray.Width;
+            int abilityButtonArrayW = AbilityButtonArray.Width;
+            int additionalInfoW = AdditionalInfo.Width;
+            int windowWidth = openGLControl.Width;
+            int windowHeight = openGLControl.Height;
+            int offsetX = (windowWidth - (entityInfoW + entityButtonArrayW + abilityButtonArrayW + additionalInfoW)) / 2;
+
+            int entityInfoX = offsetX;
+            EntityInfoPanel.Location = new Point(entityInfoX, windowHeight - EntityInfoPanel.Height);
+
+            int entityButtonArrayX = entityInfoX + entityInfoW;
+            EntityButtonArray.Location = new Point(entityButtonArrayX, windowHeight - EntityButtonArray.Height);
+
+            int abilityPanelX = entityButtonArrayX + entityButtonArrayW;
+            AbilityButtonArray.Location = new Point(abilityPanelX, windowHeight - AbilityButtonArray.Height);
+
+            int additionalInfoX = abilityPanelX + abilityButtonArrayW;
+            AdditionalInfo.Location = new Point(additionalInfoX, windowHeight - AdditionalInfo.Height);
+        }
+
+        /// <summary>
+        /// Initializes OpenGLAtlasDrawer.
+        /// </summary>
+        private void InitializeOpenGL()
+        {
+            openGLControl.FrameRate = 60;
+            OpenGL gl = openGLControl.OpenGL;
+            OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl.Width, (float)openGLControl.Height);
+            OpenGLAtlasDrawer.CreateMap(gl);
+            OpenGLAtlasDrawer.CreateNutrientsMap(gl);
+            OpenGLAtlasDrawer.CreateUnitCircles(gl);
+            OpenGLAtlasDrawer.CreateEntities(gl);
+            OpenGLAtlasDrawer.CreateEntitiesIndicators(gl);
+            OpenGLAtlasDrawer.CreateFlowField(gl);
+            OpenGLAtlasDrawer.CreateSelectionFrame(gl);
+        }
+        #endregion Initialization
+
+        #region Updates
+
+        /// <summary>
+        /// Updates and draws the game.
+        /// </summary>
+        private void UpdateAndDraw(object sender, RenderEventArgs args)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            MainLoopStep();
+
+            OpenGL gl = openGLControl.OpenGL;
+            //set correct extents of the window to game controls
+            GameControls.MapView.SetActualExtents(openGLControl.Width, openGLControl.Height);
+
+            //data buffers
+            OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, GameControls.MapView, Game);
+            if (Game.GameplayOptions.NutrientsVisible)
+                OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
+            else
+                OpenGLAtlasDrawer.TryClearNutrientsMapDataBuffers(gl);
+            OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
+            OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
+            OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
+            //show flowfield of the selected animal if an animal is selected and player wants to show flowfield
+            if (Game.GameplayOptions.ShowFlowfield)
+            {
+                FlowField flF = null;
+                if ((flF=SelectedAnimalFlowfield())!=null)
+                    OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
+                else
+                    OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+            }
+            else
+                OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+            OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
+            OpenGLAtlasDrawer.Draw(gl, Game.GameplayOptions);
+            
+            //update bottom panel
+            UpdateBottomPanel();
+
+            sw.Stop();
+            //Console.WriteLine("Tick length: " + sw.Elapsed.Milliseconds);
+
+            UpdatesDone++;
+            Console.WriteLine("Updates per second: " + UpdatesDone / TotalTime * 1000);
+        }
+
         /// <summary>
         /// Updates information for the bottom panel and air taken.
         /// </summary>
         private void UpdateBottomPanel()
         {
-            //only set new values if the values changed since the last update
-            SelectedGroup selected = GameControls.SelectedEntities;
-            List<Entity> selectedEntities = null;
-            bool changed;
-            changed = GameControls.SelectedEntities.Changed;
-            if (changed)
-                selectedEntities = selected.Entities.ToList();
-            if (changed)
+            //update selected entities
+            if (GameControls.SelectedEntities.Changed)
             {
+                //selected entities changed since the last update
                 GameControls.SelectedEntities.Changed = false;
+                List<Entity> selectedEntities = GameControls.SelectedEntities.Entities.ToList();
                 selectedEntities.Sort((u, v) => u.EntityType.GetHashCode() - v.EntityType.GetHashCode());
                 EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
                 EntityButtonArray.InfoSources = selectedEntities;
             }
+            EntityInfoPanel.SelectedEntity = EntityButtonArray.Selected;
+
             //set selected ability
-            if (GameControls.EntityCommandsInput.IsAbilitySelected)
-                AbilityButtonArray.Selected = GameControls.EntityCommandsInput.SelectedAbility;
-            else
-                AbilityButtonArray.Selected = null;
+            AbilityButtonArray.Selected = GameControls.EntityCommandsInput.SelectedAbility;
 
             if (EntityButtonArray.Selected != null)
                 AbilityButtonArray.InfoSources = EntityButtonArray.Selected.Abilities;
             else
                 AbilityButtonArray.InfoSources = new List<Ability>();
-            EntityInfoPanel.SelectedEntity = EntityButtonArray.Selected;
-
+            
             //update units panel
-            EntityButtonArray.UpdateData();
-            AbilityButtonArray.UpdateData();
-            EntityInfoPanel.UpdateData();
+            EntityButtonArray.UpdateControl();
+            AbilityButtonArray.UpdateControl();
+            EntityInfoPanel.UpdateControl();
 
             //update air
             PlayerPropertiesPanel.AirValue.Text = Game.CurrentPlayer.AirTaken + "/" + Game.CurrentPlayer.MaxAirTaken;
             
-            //show winner window if a player won
+            //show victory panel if a player won
             if (Game.Winner != null)
                 ShowVictoryPanel(Game.Winner.Value);
         }
-        
-        /// <summary>
-        /// Sets currently selected entity.
-        /// </summary>
-        public void SelectEntity()
-        {
-            List<Entity> selectedEntities = EntityButtonArray.InfoSources;
-            if (selectedEntities != null && selectedEntities.Any())
-            {
-                Entity selected = selectedEntities[0];
-                EntityInfoPanel.SelectedEntity = selected;
-                AbilityButtonArray.InfoSources = selected.Abilities;
-            }
-        }
+
+        #endregion Updates
+
+        #region Event handlers
 
         /// <summary>
         /// Ends the thread with Game when the window closes.
         /// </summary>
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void MainWinformWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Game.GameEnded = true;
         }
@@ -385,46 +379,29 @@ namespace SanguineGenesis.GUI
             }
 
         }
-
-        /// <summary>
-        /// Initializes OpenGLAtlasDrawer.
-        /// </summary>
-        private void InitializeOpenGL()
-        {
-            OpenGL gl = openGLControl1.OpenGL;
-            OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl1.Width, (float)openGLControl1.Height);
-            OpenGLAtlasDrawer.CreateMap(gl);
-            OpenGLAtlasDrawer.CreateNutrientsMap(gl);
-            OpenGLAtlasDrawer.CreateUnitCircles(gl);
-            OpenGLAtlasDrawer.CreateEntities(gl);
-            OpenGLAtlasDrawer.CreateEntitiesIndicators(gl);
-            OpenGLAtlasDrawer.CreateFlowField(gl);
-            OpenGLAtlasDrawer.CreateSelectionFrame(gl);
-        }
-
-        private int DrawingsDone { get; set; }
         
         
-        private void openGLControl1_MouseButtonDown(object sender, MouseEventArgs e)
+        private void MouseButtonDownHandler(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
+                //update vertex of frame buffer
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
                 
-                //set selected entity
                 SelectEntity();
             }
             else
             {
+                //set target
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.SetTarget(mapCoordinates);
             }
         }
 
-        private void openGLControl1_MouseButtonUp(object sender, MouseEventArgs e)
+        private void MouseButtonUpHandler(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -432,25 +409,54 @@ namespace SanguineGenesis.GUI
                 .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.EndSelection(mapCoordinates);
                 
-                //set selected entity
                 SelectEntity();
             }
         }
 
-        private void openGLControl1_MouseMove(object sender, MouseEventArgs e)
+        private void MouseMoveHandler(object sender, MouseEventArgs e)
         {
             if (GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS)
             {
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
-
-                //set selected unit
+                
                 SelectEntity();
             }
         }
-        
-        
+
+        #endregion event handlers
+
+        /// <summary>
+        /// Sets currently selected entity.
+        /// </summary>
+        private void SelectEntity()
+        {
+            List<Entity> selectedEntities = EntityButtonArray.InfoSources;
+            if (selectedEntities != null && selectedEntities.Any())
+            {
+                Entity selected = selectedEntities[0];
+                EntityInfoPanel.SelectedEntity = selected;
+                AbilityButtonArray.InfoSources = selected.Abilities;
+            }
+        }
+
+        /// <summary>
+        /// Returns flowfield of first command of selected entity if it is
+        /// a MoveToCommand and the entity is animal.
+        /// </summary>
+        /// <returns></returns>
+        private FlowField SelectedAnimalFlowfield()
+        {
+            Animal selected;
+            MoveToCommand command;
+            FlowField flF = null;
+            if ((selected = (EntityButtonArray.Selected as Animal)) != null &&
+                (command = (selected.CommandQueue.First() as MoveToCommand)) != null)
+                flF = command.FlowField;
+            return flF;
+        }
+
         /// <summary>
         /// Opens menu and disables interaction with the game.
         /// </summary>
@@ -489,10 +495,14 @@ namespace SanguineGenesis.GUI
             GameOptionsMenu.Visible = false;
         }
 
+        /// <summary>
+        /// Disables opengl control, bottom panel and menu button.
+        /// Gives focus to this window.
+        /// </summary>
         private void DisableGameControls()
         {
             //disable game and game info
-            openGLControl1.Enabled = false;
+            openGLControl.Enabled = false;
             MenuButton.Enabled = false;
             EntityButtonArray.Enabled = false;
             AbilityButtonArray.Enabled = false;
@@ -504,10 +514,14 @@ namespace SanguineGenesis.GUI
             Focus();
         }
 
+        /// <summary>
+        /// Enables opengl control, bottom panel and menu button.
+        /// Gives focus to opengl control.
+        /// </summary>
         private void EnableGameControls()
         {
             //enable game and game info
-            openGLControl1.Enabled = true;
+            openGLControl.Enabled = true;
             MenuButton.Enabled = true;
             EntityButtonArray.Enabled = true;
             AbilityButtonArray.Enabled = true;
@@ -516,7 +530,7 @@ namespace SanguineGenesis.GUI
             GameOptionsMenu.Visible = false;
 
             //put focus to the game
-            openGLControl1.Focus();
+            openGLControl.Focus();
         }
 
         /// <summary>
@@ -552,53 +566,6 @@ namespace SanguineGenesis.GUI
             VictoryPanel.Visible = false;
         }
         
-
-        /// <summary>
-        /// Updates the game and information about what should be drawn.
-        /// </summary>
-        private void TickAndDraw(object sender, RenderEventArgs args)
-        {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            MainLoopStep();
-
-            OpenGL gl = openGLControl1.OpenGL;
-            GameControls.MapView.SetActualExtents((float)openGLControl1.Width, (float)openGLControl1.Height);
-            OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, GameControls.MapView, Game);
-            if (Game.GameplayOptions.NutrientsVisible)
-                OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
-            else
-                OpenGLAtlasDrawer.TryClearNutrientsMapDataBuffers(gl);
-            OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
-            OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
-            OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
-            //show flowfield of the selected animal if an animal is selected and player wants to show flowfield
-            if (Game.GameplayOptions.ShowFlowfield)
-            {
-                Animal selected;
-                MoveToCommand command;
-                FlowField flF = null;
-                if ((selected = (EntityButtonArray.Selected as Animal)) != null &&
-                    (command = (selected.CommandQueue.First() as MoveToCommand)) != null &&
-                    (flF = command.FlowField) != null)
-                {
-                    OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
-                }
-                else
-                    OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
-            }
-            else
-                OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
-            OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
-            UpdateBottomPanel();
-            OpenGLAtlasDrawer.Draw(gl, Game.GameplayOptions);
-
-            DrawingsDone++;
-            sw.Stop();
-            //Console.WriteLine("Time drawing: " + sw.Elapsed.Milliseconds);
-        }
-
         #endregion User interface
     }
 }

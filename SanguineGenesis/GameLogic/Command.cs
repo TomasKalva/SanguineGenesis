@@ -115,7 +115,8 @@ namespace SanguineGenesis
         /// <summary>
         /// How much of the command is done. From the interval [0,100]. Used only for player's information.
         /// </summary>
-        public override int Progress => (int)((ElapsedTime / Ability.Duration) * 100);
+        public override int Progress 
+            => Math.Min(100, Ability.Duration!=0 ? (int)((ElapsedTime / Ability.Duration) * 100) : 0);
 
         protected Command(Caster commandedEntity, Target target, Abil ability)
         {
