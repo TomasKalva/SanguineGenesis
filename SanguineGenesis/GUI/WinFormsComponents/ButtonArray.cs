@@ -44,24 +44,27 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Creates new ButtonArray with the given extents and number of rows and columns.
         /// </summary>
-        public ButtonArray(int columns, int rows, int preferedWidth)
+        public ButtonArray(int columns, int rows, int preferedWidth, int preferedHeight)
         {
             RowCount = rows;
             ColumnCount = columns;
-            int buttonSize = preferedWidth / ColumnCount;
-            Width = buttonSize * ColumnCount;
-            Height = buttonSize * RowCount;
+            int buttonWidth = preferedWidth / ColumnCount;
+            int buttonHeight = preferedHeight / RowCount;
+            Width = buttonWidth * ColumnCount;
+            Height = buttonHeight * RowCount;
 
             Buttons = new Button[ColumnCount, RowCount];
             for (int i = 0; i < ColumnCount; i++)
                 for (int j = 0; j < RowCount; j++)
                 {
-                    Button b = new Button();
-                    b.Width = buttonSize;
-                    b.Height = buttonSize;
-                    b.Padding = Padding.Empty;
-                    b.Margin = Padding.Empty;
-                    b.FlatStyle = FlatStyle.Flat;
+                    Button b = new Button
+                    {
+                        Width = buttonWidth,
+                        Height = buttonHeight,
+                        Padding = Padding.Empty,
+                        Margin = Padding.Empty,
+                        FlatStyle = FlatStyle.Flat
+                    };
                     b.FlatAppearance.BorderSize = 1;
                     b.Font = new Font(Button.DefaultFont.FontFamily, 6, System.Drawing.FontStyle.Regular);
                     Buttons[i, j] = b;
@@ -167,8 +170,8 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class EntityButtonArray : ButtonArray<Entity>
     {
-        public EntityButtonArray(int colulmns, int rows, int width)
-            : base(colulmns, rows, width)
+        public EntityButtonArray(int colulmns, int rows, int preferedWidth, int preferedHeight)
+            : base(colulmns, rows, preferedWidth, preferedHeight)
         {
             for (int i = 0; i < ColumnCount; i++)
                 for (int j = 0; j < RowCount; j++)
@@ -180,7 +183,8 @@ namespace SanguineGenesis.GUI
         /// entityInfoPanel and its abilities in abilityButtonArray, and to remove
         /// the entity from selected entities on right click.
         /// </summary>
-        public void ShowInfoOnClick(EntityInfoPanel entityInfoPanel, AbilityButtonArray abilityButtonArray, GameControls gameControls)
+        public void ShowInfoOnClick(EntityInfoPanel entityInfoPanel, AbilityButtonArray abilityButtonArray, GameControls gameControls,
+                                    EntityCommandsInput entityCommandsInput)
         {
             for (int i = 0; i < ColumnCount; i++)
                 for (int j = 0; j < RowCount; j++)
@@ -201,6 +205,7 @@ namespace SanguineGenesis.GUI
                             {
                                 //select this entity
                                 Selected = info;
+                                entityCommandsInput.SelectedAbility = null;
                             }
                         }
                     };
@@ -213,10 +218,17 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class AbilityButtonArray : ButtonArray<Ability>
     {
-        public AbilityButtonArray(int columns, int rows, int width)
-            : base(columns, rows, width)
+        /// <summary>
+        /// Delegate used for selecting ability.
+        /// </summary>
+        private delegate void SelectAbility ();
+        private SelectAbility[] SelectAbilityArray { get; set; }
+
+        public AbilityButtonArray(int columns, int rows, int preferedWidth, int preferedHeight)
+            : base(columns, rows, preferedWidth, preferedHeight)
         {
             BackColor = Color.Gray;
+            SelectAbilityArray = new SelectAbility[columns * rows];
         }
         
         /// <summary>
@@ -229,15 +241,61 @@ namespace SanguineGenesis.GUI
                 {
                     Button b = Buttons[i, j];
                     int buttonInd = ButtonIndex(j, i);//capture by value
-                    b.Click += (sender, ev) =>
-                    {
-                        Ability selectedAbility;
-                        if ((selectedAbility = GetInfoSource(buttonInd)) != null)
-                            gameControls.EntityCommandsInput.SelectedAbility = selectedAbility;
-                    };
+                    SelectAbilityArray[buttonInd] =
+                        () =>
+                        {
+                            Ability selectedAbility;
+                            if ((selectedAbility = GetInfoSource(buttonInd)) != null)
+                                gameControls.EntityCommandsInput.SelectedAbility = selectedAbility;
+
+                        };
+                    b.Click += (sender, ev) => SelectAbilityArray[buttonInd]();
                 }
         }
 
+        public void SelectAbilityWithIndex(int buttonIndex)
+        {
+            if(buttonIndex>=0 && buttonIndex< RowCount * ColumnCount)
+                SelectAbilityArray[buttonIndex]();
+        }
+
+        /// <summary>
+        /// Returns index of the ability corresponding to the key.
+        /// Returns -1 if no such ability exists.
+        /// </summary>
+        public int KeyToAbilityIndex(Keys key)
+        {
+            switch (key)
+            {
+                case Keys.Q:
+                    return 0;
+                case Keys.W:
+                    return 1;
+                case Keys.E:
+                    return 2;
+                case Keys.R:
+                    return 3;
+
+                case Keys.A:
+                    return 4;
+                case Keys.S:
+                    return 5;
+                case Keys.D:
+                    return 6;
+                case Keys.F:
+                    return 7;
+
+                case Keys.Z:
+                    return 8;
+                case Keys.X:
+                    return 9;
+                case Keys.C:
+                    return 10;
+                case Keys.V:
+                    return 11;
+            }
+            return -1;
+        }
     }
 
     /// <summary>
@@ -245,8 +303,8 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class StatusButtonArray : ButtonArray<Status>
     {
-        public StatusButtonArray(int columns, int rows, int width)
-            : base(columns, rows, width)
+        public StatusButtonArray(int columns, int rows, int preferedWidth, int preferedHeight)
+            : base(columns, rows, preferedWidth, preferedHeight)
         {
             //style = (Style)Application.Current.FindResource("StatusArrayStyle");
         }
@@ -257,8 +315,8 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class CommandButtonArray : ButtonArray<Command>
     {
-        public CommandButtonArray(int colulmns, int rows, int width)
-            : base(colulmns, rows, width)
+        public CommandButtonArray(int colulmns, int rows, int preferedWidth, int preferedHeight)
+            : base(colulmns, rows, preferedWidth, preferedHeight)
         {
             if (Buttons.Length > 0)
                 Buttons[0,0].BackColor = Color.Green;

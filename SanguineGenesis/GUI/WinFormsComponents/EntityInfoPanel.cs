@@ -46,11 +46,11 @@ namespace SanguineGenesis.GUI
             int progressBarWidth = Width / 15;
 
 
-            StatusButtonArray = new StatusButtonArray(buttonArrayColumns, 1, Width);
+            StatusButtonArray = new StatusButtonArray(buttonArrayColumns, 1, Width, buttonArrayHeight);
             Controls.Add(StatusButtonArray);
-            StatusButtonArray.Location = new System.Drawing.Point(0, Height - StatusButtonArray.Height);
+            StatusButtonArray.Location = new System.Drawing.Point(Width/2 - StatusButtonArray.Width/2, Height - StatusButtonArray.Height);
 
-            CommandButtonArray = new CommandButtonArray(buttonArrayColumns, 1, Width - progressBarWidth);
+            CommandButtonArray = new CommandButtonArray(buttonArrayColumns, 1, Width - progressBarWidth, buttonArrayHeight);
             Controls.Add(CommandButtonArray);
             CommandButtonArray.Location = new System.Drawing.Point(progressBarWidth, Height - (CommandButtonArray.Height + CommandButtonArray.Height));
 

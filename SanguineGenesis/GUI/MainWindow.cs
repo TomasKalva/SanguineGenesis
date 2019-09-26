@@ -102,6 +102,7 @@ namespace SanguineGenesis.GUI
             timer.Tick += MapMovementTimer_Tick;
             timer.Enabled = true;
             timer.Interval = 10;
+            openGLControl.PreviewKeyDown += OpenGLControl_PreviewKeyDown;
 
             InitializeBottomPanel();
 
@@ -118,8 +119,10 @@ namespace SanguineGenesis.GUI
             Controls.Add(MenuButton);
 
             //menu
-            GameMenu = new GameMenu(150, 200);
-            GameMenu.Anchor = AnchorStyles.None;
+            GameMenu = new GameMenu(150, 200)
+            {
+                Anchor = AnchorStyles.None
+            };
             GameMenu.Left = (ClientSize.Width - GameMenu.Width) / 2;
             GameMenu.Top = (ClientSize.Height - GameMenu.Height) / 2;
             GameMenu.SetResumeButtonClickHandler(CloseMenu);
@@ -129,8 +132,10 @@ namespace SanguineGenesis.GUI
             Controls.SetChildIndex(GameMenu, 10);
 
             //game options panel
-            GameOptionsMenu = new GameOptionsMenu(250, 300, Game.GameplayOptions);
-            GameOptionsMenu.Anchor = AnchorStyles.None;
+            GameOptionsMenu = new GameOptionsMenu(250, 300, Game.GameplayOptions)
+            {
+                Anchor = AnchorStyles.None
+            };
             GameOptionsMenu.Left = (ClientSize.Width - GameOptionsMenu.Width) / 2;
             GameOptionsMenu.Top = (ClientSize.Height - GameOptionsMenu.Height) / 2;
             Controls.Add(GameOptionsMenu);
@@ -164,11 +169,11 @@ namespace SanguineGenesis.GUI
         {
             //initialize ui elements
             //units panel
-            EntityButtonArray = new EntityButtonArray(8, 5, 300);
+            EntityButtonArray = new EntityButtonArray(8, 5, 300, 188);
             Controls.Add(EntityButtonArray);
 
             //abilities panel
-            AbilityButtonArray = new AbilityButtonArray(4, 4, 200);
+            AbilityButtonArray = new AbilityButtonArray(4, 3, 200, 200);
             Controls.Add(AbilityButtonArray);
 
             //unit info panel
@@ -182,7 +187,7 @@ namespace SanguineGenesis.GUI
                 new List<Stat>());
 
             //add listeners to the buttons
-            EntityButtonArray.ShowInfoOnClick(EntityInfoPanel, AbilityButtonArray, GameControls);
+            EntityButtonArray.ShowInfoOnClick(EntityInfoPanel, AbilityButtonArray, GameControls, GameControls.EntityCommandsInput);
             AbilityButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
             EntityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
             EntityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
@@ -344,15 +349,31 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
+        /// Tab is not considered input key, this fixes it.
+        /// </summary>
+        private void OpenGLControl_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if(e.KeyData == Keys.Tab)
+            {
+                e.IsInputKey = true;
+            }
+        }
+
+        /// <summary>
         /// Updates information about pressed keys.
         /// </summary>
         private void MainWinformWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode)
+            int abilityIndex;
+            if((abilityIndex = AbilityButtonArray.KeyToAbilityIndex(e.KeyCode))!=-1)
             {
-                case Keys.ShiftKey:
-                            GameControls.EntityCommandsInput.ResetCommandsQueue = false; break;
+                //select the ability
+                AbilityButtonArray.SelectAbilityWithIndex(abilityIndex);
             }
+            else if(e.KeyCode == Keys.ShiftKey)
+                GameControls.EntityCommandsInput.ResetCommandsQueue = false;
+            else if (e.KeyCode == Keys.Tab)
+                SelectEntityOfNextType();
         }
 
         /// <summary>
@@ -360,13 +381,9 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void MainWinformWindow_KeyUp(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode)
-            {
-                case Keys.ShiftKey:
-                            GameControls.EntityCommandsInput.ResetCommandsQueue = true; break;
-            }
+            if (e.KeyCode == Keys.ShiftKey)
+                GameControls.EntityCommandsInput.ResetCommandsQueue = true;
         }
-        
 
         /// <summary>
         /// Changes the zoom of the map.
@@ -442,10 +459,6 @@ namespace SanguineGenesis.GUI
                 
                 SelectEntity();
             }
-            else
-            {
-                
-            }
         }
 
         public void MapMovementTimer_Tick(object sender, EventArgs e)
@@ -503,6 +516,35 @@ namespace SanguineGenesis.GUI
                 Entity selected = selectedEntities[0];
                 EntityInfoPanel.SelectedEntity = selected;
                 AbilityButtonArray.InfoSources = selected.Abilities;
+                GameControls.EntityCommandsInput.SelectedAbility = null;
+            }
+        }
+
+        /// <summary>
+        /// Selects entity of the next type.
+        /// </summary>
+        private void SelectEntityOfNextType()
+        {
+            List<Entity> selectedEntities = EntityButtonArray.InfoSources;
+            Entity selectedEntity = EntityButtonArray.Selected;
+            if (selectedEntities != null &&
+                selectedEntities.Any() &&
+                selectedEntity != null)
+            {
+                string currentType = selectedEntity.EntityType;
+                int start = selectedEntities.IndexOf(selectedEntity);
+                int length = selectedEntities.Count;
+                int i = (start + 1) % length;
+                while (i != start)
+                {
+                    if(selectedEntities[i].EntityType!=currentType)
+                    {
+                        EntityButtonArray.Selected = selectedEntities[i];
+                        GameControls.EntityCommandsInput.SelectedAbility = null;
+                        break;
+                    }
+                    i = (i + 1) % length;
+                }
             }
         }
 

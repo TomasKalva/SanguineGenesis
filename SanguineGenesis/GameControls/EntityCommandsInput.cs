@@ -10,8 +10,6 @@ namespace SanguineGenesis
 {
     class EntityCommandsInput
     {
-        private Dictionary<Key, Ability> keyToAbility;
-        
         public EntityCommandsInputState State { get; set; }
         public Vector2 SelectingCoordinates { get; private set; }
         public Vector2 TargetCoordinates { get; private set; }
@@ -27,12 +25,7 @@ namespace SanguineGenesis
         {
             State = EntityCommandsInputState.IDLE;
             SelectingCoordinates = new Vector2();
-            //SelectedAbility = game.CurrentPlayer.GameStaticData.Abilities.MoveTo;
             ResetCommandsQueue = true;
-
-            //initialize keyToAbilityType
-            keyToAbility = new Dictionary<Key, Ability>();
-            //keyToAbility.Add(Key.Escape, game.CurrentPlayer.GameStaticData.Abilities.MoveTo);
         }
 
         /// <summary>
