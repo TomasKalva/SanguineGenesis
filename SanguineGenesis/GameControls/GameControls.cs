@@ -18,7 +18,7 @@ namespace SanguineGenesis
 
         public EntityCommandsInput EntityCommandsInput { get; }
         public MapSelectorFrame MapSelectorFrame { get; set; }
-        public SelectedGroup SelectedEntities { get; }
+        public SelectedGroup SelectedGroup { get; }
 
 
         public GameControls(Map map)
@@ -27,7 +27,7 @@ namespace SanguineGenesis
             MapMovementInput = new MapMovementInput();
             EntityCommandsInput = new EntityCommandsInput();
             MapSelectorFrame = null;
-            SelectedEntities = new SelectedGroup();
+            SelectedGroup = new SelectedGroup();
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace SanguineGenesis
                             MapSelectorFrame = new MapSelectorFrame(mapPoint);
 
                             //remove all previously selected entities
-                            SelectedEntities.Clear();
+                            SelectedGroup.ClearTemporary();
 
                             //reset selected ability
                             EntityCommandsInput.SelectedAbility = null;
@@ -70,15 +70,19 @@ namespace SanguineGenesis
                         //update selected entities
                         MapSelectorFrame.SetEndPoint(mapPoint);
                         List<Entity> selected = MapSelectorFrame.GetSelectedUnits(game).ToList();
-                        SelectedEntities.SetEntities(selected);
+                        SelectedGroup.SetEntities(selected);
                         MapSelectorFrame.Update();
 
                         //finish selecting
                         if (EntityCommandsInput.State == EntityCommandsInputState.FINISH_SELECTING_UNITS)
                         {
                             MapSelectorFrame = null;
-                            if(SelectedEntities.Entities.Any())
+                            if (SelectedGroup.Entities.Any())
+                            {
+                                SelectedGroup.CommitEntities();
+                                SelectedGroup.SortEntities();
                                 EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
+                            }
                             else
                                 EntityCommandsInput.State = EntityCommandsInputState.IDLE;
                         }
@@ -92,7 +96,7 @@ namespace SanguineGenesis
                             && selectedAbility.TargetType == typeof(Nothing))
                         {
                             //use the ability
-                            IEnumerable<Entity> entitiesWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(selectedAbility));
+                            IEnumerable<Entity> entitiesWithAbil = SelectedGroup.Entities.Where((e) => e.Abilities.Contains(selectedAbility));
                             if (entitiesWithAbil != null)
                             {
                                 selectedAbility.SetCommands(entitiesWithAbil, Nothing.Get, EntityCommandsInput.ResetCommandsQueue);
@@ -117,7 +121,7 @@ namespace SanguineGenesis
                             if (target != null)
                             {
                                 //use the ability if a valid target was selected
-                                IEnumerable<Entity> entitiesWithAbil = SelectedEntities.Entities.Where((e) => e.Abilities.Contains(ability));
+                                IEnumerable<Entity> entitiesWithAbil = SelectedGroup.Entities.Where((e) => e.Abilities.Contains(ability));
                                 ability.SetCommands(entitiesWithAbil, target, EntityCommandsInput.ResetCommandsQueue);
                             }
                         }
@@ -128,7 +132,7 @@ namespace SanguineGenesis
                         break;
                     }
             }
-            SelectedEntities.RemoveDead();
+            SelectedGroup.RemoveDead();
         }
 
         /// <summary>
@@ -144,13 +148,13 @@ namespace SanguineGenesis
             if (enemy == null)
             {
                 //no enemy selected, move to the clicked coordiantes
-                game.CurrentPlayer.GameStaticData.Abilities.MoveTo.SetCommands(SelectedEntities.Entities
+                game.CurrentPlayer.GameStaticData.Abilities.MoveTo.SetCommands(SelectedGroup.Entities
                     .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), targetCoords, resetQueue);
             }
             else
             {
                 //enemy selected => attack it
-                game.CurrentPlayer.GameStaticData.Abilities.Attack.SetCommands(SelectedEntities.Entities, enemy, resetQueue);
+                game.CurrentPlayer.GameStaticData.Abilities.Attack.SetCommands(SelectedGroup.Entities, enemy, resetQueue);
             }
         }
 

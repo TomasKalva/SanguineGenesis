@@ -13,17 +13,32 @@ namespace SanguineGenesis
     public class SelectedGroup
     {
         /// <summary>
-        /// List of currently selected entities. Shouldn't be set to null.
+        /// Entities to this group are added during selecting.
         /// </summary>
-        public List<Entity> Entities { get ; }
+        private List<Entity> TemporaryGroup { get; }
         /// <summary>
-        /// Set to true after Entities was changed.
+        /// Entities in this group are changed when selecting is over.
+        /// </summary>
+        private List<Entity> TotalGroup { get; set; }
+        /// <summary>
+        /// Operation that will be used to transfer from temporary group
+        /// to total group.
+        /// </summary>
+        public Operation NextOperation { get; set; }
+        /// <summary>
+        /// List of currently selected entities.
+        /// </summary>
+        public List<Entity> Entities => ComposeGroups(NextOperation, TotalGroup, TemporaryGroup);
+        /// <summary>
+        /// Set to true after Entities is changed.
         /// </summary>
         public bool Changed { get; set; }
 
         public SelectedGroup()
         {
-            Entities = new List<Entity>();
+            TemporaryGroup = new List<Entity>();
+            TotalGroup = new List<Entity>();
+            NextOperation = Operation.ALREADY_SELECTED;
             Changed = true;
         }
 
@@ -32,28 +47,18 @@ namespace SanguineGenesis
         /// </summary>
         public void SetEntities(List<Entity> entities)
         {
-            foreach (Entity e in Entities)
-                e.Selected = false;
-            Entities.Clear();
+            if (NextOperation == Operation.REPLACE &&
+                TotalGroup.Any())
+                ClearTotal();
+            ClearTemporary();
             foreach (Entity e in entities)
             {
-                Entities.Add(e);
-                e.Selected = true;
+                TemporaryGroup.Add(e);
+                if (NextOperation == Operation.SUBTRACT)
+                    e.Selected = false;
+                else
+                    e.Selected = true;
             }
-            Changed = true;
-        }
-
-        /// <summary>
-        /// Adds entities to the Entities.
-        /// </summary>
-        public void AddEntities(List<Entity> entities)
-        {
-            foreach(Entity u in entities)
-                if (!Entities.Contains(u))
-                {
-                    Entities.Add(u);
-                    u.Selected = true;
-                }
             Changed = true;
         }
 
@@ -63,7 +68,8 @@ namespace SanguineGenesis
         public void RemoveEntity(Entity entity)
         {
             entity.Selected = false;
-            Entities.Remove(entity);
+            TemporaryGroup.Remove(entity);
+            TotalGroup.Remove(entity);
             Changed = true;
         }
 
@@ -72,21 +78,89 @@ namespace SanguineGenesis
         /// </summary>
         public void RemoveDead()
         {
-            int count = Entities.Count;
-            Entities.RemoveAll((u) => u.IsDead);
-            if (count != Entities.Count)
+            int count = TemporaryGroup.Count;
+            TemporaryGroup.RemoveAll((e) => { count++; return e.IsDead; });
+            TotalGroup.RemoveAll((e) => { count++; return e.IsDead; });
+            if (count != 0)
                 Changed = true;
+        }
+        
+        /// <summary>
+        /// Remove temporarily selected entities.
+        /// </summary>
+        public void ClearTemporary()
+        {
+            foreach (Entity e in TemporaryGroup)
+                e.Selected = false;
+            TemporaryGroup.Clear();
+            Changed = true;
         }
 
         /// <summary>
-        /// Remove all entities.
+        /// Remove selected entities.
         /// </summary>
-        public void Clear()
+        public void ClearTotal()
         {
-            foreach (Entity e in Entities)
+            foreach (Entity e in TotalGroup)
                 e.Selected = false;
-            Entities.Clear();
+            TotalGroup.Clear();
             Changed = true;
         }
+
+        /// <summary>
+        /// Sorts entities by their entity type and hash code.
+        /// </summary>
+        public void SortEntities()
+        {
+            TotalGroup.Sort((e1, e2) =>
+            {
+                int typeDifference = e1.EntityType.GetHashCode() - e2.EntityType.GetHashCode();
+                if (typeDifference != 0)
+                    return typeDifference;
+                else
+                    return e1.GetHashCode() - e2.GetHashCode();
+            });
+            Changed = true;
+        }
+
+        /// <summary>
+        /// Sorts entities by their entity type and hash code.
+        /// </summary>
+        public void CommitEntities()
+        {
+            var newTotalGroup = ComposeGroups(NextOperation, TotalGroup, TemporaryGroup);
+            ClearTemporary();
+            ClearTotal();
+            TotalGroup = newTotalGroup;
+            foreach (Entity e in TotalGroup)
+                e.Selected = true;
+            NextOperation = Operation.ALREADY_SELECTED;
+        }
+
+        /// <summary>
+        /// Composes the two groups using the operation and returns the result.
+        /// </summary>
+        private List<Entity> ComposeGroups(Operation opearation, List<Entity> total, List<Entity> temporary)
+        {
+            switch (NextOperation)
+            {
+                case Operation.ADD:
+                    return TotalGroup.Union(TemporaryGroup).ToList();
+                case Operation.SUBTRACT:
+                    return TotalGroup.Where(e => !TemporaryGroup.Contains(e)).ToList();
+                case Operation.REPLACE:
+                    return TemporaryGroup.ToList();
+                default:
+                    return TotalGroup.ToList();
+            }
+        }
+    }
+
+    public enum Operation
+    {
+        ADD,
+        SUBTRACT,
+        REPLACE,
+        ALREADY_SELECTED//if entities are currently not being selected
     }
 }

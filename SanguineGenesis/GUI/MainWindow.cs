@@ -282,18 +282,27 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
+        /// True if the first entity of selected entities should be set selected entity.
+        /// </summary>
+        private bool ShouldSetSelected { get; set; }
+
+        /// <summary>
         /// Updates information for the bottom panel and air taken.
         /// </summary>
         private void UpdateBottomPanel()
         {
             //update selected entities
-            if (GameControls.SelectedEntities.Changed)
+            if (GameControls.SelectedGroup.Changed)
             {
                 //selected entities changed since the last update
-                GameControls.SelectedEntities.Changed = false;
-                List<Entity> selectedEntities = GameControls.SelectedEntities.Entities.ToList();
-                selectedEntities.Sort((u, v) => u.EntityType.GetHashCode() - v.EntityType.GetHashCode());
-                EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
+                GameControls.SelectedGroup.Changed = false;
+                List<Entity> selectedEntities = GameControls.SelectedGroup.Entities;
+                //update selected entity if the old one was removed or player is currently selecting entities
+                if(GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS ||
+                    ShouldSetSelected ||
+                    !selectedEntities.Contains(EntityButtonArray.Selected))
+                    EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
+                ShouldSetSelected = GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS;
                 EntityButtonArray.InfoSources = selectedEntities;
             }
             EntityInfoPanel.SelectedEntity = EntityButtonArray.Selected;
@@ -306,7 +315,7 @@ namespace SanguineGenesis.GUI
             else
                 AbilityButtonArray.InfoSources = new List<Ability>();
             
-            //update units panel
+            //update entities and abilities panels
             EntityButtonArray.UpdateControl();
             AbilityButtonArray.UpdateControl();
             EntityInfoPanel.UpdateControl();
@@ -389,7 +398,21 @@ namespace SanguineGenesis.GUI
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
-                
+                //set the mode of entity selection
+                switch (ModifierKeys)
+                {
+                    case Keys.Shift:
+                        GameControls.SelectedGroup.NextOperation = Operation.ADD;
+                        break;
+                    case Keys.Control:
+                        GameControls.SelectedGroup.NextOperation = Operation.SUBTRACT;
+                        break;
+                    default:
+                        GameControls.SelectedGroup.NextOperation = Operation.REPLACE;
+                        break;
+                }
+
+
                 SelectEntity();
             }
             else

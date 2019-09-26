@@ -195,7 +195,7 @@ namespace SanguineGenesis.GUI
                             if (ev.Button == MouseButtons.Right)
                             {
                                 //remove the entity corresponding to the clicked button from selection
-                                gameControls.SelectedEntities.RemoveEntity(info);
+                                gameControls.SelectedGroup.RemoveEntity(info);
                             }
                             else
                             {
