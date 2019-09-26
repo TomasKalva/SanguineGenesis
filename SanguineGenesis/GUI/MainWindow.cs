@@ -10,8 +10,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI
@@ -98,7 +96,12 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void InitializeUserInterface()
         {
+            //add event handlers
             MouseWheel += Window_MouseWheel;
+            Timer timer = new Timer();
+            timer.Tick += MapMovementTimer_Tick;
+            timer.Enabled = true;
+            timer.Interval = 10;
 
             InitializeBottomPanel();
 
@@ -347,10 +350,6 @@ namespace SanguineGenesis.GUI
         {
             switch (e.KeyCode)
             {
-                case Keys.S: GameControls.MapMovementInput.AddDirection(Direction.DOWN); break;
-                case Keys.W: GameControls.MapMovementInput.AddDirection(Direction.UP); break;
-                case Keys.A: GameControls.MapMovementInput.AddDirection(Direction.LEFT); break;
-                case Keys.D: GameControls.MapMovementInput.AddDirection(Direction.RIGHT); break;
                 case Keys.ShiftKey:
                             GameControls.EntityCommandsInput.ResetCommandsQueue = false; break;
             }
@@ -363,10 +362,6 @@ namespace SanguineGenesis.GUI
         {
             switch (e.KeyCode)
             {
-                case Keys.S: GameControls.MapMovementInput.RemoveDirection(Direction.DOWN); break;
-                case Keys.W: GameControls.MapMovementInput.RemoveDirection(Direction.UP); break;
-                case Keys.A: GameControls.MapMovementInput.RemoveDirection(Direction.LEFT); break;
-                case Keys.D: GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT); break;
                 case Keys.ShiftKey:
                             GameControls.EntityCommandsInput.ResetCommandsQueue = true; break;
             }
@@ -440,11 +435,58 @@ namespace SanguineGenesis.GUI
         {
             if (GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS)
             {
+                //update selection frame
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
                 
                 SelectEntity();
+            }
+            else
+            {
+                
+            }
+        }
+
+        public void MapMovementTimer_Tick(object sender, EventArgs e)
+        {
+            //move map if player is not selecting entities
+            if (!(GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS))
+            {
+                Point mousePos = Cursor.Position;
+
+                int movingFrameSize = 2;
+                if (mousePos.X >= openGLControl.Width - movingFrameSize)
+                {
+                    GameControls.MapMovementInput.AddDirection(Direction.RIGHT);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.LEFT);
+                }
+                else if (mousePos.X <= movingFrameSize)
+                {
+                    GameControls.MapMovementInput.AddDirection(Direction.LEFT);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT);
+                }
+                else
+                {
+                    GameControls.MapMovementInput.RemoveDirection(Direction.LEFT);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT);
+                }
+
+                if (mousePos.Y >= openGLControl.Height - movingFrameSize)
+                {
+                    GameControls.MapMovementInput.AddDirection(Direction.DOWN);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.UP);
+                }
+                else if (mousePos.Y <= movingFrameSize)
+                {
+                    GameControls.MapMovementInput.AddDirection(Direction.UP);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.DOWN);
+                }
+                else
+                {
+                    GameControls.MapMovementInput.RemoveDirection(Direction.UP);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.DOWN);
+                }
             }
         }
 
