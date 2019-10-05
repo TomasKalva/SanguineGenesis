@@ -10,12 +10,19 @@ namespace SanguineGenesis
     public class FlowField:IMap<float?>
     {
         /// <summary>
-        /// Minimal valid value for an angle in flowfield.
+        /// If value of the flowfield is at most POINT_TO_TARGET, the intensity points to the target.
         /// </summary>
-        public const float MIN_VALID_VALUE= -0.01f;
+        public const float POINT_TO_TARGET = -50f;
 
-        //values are oriented angles in radians relative to the positive x axis
+        /// <summary>
+        /// Values are oriented angles in radians relative to the positive x axis.
+        /// If the value is not present, the direction goes straight to the target.
+        /// </summary>
         private float?[,] directions;
+        /// <summary>
+        /// The point to which this flow field is flowing.
+        /// </summary>
+        private Vector2 target;
 
         public float? this[int i, int j]
         {
@@ -31,9 +38,10 @@ namespace SanguineGenesis
         /// </summary>
         public int Height => directions.GetLength(1);
 
-        internal FlowField(int width, int height)
+        internal FlowField(int width, int height, Vector2 target)
         {
             directions = new float?[width, height];
+            this.target = target;
         }
 
         /// <summary>
@@ -47,10 +55,15 @@ namespace SanguineGenesis
         {
             int i = (int)position.X; int j = (int)position.Y;
             if (i < 0 || i >= Width || j < 0 || j >= Height ||
-                directions[i,j] == null)
-                return new Vector2(0f, 0f);
+                directions[i, j] == null)
+                return new Vector2(0, 0) ;
 
+            
             float angle = directions[i, j].Value;
+            //return direction that points directly to the target
+            if(PointToTarget(angle))
+                return speed * (position.UnitDirectionTo(target));
+            //return direction from this flowfield
             return new Vector2(
                 (float)Math.Cos(angle) * speed,
                 (float)Math.Sin(angle) * speed
@@ -58,9 +71,10 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// True iff val is valid value in flowfield.
+        /// Returns true iff the angle indicates that angle pointing to the target should be used,
+        /// instead of this angle.
         /// </summary>
-        public static bool IsValidValue(float val) => val >= MIN_VALID_VALUE;
+        public static bool PointToTarget(float angle) => angle <= POINT_TO_TARGET;
     }
 
     /// <summary>

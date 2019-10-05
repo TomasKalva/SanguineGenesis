@@ -945,11 +945,23 @@ namespace SanguineGenesis
                     {
                         float angle = flowF[i, j].Value;
 
-                        //rotated triangle coordinates
-                        vec2 rotTriLB = (Rotate(triLB, angle) + triOffset + leftBottom) * squareExt;
-                        vec2 rotTriLT = (Rotate(triLT, angle) + triOffset + leftBottom) * squareExt;
-                        vec2 rotTriRM = (Rotate(triRM, angle) + triOffset + leftBottom) * squareExt;
-
+                        vec2 rotTriLB;
+                        vec2 rotTriLT;
+                        vec2 rotTriRM;
+                        if (FlowField.PointToTarget(angle))
+                        {
+                            //triangle that represents that the animal should move directly to the target
+                            rotTriLB = (new vec2(-0.2f, 0.15f) + triOffset + leftBottom) * squareExt;
+                            rotTriLT = (new vec2(0.2f, 0.15f) + triOffset + leftBottom) * squareExt;
+                            rotTriRM = (new vec2(0, -0.20f) + triOffset + leftBottom) * squareExt;
+                        }
+                        else
+                        {
+                            //rotated triangle coordinates
+                            rotTriLB = (Rotate(triLB, angle) + triOffset + leftBottom) * squareExt;
+                            rotTriLT = (Rotate(triLT, angle) + triOffset + leftBottom) * squareExt;
+                            rotTriRM = (Rotate(triRM, angle) + triOffset + leftBottom) * squareExt;
+                        }
                         //bottom left
                         vertices[coord + offset + 0] = rotTriLB.x;
                         vertices[coord + offset + 1] = rotTriLB.y;
@@ -968,7 +980,6 @@ namespace SanguineGenesis
                         vertices[coord + offset + 0] = rotTriRM.x;
                         vertices[coord + offset + 1] = rotTriRM.y;
                         vertices[coord + offset + 2] = -9;
-
                     }
 
                     //bottom left

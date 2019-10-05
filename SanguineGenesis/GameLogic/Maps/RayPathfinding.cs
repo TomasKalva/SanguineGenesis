@@ -29,7 +29,7 @@ namespace SanguineGenesis.GameLogic.Maps
 
         public FlowField GenerateFlowField(ObstacleMap obst, Vector2 targetLocation)
         {
-            FlowField flFap = new FlowField(obst.Width, obst.Height);
+            FlowField flFap = new FlowField(obst.Width, obst.Height, targetLocation);
             //distance from the target
             float[,] distance = new float[obst.Width, obst.Height];
             //squares that need to be explored

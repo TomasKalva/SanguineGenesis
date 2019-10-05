@@ -8,7 +8,8 @@ namespace SanguineGenesis.GameLogic.Maps
 {
     /// <summary>
     /// Used for generating flowfield using bfs with raycasting heuristics. One instance of the class
-    /// is one instance of the algorithm.
+    /// is one instance of the algorithm. The flowfield overlaps with movement blocked square by one
+    /// node.
     /// </summary>
     class BfsPathfinding : IPathfinding
     {
@@ -34,10 +35,15 @@ namespace SanguineGenesis.GameLogic.Maps
         {
             int width = obst.Width;
             int height = obst.Height;
-            flowField = new FlowField(width, height);
+            flowField = new FlowField(width, height, targetLocation);
             obstacleMap = obst;
             this.targetLocation = targetLocation;
             discovered = new Queue<Coords>();
+            //initialize walkable nodes to point to target
+            for(int i=0; i<width; i++)
+                for(int j = 0; j<width; j++)
+                    if(!obst[i,j])
+                        flowField[i, j] = FlowField.POINT_TO_TARGET;
         }
 
         public FlowField GenerateFlowField()
@@ -94,7 +100,7 @@ namespace SanguineGenesis.GameLogic.Maps
             {
                 int x = relaxed.X;
                 int y = relaxed.Y;
-                if (flowField[x, y] == null)
+                if (flowField[x, y] == null || FlowField.PointToTarget(flowField[x,y].Value))
                 {
                     flowField[x, y] = angle;
                     discovered.Enqueue(relaxed);
@@ -118,7 +124,7 @@ namespace SanguineGenesis.GameLogic.Maps
                     rayLength,
                     obstacleMap);
                 while (rTop.Next(out int x, out int y))
-                    flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
+                    flowField[x, y] = FlowField.POINT_TO_TARGET;//direction will point straight to the target
 
                 //bottom
                 Ray rBottom = new Ray(targetLocation,
@@ -126,7 +132,7 @@ namespace SanguineGenesis.GameLogic.Maps
                     rayLength,
                     obstacleMap);
                 while (rBottom.Next(out int x, out int y))
-                    flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
+                    flowField[x, y] = FlowField.POINT_TO_TARGET;//direction will point straight to the target
             }
             //cast rays to the lines on left and right of the map
             for (int j = 0; j <= obstacleMap.Height; j++)
@@ -137,7 +143,7 @@ namespace SanguineGenesis.GameLogic.Maps
                     rayLength,
                     obstacleMap);
                 while (rLeft.Next(out int x, out int y))
-                    flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
+                    flowField[x, y] = FlowField.POINT_TO_TARGET;//direction will point straight to the target
 
                 //right
                 Ray rRight = new Ray(targetLocation,
@@ -145,7 +151,7 @@ namespace SanguineGenesis.GameLogic.Maps
                     rayLength,
                     obstacleMap);
                 while (rRight.Next(out int x, out int y))
-                    flowField[x, y] = new Vector2(x + 0.5f, y + 0.5f).AngleTo(targetLocation);
+                    flowField[x, y] = FlowField.POINT_TO_TARGET;//direction will point straight to the target
             }
         }
         
@@ -159,13 +165,13 @@ namespace SanguineGenesis.GameLogic.Maps
                 for (int j = 0; j < flowField.Height; j++)
                 {
                     //update only squares that are not blocked and have valid value of flowField
-                    if (obstacleMap[i, j] || flowField[i, j] == null)
+                    if (obstacleMap[i, j])
                         continue;
 
-                    float angle = flowField[i, j].Value;
+                    var dir = flowField.GetIntensity(new Vector2(i + .5f, j + .5f), 1f);
                     //directions of the components
-                    int dirX = Math.Sign(Math.Cos(angle));
-                    int dirY = Math.Sign(Math.Sin(angle));
+                    int dirX = Math.Sign(dir.X);
+                    int dirY = Math.Sign(dir.Y);
                     //coordinate of vertical and horizontal neighbor
                     int neibX = i + dirX;
                     int neibY = j + dirY;

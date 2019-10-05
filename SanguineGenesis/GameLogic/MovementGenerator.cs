@@ -54,7 +54,6 @@ namespace SanguineGenesis.GameLogic
             /// </summary>
             public List<MoveToCommandAssignment> Output { get; set; }
 
-
             //These fields are set at the start of new cycle from the input from outside.
             //They are isolated during the algorithm.
             /// <summary>
