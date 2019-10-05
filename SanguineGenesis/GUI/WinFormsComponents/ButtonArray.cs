@@ -407,7 +407,7 @@ namespace SanguineGenesis.GUI
                             if (entities.Any())
                             {
                                 ControlGroups[index] = new ControlGroup(entities);
-                                b.Text = "s";
+                                b.Text = entities.Count.ToString();
                             }
                             else
                             {
