@@ -84,6 +84,7 @@ namespace SanguineGenesis.GUI
         private AbilityButtonArray AbilityButtonArray { get; set; }
         private EntityInfoPanel EntityInfoPanel { get; set; }
         private AdditionalInfo AdditionalInfo { get; set; }
+        private ControlGroupButtonArray ControlGroupButtonArray { get; set; }
         private GameOptionsMenu GameOptionsMenu { get; set; }
         private Button MenuButton { get; set; }
         private GameMenu GameMenu { get; set; }
@@ -186,6 +187,10 @@ namespace SanguineGenesis.GUI
             AdditionalInfo.Stats.SetStats(
                 new List<Stat>());
 
+            //control groups panel
+            ControlGroupButtonArray = new ControlGroupButtonArray(6, 1, EntityButtonArray.Width, 20);
+            Controls.Add(ControlGroupButtonArray);
+
             //add listeners to the buttons
             EntityButtonArray.ShowInfoOnClick(EntityInfoPanel, AbilityButtonArray, GameControls, GameControls.EntityCommandsInput);
             AbilityButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
@@ -193,9 +198,11 @@ namespace SanguineGenesis.GUI
             EntityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
             EntityInfoPanel.StatusButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
             AbilityButtonArray.SelectAbilityOnClick(GameControls);
+            ControlGroupButtonArray.SetEventHandlers(GameControls);
 
             EntityButtonArray.GiveFocusTo(openGLControl);
             AbilityButtonArray.GiveFocusTo(openGLControl);
+            ControlGroupButtonArray.GiveFocusTo(openGLControl);
             EntityInfoPanel.CommandButtonArray.GiveFocusTo(openGLControl);
             EntityInfoPanel.StatusButtonArray.GiveFocusTo(openGLControl);
 
@@ -214,6 +221,8 @@ namespace SanguineGenesis.GUI
 
             int entityButtonArrayX = entityInfoX + entityInfoW;
             EntityButtonArray.Location = new Point(entityButtonArrayX, windowHeight - EntityButtonArray.Height);
+
+            ControlGroupButtonArray.Location = new Point(entityButtonArrayX, windowHeight - EntityButtonArray.Height - ControlGroupButtonArray.Height);
 
             int abilityPanelX = entityButtonArrayX + entityButtonArrayW;
             AbilityButtonArray.Location = new Point(abilityPanelX, windowHeight - AbilityButtonArray.Height);
@@ -365,15 +374,35 @@ namespace SanguineGenesis.GUI
         private void MainWinformWindow_KeyDown(object sender, KeyEventArgs e)
         {
             int abilityIndex;
-            if((abilityIndex = AbilityButtonArray.KeyToAbilityIndex(e.KeyCode))!=-1)
+            int ctrlGroupIndex;
+            if ((abilityIndex = AbilityButtonArray.KeyToAbilityIndex(e.KeyCode))!=-1)
             {
                 //select the ability
                 AbilityButtonArray.SelectAbilityWithIndex(abilityIndex);
             }
             else if(e.KeyCode == Keys.ShiftKey)
+                //abilities will be appended to the queue
                 GameControls.EntityCommandsInput.ResetCommandsQueue = false;
             else if (e.KeyCode == Keys.Tab)
+                //jump to next entity type
                 SelectEntityOfNextType();
+            else if ((ctrlGroupIndex = ControlGroupButtonArray.KeyToGroupIndex(e.KeyCode)) != -1)
+            {
+                //modify control groups
+                if (e.Control)
+                {
+                    ControlGroupButtonArray.SaveGroupWithIndex(ctrlGroupIndex);
+                }
+                else if(GameControls.EntityCommandsInput.State==EntityCommandsInputState.IDLE ||
+                    GameControls.EntityCommandsInput.State == EntityCommandsInputState.UNITS_SELECTED)
+                {
+                    if (e.Shift)
+                        GameControls.SelectedGroup.NextOperation = Operation.ADD;
+
+                    ControlGroupButtonArray.LoadGroupWithIndex(ctrlGroupIndex);
+
+                }
+            }
         }
 
         /// <summary>

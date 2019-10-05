@@ -320,7 +320,6 @@ namespace SanguineGenesis.GUI
         {
             if (Buttons.Length > 0)
                 Buttons[0,0].BackColor = Color.Green;
-            //Style = (Style)Application.Current.FindResource("CommandsArrayStyle");
         }
 
         /// <summary>
@@ -348,6 +347,127 @@ namespace SanguineGenesis.GUI
                 }
         }
     }
+
+    /// <summary>
+    /// Used for drawing buttons with control groups.
+    /// </summary>
+    class ControlGroupButtonArray : ButtonArray<Status>
+    {
+        //todo: fix bugs
+        delegate void ManipulateGroup();
+
+        private class ControlGroup
+        {
+            public List<Entity> Entities { get; }
+
+            public ControlGroup(List<Entity> entities)
+            {
+                Entities = entities;
+            }
+
+            public void RemoveDead()
+            {
+                if (Entities != null)
+                    Entities.RemoveAll(e => e.IsDead);
+            }
+        }
+
+        private ControlGroup[] ControlGroups { get; }
+        /// <summary>
+        /// Loads selected group to currently selected entities.
+        /// </summary>
+        private ManipulateGroup[] LoadGroup { get; }
+        /// <summary>
+        /// Saves currnetly selected entities to control group.
+        /// </summary>
+        private ManipulateGroup[] SaveGroup { get; }
+
+        public ControlGroupButtonArray(int columns, int rows, int preferedWidth, int preferedHeight)
+            : base(columns, rows, preferedWidth, preferedHeight)
+        {
+            ControlGroups = new ControlGroup[columns * rows];
+            SaveGroup = new ManipulateGroup[columns * rows];
+            LoadGroup = new ManipulateGroup[columns * rows];
+        }
+
+        public void SetEventHandlers(GameControls gameControls)
+        {
+            for (int i = 0; i < ColumnCount * RowCount; i++)
+            {
+                int column = i % ColumnCount;
+                int row = i / ColumnCount;
+                int index = i;//capture by value
+                Button b = Buttons[column, row];
+                SaveGroup[i] = () =>
+                {
+                    {
+                        if(index >= 0 && index < ControlGroups.Length)
+                        { 
+                            var entities = gameControls.SelectedGroup.Entities;
+                            if (entities.Any())
+                            {
+                                ControlGroups[index] = new ControlGroup(entities);
+                                b.Text = "s";
+                            }
+                            else
+                            {
+                                ControlGroups[index] = null;
+                                b.Text = "";
+                            }
+                        }
+                    }
+                };
+                LoadGroup[i] = () =>
+                {
+                    {
+                        if (index >= 0 && index < ControlGroups.Length)
+                        {
+                            SelectedGroup selectedGroup = gameControls.SelectedGroup;
+                            //commit the selected entities
+                            if(selectedGroup.NextOperation == Operation.ALREADY_SELECTED)
+                                selectedGroup.NextOperation = Operation.REPLACE;
+
+                            if (ControlGroups[index]!=null)
+                                selectedGroup.SetEntities(ControlGroups[index].Entities);
+                            else
+                                selectedGroup.SetEntities(new List<Entity>());
+                            selectedGroup.CommitEntities();
+                        }
+                    }
+                };
+                b.Click += (_s, _e) =>
+                {
+                    LoadGroupWithIndex(index);
+                };
+            }
+        }
+
+        public int KeyToGroupIndex(Keys key)
+        {
+            switch (key)
+            {
+                case Keys.D1: return 0;
+                case Keys.D2: return 1;
+                case Keys.D3: return 2;
+                case Keys.D4: return 3;
+                case Keys.D5: return 4;
+                case Keys.D6: return 5;
+                case Keys.D7: return 6;
+                default: return -1;
+            }
+        }
+
+        public void SaveGroupWithIndex(int i)
+        {
+            if (i >= 0 && i < SaveGroup.Length) SaveGroup[i]();
+        }
+
+        public void LoadGroupWithIndex(int i)
+        {            
+            if(i>=0 && i<LoadGroup.Length) LoadGroup[i]();
+        }    
+    }
+
 
     public interface IShowable
     {
