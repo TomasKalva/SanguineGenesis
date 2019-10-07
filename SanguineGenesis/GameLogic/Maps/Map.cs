@@ -246,14 +246,16 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Nodes with roots of producers produce nutrients trients.
+        /// Nodes with roots of producers produce nutrients trients. Nutrients can't be produced under
+        /// structures.
         /// </summary>
         public void ProduceNutrients()
         {
             //generate nutrients
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
-                    if (this[i, j].Roots.Where((t) => t.Producer).Any())
+                    if (this[i, j].Roots.Where((t) => t.Producer).Any() &&
+                        !(this[i,j].Building is Structure))
                         this[i, j].GenerateNutrients();
         }
 
