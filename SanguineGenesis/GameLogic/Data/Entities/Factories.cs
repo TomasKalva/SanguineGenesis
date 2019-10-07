@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Loads and stores factories of the type EntityFactory.
     /// </summary>
-    public abstract class Factories<Factory> where Factory : EntityFactory
+    abstract class Factories<Factory> where Factory : EntityFactory
     {
         /// <summary>
         /// For each entity name created by Factory contains a factory that
@@ -202,7 +202,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Loads and stores factories of the type TreeFactory.
     /// </summary>
-    public class TreeFactories : Factories<TreeFactory>
+    class TreeFactories : Factories<TreeFactory>
     {
         public override void AddNewFactory(string description, Statuses statuses)
         {
@@ -232,7 +232,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Loads and stores factories of the type StructureFactory.
     /// </summary>
-    public class StructureFactories : Factories<StructureFactory>
+    class StructureFactories : Factories<StructureFactory>
     {
         public override void AddNewFactory(string description, Statuses statuses)
         {
@@ -259,7 +259,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Loads and stores factories of the type AnimalFactory.
     /// </summary>
-    public class AnimalFactories : Factories<AnimalFactory>
+    class AnimalFactories : Factories<AnimalFactory>
     {
         public override void AddNewFactory(string description, Statuses statuses)
         {

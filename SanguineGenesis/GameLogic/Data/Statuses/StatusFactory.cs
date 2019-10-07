@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Use for creating statuses.
     /// </summary>
-    public abstract class StatusFactory
+    abstract class StatusFactory
     {
         /// <summary>
         /// True iff there can be at most one instance of this status per entity.
@@ -27,7 +27,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
     }
 
-    public abstract class StatusFactory<Affected>:StatusFactory where Affected:Entity
+    abstract class StatusFactory<Affected>:StatusFactory where Affected:Entity
     {
         public StatusFactory(bool onlyOnce)
             :base(onlyOnce)
@@ -57,7 +57,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public override string ToString() => NewInstance(null).GetName();
     }
 
-    public class PoisonFactory : StatusFactory<Entity>
+    class PoisonFactory : StatusFactory<Entity>
     {
         /// <summary>
         /// Damage that the poison does in one tick.
@@ -84,7 +84,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             => new Poison(affectedEntity, this);
     }
 
-    public class SprintFactory : StatusFactory<Animal>
+    class SprintFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// Speed gained by the unit on land.
@@ -107,7 +107,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
     }
 
-    public class ConsumedAnimalFactory : StatusFactory<Animal>
+    class ConsumedAnimalFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// Duration of the unit being consumed.
@@ -129,7 +129,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
     }
 
-    public class AnimalsOnTreeFactory : StatusFactory<Tree>
+    class AnimalsOnTreeFactory : StatusFactory<Tree>
     {
         /// <summary>
         /// Animal that will be put on the tree. Should be set right before using this factory to apply status.
@@ -168,7 +168,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     }
 
 
-    public class UndergroundFactory : StatusFactory<Structure>
+    class UndergroundFactory : StatusFactory<Structure>
     {
         /// <summary>
         /// Animal that will be put under ground. Should be set right before using this factory to apply status.
@@ -189,7 +189,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
     }
 
-    public class ShellFactory : StatusFactory<Animal>
+    class ShellFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// Length of the time interval this staus will be active for in s.
@@ -208,7 +208,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     }
 
 
-    public class FastStrikesFactory : StatusFactory<Animal>
+    class FastStrikesFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// Length of the time interval this staus will be active for in s.
@@ -226,7 +226,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
     }
 
-    public class FarSightFactory : StatusFactory<Animal>
+    class FarSightFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// View range increase.
@@ -244,7 +244,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
     }
 
-    public class KnockAwayFactory : StatusFactory<Animal>
+    class KnockAwayFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// How far the animal is knocked away.

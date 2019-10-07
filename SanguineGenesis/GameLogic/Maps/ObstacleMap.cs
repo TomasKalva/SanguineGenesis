@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly : InternalsVisibleTo("GameLogicTests")]
 namespace SanguineGenesis
 {
     /// <summary>
     /// Represents areas that can't be passed through. Around the map is a
     /// frame of unpassable areas with width one.
     /// </summary>
-    public class ObstacleMap : IMap<bool>
+    class ObstacleMap : IMap<bool>
     {
         /// <summary>
         /// Data of the map.

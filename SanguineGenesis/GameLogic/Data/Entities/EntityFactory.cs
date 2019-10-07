@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used for creating Entities.
     /// </summary>
-    public abstract class EntityFactory
+    abstract class EntityFactory
     {
         public string EntityType { get; }
         public decimal MaxHealth { get; }
@@ -48,7 +48,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used for creating Buildings.
     /// </summary>
-    public abstract class BuildingFactory : EntityFactory
+    class BuildingFactory : EntityFactory
     {
         public int Size { get; }
         public Biome Biome { get; }
@@ -81,7 +81,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used for creating Trees.
     /// </summary>
-    public class TreeFactory : BuildingFactory
+    class TreeFactory : BuildingFactory
     {
         public decimal MaxEnergyIntake { get; }
         public int RootsDistance { get; }
@@ -110,7 +110,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used for creating Structures.
     /// </summary>
-    public class StructureFactory : BuildingFactory
+    class StructureFactory : BuildingFactory
     {
         /// <summary>
         /// Creates a new Structure for the player.
@@ -132,7 +132,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used for creating Units.
     /// </summary>
-    public abstract class UnitFactory : EntityFactory
+    class UnitFactory : EntityFactory
     {
         public float Range { get; }//range of the circle collider
 
@@ -147,7 +147,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used for creating Animals.
     /// </summary>
-    public class AnimalFactory : UnitFactory
+    class AnimalFactory : UnitFactory
     {
         public decimal FoodEnergyRegen { get; }
         public float FoodEatingPeriod { get; }

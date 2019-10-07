@@ -12,7 +12,7 @@ namespace SanguineGenesis
     /// <summary>
     /// The class describes player's view of the map.
     /// </summary>
-    public class MapView:IRectangle
+    class MapView:IRectangle
     {
         /// <summary>
         /// Width of the component this view is drawn to.

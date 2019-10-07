@@ -15,7 +15,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Represents an object on the map.
     /// </summary>
-    public abstract class Entity: ITargetable, IMovementTarget, IRectangle, IShowable
+    abstract class Entity: ITargetable, IMovementTarget, IRectangle, IShowable
     {
         /// <summary>
         /// Center of this entity on the map.
@@ -294,7 +294,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Implements logic of command queue for an entity.
     /// </summary>
-    public class CommandQueue:IEnumerable<Command>
+    class CommandQueue:IEnumerable<Command>
     {
         public List<Command> Queue { get; }
 

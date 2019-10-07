@@ -8,7 +8,7 @@ using SanguineGenesis.GUI;
 
 namespace SanguineGenesis.GameLogic
 {
-    public class Tree:Building, IHerbivoreFood
+    class Tree:Building, IHerbivoreFood
     {
         /// <summary>
         /// Maximum energy taken from one source per second.

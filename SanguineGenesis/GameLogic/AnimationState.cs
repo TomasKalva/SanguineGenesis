@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Animation with current image and timer.
     /// </summary>
-    public class AnimationState
+    class AnimationState
     {
         /// <summary>
         /// Animation whose images are used.

@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Represent building that doesn't do anything special.
     /// </summary>
-    public class Structure : Building
+    class Structure : Building
     {
         public Structure(Player player, string buildingType, Node[,] nodes, decimal maxHealth, decimal maxEnergy, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)

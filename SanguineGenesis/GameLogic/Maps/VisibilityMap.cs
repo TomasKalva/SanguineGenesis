@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Maps
     /// <summary>
     /// Represents part of a map visible by a player.
     /// </summary>
-    public class VisibilityMap : IMap<bool>
+    class VisibilityMap : IMap<bool>
     {
         private static VisibilityMap everythingVisible;
         /// <summary>

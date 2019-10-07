@@ -19,7 +19,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Represents game state.
     /// </summary>
-    public class Game
+    class Game
     {
         /// <summary>
         /// The main map of the game.

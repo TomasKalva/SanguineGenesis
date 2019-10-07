@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Build a building at the target node.
     /// </summary>
-    public sealed class BuildBuilding : TargetAbility<Entity, Node>
+    sealed class BuildBuilding : TargetAbility<Entity, Node>
     {
         internal BuildBuilding(BuildingFactory buildingFactory)
             : base(10f, buildingFactory.EnergyCost, true, false)
@@ -38,7 +38,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class BuildBuildingCommand : Command<Entity, Node, BuildBuilding>
+    class BuildBuildingCommand : Command<Entity, Node, BuildBuilding>
     {
         private BuildBuildingCommand() : base(null, null, null) => throw new NotImplementedException();
         public BuildBuildingCommand(Entity commandedEntity, Node target, BuildBuilding plantBuilding)

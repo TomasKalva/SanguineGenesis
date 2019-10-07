@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Set rally point of the building.
     /// </summary>
-    public sealed class SetRallyPoint : TargetAbility<Building, Vector2>
+    sealed class SetRallyPoint : TargetAbility<Building, Vector2>
     {
         internal SetRallyPoint()
             : base(0, 0, false, false)
@@ -34,7 +34,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class SetRallyPointCommand : Command<Building, Vector2, SetRallyPoint>
+    class SetRallyPointCommand : Command<Building, Vector2, SetRallyPoint>
     {
         public SetRallyPointCommand(Building commandedEntity, Vector2 target, SetRallyPoint spawn)
             : base(commandedEntity, target, spawn)

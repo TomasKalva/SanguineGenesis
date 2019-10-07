@@ -12,7 +12,7 @@ namespace SanguineGenesis.GUI
     /// <summary>
     /// Shows list of Stats.
     /// </summary>
-    public class StatsTable : TableLayoutPanel
+    class StatsTable : TableLayoutPanel
     {
         private Label[,] Stats { get; }
 

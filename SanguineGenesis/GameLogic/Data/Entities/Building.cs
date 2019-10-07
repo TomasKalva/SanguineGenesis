@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Represent entity that is bound to the square grid.
     /// </summary>
-    public abstract class Building : Entity
+    abstract class Building : Entity
     {
         /// <summary>
         /// Center of this building on the map.

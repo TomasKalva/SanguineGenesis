@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Attack the target.
     /// </summary>
-    public sealed class Attack : TargetAbility<Animal, Entity>
+    sealed class Attack : TargetAbility<Animal, Entity>
     {
         internal Attack() : base(0.1f, 0, false, false) { }
 
@@ -26,7 +26,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class AttackCommand : Command<Animal, Entity, Attack>
+    class AttackCommand : Command<Animal, Entity, Attack>
     {
         public AttackCommand(Animal commandedEntity, Entity target, Attack attack)
             : base(commandedEntity, target, attack)

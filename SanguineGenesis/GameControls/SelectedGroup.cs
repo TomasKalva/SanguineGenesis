@@ -10,7 +10,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Represents entities selected by player.
     /// </summary>
-    public class SelectedGroup
+    class SelectedGroup
     {
         /// <summary>
         /// Entities to this group are added during selecting.

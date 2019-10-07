@@ -12,7 +12,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Used for extracting information about the game.
     /// </summary>
-    public static class GameQuerying
+    static class GameQuerying
     {
         /// <summary>
         /// Select all entities which satisfy the condition.

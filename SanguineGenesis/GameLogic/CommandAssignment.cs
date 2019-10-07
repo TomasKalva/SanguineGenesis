@@ -9,7 +9,7 @@ using SanguineGenesis.GameLogic.Maps;
 
 namespace SanguineGenesis.GameLogic
 {
-    public class MoveToCommandAssignment
+    class MoveToCommandAssignment
     {
         /// <summary>
         /// Animals whose commands should be updated.

@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used to set commands to entities.
     /// </summary>
-    public abstract class Ability: IShowable
+    abstract class Ability: IShowable
     {
         /// <summary>
         /// Group of abilities this ability belongs to.
@@ -95,7 +95,7 @@ namespace SanguineGenesis.GameLogic
         }
     }
 
-    public abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
+    abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
         public TargetAbility(float? distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
@@ -224,7 +224,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Represents a target on the map.
     /// </summary>
-    public interface ITargetable
+    interface ITargetable
     {
         Vector2 Center { get; }
     }
@@ -232,7 +232,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Place to which an animal can go.
     /// </summary>
-    public interface IMovementTarget : ITargetable
+    interface IMovementTarget : ITargetable
     {
         /// <summary>
         /// Distance to animal.
@@ -243,7 +243,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used as generic parameter for abilities without target.
     /// </summary>
-    public sealed class Nothing : ITargetable
+    sealed class Nothing : ITargetable
     {
         /// <summary>
         /// Throws an exception.
@@ -262,7 +262,7 @@ namespace SanguineGenesis.GameLogic
     }
 
     //Marks classes that can manipulate animal's movement.
-    public interface IAnimalStateManipulator
+    interface IAnimalStateManipulator
     {
 
     }

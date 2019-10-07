@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Generates movement flowfields in other thread.
     /// </summary>
-    public class MovementGenerator
+    class MovementGenerator
     {
         private static MovementGenerator movementGenerator;
         public static MovementGenerator GetMovementGenerator() => movementGenerator;

@@ -7,7 +7,7 @@ using SanguineGenesis.GameLogic;
 
 namespace SanguineGenesis
 {
-    public class FlowField:IMap<float?>
+    class FlowField:IMap<float?>
     {
         /// <summary>
         /// If value of the flowfield is at most POINT_TO_TARGET, the intensity points to the target.

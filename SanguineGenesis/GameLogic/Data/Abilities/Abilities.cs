@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Contains abilities that are used in the game.
     /// </summary>
-    public class Abilities
+    class Abilities
     {
         /// <summary>
         /// List of all abilities that aren't moveToCast ability.

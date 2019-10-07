@@ -9,16 +9,25 @@ using SanguineGenesis.GameLogic.Maps;
 
 namespace SanguineGenesis
 {
-    public class Player
+    class Faction
+    {
+        /// <summary>
+        /// Entities owned by the faction.
+        /// </summary>
+        public List<Entity> Entities { get; private set; }
+
+        public Faction()
+        {
+            Entities = new List<Entity>();
+        }
+    }
+
+    class Player:Faction
     {
         /// <summary>
         /// Maximum value of MaxAirTaken.
         /// </summary>
         public const int MAX_AIR_TAKEN = 100;
-        /// <summary>
-        /// Entities owned by the player.
-        /// </summary>
-        public List<Entity> Entities { get; private set; }
         /// <summary>
         /// Describes the area of map view by the player.
         /// </summary>
@@ -65,9 +74,6 @@ namespace SanguineGenesis
         //todo: remove this things
         public void InitUnits()
         {
-
-            Entities = new List<Entity>();
-
             if (PlayerID == Players.PLAYER1)
                 return;
 

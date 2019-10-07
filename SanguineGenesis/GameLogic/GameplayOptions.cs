@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Describes customizable game features.
     /// </summary>
-    public class GameplayOptions
+    class GameplayOptions
     {
         public GameplayOptions()
         {

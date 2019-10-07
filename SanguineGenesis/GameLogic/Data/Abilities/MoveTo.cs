@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The animal moves to the target.
     /// </summary>
-    public sealed class MoveTo : TargetAbility<Animal, IMovementTarget>
+    sealed class MoveTo : TargetAbility<Animal, IMovementTarget>
     {
         internal MoveTo(float? goalDistance, bool attackEnemyInstead, bool usesAttackDistance)
             : base(null, 0, false, false)
@@ -82,7 +82,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     }
 
 
-    public class MoveToCommand : Command<Animal, IMovementTarget, MoveTo>, IComputable
+    class MoveToCommand : Command<Animal, IMovementTarget, MoveTo>, IComputable
     {
         /// <summary>
         /// Assignment for generating flowfield in other thread.
@@ -222,7 +222,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
     /*
-    public class MoveToLogic
+    class MoveToLogic
     {
         /// <summary>
         /// If the distance to the target is higher than this, flowfield will be used. 
@@ -349,7 +349,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// Detects if the animal is not moving much from positions this animal has recently
     /// been at.
     /// </summary>
-    public class NoMovementDetection
+    class NoMovementDetection
     {
         /// <summary>
         /// Last 4 positions of the entity.
@@ -394,7 +394,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public interface IComputable
+    interface IComputable
     {
         MoveToCommandAssignment Assignment { get; set; }
     }

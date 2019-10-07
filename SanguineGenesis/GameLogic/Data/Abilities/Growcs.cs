@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The tree grows until it has full energy.
     /// </summary>
-    public sealed class Grow : TargetAbility<Tree, Nothing>
+    sealed class Grow : TargetAbility<Tree, Nothing>
     {
         internal Grow()
             : base(0, 0, true, false, false)
@@ -29,7 +29,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class GrowCommand : Command<Tree, Nothing, Grow>
+    class GrowCommand : Command<Tree, Nothing, Grow>
     {
         public GrowCommand(Tree commandedEntity, Grow plantBuilding)
             : base(commandedEntity, Nothing.Get, plantBuilding)

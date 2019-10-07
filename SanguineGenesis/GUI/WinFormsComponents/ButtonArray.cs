@@ -469,7 +469,7 @@ namespace SanguineGenesis.GUI
     }
 
 
-    public interface IShowable
+    interface IShowable
     {
         /// <summary>
         /// Name of this.

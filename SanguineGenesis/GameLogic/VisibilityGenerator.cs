@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic
     /// Used for asynchronous creating of visibility maps. Lock for accessing public properties
     /// is the instance.
     /// </summary>
-    public class VisibilityGenerator
+    class VisibilityGenerator
     {
         //inputs
         /// <summary>

@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Eat a node or tree to regenerate energy.
     /// </summary>
-    public sealed class HerbivoreEat : TargetAbility<Animal, IHerbivoreFood>
+    sealed class HerbivoreEat : TargetAbility<Animal, IHerbivoreFood>
     {
         internal HerbivoreEat()
             : base(0.1f, 0, false, false)
@@ -34,7 +34,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class HerbivoreEatCommand : Command<Animal, IHerbivoreFood, HerbivoreEat>
+    class HerbivoreEatCommand : Command<Animal, IHerbivoreFood, HerbivoreEat>
     {
         public HerbivoreEatCommand(Animal commandedEntity, IHerbivoreFood target, HerbivoreEat eat)
             : base(commandedEntity, target, eat)
@@ -69,7 +69,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Eat a corpse to regenerate energy.
     /// </summary>
-    public sealed class CarnivoreEat : TargetAbility<Animal, ICarnivoreFood>
+    sealed class CarnivoreEat : TargetAbility<Animal, ICarnivoreFood>
     {
         internal CarnivoreEat()
             : base(0.1f, 0, false, false)
@@ -94,7 +94,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class CarnivoreEatCommand : Command<Animal, ICarnivoreFood, CarnivoreEat>
+    class CarnivoreEatCommand : Command<Animal, ICarnivoreFood, CarnivoreEat>
     {
         public CarnivoreEatCommand(Animal commandedEntity, ICarnivoreFood target, CarnivoreEat eat)
             : base(commandedEntity, target, eat)
@@ -130,7 +130,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Marks classes that can be eaten by animals.
     /// </summary>
-    public interface IFood : ITargetable
+    interface IFood : ITargetable
     {
         bool FoodLeft { get; }
         void EatFood(Animal eater);
@@ -139,13 +139,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Marks classes that can be eaten by herbivores.
     /// </summary>
-    public interface IHerbivoreFood : IFood
+    interface IHerbivoreFood : IFood
     {
     }
     /// <summary>
     /// Marks classes that can be eaten by herbivores.
     /// </summary>
-    public interface ICarnivoreFood : IFood
+    interface ICarnivoreFood : IFood
     {
     }
 }

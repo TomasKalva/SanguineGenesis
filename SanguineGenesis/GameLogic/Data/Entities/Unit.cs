@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Represent entity that isn't bound to the square grid.
     /// </summary>
-    public abstract class Unit : Entity
+    abstract class Unit : Entity
     {
         /// <summary>
         /// Position of the unit on the map.

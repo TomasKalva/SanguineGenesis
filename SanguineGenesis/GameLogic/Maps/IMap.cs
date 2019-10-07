@@ -9,7 +9,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Represents rectangle area of squares. Type of the square is Square.
     /// </summary>
-    public interface IMap<Square>
+    interface IMap<Square>
     {
         Square this[int i, int j] { get;}
         /// <summary>

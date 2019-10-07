@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Pull the target to the caster.
     /// </summary>
-    public sealed class Pull : TargetAbility<Animal, Animal>
+    sealed class Pull : TargetAbility<Animal, Animal>
     {
         public float PullSpeed { get; }
 
@@ -32,7 +32,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class PullCommand : Command<Animal, Animal, Pull>, IAnimalStateManipulator
+    class PullCommand : Command<Animal, Animal, Pull>, IAnimalStateManipulator
     {
         /// <summary>
         /// The unit is jumping.

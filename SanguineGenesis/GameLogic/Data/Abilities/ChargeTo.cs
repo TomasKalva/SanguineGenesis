@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Move quickly to the target and deal it damage.
     /// </summary>
-    public sealed class ChargeTo : TargetAbility<Animal, Entity>
+    sealed class ChargeTo : TargetAbility<Animal, Entity>
     {
         public decimal AttackDamageMultiplier { get; }
         public float ChargeSpeed { get; }
@@ -34,7 +34,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class ChargeToCommand : Command<Animal, Entity, ChargeTo>, IAnimalStateManipulator
+    class ChargeToCommand : Command<Animal, Entity, ChargeTo>, IAnimalStateManipulator
     {
         private MoveAnimalToPoint moveAnimalToPoint;
 

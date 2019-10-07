@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The target is consumed for a short time by the caster.
     /// </summary>
-    public sealed class ConsumeAnimal : TargetAbility<Animal, Animal>
+    sealed class ConsumeAnimal : TargetAbility<Animal, Animal>
     {
         public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
 
@@ -33,7 +33,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class ConsumeAnimalCommand : Command<Animal, Animal, ConsumeAnimal>
+    class ConsumeAnimalCommand : Command<Animal, Animal, ConsumeAnimal>
     {
         public ConsumeAnimalCommand(Animal commandedEntity, Animal target, ConsumeAnimal bite)
             : base(commandedEntity, target, bite)

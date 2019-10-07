@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Enter hole.
     /// </summary>
-    public sealed class EnterHole : TargetAbility<Animal, Structure>
+    sealed class EnterHole : TargetAbility<Animal, Structure>
     {
         internal EnterHole(decimal energyCost, float enteringTime)
             : base(0.1f, energyCost, false, false, duration:enteringTime)
@@ -36,7 +36,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class EnterHoleCommand : Command<Animal, Structure, EnterHole>, IAnimalStateManipulator
+    class EnterHoleCommand : Command<Animal, Structure, EnterHole>, IAnimalStateManipulator
     {
         public EnterHoleCommand(Animal commandedEntity, Structure target, EnterHole enterHole)
             : base(commandedEntity, target, enterHole)
@@ -65,7 +65,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Exit hole.
     /// </summary>
-    public sealed class ExitHole : TargetAbility<Structure, Nothing>
+    sealed class ExitHole : TargetAbility<Structure, Nothing>
     {
         internal ExitHole(decimal energyCost, float exitingTime)
             : base(0.1f, energyCost, false, false, duration:exitingTime)
@@ -85,7 +85,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class ExitHoleCommand : Command<Structure, Nothing, ExitHole>, IAnimalStateManipulator
+    class ExitHoleCommand : Command<Structure, Nothing, ExitHole>, IAnimalStateManipulator
     {
         public ExitHoleCommand(Structure commandedEntity, Nothing target, ExitHole exitHole)
             : base(commandedEntity, target, exitHole)

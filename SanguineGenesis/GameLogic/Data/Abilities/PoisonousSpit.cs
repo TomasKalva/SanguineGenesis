@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Apply poison to the animal.
     /// </summary>
-    public sealed class PoisonousSpit : TargetAbility<Animal, Animal>
+    sealed class PoisonousSpit : TargetAbility<Animal, Animal>
     {
         public PoisonFactory PoisonFactory { get; }
 
@@ -33,7 +33,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class PoisonousSpitCommand : Command<Animal, Animal, PoisonousSpit>
+    class PoisonousSpitCommand : Command<Animal, Animal, PoisonousSpit>
     {
         public PoisonousSpitCommand(Animal commandedEntity, Animal target, PoisonousSpit attack)
             : base(commandedEntity, target, attack)

@@ -11,7 +11,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Represents one square of the map.
     /// </summary>
-    public class Node:ITargetable,IMovementTarget, IHerbivoreFood
+    class Node:ITargetable,IMovementTarget, IHerbivoreFood
     {
         /// <summary>
         /// Maximal number of nutrients a node can have.

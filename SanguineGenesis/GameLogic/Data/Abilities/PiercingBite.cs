@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Deal huge amount of damage to animal.
     /// </summary>
-    public sealed class PiercingBite : TargetAbility<Animal, Animal>
+    sealed class PiercingBite : TargetAbility<Animal, Animal>
     {
         public decimal Damage { get; }
 
@@ -32,7 +32,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class PiercingBiteCommand : Command<Animal, Animal, PiercingBite>
+    class PiercingBiteCommand : Command<Animal, Animal, PiercingBite>
     {
         public PiercingBiteCommand(Animal commandedEntity, Animal target, PiercingBite bite)
             : base(commandedEntity, target, bite)

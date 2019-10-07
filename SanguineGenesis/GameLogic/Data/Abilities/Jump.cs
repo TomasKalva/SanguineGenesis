@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Jump to the target location.
     /// </summary>
-    public sealed class Jump : TargetAbility<Animal, Vector2>
+    sealed class Jump : TargetAbility<Animal, Vector2>
     {
         public float JumpSpeed { get; }
 
@@ -32,7 +32,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class JumpCommand : Command<Animal, Vector2, Jump>, IAnimalStateManipulator
+    class JumpCommand : Command<Animal, Vector2, Jump>, IAnimalStateManipulator
     {
         /// <summary>
         /// The unit is jumping.

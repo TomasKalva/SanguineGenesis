@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Contains entity factories, abilities and statuses that are in the game.
     /// </summary>
-    public class GameStaticData
+    class GameStaticData
     {
         public TreeFactories TreeFactories { get; }
         public StructureFactories StructureFactories { get; }

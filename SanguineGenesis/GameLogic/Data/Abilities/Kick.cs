@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Deal energy damage to the animal.
     /// </summary>
-    public sealed class Kick : TargetAbility<Animal, Animal>
+    sealed class Kick : TargetAbility<Animal, Animal>
     {
         public decimal EnergyDamage { get; }
 
@@ -32,7 +32,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class KickCommand : Command<Animal, Animal, Kick>
+    class KickCommand : Command<Animal, Animal, Kick>
     {
         public KickCommand(Animal commandedEntity, Animal target, Kick kick)
             : base(commandedEntity, target, kick)

@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Transfer energy to the target structure.
     /// </summary>
-    public sealed class ImproveStructure : TargetAbility<Animal, Structure>
+    sealed class ImproveStructure : TargetAbility<Animal, Structure>
     {
         public decimal EnergyPerS { get; }
 
@@ -32,7 +32,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class ImproveStructureCommand : Command<Animal, Structure, ImproveStructure>, IAnimalStateManipulator
+    class ImproveStructureCommand : Command<Animal, Structure, ImproveStructure>, IAnimalStateManipulator
     {
         public ImproveStructureCommand(Animal commandedEntity, Structure target, ImproveStructure improveStructure)
             : base(commandedEntity, target, improveStructure)

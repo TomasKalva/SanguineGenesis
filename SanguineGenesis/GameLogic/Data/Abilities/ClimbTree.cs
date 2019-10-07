@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Climb on a tree.
     /// </summary>
-    public sealed class ClimbTree : TargetAbility<Animal, Tree>
+    sealed class ClimbTree : TargetAbility<Animal, Tree>
     {
         public AnimalsOnTreeFactory AnimalsOnTreeFactory { get; }
 
@@ -33,7 +33,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class ClimbTreeCommand : Command<Animal, Tree, ClimbTree>, IAnimalStateManipulator
+    class ClimbTreeCommand : Command<Animal, Tree, ClimbTree>, IAnimalStateManipulator
     {
         public ClimbTreeCommand(Animal commandedEntity, Tree target, ClimbTree climbTree)
             : base(commandedEntity, target, climbTree)
@@ -60,7 +60,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Climb down a tree.
     /// </summary>
-    public sealed class ClimbDownTree : TargetAbility<Tree, Nothing>
+    sealed class ClimbDownTree : TargetAbility<Tree, Nothing>
     {
         internal ClimbDownTree(decimal energyCost, float climbingTime)
             : base(0.1f, energyCost, false, false, duration:climbingTime)
@@ -80,7 +80,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class ClimbDownTreeCommand : Command<Tree, Nothing, ClimbDownTree>, IAnimalStateManipulator
+    class ClimbDownTreeCommand : Command<Tree, Nothing, ClimbDownTree>, IAnimalStateManipulator
     {
         public ClimbDownTreeCommand(Tree commandedEntity, Nothing target, ClimbDownTree climbDownTree)
             : base(commandedEntity, target, climbDownTree)

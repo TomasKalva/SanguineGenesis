@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Knock the target back.
     /// </summary>
-    public sealed class KnockBack : TargetAbility<Animal, Animal>
+    sealed class KnockBack : TargetAbility<Animal, Animal>
     {
         public KnockAwayFactory KnockAwayFactory { get; }
 
@@ -33,7 +33,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class KnockBackCommand : Command<Animal, Animal, KnockBack>
+    class KnockBackCommand : Command<Animal, Animal, KnockBack>
     {
         public KnockBackCommand(Animal commandedEntity, Animal target, KnockBack knockBack)
             : base(commandedEntity, target, knockBack)

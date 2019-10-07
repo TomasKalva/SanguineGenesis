@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Maps
     /// Represents ray from one point to another. It returns indices of
     /// squares it intersects in the order of the intersections.
     /// </summary>
-    public struct Ray
+    struct Ray
     {
         /// <summary>
         /// Starting point of the ray.

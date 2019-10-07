@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Contains statuses that are used in the game.
     /// </summary>
-    public class Statuses
+    class Statuses
     {
         public UndergroundFactory UndergroundFactory { get; }
 

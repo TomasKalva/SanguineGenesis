@@ -14,7 +14,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Tells entity what to do.
     /// </summary>
-    public abstract class Command : IShowable
+    abstract class Command : IShowable
     {
         /// <summary>
         /// True iff the command can be removed from the first place in the command queue.
@@ -65,7 +65,7 @@ namespace SanguineGenesis
         public MoveToCommand FollowCommand { get; set; }
     }
 
-    public abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
+    abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
                                                                     where Target : ITargetable
                                                                     where Abil : TargetAbility<Caster, Target>
     {
@@ -277,7 +277,7 @@ namespace SanguineGenesis
     /// Moves animal to point on the map with even movement in given time. During the movement
     /// the animal doesn't check for collisions and can't be used as a target for a command.
     /// </summary>
-    public class MoveAnimalToPoint
+    class MoveAnimalToPoint
     {
         public Animal Animal { get; }
         public IMovementTarget Target { get; }

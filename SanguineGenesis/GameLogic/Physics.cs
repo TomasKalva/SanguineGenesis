@@ -12,7 +12,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Used for handling collisions.
     /// </summary>
-    public class Physics
+    class Physics
     {
         /// <summary>
         /// Pushing maps for the current map. If the map changes they are updated by the method UpdatePushingMaps.

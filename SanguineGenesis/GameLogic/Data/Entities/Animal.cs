@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Represent unit that can move.
     /// </summary>
-    public class Animal : Unit
+    class Animal : Unit
     {
         /// <summary>
         /// Velocity vector.

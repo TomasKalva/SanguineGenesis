@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Can be applied to Entity. Does something.
     /// </summary>
-    public abstract class Status: IShowable
+    abstract class Status: IShowable
     {
         /// <summary>
         /// Called when the status is added to the entity.
@@ -35,7 +35,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         #endregion IShowable
     }
 
-    public abstract class Status<Affected,Info>:Status where Info:StatusFactory<Affected>
+    abstract class Status<Affected,Info>:Status where Info:StatusFactory<Affected>
                                                         where Affected:Entity
     {
         /// <summary>
@@ -57,7 +57,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Increases speed.
     /// </summary>
-    public class Sprint : Status<Animal, SprintFactory>
+    class Sprint : Status<Animal, SprintFactory>
     {
         public Sprint(Animal affectedEntity, SprintFactory sprintInfo)
             :base(affectedEntity, sprintInfo)
@@ -94,7 +94,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Represents consumed animal by this animal.
     /// </summary>
-    public class ConsumedAnimal : Status<Animal, ConsumedAnimalFactory>, IAnimalStateManipulator
+    class ConsumedAnimal : Status<Animal, ConsumedAnimalFactory>, IAnimalStateManipulator
     {
         /// <summary>
         /// Animal that is consumed.
@@ -157,7 +157,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Deals damage over time.
     /// </summary>
-    public class Poison : Status<Entity, PoisonFactory>
+    class Poison : Status<Entity, PoisonFactory>
     {
         /// <summary>
         /// Time from the last tick in s.
@@ -223,7 +223,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Gives thick skin.
     /// </summary>
-    public class Shell : Status<Animal, ShellFactory>
+    class Shell : Status<Animal, ShellFactory>
     {
         private float timer;
 
@@ -263,7 +263,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Increases attack speed.
     /// </summary>
-    public class FastStrikes : Status<Animal, FastStrikesFactory>
+    class FastStrikes : Status<Animal, FastStrikesFactory>
     {
         private float timer;
 
@@ -311,7 +311,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Represents animal on tree.
     /// </summary>
-    public class AnimalsOnTree : Status<Tree, AnimalsOnTreeFactory>, IAnimalStateManipulator
+    class AnimalsOnTree : Status<Tree, AnimalsOnTreeFactory>, IAnimalStateManipulator
     {
         public List<Animal> Animals { get; }
 
@@ -357,7 +357,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Represents animals underground.
     /// </summary>
-    public class Underground : Status<Structure, UndergroundFactory>, IAnimalStateManipulator
+    class Underground : Status<Structure, UndergroundFactory>, IAnimalStateManipulator
     {
         public List<Animal> AnimalsUnderGround => StatusInfo.AnimalsUnderGround;
 
@@ -400,7 +400,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Increases view range.
     /// </summary>
-    public class FarSight : Status<Animal, FarSightFactory>
+    class FarSight : Status<Animal, FarSightFactory>
     {
         public FarSight(Animal affectedEntity, FarSightFactory farSightInfo)
             : base(affectedEntity, farSightInfo)
@@ -444,7 +444,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Animal is being knocked away.
     /// </summary>
-    public class KnockAway : Status<Animal, KnockAwayFactory>, IAnimalStateManipulator
+    class KnockAway : Status<Animal, KnockAwayFactory>, IAnimalStateManipulator
     {
         private MoveAnimalToPoint moveAnimalToPoint;
 

@@ -9,7 +9,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Represents rectangle for selecting units.
     /// </summary>
-    public class MapSelectorFrame:IRectangle
+    class MapSelectorFrame:IRectangle
     {   
         /// <summary>
         /// The starting point of this frame. In map coordinates.

@@ -9,7 +9,7 @@ namespace SanguineGenesis.GameLogic.Maps
     /// <summary>
     /// Used for pushing animals out of terrain they can't walk on.
     /// </summary>
-    public class PushingMap : IMap<PushingSquare?>
+    class PushingMap : IMap<PushingSquare?>
     {
         /// <summary>
         /// Data of the map.

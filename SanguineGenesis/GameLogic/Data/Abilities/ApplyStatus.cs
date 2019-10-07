@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Applies status to the CommandedEntity.
     /// </summary>
-    public sealed class ApplyStatus : TargetAbility<Animal, Nothing>
+    sealed class ApplyStatus : TargetAbility<Animal, Nothing>
     {
         public StatusFactory StatusFactory { get; }
 
@@ -33,7 +33,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    public class ApplyStatusCommand : Command<Animal, Nothing, ApplyStatus>
+    class ApplyStatusCommand : Command<Animal, Nothing, ApplyStatus>
     {
         public ApplyStatusCommand(Animal commandedEntity, Nothing target, ApplyStatus applyStatus)
             : base(commandedEntity, target, applyStatus)

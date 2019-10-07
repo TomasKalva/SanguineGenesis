@@ -12,7 +12,7 @@ namespace SanguineGenesis.GUI
     /// <summary>
     /// Describes the contents of the tile map. All images are aligned to a square grid.
     /// </summary>
-    public class ImageAtlas
+    class ImageAtlas
     {
         /// <summary>
         /// Size of tile in the atlas.
@@ -319,7 +319,7 @@ namespace SanguineGenesis.GUI
     /// <summary>
     /// Represents animation and location of its images in the atlas.
     /// </summary>
-    public class Animation
+    class Animation
     {
         /// <summary>
         /// Left bottom position in the atlas. In grid coordinates.

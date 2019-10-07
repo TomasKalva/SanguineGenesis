@@ -10,7 +10,7 @@ using SanguineGenesis.GameLogic;
 
 namespace SanguineGenesis
 {
-    public class Map:IMap<Node>
+    class Map:IMap<Node>
     {
         /// <summary>
         /// Data of the map.
