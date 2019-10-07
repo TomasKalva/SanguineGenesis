@@ -359,8 +359,8 @@ namespace SanguineGenesis
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.PlayerID].VisibilityMap);
-            Node[,] visible = mapView.GetVisibleNodes(game.Players[game.CurrentPlayer.PlayerID].VisibleMap);
+            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.FactionID].VisibilityMap);
+            Node[,] visible = mapView.GetVisibleNodes(game.Players[game.CurrentPlayer.FactionID].VisibleMap);
             int width = visible.GetLength(0);
             int height = visible.GetLength(1);
 
@@ -453,7 +453,7 @@ namespace SanguineGenesis
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.PlayerID].VisibilityMap);
+            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.FactionID].VisibilityMap);
             Node[,] visible = mapView.GetVisibleNodes(game.CurrentPlayer.VisibleMap);
             int width = visible.GetLength(0);
             int height = visible.GetLength(1);
@@ -617,13 +617,16 @@ namespace SanguineGenesis
                     if (!current.Selected)
                     {
                         //fill the circle with color of the corresponding player
-                        switch (current.Player.PlayerID)
+                        switch (current.Faction.FactionID)
                         {
-                            case Players.PLAYER0:
+                            case FactionType.PLAYER0:
                                 SetColor(colors, 0f, 0f, 1f, index, 6);
                                 break;
-                            case Players.PLAYER1:
+                            case FactionType.PLAYER1:
                                 SetColor(colors, 1f, 0f, 0f, index, 6);
+                                break;
+                            case FactionType.NEUTRAL:
+                                SetColor(colors, .5f, .5f, .5f, index, 6);
                                 break;
                         }
                     }

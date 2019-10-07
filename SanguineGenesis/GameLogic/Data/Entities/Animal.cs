@@ -102,7 +102,7 @@ namespace SanguineGenesis.GameLogic
         public int Air { get; }
 
         public Animal(
-            Player player,
+            Faction faction,
             Vector2 position,
             string unitType,
             decimal maxHealth,
@@ -125,7 +125,7 @@ namespace SanguineGenesis.GameLogic
             float viewRange,
             List<Ability> abilities,
             int air)
-            : base(player, unitType, maxHealth, viewRange, maxEnergy, abilities, position, range, physical)
+            : base(faction, unitType, maxHealth, viewRange, maxEnergy, abilities, position, range, physical)
         {
             Velocity = new Vector2(0f, 0f);
             CanBeMoved = true;
@@ -150,7 +150,7 @@ namespace SanguineGenesis.GameLogic
         {
             List<Stat> stats = new List<Stat>()
             {
-                new Stat( "Player", Player.PlayerID.ToString()),
+                new Stat( "Player", Faction.FactionID.ToString()),
             new Stat( "EntityType", EntityType),
             new Stat( "Health", Health.ToString()),
             new Stat("Energy", Energy.ToString()),
@@ -214,14 +214,14 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Called after this animal dies. Spawns a corpse.
         /// </summary>
-        public override void Die()
+        public override void Die(Game game)
         {
-            base.Die();
+            base.Die(game);
 
             //spawn a corpse of this animal if the animal has any energy left
             if(Energy > 0)
-                Player.Entities.Add(
-                    new Corpse(Player, "CORPSE", Energy, 0, Position, 0.2f));
+                Faction.Entities.Add(
+                    new Corpse(game.NeutralFaction, "CORPSE", Energy, 0, Position, 0.2f));
         }
 
         /// <summary>

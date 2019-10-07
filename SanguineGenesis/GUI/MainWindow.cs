@@ -680,7 +680,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Shows panel anouncing winner of the game. Disables other ui. Only shows the panel once.
         /// </summary>
-        private void ShowVictoryPanel(Players Winner)
+        private void ShowVictoryPanel(FactionType Winner)
         {
             //show the panel only once
             if (VictoryPanel.AlreadyShown)

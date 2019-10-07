@@ -32,11 +32,15 @@ namespace SanguineGenesis
         /// <summary>
         /// The player who won this game.
         /// </summary>
-        public Players? Winner { get; set; }
+        public FactionType? Winner { get; set; }
+        /// <summary>
+        /// Stores entities owned by none of the players.
+        /// </summary>
+        public Faction NeutralFaction { get; }
         /// <summary>
         /// Dictionary of all players.
         /// </summary>
-        public Dictionary<Players,Player> Players { get; }
+        public Dictionary<FactionType,Player> Players { get; }
         /// <summary>
         /// Player controlled by the user.
         /// </summary>
@@ -52,7 +56,7 @@ namespace SanguineGenesis
         /// <summary>
         /// The next player to whom will be generated visibility map.
         /// </summary>
-        private Players nextVisibilityPlayer;
+        private FactionType nextVisibilityPlayer;
         /// <summary>
         /// Describes customizable parts of the game.
         /// </summary>
@@ -64,10 +68,11 @@ namespace SanguineGenesis
             Winner = null;
 
             //players
-            Players = new Dictionary<Players, Player>();
-            Players.Add(SanguineGenesis.Players.PLAYER0, new Player(SanguineGenesis.Players.PLAYER0));
-            Players.Add(SanguineGenesis.Players.PLAYER1, new Player(SanguineGenesis.Players.PLAYER1));
-            CurrentPlayer = Players[SanguineGenesis.Players.PLAYER0];
+            Players = new Dictionary<FactionType, Player>();
+            Players.Add(SanguineGenesis.FactionType.PLAYER0, new Player(SanguineGenesis.FactionType.PLAYER0));
+            Players.Add(SanguineGenesis.FactionType.PLAYER1, new Player(SanguineGenesis.FactionType.PLAYER1));
+            CurrentPlayer = Players[SanguineGenesis.FactionType.PLAYER0];
+            NeutralFaction = new Faction(FactionType.NEUTRAL);
 
              //map
             var mapLoader = new MapLoader();
@@ -80,7 +85,7 @@ namespace SanguineGenesis
 
             physics = Physics.GetPhysics();
             visibilityGenerator = new VisibilityGenerator();
-            nextVisibilityPlayer = SanguineGenesis.Players.PLAYER0;
+            nextVisibilityPlayer = SanguineGenesis.FactionType.PLAYER0;
             GameplayOptions = new GameplayOptions();
             foreach (Animal u in CurrentPlayer.GetAll<Unit>())
             {
@@ -108,6 +113,8 @@ namespace SanguineGenesis
             {
                 Ts = Ts.Concat(kvpPlayer.Value.GetAll<T>()).ToList();
             }
+
+            Ts = Ts.Concat(NeutralFaction.GetAll<T>()).ToList();
             return Ts;
         }
 
@@ -166,7 +173,7 @@ namespace SanguineGenesis
                 if(!a.CommandQueue.Any())
                 {
                     //unit isn't doing anything
-                    Entity en = units.Where((v) => v.Player!=a.Player && a.DistanceTo(v) < a.AttackDistance).FirstOrDefault();
+                    Entity en = units.Where((v) => v.Faction!=a.Faction && a.DistanceTo(v) < a.AttackDistance).FirstOrDefault();
                     if(en!=null)
                         a.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(a, en));
                 }
@@ -174,7 +181,7 @@ namespace SanguineGenesis
 
             //remove dead units
             foreach(var kvp in Players)
-                kvp.Value.RemoveDeadEntities();
+                kvp.Value.RemoveDeadEntities(this);
 
             //update players' visibility map
             if (!GameplayOptions.WholeMapVisible)
@@ -196,10 +203,10 @@ namespace SanguineGenesis
             //test if someone won the game
             if (Winner == null)
             {
-                if (!Players[SanguineGenesis.Players.PLAYER0].GetAll<Tree>().Any())
-                    Winner = SanguineGenesis.Players.PLAYER1;
-                else if (!Players[SanguineGenesis.Players.PLAYER1].GetAll<Tree>().Any())
-                    Winner = SanguineGenesis.Players.PLAYER0;
+                if (!Players[SanguineGenesis.FactionType.PLAYER0].GetAll<Tree>().Any())
+                    Winner = SanguineGenesis.FactionType.PLAYER1;
+                else if (!Players[SanguineGenesis.FactionType.PLAYER1].GetAll<Tree>().Any())
+                    Winner = SanguineGenesis.FactionType.PLAYER0;
             }
         }
 
@@ -210,10 +217,10 @@ namespace SanguineGenesis
         {
             if (visibilityGenerator.Done)
             {
-                Players current = nextVisibilityPlayer;
-                Players other = nextVisibilityPlayer == SanguineGenesis.Players.PLAYER0 ?
-                                        SanguineGenesis.Players.PLAYER1 :
-                                        SanguineGenesis.Players.PLAYER0;
+                FactionType current = nextVisibilityPlayer;
+                FactionType other = nextVisibilityPlayer == SanguineGenesis.FactionType.PLAYER0 ?
+                                        SanguineGenesis.FactionType.PLAYER1 :
+                                        SanguineGenesis.FactionType.PLAYER0;
 
                 //update current player's visibility map
                 Players[current].SetVisibilityMap(visibilityGenerator.VisibilityMap, allBuildings);

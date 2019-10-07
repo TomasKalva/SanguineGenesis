@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic
         public int Air { get; }
 
 
-        public Tree(Player player, string treeType, Node[,] nodes, Node[,] rootNodes, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+        public Tree(Faction faction, string treeType, Node[,] nodes, Node[,] rootNodes, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int air, List<Ability> abilities)
-            : base(player, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, viewRange, abilities)
+            : base(faction, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, viewRange, abilities)
         {
             MaxEnergyIntake = maxEnergyIntake;
             RootNodes = rootNodes;
@@ -44,9 +44,9 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Called after this entity dies. Creates a structure representing dead tree.
         /// </summary>
-        public override void Die()
+        public override void Die(Game game)
         {
-            base.Die();
+            base.Die(game);
 
             //remove roots from map
             foreach(Node n in RootNodes)
@@ -56,8 +56,8 @@ namespace SanguineGenesis.GameLogic
 
             //after physical tree dies and has energy left, spawn a dead tree
             if(Physical && Energy > 0)
-                Player.Entities.Add(
-                    new Structure(Player, "DEAD_TREE", Nodes, Energy, 0, Size,
+                Faction.Entities.Add(
+                    new Structure(game.NeutralFaction, "DEAD_TREE", Nodes, Energy, 0, Size,
                     Physical, Biome, Terrain, SoilQuality.BAD, false, 0, new List<Ability>()));
         }
 
@@ -108,7 +108,7 @@ namespace SanguineGenesis.GameLogic
         {
             List<Stat> stats = new List<Stat>()
             {
-                new Stat( "Player", Player.PlayerID.ToString()),
+                new Stat( "Player", Faction.FactionID.ToString()),
             new Stat( "EntityType", EntityType),
             new Stat( "Health", Health.ToString()),
             new Stat("Energy", Energy.ToString()),

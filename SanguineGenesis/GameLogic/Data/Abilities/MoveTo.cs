@@ -37,7 +37,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     c.ResetCommands();
 
             //player whose animals are receiving commands
-            Players player = casters.First().Player.PlayerID;
+            FactionType player = casters.First().Faction.FactionID;
 
             //separete animals to different groups by their movement
             var castersGroups = casters.ToLookup((unit) => unit.Movement);
@@ -130,7 +130,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (Ability.AttackEnemyInstead)
             {
                 Entity enemy = game.GetAll<Animal>().Where(
-                            (a) => a.Player != CommandedEntity.Player
+                            (a) => a.Faction != CommandedEntity.Faction
                             && CommandedEntity.DistanceTo(a) <= CommandedEntity.AttackDistance).FirstOrDefault();
                 if (enemy != null)
                 {

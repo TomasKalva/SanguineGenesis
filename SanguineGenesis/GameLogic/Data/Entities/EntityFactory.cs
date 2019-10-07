@@ -90,9 +90,9 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Creates a new Tree for the player.
         /// </summary>
-        public Tree NewInstance(Player player, Node[,] nodesUnder, Node[,] roots)
+        public Tree NewInstance(Faction faction, Node[,] nodesUnder, Node[,] roots)
         {
-            return (Tree)SetStatuses(new Tree(player, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake,
+            return (Tree)SetStatuses(new Tree(faction, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake,
                 Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Air, Abilities.ToList()));
         }
 
@@ -115,9 +115,9 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Creates a new Structure for the player.
         /// </summary>
-        public Structure NewInstance(Player player, Node[,] nodesUnder)
+        public Structure NewInstance(Faction faction, Node[,] nodesUnder)
         {
-            return (Structure)SetStatuses(new Structure(player, EntityType, nodesUnder, MaxHealth, MaxEnergy,
+            return (Structure)SetStatuses(new Structure(faction, EntityType, nodesUnder, MaxHealth, MaxEnergy,
                 Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Abilities.ToList()));
         }
 
@@ -166,10 +166,10 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Creates a new Animal for the player.
         /// </summary>
-        public Animal NewInstance(Player player, Vector2 pos)
+        public Animal NewInstance(Faction faction, Vector2 pos)
         {
             return (Animal)SetStatuses(new Animal(
-                player: player,
+                faction: faction,
                 position: pos,
                 unitType: EntityType,
                 maxHealth: MaxHealth,

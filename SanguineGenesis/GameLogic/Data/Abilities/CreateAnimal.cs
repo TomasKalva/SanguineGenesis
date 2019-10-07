@@ -51,7 +51,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 //if the player doesn't have enough air, wait until he does
-                if (CommandedEntity.Player.AirTaken + Ability.SpawningAnimalFactory.Air > CommandedEntity.Player.MaxAirTaken)
+                if (CommandedEntity.Faction.AirTaken + Ability.SpawningAnimalFactory.Air > CommandedEntity.Faction.MaxAirTaken)
                     return false;
 
                 //if there is no position where the animal can spawn, don't spawn the animal
@@ -59,10 +59,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 if (newUnitPosition == null)
                     return false;
 
-                Player newUnitOwner = CommandedEntity.Player;
+                var newUnitOwner = CommandedEntity.Faction;
                 //Vector2 newUnitPosition = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - Ability.SpawningAnimalFactory.Range);
                 Animal newUnit = Ability.SpawningAnimalFactory.NewInstance(newUnitOwner, newUnitPosition.Value);
-                game.Players[newUnitOwner.PlayerID].Entities.Add(newUnit);
+                game.Players[newUnitOwner.FactionID].Entities.Add(newUnit);
                 //make unit go towards the rally point
                 newUnitOwner.GameStaticData.Abilities.MoveTo.SetCommands(new List<Unit>(1) { newUnit }, CommandedEntity.RallyPoint, true);
                 return true;

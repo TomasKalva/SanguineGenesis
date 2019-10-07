@@ -18,7 +18,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Whose animals are performing commands for this assignment.
         /// </summary>
-        public Players Player { get; }
+        public FactionType Player { get; }
         /// <summary>
         /// Where the animals should go.
         /// </summary>
@@ -43,7 +43,7 @@ namespace SanguineGenesis.GameLogic
         private FlowField flowField;
         private FlowField FlowField { get { lock (this) return flowField; } set { lock (this) flowField = value; } }
 
-        public MoveToCommandAssignment(Players player, List<Animal> units, Movement movement, IMovementTarget target, float goalDistance=0.1f, bool interruptable=true)
+        public MoveToCommandAssignment(FactionType player, List<Animal> units, Movement movement, IMovementTarget target, float goalDistance=0.1f, bool interruptable=true)
         {
             Movement = movement;
             Active = false;

@@ -154,7 +154,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 if (PutOnTree != null)
                 {
                     alreadyApplied.Animals.Add(PutOnTree);
-                    PutOnTree.Player.Entities.Remove(PutOnTree);
+                    PutOnTree.Faction.Entities.Remove(PutOnTree);
                     PutOnTree.StateChangeLock = alreadyApplied;
                 }
             }

@@ -143,7 +143,7 @@ namespace SanguineGenesis
         {
             //determine target
             ITargetable enemy = SelectClickedTarget(game, targetCoords.X, targetCoords.Y, game.CurrentPlayer,
-                (entity) => entity.Player.PlayerID != game.CurrentPlayer.PlayerID, typeof(Entity));
+                (entity) => entity.Faction.FactionID != game.CurrentPlayer.FactionID, typeof(Entity));
 
             if (enemy == null)
             {

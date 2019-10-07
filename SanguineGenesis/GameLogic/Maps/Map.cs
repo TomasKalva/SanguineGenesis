@@ -38,8 +38,8 @@ namespace SanguineGenesis
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
             InitializeObstacleMaps();
             MovementGenerator mg = MovementGenerator.GetMovementGenerator();
-            mg.SetMapChanged(SanguineGenesis.Players.PLAYER0, ObstacleMaps);
-            mg.SetMapChanged(SanguineGenesis.Players.PLAYER1, ObstacleMaps);
+            mg.SetMapChanged(SanguineGenesis.FactionType.PLAYER0, ObstacleMaps);
+            mg.SetMapChanged(SanguineGenesis.FactionType.PLAYER1, ObstacleMaps);
         }
 
         /// <summary>
@@ -115,13 +115,13 @@ namespace SanguineGenesis
         /// <summary>
         /// Returns obstacles map where the obstacles block vision.
         /// </summary>
-        public ObstacleMap GetViewObstaclesMap(Players player)
+        public ObstacleMap GetViewObstaclesMap(FactionType player)
         {
             ObstacleMap om = new ObstacleMap(Width, Height);
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
                     //player can't see through blocked squares that he doesn't own
-                    om[i, j] = this[i, j].Blocked && this[i, j].Building.Player.PlayerID != player;
+                    om[i, j] = this[i, j].Blocked && this[i, j].Building.Faction.FactionID != player;
             return om;
         }
 

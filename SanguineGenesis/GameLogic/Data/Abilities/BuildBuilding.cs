@@ -86,7 +86,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     //entity doesn't have enough energy
                     return true;
 
-                Player newUnitOwner = CommandedEntity.Player;
+                var newUnitOwner = CommandedEntity.Faction;
                 Building newBuilding;
                 if (bf is TreeFactory trF)
                 {
@@ -104,7 +104,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     newBuilding = stF.NewInstance(newUnitOwner, buildNodes);
                 }
                 //put the new building on the main map
-                game.Players[newUnitOwner.PlayerID].Entities.Add(newBuilding);
+                game.Players[newUnitOwner.FactionID].Entities.Add(newBuilding);
                 map.AddBuilding(newBuilding);
                 game.Map.MapWasChanged = true;
             }

@@ -74,9 +74,9 @@ namespace SanguineGenesis.GameLogic
         public new int Width => Right - Left;
         public new int Height => Top - Bottom;
 
-        public Building(Player player, string buildingType, Node[,] nodes, decimal maxHealth, decimal maxEnergy, int size,
+        public Building(Faction faction, string buildingType, Node[,] nodes, decimal maxHealth, decimal maxEnergy, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)
-            : base(player, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
+            : base(faction, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Nodes = nodes;
             Size = size;
@@ -122,9 +122,9 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Called after this building dies.
         /// </summary>
-        public override void Die()
+        public override void Die(Game game)
         {
-            base.Die();
+            base.Die(game);
 
             RemoveFromMap();
         }

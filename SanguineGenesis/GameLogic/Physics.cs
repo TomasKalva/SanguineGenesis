@@ -99,7 +99,7 @@ namespace SanguineGenesis
                             else
                             {
                                 Animal a1 = (Animal)e;
-                                if (a.Player != a1.Player)
+                                if (a.Faction != a1.Faction)
                                 {
                                     //if the players are different, push the animal that wants to move
                                     //if both or none want to move, push both of them

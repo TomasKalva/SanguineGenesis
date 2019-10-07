@@ -45,7 +45,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 //put the animal on the target tree
-                CommandedEntity.Player.Entities.Remove(CommandedEntity);
+                CommandedEntity.Faction.Entities.Remove(CommandedEntity);
 
                 AnimalsOnTreeFactory anOnTreeFact = Ability.AnimalsOnTreeFactory;
                 anOnTreeFact.PutOnTree = CommandedEntity;
@@ -105,7 +105,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 else
                 {
                     anOnTree.StateChangeLock = null;
-                    CommandedEntity.Player.Entities.Add(anOnTree);
+                    CommandedEntity.Faction.Entities.Add(anOnTree);
                     status.Animals.Remove(anOnTree);
 
                     //if there are no animals left, remove the status

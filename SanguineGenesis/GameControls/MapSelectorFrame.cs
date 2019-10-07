@@ -76,7 +76,7 @@ namespace SanguineGenesis
         public IEnumerable<Entity> GetSelectedUnits(Game game)
         {
             return GameQuerying.SelectRectEntities(game,((IRectangle)this).GetRect(),
-                (unit)=>unit.Player.PlayerID==game.CurrentPlayer.PlayerID);
+                (unit)=>unit.Faction.FactionID==game.CurrentPlayer.FactionID);
         }
     }
 }

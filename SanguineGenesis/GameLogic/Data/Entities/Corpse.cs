@@ -14,8 +14,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// </summary>
     class Corpse:Unit, ICarnivoreFood
     {
-        public Corpse(Player player, string corpseType, decimal maxHealth, decimal maxEnergy, Vector2 pos, float range)
-            : base(player, corpseType, maxHealth, 0, maxEnergy, new List<Ability>(), pos, range, false)
+        public Corpse(Faction faction, string corpseType, decimal maxHealth, decimal maxEnergy, Vector2 pos, float range)
+            : base(faction, corpseType, maxHealth, 0, maxEnergy, new List<Ability>(), pos, range, false)
         {
         }
         
@@ -42,7 +42,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             List<Stat> stats = new List<Stat>()
             {
-                new Stat( "Player", Player.PlayerID.ToString()),
+                new Stat( "Player", Faction.FactionID.ToString()),
                 new Stat( "EntityType", EntityType),
                 new Stat( "Health", Health.ToString()),
             };

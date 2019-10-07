@@ -43,9 +43,9 @@ namespace SanguineGenesis
         /// </summary>
         public View View => new View(Center, ViewRange);
         /// <summary>
-        /// Player who owns this unit.
+        /// Faction which owns this unit.
         /// </summary>
-        public Player Player { get; }
+        public Faction Faction { get; }
         /// <summary>
         /// Entity's current animation.
         /// </summary>
@@ -87,9 +87,9 @@ namespace SanguineGenesis
         public float Width => Right - Left;
         public float Height => Top - Bottom;
 
-        public Entity(Player player, string entityType, decimal maxHealth, float viewRange, decimal maxEnergy, bool physical, List<Ability> abilities)
+        public Entity(Faction faction, string entityType, decimal maxHealth, float viewRange, decimal maxEnergy, bool physical, List<Ability> abilities)
         {
-            Player = player;
+            Faction = faction;
             ViewRange = viewRange;
             Selected = false;
             CommandQueue = new CommandQueue();
@@ -273,7 +273,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Called after this entity dies.
         /// </summary>
-        public virtual void Die()
+        public virtual void Die(Game game)
         {
             //reset commands - some commands might require entity to be unregistered (e.g. MoveTo)
             ResetCommands();

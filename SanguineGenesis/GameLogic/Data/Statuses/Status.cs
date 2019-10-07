@@ -116,7 +116,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public override void Added()
         {
             //temporarily remove the animal from list of entities
-            AnimalConsumed.Player.Entities.Remove(AnimalConsumed);
+            AnimalConsumed.Faction.Entities.Remove(AnimalConsumed);
             AnimalConsumed.StateChangeLock = this;
         }
 
@@ -125,7 +125,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             //add the consumed unit back to the list of entities
             //it spawns in front of the affected animal
             AnimalConsumed.Position = AffectedEntity.Position + (AffectedEntity.Range + AnimalConsumed.Range) * AffectedEntity.Direction;
-            AnimalConsumed.Player.Entities.Add(AnimalConsumed);
+            AnimalConsumed.Faction.Entities.Add(AnimalConsumed);
             AnimalConsumed.StateChangeLock = null;
         }
 
@@ -324,13 +324,13 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public override void Added()
         {
             //add ability for animals climbing down from the tree
-            AffectedEntity.Abilities.Add(AffectedEntity.Player.GameStaticData.Abilities.ClimbDownTree);
+            AffectedEntity.Abilities.Add(AffectedEntity.Faction.GameStaticData.Abilities.ClimbDownTree);
         }
 
         public override void Removed()
         {
             //remove ability for animals climbing down from the tree
-            AffectedEntity.Abilities.Remove(AffectedEntity.Player.GameStaticData.Abilities.ClimbDownTree);
+            AffectedEntity.Abilities.Remove(AffectedEntity.Faction.GameStaticData.Abilities.ClimbDownTree);
         }
 
         public override bool Step(Game game, float deltaT)

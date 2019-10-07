@@ -25,8 +25,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public override float Range { get; }
 
-        public Unit(Player player, string unitType, decimal maxHealth, float viewRange, decimal maxEnergy, List<Ability> abilities, Vector2 position, float range, bool physical)
-            :base(player, unitType, maxHealth, viewRange, maxEnergy, physical, abilities)
+        public Unit(Faction faction, string unitType, decimal maxHealth, float viewRange, decimal maxEnergy, List<Ability> abilities, Vector2 position, float range, bool physical)
+            :base(faction, unitType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Position = position;
             Range = range;

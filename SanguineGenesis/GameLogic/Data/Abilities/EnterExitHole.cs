@@ -51,7 +51,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 if (underground != null)
                 {
                     //put the animal in the target hole
-                    CommandedEntity.Player.Entities.Remove(CommandedEntity);
+                    CommandedEntity.Faction.Entities.Remove(CommandedEntity);
                     underground.AnimalsUnderGround.Add(CommandedEntity);
                     CommandedEntity.StateChangeLock = underground;
                 }
@@ -104,7 +104,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     Animal animalInHole = underground.AnimalsUnderGround.FirstOrDefault();
                     if (animalInHole != null)
                     {
-                        animalInHole.Player.Entities.Add(animalInHole);
+                        animalInHole.Faction.Entities.Add(animalInHole);
                         animalInHole.Position = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - animalInHole.Range);
                         underground.AnimalsUnderGround.Remove(animalInHole);
                         animalInHole.StateChangeLock = null;
