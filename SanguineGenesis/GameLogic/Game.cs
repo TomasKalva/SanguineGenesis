@@ -38,10 +38,6 @@ namespace SanguineGenesis
         /// </summary>
         public Dictionary<Players,Player> Players { get; }
         /// <summary>
-        /// Used for extracting information about the game.
-        /// </summary>
-        public GameQuerying GameQuerying { get; }
-        /// <summary>
         /// Player controlled by the user.
         /// </summary>
         public Player CurrentPlayer { get; private set; }
@@ -82,7 +78,6 @@ namespace SanguineGenesis
             foreach(var kvp in Players)
                 kvp.Value.InitializeMapView(Map);
 
-            GameQuerying = GameQuerying.GetGameQuerying();
             physics = Physics.GetPhysics();
             visibilityGenerator = new VisibilityGenerator();
             nextVisibilityPlayer = SanguineGenesis.Players.PLAYER0;

@@ -215,11 +215,11 @@ namespace SanguineGenesis
             if (!typeof(ITargetable).IsAssignableFrom(type))
                 throw new ArgumentException("The type has to inherit from ITargetable!");
 
-            IEnumerable<Entity> allEntities = GameQuerying.GetGameQuerying().SelectRectEntities(
+            IEnumerable<Entity> allEntities = GameQuerying.SelectRectEntities(
                                     game, new Rect(x, y, x, y),
                                     (entity) => type.IsAssignableFrom(entity.GetType()) && condition(entity))
                                     .ToList();
-            return GameQuerying.GetGameQuerying().SelectVisibleEntities(game, selectingPlayer, allEntities).FirstOrDefault();
+            return GameQuerying.SelectVisibleEntities(selectingPlayer, allEntities).FirstOrDefault();
         }
     }
 }

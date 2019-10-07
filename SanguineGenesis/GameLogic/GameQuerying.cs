@@ -12,17 +12,12 @@ namespace SanguineGenesis
     /// <summary>
     /// Used for extracting information about the game.
     /// </summary>
-    public class GameQuerying
+    public static class GameQuerying
     {
-        public static GameQuerying GetGameQuerying()=>new GameQuerying(); 
-        private GameQuerying() { }
-        
-        //todo: some of the following 4 methods might not be needed
-
         /// <summary>
         /// Select all entities which satisfy the condition.
         /// </summary>
-        public IEnumerable<Entity> SelectRectEntities(Game game, Rect area, Func<Entity,bool> condition)
+        public static IEnumerable<Entity> SelectRectEntities(Game game, Rect area, Func<Entity,bool> condition)
         {
             return game.GetAll<Entity>()
                 .Where(condition)
@@ -34,41 +29,17 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Select all units that intersect area and satisfy the condition.
-        /// </summary>
-        public List<Unit> SelectRectUnits(Game game, Rect area, Func<Unit, bool> condition)
-        {
-            List<Unit> selected = new List<Unit>();
-            foreach (Unit unit in SelectRectEntities(game, area, (e)=>e is Unit))
-            {
-                Rect unitRect = unit.GetActualRect();
-                unitRect = ((IRectangle)unit).GetRect();
-                //todo: select units by circles on the ground
-                if (area.IntersectsWith(unitRect) && condition(unit))
-                {
-                    selected.Add(unit);
-                }
-            }
-            return selected;
-        }
-
-        /// <summary>
         /// Select all entities which satisfy the condition.
         /// </summary>
-        public List<Entity> SelectEntities(Game game, Func<Entity, bool> condition)
+        public static List<Entity> SelectEntities(Game game, Func<Entity, bool> condition)
         {
-            List<Entity> selected = new List<Entity>();
-            foreach (Entity entity in game.GetAll<Entity>().Where(condition))
-            {
-                selected.Add(entity);
-            }
-            return selected;
+            return game.GetAll<Entity>().Where(condition).ToList();
         }
 
         /// <summary>
         /// Returns all entities visible by observer.
         /// </summary>
-        public IEnumerable<Entity> SelectVisibleEntities(Game game, Player observer, IEnumerable<Entity> entities)
+        public static IEnumerable<Entity> SelectVisibleEntities(Player observer, IEnumerable<Entity> entities)
         {
             return entities.Where((e) =>
             {
@@ -83,15 +54,10 @@ namespace SanguineGenesis
             });
         }
 
-        public Node[,] SelectNodes(Map map, Rect area)
-        {
-            return SelectPartOfMap(map, area);
-        }
-
         /// <summary>
         /// Select the rectangle of Nodes given by the coordinates.
         /// </summary>
-        public Node[,] SelectNodes(Map map, int left, int bottom, int right, int top)
+        public static Node[,] SelectNodes(Map map, int left, int bottom, int right, int top)
         {
             return SelectPartOfMap(map,left,bottom,right,top);
         }
@@ -99,7 +65,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Select the rectangle of squares T given by the coordinates.
         /// </summary>
-        public T[,] SelectPartOfMap<T>(IMap<T> map, int left, int bottom, int right, int top)
+        public static T[,] SelectPartOfMap<T>(IMap<T> map, int left, int bottom, int right, int top)
         {
             //clamp extents to be inside of the map
             int validL = Math.Min(map.Width - 1, Math.Max(0, left));
@@ -121,7 +87,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Selects rectangle of squares T. Each T intersects the area.
         /// </summary>
-        public T[,] SelectPartOfMap<T>(IMap<T> map, Rect area)
+        public static T[,] SelectPartOfMap<T>(IMap<T> map, Rect area)
         {
             int width = Math.Min((int)(Math.Ceiling(area.Width) + 1),
                 (int)(map.Width - area.Left));
@@ -137,7 +103,7 @@ namespace SanguineGenesis
         /// +rrrr+
         /// _++++_
         /// </summary>
-        public IEnumerable<T> SelectNeighbors<T>(IMap<T> map, int left, int bottom, int right, int top)
+        public static IEnumerable<T> SelectNeighbors<T>(IMap<T> map, int left, int bottom, int right, int top)
         {
             return HorizontalLine(map, bottom - 1, left, right)
                 .Concat(VerticalLine(map, right + 1, bottom, top))
@@ -148,7 +114,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Select vertical line of squares T given by the coordinates.
         /// </summary>
-        public List<T> VerticalLine<T>(IMap<T> map, int x, int bottom, int top)
+        public static List<T> VerticalLine<T>(IMap<T> map, int x, int bottom, int top)
         {
             List<T> line = new List<T>();
             if (x >= 0 && x < map.Width)
@@ -164,7 +130,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Select horizontal line of squares T given by the coordinates.
         /// </summary>
-        public List<T> HorizontalLine<T>(IMap<T> map, int y, int left, int right)
+        public static List<T> HorizontalLine<T>(IMap<T> map, int y, int left, int right)
         {
             List<T> line = new List<T>();
             if (y >= 0 && y < map.Height)

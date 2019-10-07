@@ -59,7 +59,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             int nX = Targ.X;
             int nY = Targ.Y;
             int size = bf.Size;
-            Node[,] buildNodes = GameQuerying.GetGameQuerying().SelectNodes(map, nX, nY, nX + (size - 1), nY + (size - 1));
+            Node[,] buildNodes = GameQuerying.SelectNodes(map, nX, nY, nX + (size - 1), nY + (size - 1));
 
             if (buildNodes.GetLength(0) == size &&
                 buildNodes.GetLength(1) == size)
@@ -93,7 +93,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     //find energy source nodes
                     Node[,] rootNodes;
                     int rDist = trF.RootsDistance;
-                    rootNodes = GameQuerying.GetGameQuerying().SelectNodes(map, nX - rDist, nY - rDist, nX + (size + rDist - 1), nY + (size + rDist - 1));
+                    rootNodes = GameQuerying.SelectNodes(map, nX - rDist, nY - rDist, nX + (size + rDist - 1), nY + (size + rDist - 1));
                     newBuilding = trF.NewInstance(newUnitOwner, buildNodes, rootNodes);
                     //make the tree grow
                     newUnitOwner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get, true);

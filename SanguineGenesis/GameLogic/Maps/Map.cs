@@ -130,7 +130,7 @@ namespace SanguineGenesis
         /// </summary>
         public void AddBuilding(Building building)
         {
-            Node[,] nodes = GameQuerying.GetGameQuerying()
+            Node[,] nodes = GameQuerying
                 .SelectNodes(this,
                 building.NodeLeft,
                 building.NodeBottom,

@@ -88,7 +88,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 int left = CommandedEntity.Left; int right = CommandedEntity.Right;
                 int bottom = CommandedEntity.Bottom; int top = CommandedEntity.Top;
-                var frame = GameQuerying.GetGameQuerying().SelectNeighbors(game.Map,
+                var frame = GameQuerying.SelectNeighbors(game.Map,
                     left , bottom, right, top) ;
                 foreach(Node n in frame)
                 {
