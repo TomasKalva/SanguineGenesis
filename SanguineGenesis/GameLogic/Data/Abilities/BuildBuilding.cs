@@ -52,61 +52,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 //finish if the command can't be used
                 return true;
 
-            Map map = game.Map;
-            BuildingFactory bf = Ability.BuildingFactory;
-            //check if the building can be built on the node
-            bool canBeBuilt = true;
             int nX = Targ.X;
             int nY = Targ.Y;
-            int size = bf.Size;
-            Node[,] buildNodes = GameQuerying.SelectNodes(map, nX, nY, nX + (size - 1), nY + (size - 1));
 
-            if (buildNodes.GetLength(0) == size &&
-                buildNodes.GetLength(1) == size)
-            {
-                for (int i = 0; i < size; i++)
-                    for (int j = 0; j < size; j++)
-                    {
-                        Node ijN = buildNodes[i, j];
-                        //the building can't be built if the node is blocked or contains
-                        //incompatible terrain
-                        if (ijN.Blocked || !(bf.CanBeOn(ijN)))
-                            canBeBuilt = false;
-                    }
-            }
-            else
-            {
-                //the whole building has to be on the map
-                canBeBuilt = false;
-            }
-
-            if (canBeBuilt)
+            if (game.Map.BuildingCanBePlaced(Ability.BuildingFactory, nX, nY))
             {
                 if (!TryPay())
                     //entity doesn't have enough energy
                     return true;
 
-                var newUnitOwner = CommandedEntity.Faction;
-                Building newBuilding;
-                if (bf is TreeFactory trF)
-                {
-                    //find energy source nodes
-                    Node[,] rootNodes;
-                    int rDist = trF.RootsDistance;
-                    rootNodes = GameQuerying.SelectNodes(map, nX - rDist, nY - rDist, nX + (size + rDist - 1), nY + (size + rDist - 1));
-                    newBuilding = trF.NewInstance(newUnitOwner, buildNodes, rootNodes);
-                    //make the tree grow
-                    newUnitOwner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get, true);
-                }
-                else
-                {
-                    StructureFactory stF = bf as StructureFactory;
-                    newBuilding = stF.NewInstance(newUnitOwner, buildNodes);
-                }
-                //put the new building on the main map
-                newUnitOwner.Entities.Add(newBuilding);
-                map.AddBuilding(newBuilding);
-                game.Map.MapWasChanged = true;
+                game.Map.PlaceBuilding(Ability.BuildingFactory, CommandedEntity.Faction, nX, nY);
             }
             //the command always immediately finishes regardless of the success of placing the building
             return true;

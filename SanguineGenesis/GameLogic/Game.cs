@@ -62,22 +62,21 @@ namespace SanguineGenesis
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
 
-        public Game()
+        public Game(Biome firstPlayersBiome)
         {
             GameEnded = false;
             Winner = null;
 
             //players
             Players = new Dictionary<FactionType, Player>();
-            Players.Add(SanguineGenesis.FactionType.PLAYER0, new Player(SanguineGenesis.FactionType.PLAYER0));
-            Players.Add(SanguineGenesis.FactionType.PLAYER1, new Player(SanguineGenesis.FactionType.PLAYER1));
+            Players.Add(SanguineGenesis.FactionType.PLAYER0, new Player(SanguineGenesis.FactionType.PLAYER0, firstPlayersBiome));
+            Players.Add(SanguineGenesis.FactionType.PLAYER1, new Player(SanguineGenesis.FactionType.PLAYER1, firstPlayersBiome==Biome.SAVANNA?Biome.RAINFOREST: Biome.SAVANNA));
             CurrentPlayer = Players[SanguineGenesis.FactionType.PLAYER0];
             NeutralFaction = new Faction(FactionType.NEUTRAL);
 
              //map
             var mapLoader = new MapLoader();
-            Map = mapLoader.LoadMap("Images\\NewMap\\nutrients.png", "Images\\NewMap\\biomes.png",
-                 "Images\\NewMap\\terrain.png", this);
+            Map = mapLoader.LoadMap("Images\\NewMap\\nutrients.png", "Images\\NewMap\\terrain.png", this);
             mapLoader.LoadBuildings(this, "Images\\NewMap\\buildings.png");
 
             foreach(var kvp in Players)

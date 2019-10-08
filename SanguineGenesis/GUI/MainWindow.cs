@@ -20,7 +20,7 @@ namespace SanguineGenesis.GUI
         {
             InitializeComponent();
 
-            Game = new Game();
+            Game = new Game(Biome.RAINFOREST);
             GameControls = new GameControls(Game.Map);
             TotalStopwatch = new Stopwatch();
             TotalStopwatch.Start();

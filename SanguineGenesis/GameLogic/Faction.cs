@@ -117,12 +117,17 @@ namespace SanguineGenesis
         /// exist.
         /// </summary>
         public List<Building> VisibleBuildings { get; }
+        /// <summary>
+        /// Biome this player is playing.
+        /// </summary>
+        public Biome Biome { get; }
 
-        public Player(FactionType factionID)
+        public Player(FactionType factionID, Biome biome)
             : base(factionID)
         {
             InitUnits();
             VisibleBuildings = new List<Building>();
+            Biome = biome;
         }
 
         //todo: remove this things
@@ -253,6 +258,19 @@ namespace SanguineGenesis
         public void InitializeMapView(Map map)
         {
             VisibleMap = new Map(map);
+        }
+
+        /// <summary>
+        /// Returns the factory of main building of this players biome.
+        /// </summary>
+        public BuildingFactory GetMainBuildingFactory()
+        {
+            switch (Biome)
+            {
+                case Biome.SAVANNA: return GameStaticData.TreeFactories["BAOBAB"];
+                case Biome.RAINFOREST: return GameStaticData.TreeFactories["KAPOC"];
+                default: return GameStaticData.StructureFactories["ROCK"];
+            }
         }
     }
 

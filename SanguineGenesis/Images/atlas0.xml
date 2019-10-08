@@ -58,6 +58,11 @@
       <Image X="16" Y="6" Width="2" Height="2"></Image>
     </Animation>
   </Entity>
+  <Entity EntityType="BIG_ROCK">
+    <Animation Action="IDLE" CenterX="1" CenterY="0.4">
+      <Image X="16" Y="8" Width="2" Height="2"></Image>
+    </Animation>
+  </Entity>
   <Entity EntityType="ROCK">
     <Animation Action="IDLE" CenterX="1" CenterY="0.4">
       <Image X="16" Y="8" Width="2" Height="2"></Image>

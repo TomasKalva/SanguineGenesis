@@ -13,16 +13,11 @@ namespace SanguineGenesis.GameLogic.Maps
     /// </summary>
     class MapLoader
     {
-        private Dictionary<Color, Biome> ColorToBiome { get; }
         private Dictionary<Color, Terrain> ColorToTerrain { get; }
+        private Dictionary<Color, Building> ColorToBuilding { get; }
 
         public MapLoader()
         {
-            ColorToBiome = new Dictionary<Color, Biome>()
-            {
-                {Color.FromArgb(0, 255, 137), Biome.SAVANNA },
-                {Color.FromArgb(0, 160, 0), Biome.RAINFOREST }
-            };
             ColorToTerrain = new Dictionary<Color, Terrain>()
             {
                 {Color.FromArgb(168, 142, 78), Terrain.LAND },
@@ -34,11 +29,10 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <summary>
         /// Loads information about nodes from the files.
         /// </summary>
-        public Map LoadMap(string nutrientsMapFileName, string biomesMapFileName,
+        public Map LoadMap(string nutrientsMapFileName,
             string terrainFileName, Game game)
         {
             Bitmap nutrients = new Bitmap(nutrientsMapFileName);
-            Bitmap biomes = new Bitmap(biomesMapFileName);
             Bitmap terrain = new Bitmap(terrainFileName);
 
             int width = nutrients.Width + 2;
@@ -46,8 +40,8 @@ namespace SanguineGenesis.GameLogic.Maps
 
             //create nodes
             Node[,] mapNodes = new Node[width, height];
-            for(int i = 0; i<width; i++)
-                for(int j=0;j<height; j++)
+            for (int i = 0; i < width; i++)
+                for (int j = 0; j < height; j++)
                 {
                     if (i <= 0 || i > width - 2 || j <= 0 || j > height - 2)
                         //nodes outside of the map have default biome and maximal nutrients
@@ -56,17 +50,22 @@ namespace SanguineGenesis.GameLogic.Maps
                     {
                         int x = i - 1; int y = j - 1;
                         int mapsX = x; int mapsY = height - y - 3;
-                        Biome biome = GetBiome(biomes.GetPixel(mapsX, mapsY));
                         Terrain terr = GetTerrain(terrain.GetPixel(mapsX, mapsY));
-                        decimal nutr = (nutrients.GetPixel(mapsX, mapsY).A/256m) * Node.MAX_NUTRIENTS;
-                        decimal minNutr = terr.Nutrients(biome, SoilQuality.LOW);
-                        nutr = Math.Max(nutr, minNutr);
+                        decimal nutr = (nutrients.GetPixel(mapsX, mapsY).A / 256m) * Node.MAX_NUTRIENTS;
 
-                        mapNodes[x + 1, y + 1] = new Node(x, y, nutr, biome, terr);
+                        mapNodes[x + 1, y + 1] = new Node(x, y, nutr, Biome.DEFAULT, terr);
                     }
                 }
-            
+
             return new Map(mapNodes);
+        }
+
+        /// <summary>
+        /// Returns terrain corresponding to the color c.
+        /// </summary>
+        private Terrain GetTerrain(Color c)
+        {
+            return ColorToTerrain[c];
         }
 
         /// <summary>
@@ -78,62 +77,80 @@ namespace SanguineGenesis.GameLogic.Maps
             Map map = game.Map;
             Bitmap buildings = new Bitmap(buildingsMapFileName);
             //add buildings
-            for (int i = 0; i < map.Width ; i++)
-                for (int j = 0; j < map.Height ; j++)
+            for (int i = 0; i < map.Width; i++)
+                for (int j = map.Height - 1; j >= 0; j--)
                 {
-                    int mapX = i; int mapY = map.Height - (j + 1); 
+                    int mapX = i; int mapY = j;
                     if (buildings.GetPixel(mapX, mapY).A != 0)
-                        SetBuilding(buildings.GetPixel(mapX, mapY), map[i, j], game);
+                        SetBuilding(buildings.GetPixel(mapX, mapY), map[i, map.Height - (j + 1)], game, buildings);
                 }
         }
 
         /// <summary>
-        /// Returns biome corresponding to the color c.
-        /// </summary>
-        private Biome GetBiome(Color c)
-        {
-            if (ColorToBiome.TryGetValue(c, out Biome biome))
-                return biome;
-            return Biome.DEFAULT;
-        }
-
-        /// <summary>
-        /// Returns terrain corresponding to the color c.
-        /// </summary>
-        private Terrain GetTerrain(Color c)
-        {
-            return ColorToTerrain[c];
-        }
-        
-        /// <summary>
         /// Returns building corresponding to the color c.
         /// </summary>
-        private void SetBuilding(Color c, Node n, Game game)
+        private void SetBuilding(Color c, Node n, Game game, Bitmap buildings)
         {
-            Color blue = Color.Blue;
-            Color red = Color.Red;
-            Color black = Color.Black;
-            if (c.R == blue.R && c.G==blue.G && c.B==blue.B)
+            if (c.Is(Color.Blue))
             {
-                GameStaticData gsd = game.Players[FactionType.PLAYER0].GameStaticData;
-                //create a new builder that will be used to build the building
-                Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.Players[FactionType.PLAYER0], n.Center);
-                gsd.Abilities.BuildBuilding("BAOBAB").NewCommand(builder, n).PerformCommand(game, 0);
+                //main building of player 0
+                Player player = game.Players[FactionType.PLAYER0];
+                PlaceMainBuildingOfPlayer(n, game, player);
             }
-            else if (c.R == red.R && c.G == red.G && c.B == red.B)
+            else if (c.Is(Color.Red))
             {
-                GameStaticData gsd = game.Players[FactionType.PLAYER1].GameStaticData;
-                //create a new builder that will be used to build the building
-                Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.Players[FactionType.PLAYER1], n.Center);
-                gsd.Abilities.BuildBuilding("KAPOC").NewCommand(builder, n).PerformCommand(game, 0);
+                //main building of player 1
+                Player player = game.Players[FactionType.PLAYER1];
+                PlaceMainBuildingOfPlayer(n, game, player);
             }
-            else if (c.R == black.R && c.G == black.G && c.B == black.B)
+            else if (c.Is(Color.Black))
             {
+                //rock
+                int x = n.X; int y = buildings.Height - (n.Y + 1);
                 GameStaticData gsd = game.NeutralFaction.GameStaticData;
-                //create a new builder that will be used to build the building
-                Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.NeutralFaction, n.Center);
-                gsd.Abilities.BuildBuilding("ROCK").NewCommand(builder, n).PerformCommand(game, 0);
+                bool bigRock = false;
+                //if there is enough space, place big rock instead of the small one
+                if ((x + 1 < buildings.Width) && (y - 1 >= 0))
+                {
+                    if (buildings.GetPixel(x + 1, y).Is(Color.Black) &&
+                       buildings.GetPixel(x, y - 1).Is(Color.Black) &&
+                       buildings.GetPixel(x + 1, y - 1).Is(Color.Black))
+                        bigRock = true;
+                }
+                if (bigRock)
+                    game.Map.PlaceBuilding(gsd.StructureFactories["BIG_ROCK"], game.NeutralFaction, n.X, n.Y);
+                else
+                    game.Map.PlaceBuilding(gsd.StructureFactories["ROCK"], game.NeutralFaction, n.X, n.Y);
+
             }
         }
+
+        private void PlaceMainBuildingOfPlayer(Node n, Game game, Player player)
+        {
+            //main buildings can only stand on land
+            if (n.Terrain != Terrain.LAND)
+                return;
+
+            BuildingFactory buildingFactory = player.GetMainBuildingFactory();
+
+            int size = buildingFactory.Size;
+            Node[,] buildNodes = GameQuerying.SelectNodes(game.Map, n.X, n.Y, n.X + (size - 1), n.Y + (size - 1));
+            decimal minNutr = n.Terrain.Nutrients(player.Biome, SoilQuality.LOW);
+            for (int i = 0; i < buildNodes.GetLength(0); i++)
+                for (int j = 0; j < buildNodes.GetLength(1); j++)
+                {
+                    buildNodes[i, j].Biome = player.Biome;
+                    buildNodes[i, j].Nutrients = minNutr;
+                }
+            game.Map.PlaceBuilding(buildingFactory, player, n.X, n.Y);
+        }
+    }
+
+    public static class ColorExtensions
+    {
+        /// <summary>
+        /// Returns true if the color is the same. Doesn't compare alpha channel.
+        /// </summary>
+        public static bool Is(this Color a, Color b) => a.R == b.R && a.G == b.G && a.B == b.B;
     }
 }

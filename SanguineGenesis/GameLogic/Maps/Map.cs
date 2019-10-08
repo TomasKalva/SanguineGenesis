@@ -126,6 +126,69 @@ namespace SanguineGenesis
         }
 
         /// <summary>
+        /// Returns true if the building can be placed on the coordinates of this map.
+        /// </summary>
+        public bool BuildingCanBePlaced(BuildingFactory buildingFactory, int x, int y)
+        {
+            int size = buildingFactory.Size;
+            Node[,] buildNodes = GameQuerying.SelectNodes(this, x, y, x + (size - 1), y + (size - 1));
+
+            if (buildNodes.GetLength(0) == size &&
+                buildNodes.GetLength(1) == size)
+            {
+                for (int i = 0; i < size; i++)
+                    for (int j = 0; j < size; j++)
+                    {
+                        Node ijN = buildNodes[i, j];
+                        //the building can't be built if the node is blocked or contains
+                        //incompatible terrain
+                        if (ijN.Blocked || !(buildingFactory.CanBeOn(ijN)))
+                            return false;
+                    }
+            }
+            else
+            {
+                //the whole building has to be on the map
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Places the building created by buildingFactory on the coordinates of this map. The building
+        /// will be owned by owner.
+        /// </summary>
+        public void PlaceBuilding(BuildingFactory buildingFactory, Faction owner, int x, int y)
+        {
+            //don't place the building if it can't be placed
+            if (!BuildingCanBePlaced(buildingFactory, x, y))
+                return;
+
+            int size = buildingFactory.Size;
+            Node[,] buildNodes = GameQuerying.SelectNodes(this, x, y, x + (size - 1), y + (size - 1));
+            Building newBuilding;
+            if (buildingFactory is TreeFactory trF)
+            {
+                //find energy source nodes
+                Node[,] rootNodes;
+                int rDist = trF.RootsDistance;
+                rootNodes = GameQuerying.SelectNodes(this, x - rDist, y - rDist, x + (size + rDist - 1), y + (size + rDist - 1));
+                newBuilding = trF.NewInstance(owner, buildNodes, rootNodes);
+                //make the tree grow
+                owner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get, true);
+            }
+            else
+            {
+                StructureFactory stF = buildingFactory as StructureFactory;
+                newBuilding = stF.NewInstance(owner, buildNodes);
+            }
+            //put the new building on the main map
+            owner.Entities.Add(newBuilding);
+            AddBuilding(newBuilding);
+            MapWasChanged = true;
+        }
+
+        /// <summary>
         /// Adds building to the map. Set MapWasChanged to true.
         /// </summary>
         public void AddBuilding(Building building)
