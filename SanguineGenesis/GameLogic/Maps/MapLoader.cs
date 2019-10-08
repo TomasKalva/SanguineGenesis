@@ -112,6 +112,7 @@ namespace SanguineGenesis.GameLogic.Maps
         {
             Color blue = Color.Blue;
             Color red = Color.Red;
+            Color black = Color.Black;
             if (c.R == blue.R && c.G==blue.G && c.B==blue.B)
             {
                 GameStaticData gsd = game.Players[FactionType.PLAYER0].GameStaticData;
@@ -125,6 +126,13 @@ namespace SanguineGenesis.GameLogic.Maps
                 //create a new builder that will be used to build the building
                 Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.Players[FactionType.PLAYER1], n.Center);
                 gsd.Abilities.BuildBuilding("KAPOC").NewCommand(builder, n).PerformCommand(game, 0);
+            }
+            else if (c.R == black.R && c.G == black.G && c.B == black.B)
+            {
+                GameStaticData gsd = game.NeutralFaction.GameStaticData;
+                //create a new builder that will be used to build the building
+                Entity builder = gsd.AnimalFactories.Factorys["TIGER"].NewInstance(game.NeutralFaction, n.Center);
+                gsd.Abilities.BuildBuilding("ROCK").NewCommand(builder, n).PerformCommand(game, 0);
             }
         }
     }

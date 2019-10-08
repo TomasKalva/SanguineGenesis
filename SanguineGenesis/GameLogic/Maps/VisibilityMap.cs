@@ -32,7 +32,11 @@ namespace SanguineGenesis.GameLogic.Maps
         /// </summary>
         private bool[,] visible;
 
-        public bool this[int i, int j] => visible[i, j];
+        public bool this[int i, int j]
+        {
+            get => visible [i, j];
+            set => visible[i, j] = value;
+        }
 
         /// <summary>
         /// Width of the map in squares.

@@ -182,20 +182,12 @@ namespace SanguineGenesis
             //remove dead units
             foreach(var kvp in Players)
                 kvp.Value.RemoveDeadEntities(this);
+            NeutralFaction.RemoveDeadEntities(this);
+            foreach (var kvp in Players)
+                kvp.Value.RemoveDeadVisibleBuildings();
 
             //update players' visibility map
-            if (!GameplayOptions.WholeMapVisible)
-            {
-                VisibilityGeneratorInteraction(buildings);
-            }
-            else
-            {
-                foreach(var kvp in Players)
-                {
-                    VisibilityMap everythingVisible = VisibilityMap.GetEverythingVisible(Map.Width, Map.Height);
-                    kvp.Value.SetVisibilityMap(everythingVisible, buildings);
-                }
-            }
+            VisibilityGeneratorInteraction(buildings);
 
             //set and refresh movement commands
             MovementGeneratorInteraction();
@@ -228,8 +220,15 @@ namespace SanguineGenesis
                 //generated visibility map for the other player
                 nextVisibilityPlayer = other;
 
-                visibilityGenerator.SetNewTask(Map.GetViewObstaclesMap(nextVisibilityPlayer),
+                //create algorithm for generating visibility map
+                IVisibilityGeneratingTask visGenTask;
+                if (GameplayOptions.WholeMapVisible)
+                    visGenTask = new UnlimitedVisibilityGeneratingTask(Map.Width, Map.Height);
+                else
+                    visGenTask = new RayVisibilityGeneratingTask(Map.GetViewObstaclesMap(nextVisibilityPlayer),
                     Players[nextVisibilityPlayer].Entities.Select((entity) => entity.View).ToList());
+
+                visibilityGenerator.SetNewTask(visGenTask);
             }
         }
 

@@ -75,6 +75,27 @@ namespace SanguineGenesis
             MaxAirTaken = Math.Min(MAX_AIR_TAKEN, GetAll<Tree>().Sum((t) => t.Air));
             AirTaken = GetAll<Animal>().Sum((a) => a.Air);
         }
+
+        /// <summary>
+        /// Removes dead entities and references to them from their commands. The references
+        /// from other commands stay - other commands need to check for dead entities.
+        /// </summary>
+        public void RemoveDeadEntities(Game game)
+        {
+            //remove player's dead entities
+            List<Entity> deadEntities = new List<Entity>();
+            foreach (Entity e in Entities)
+            {
+                if (e.IsDead)
+                {
+                    deadEntities.Add(e);
+                }
+            }
+            foreach (Entity e in deadEntities)
+                e.Die(game);
+
+            Entities.RemoveAll((entity) => entity.IsDead);
+        }
     }
 
     class Player:Faction
@@ -215,30 +236,6 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Removes dead entities and references to them from their commands. The references
-        /// from other commands stay - other commands need to check for dead entities.
-        /// </summary>
-        public void RemoveDeadEntities(Game game)
-        {
-            //remove player's dead entities
-            List<Entity> deadEntities = new List<Entity>();
-            foreach(Entity e in Entities)
-            {
-                if(e.IsDead)
-                {
-                    deadEntities.Add(e);
-                }
-            }
-            foreach(Entity e in deadEntities)
-                e.Die(game);
-
-            Entities.RemoveAll((entity) => entity.IsDead);
-            
-            //remove dead visible buildings
-            RemoveDeadVisibleBuildings();
-        }
-
-        /// <summary>
         /// Removes all visible buildings that are dead.
         /// </summary>
         public void RemoveDeadVisibleBuildings()
@@ -255,7 +252,6 @@ namespace SanguineGenesis
         /// </summary>
         public void InitializeMapView(Map map)
         {
-            //todo: implement with visibility map
             VisibleMap = new Map(map);
         }
     }

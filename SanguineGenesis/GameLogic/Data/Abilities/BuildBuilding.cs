@@ -104,7 +104,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     newBuilding = stF.NewInstance(newUnitOwner, buildNodes);
                 }
                 //put the new building on the main map
-                game.Players[newUnitOwner.FactionID].Entities.Add(newBuilding);
+                newUnitOwner.Entities.Add(newBuilding);
                 map.AddBuilding(newBuilding);
                 game.Map.MapWasChanged = true;
             }
