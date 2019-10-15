@@ -17,7 +17,7 @@ namespace SanguineGenesis
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainWinformWindow());
+            Application.Run(new MainMenuWindow());
         }
     }
 }
