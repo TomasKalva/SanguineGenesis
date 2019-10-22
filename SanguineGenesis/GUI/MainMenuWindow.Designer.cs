@@ -59,6 +59,11 @@
             this.landRB = new System.Windows.Forms.RadioButton();
             this.shallowWaterRB = new System.Windows.Forms.RadioButton();
             this.errorMessageL = new System.Windows.Forms.Label();
+            this.coordinatesL = new System.Windows.Forms.Label();
+            this.brushSizeNUD = new System.Windows.Forms.NumericUpDown();
+            this.brushSizeL = new System.Windows.Forms.Label();
+            this.nutrientsRateL = new System.Windows.Forms.Label();
+            this.nutrientsRateNUD = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.newMapPanel.SuspendLayout();
@@ -66,6 +71,8 @@
             this.playPanel.SuspendLayout();
             this.drawOptionsGB.SuspendLayout();
             this.buildingSelectionGB.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nutrientsRateNUD)).BeginInit();
             this.SuspendLayout();
             // 
             // mapPB
@@ -77,8 +84,8 @@
             this.mapPB.TabIndex = 0;
             this.mapPB.TabStop = false;
             this.mapPB.Paint += new System.Windows.Forms.PaintEventHandler(this.MapPB_Paint);
-            this.mapPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MapPB_MouseDown);
-            this.mapPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MapPB_MouseMove);
+            this.mapPB.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MapPB_MouseDownAction);
+            this.mapPB.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MapPB_MouseDownAction);
             // 
             // playB
             // 
@@ -114,6 +121,7 @@
             // savannaRB
             // 
             this.savannaRB.AutoSize = true;
+            this.savannaRB.Checked = true;
             this.savannaRB.Location = new System.Drawing.Point(7, 20);
             this.savannaRB.Name = "savannaRB";
             this.savannaRB.Size = new System.Drawing.Size(68, 17);
@@ -140,6 +148,7 @@
             this.loadB.TabIndex = 4;
             this.loadB.Text = "Load";
             this.loadB.UseVisualStyleBackColor = true;
+            this.loadB.Click += new System.EventHandler(this.LoadB_Click);
             // 
             // saveB
             // 
@@ -149,6 +158,7 @@
             this.saveB.TabIndex = 5;
             this.saveB.Text = "Save";
             this.saveB.UseVisualStyleBackColor = true;
+            this.saveB.Click += new System.EventHandler(this.SaveB_Click);
             // 
             // mapNamesCB
             // 
@@ -205,7 +215,7 @@
             this.newMapPanel.Controls.Add(this.widthL);
             this.newMapPanel.Controls.Add(this.widthTB);
             this.newMapPanel.Controls.Add(this.heightTB);
-            this.newMapPanel.Location = new System.Drawing.Point(12, 214);
+            this.newMapPanel.Location = new System.Drawing.Point(12, 268);
             this.newMapPanel.Name = "newMapPanel";
             this.newMapPanel.Size = new System.Drawing.Size(273, 103);
             this.newMapPanel.TabIndex = 13;
@@ -217,7 +227,7 @@
             this.loadMapPanel.Controls.Add(this.editB);
             this.loadMapPanel.Controls.Add(this.loadB);
             this.loadMapPanel.Controls.Add(this.saveB);
-            this.loadMapPanel.Location = new System.Drawing.Point(12, 323);
+            this.loadMapPanel.Location = new System.Drawing.Point(12, 377);
             this.loadMapPanel.Name = "loadMapPanel";
             this.loadMapPanel.Size = new System.Drawing.Size(273, 75);
             this.loadMapPanel.TabIndex = 14;
@@ -230,6 +240,7 @@
             this.deleteB.TabIndex = 13;
             this.deleteB.Text = "Delete";
             this.deleteB.UseVisualStyleBackColor = true;
+            this.deleteB.Click += new System.EventHandler(this.DeleteB_Click);
             // 
             // editB
             // 
@@ -239,12 +250,13 @@
             this.editB.TabIndex = 12;
             this.editB.Text = "Edit";
             this.editB.UseVisualStyleBackColor = true;
+            this.editB.Click += new System.EventHandler(this.EditB_Click);
             // 
             // playPanel
             // 
             this.playPanel.Controls.Add(this.playB);
             this.playPanel.Controls.Add(this.groupBox1);
-            this.playPanel.Location = new System.Drawing.Point(291, 323);
+            this.playPanel.Location = new System.Drawing.Point(291, 377);
             this.playPanel.Name = "playPanel";
             this.playPanel.Size = new System.Drawing.Size(300, 75);
             this.playPanel.TabIndex = 15;
@@ -252,6 +264,7 @@
             // deepWaterRB
             // 
             this.deepWaterRB.AutoSize = true;
+            this.deepWaterRB.Checked = true;
             this.deepWaterRB.Location = new System.Drawing.Point(6, 19);
             this.deepWaterRB.Name = "deepWaterRB";
             this.deepWaterRB.Size = new System.Drawing.Size(80, 17);
@@ -263,15 +276,21 @@
             // 
             // drawOptionsGB
             // 
+            this.drawOptionsGB.Controls.Add(this.nutrientsRateL);
+            this.drawOptionsGB.Controls.Add(this.nutrientsRateNUD);
+            this.drawOptionsGB.Controls.Add(this.brushSizeL);
+            this.drawOptionsGB.Controls.Add(this.brushSizeNUD);
+            this.drawOptionsGB.Controls.Add(this.coordinatesL);
             this.drawOptionsGB.Controls.Add(this.addBuildingRB);
             this.drawOptionsGB.Controls.Add(this.buildingSelectionGB);
             this.drawOptionsGB.Controls.Add(this.nutrientsRB);
             this.drawOptionsGB.Controls.Add(this.landRB);
             this.drawOptionsGB.Controls.Add(this.shallowWaterRB);
             this.drawOptionsGB.Controls.Add(this.deepWaterRB);
+            this.drawOptionsGB.Enabled = false;
             this.drawOptionsGB.Location = new System.Drawing.Point(12, 68);
             this.drawOptionsGB.Name = "drawOptionsGB";
-            this.drawOptionsGB.Size = new System.Drawing.Size(273, 140);
+            this.drawOptionsGB.Size = new System.Drawing.Size(273, 194);
             this.drawOptionsGB.TabIndex = 13;
             this.drawOptionsGB.TabStop = false;
             this.drawOptionsGB.Text = "Draw options";
@@ -294,9 +313,9 @@
             this.buildingSelectionGB.Controls.Add(this.main1RB);
             this.buildingSelectionGB.Controls.Add(this.bigRockRB);
             this.buildingSelectionGB.Controls.Add(this.main0RB);
-            this.buildingSelectionGB.Location = new System.Drawing.Point(127, 15);
+            this.buildingSelectionGB.Location = new System.Drawing.Point(142, 18);
             this.buildingSelectionGB.Name = "buildingSelectionGB";
-            this.buildingSelectionGB.Size = new System.Drawing.Size(122, 119);
+            this.buildingSelectionGB.Size = new System.Drawing.Size(107, 119);
             this.buildingSelectionGB.TabIndex = 6;
             this.buildingSelectionGB.TabStop = false;
             this.buildingSelectionGB.Text = "Building";
@@ -311,6 +330,7 @@
             this.rockRB.TabStop = true;
             this.rockRB.Text = "Rock";
             this.rockRB.UseVisualStyleBackColor = true;
+            this.rockRB.Click += new System.EventHandler(this.BuildingRB_Click);
             // 
             // main1RB
             // 
@@ -322,6 +342,7 @@
             this.main1RB.TabStop = true;
             this.main1RB.Text = "Main player 1";
             this.main1RB.UseVisualStyleBackColor = true;
+            this.main1RB.Click += new System.EventHandler(this.BuildingRB_Click);
             // 
             // bigRockRB
             // 
@@ -333,10 +354,12 @@
             this.bigRockRB.TabStop = true;
             this.bigRockRB.Text = "Big rock";
             this.bigRockRB.UseVisualStyleBackColor = true;
+            this.bigRockRB.Click += new System.EventHandler(this.BuildingRB_Click);
             // 
             // main0RB
             // 
             this.main0RB.AutoSize = true;
+            this.main0RB.Checked = true;
             this.main0RB.Location = new System.Drawing.Point(6, 19);
             this.main0RB.Name = "main0RB";
             this.main0RB.Size = new System.Drawing.Size(88, 17);
@@ -385,17 +408,85 @@
             // errorMessageL
             // 
             this.errorMessageL.BackColor = System.Drawing.Color.White;
+            this.errorMessageL.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.errorMessageL.Location = new System.Drawing.Point(16, 17);
             this.errorMessageL.Name = "errorMessageL";
             this.errorMessageL.Size = new System.Drawing.Size(269, 39);
             this.errorMessageL.TabIndex = 16;
             this.errorMessageL.Text = "Error messages";
+            this.errorMessageL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // coordinatesL
+            // 
+            this.coordinatesL.AutoSize = true;
+            this.coordinatesL.Location = new System.Drawing.Point(145, 140);
+            this.coordinatesL.Name = "coordinatesL";
+            this.coordinatesL.Size = new System.Drawing.Size(39, 13);
+            this.coordinatesL.TabIndex = 8;
+            this.coordinatesL.Text = "X=; Y=";
+            // 
+            // brushSizeNUD
+            // 
+            this.brushSizeNUD.Location = new System.Drawing.Point(90, 138);
+            this.brushSizeNUD.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.brushSizeNUD.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.brushSizeNUD.Name = "brushSizeNUD";
+            this.brushSizeNUD.Size = new System.Drawing.Size(46, 20);
+            this.brushSizeNUD.TabIndex = 9;
+            this.brushSizeNUD.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // brushSizeL
+            // 
+            this.brushSizeL.AutoSize = true;
+            this.brushSizeL.Location = new System.Drawing.Point(6, 140);
+            this.brushSizeL.Name = "brushSizeL";
+            this.brushSizeL.Size = new System.Drawing.Size(58, 13);
+            this.brushSizeL.TabIndex = 10;
+            this.brushSizeL.Text = "Brush size:";
+            // 
+            // nutrientsRateL
+            // 
+            this.nutrientsRateL.AutoSize = true;
+            this.nutrientsRateL.Location = new System.Drawing.Point(6, 164);
+            this.nutrientsRateL.Name = "nutrientsRateL";
+            this.nutrientsRateL.Size = new System.Drawing.Size(73, 13);
+            this.nutrientsRateL.TabIndex = 12;
+            this.nutrientsRateL.Text = "Nutrients rate:";
+            // 
+            // nutrientsRateNUD
+            // 
+            this.nutrientsRateNUD.Location = new System.Drawing.Point(90, 162);
+            this.nutrientsRateNUD.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nutrientsRateNUD.Name = "nutrientsRateNUD";
+            this.nutrientsRateNUD.Size = new System.Drawing.Size(46, 20);
+            this.nutrientsRateNUD.TabIndex = 11;
+            this.nutrientsRateNUD.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // MainMenuWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(606, 410);
+            this.ClientSize = new System.Drawing.Size(606, 462);
             this.Controls.Add(this.errorMessageL);
             this.Controls.Add(this.drawOptionsGB);
             this.Controls.Add(this.playPanel);
@@ -417,6 +508,8 @@
             this.drawOptionsGB.PerformLayout();
             this.buildingSelectionGB.ResumeLayout(false);
             this.buildingSelectionGB.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nutrientsRateNUD)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -454,5 +547,10 @@
         private System.Windows.Forms.RadioButton shallowWaterRB;
         private System.Windows.Forms.Label errorMessageL;
         private System.Windows.Forms.Button deleteB;
+        private System.Windows.Forms.Label coordinatesL;
+        private System.Windows.Forms.Label brushSizeL;
+        private System.Windows.Forms.NumericUpDown brushSizeNUD;
+        private System.Windows.Forms.Label nutrientsRateL;
+        private System.Windows.Forms.NumericUpDown nutrientsRateNUD;
     }
 }

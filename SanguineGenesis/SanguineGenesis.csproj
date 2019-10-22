@@ -240,6 +240,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GameLogic\AI\" />
+    <Folder Include="Maps\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\NewMap\buildings.png">
