@@ -165,9 +165,28 @@ namespace SanguineGenesis.GUI
                     {
                         int xx = x + i;
                         int yy = y + j;
-                        if(xx>=0 && xx<bitmap.Width && yy >=0 && yy < bitmap.Height)
+                        if(ValidCoordinates(xx, yy))
                         {
                             bitmap.SetPixel(xx, yy, c);
+                        }
+                    }
+            }
+
+            /// <summary>
+            /// Fills the terrain map in the given rectangle with the color c but 
+            /// ignores the squares with buildings. Coordiantes can be out of range.
+            /// </summary>
+            private void FillTerrainIgnoreBuildings(Color c, int x, int y, int width, int height)
+            {
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
+                    {
+                        int xx = x + i;
+                        int yy = y + j;
+                        if (ValidCoordinates(xx, yy))
+                        {
+                            if(ColorsEqual(BuildingsLocations.GetPixel(xx,yy), Color.White))
+                                TerrainMap.SetPixel(xx, yy, c);
                         }
                     }
             }
@@ -198,14 +217,14 @@ namespace SanguineGenesis.GUI
             /// <summary>
             /// Returns true iff the coordinate on the map is valid.
             /// </summary>
-            public bool ValidCoordinate(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
+            public bool ValidCoordinates(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
 
             /// <summary>
             /// Draws the color to the terrain map.
             /// </summary>
             public void DrawTerrain(Color color, int x, int y , int width, int height)
             {
-                FillRectWithColor(TerrainMap, color, x, y, width, height);
+                FillTerrainIgnoreBuildings(color, x, y, width, height);
             }
 
             /// <summary>
@@ -221,13 +240,13 @@ namespace SanguineGenesis.GUI
             /// </summary>
             private bool CanBePlacedBuilding(int x, int y, int width, int height)
             {
-                if(ValidCoordinate(x, y) &&
-                    ValidCoordinate(x + width - 1, y + height - 1))
+                if(ValidCoordinates(x, y) &&
+                    ValidCoordinates(x + width - 1, y + height - 1))
                 {
                     for (int i = x; i < x + width; i++)
                         for (int j = y; j < y + height; j++)
                             if (ColorsEqual(BuildingsLocations.GetPixel(i, j),Color.Black) ||
-                                ColorsEqual(TerrainMap.GetPixel(i,j), Color.FromArgb(168, 142, 78)))
+                                !ColorsEqual(TerrainMap.GetPixel(i,j), Color.FromArgb(168, 142, 78)))
                                 return false;
                     return true;
                 }
@@ -235,16 +254,58 @@ namespace SanguineGenesis.GUI
             }
 
             /// <summary>
-            /// Adds a new building of given type to the map.
+            /// Adds a new building of given type to the map. Returns error message.
             /// </summary>
-            public void AddBuilding(BuildingType type, int x, int y)
+            public string AddBuilding(string type, int x, int y)
             {
-                if(TryGetBuildingSize(type.ToString(), out int width, out int height))
-                    if(CanBePlacedBuilding(x, y, width, height))
+                if (TryGetBuildingSize(type, out int width, out int height))
+                {
+                    if (type == "PLAYER_0_MAIN" &&
+                        Buildings.Where(bd => bd.Type == type).Any())
+                        return "Main building for player 0 was already placed.";
+
+                    if (type == "PLAYER_1_MAIN" &&
+                        Buildings.Where(bd => bd.Type == type).Any())
+                        return "Main building for player 1 was already placed.";
+
+                    if (CanBePlacedBuilding(x, y, width, height))
                     {
                         Buildings.Add(new BuildingDescriptor(type.ToString(), x, y));
                         FillRectWithColor(BuildingsLocations, Color.Black, x, y, width, height);
+                        return null;
                     }
+                    else
+                        return "The building cannot be placed at the coordinates (" + x + ", "+ y +").";
+                }
+                else
+                    return "The building with a type \"" + type + "\" doesn't exist.";
+            }
+
+            /// <summary>
+            /// Removes the building that lies on position (x,y).
+            /// </summary>
+            public void RemoveBuilding(int x, int y)
+            {
+                if (!ValidCoordinates(x, y))
+                    return;
+
+                //the square isn't occupied by any building
+                if (ColorsEqual(BuildingsLocations.GetPixel(x, y), Color.White))
+                    return;
+
+                BuildingDescriptor? toRemove=null;
+                foreach(var bd in Buildings)
+                {
+                    TryGetBuildingSize(bd.Type, out int width, out int height);
+                    if(bd.X<=x && x<bd.X + width && bd.Y<= y && y<bd.Y + height)
+                    {
+                        toRemove = bd;
+                        FillRectWithColor(BuildingsLocations, Color.White, bd.X, bd.Y, width, height);
+                        break;
+                    }
+                }
+                if(toRemove.HasValue)
+                    Buildings.Remove(toRemove.Value);
             }
 
             /// <summary>
@@ -253,7 +314,6 @@ namespace SanguineGenesis.GUI
             public void Save()
             {
                 string dirName = DIRECTORY + Name;
-                //todo: ask user if the directory should be cleared
                 if (Directory.Exists(dirName))
                     foreach (var f in Directory.GetFiles(dirName))
                         File.Delete(f);
@@ -291,6 +351,12 @@ namespace SanguineGenesis.GUI
                 {
                     TerrainMap = new Bitmap(terrainReader);
                     NutrientsMap = new Bitmap(nutrientsReader);
+                    BuildingsLocations = new Bitmap(TerrainMap.Width, TerrainMap.Height);
+                    for (int i = 0; i < BuildingsLocations.Width; i++)
+                        for (int j = 0; j < BuildingsLocations.Height; j++)
+                        {
+                            BuildingsLocations.SetPixel(i, j, Color.White);
+                        }
 
                     Buildings = new List<BuildingDescriptor>();
                     string line;
@@ -300,7 +366,7 @@ namespace SanguineGenesis.GUI
                         int x = int.Parse(param[0]);
                         int y = int.Parse(param[1]);
                         string type = param[2];
-                        Buildings.Add(new BuildingDescriptor(type, x, y));
+                        AddBuilding(type, x, y);
                     }
                 }
                 Name = mapDirectoryName;
@@ -315,6 +381,7 @@ namespace SanguineGenesis.GUI
             DRAW_DEEP_WATER,
             DRAW_NUTRIENTS,
             ADD_BUILDING,
+            REMOVE_BUILDING,
             NO_ACTION
         }
         private DrawOption drawOpt;
@@ -352,23 +419,56 @@ namespace SanguineGenesis.GUI
 
         private void NewMapB_Click(object sender, EventArgs e)
         {
-            if(int.TryParse(widthTB.Text, out int width) &&
-                int.TryParse(heightTB.Text, out int height)&&
-                width > 0 && width <= MAX_MAP_WIDTH &&
-                height > 0 && height <= MAX_MAP_HEIGHT &&
-                ValidName(newNameTB.Text))
+            if(!int.TryParse(widthTB.Text, out int width))
+            {
+                ErrorMessage("The width value \""+widthTB.Text + "\" is not a number.");
+                return;
+            }
+            if(!int.TryParse(heightTB.Text, out int height))
+            {
+                ErrorMessage("The height value \"" + heightTB.Text + "\" is not a valid number.");
+                return;
+            }
+            if (!(width > 0 && width <= MAX_MAP_WIDTH))
+            {
+
+                ErrorMessage("Width has to be between " + 0 + " and " + MAX_MAP_WIDTH + ".");
+                return;
+            }
+            if(!(height > 0 && height <= MAX_MAP_HEIGHT))
+            {
+                ErrorMessage("Height has to be between " + 0 + " and " + MAX_MAP_HEIGHT + ".");
+                return;
+            }
+            if(ValidName(newNameTB.Text))
             {
                 MapDescr = new MapDescription(width, height, newNameTB.Text);
                 mapPB.Invalidate();
                 mapPB.Refresh();
                 EnableEditing();
+                mapNameL.Text = MapDescr.Name;
+                Message("The map \"" + MapDescr.Name + "\" was created.");
             }
         }
 
         /// <summary>
-        /// Returns true if name can be used as name of the map.
+        /// Returns true if name can be used as a name of the map. Prints error message.
         /// </summary>
-        private bool ValidName(string name) => name!="";
+        private bool ValidName(string name)
+        {
+            if (name == "")
+            {
+                ErrorMessage("The name of the map cannot be empty.");
+                return false;
+            }
+            foreach(string mapName in mapNamesCB.Items)
+                if(mapName == name)
+                {
+                    ErrorMessage("The name \"" + name + "\" already exits.");
+                    return false;
+                }
+            return true;
+        }
 
         /// <summary>
         /// Returns point in map coordinates. Input coordiantes x and y have to be relative
@@ -399,6 +499,9 @@ namespace SanguineGenesis.GUI
                     break;
                 case "addBuildingRB":
                     DrawOpt = DrawOption.ADD_BUILDING;
+                    break;
+                case "removeBuildingRB":
+                    DrawOpt = DrawOption.REMOVE_BUILDING;
                     break;
             }
         }
@@ -445,7 +548,7 @@ namespace SanguineGenesis.GUI
 
             if (e.Button == MouseButtons.Left)
             {
-                if (MapDescr.ValidCoordinate(mapPoint.X, mapPoint.Y))
+                if (MapDescr.ValidCoordinates(mapPoint.X, mapPoint.Y))
                 {
                     int size = (int)brushSizeNUD.Value;//of brush
                     int x = mapPoint.X - size / 2;
@@ -465,7 +568,12 @@ namespace SanguineGenesis.GUI
                             MapDescr.AddNutrients(x, y, size, size, (int)nutrientsRateNUD.Value);
                             break;
                         case DrawOption.ADD_BUILDING:
-                            MapDescr.AddBuilding(BuildingToPlace, mapPoint.X, mapPoint.Y);
+                            string error = MapDescr.AddBuilding(BuildingToPlace.ToString(), mapPoint.X, mapPoint.Y);
+                            if (error != null)
+                                ErrorMessage(error);
+                            break;
+                        case DrawOption.REMOVE_BUILDING:
+                            MapDescr.RemoveBuilding(mapPoint.X, mapPoint.Y);
                             break;
                     }
                 }
@@ -480,7 +588,10 @@ namespace SanguineGenesis.GUI
                 MapDescr.Save();
                 DisableEditing();
                 LoadNamesOfCreatedMaps();
+                Message("The map \"" + MapDescr.Name + "\" was saved.");
             }
+            else
+                ErrorMessage("No map is loaded.");
         }
 
         private void LoadB_Click(object sender, EventArgs e)
@@ -496,10 +607,12 @@ namespace SanguineGenesis.GUI
             {
                 MapDescr = new MapDescription(mapDirName);
                 DisableEditing();
+                mapNameL.Text = MapDescr.Name;
+                Message("The map \"" + mapDirName + "\" was loaded.");
             }
             catch(Exception)
             {
-                ErrorMessage("Map " + mapDirName + " was not loaded, because it doesn't exist or has incorrect format.");
+                ErrorMessage("Map \"" + mapDirName + "\" was not loaded, because it doesn't exist or has incorrect format.");
             }
             mapPB.Refresh();
         }
@@ -511,6 +624,11 @@ namespace SanguineGenesis.GUI
             {
                 Directory.Delete(dirName, true);
                 LoadNamesOfCreatedMaps();
+                Message("The map \"" + mapNamesCB.Text + "\" was deleted.");
+            }
+            else
+            {
+                ErrorMessage("No map is loaded.");
             }
         }
 
@@ -535,12 +653,25 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void ErrorMessage(string message)
         {
+            errorMessageL.ForeColor = Color.Red;
+            errorMessageL.Text = message;
+        }
+
+        /// <summary>
+        /// Prints message.
+        /// </summary>
+        private void Message(string message)
+        {
+            errorMessageL.ForeColor = Color.Green;
             errorMessageL.Text = message;
         }
 
         private void EditB_Click(object sender, EventArgs e)
         {
-            EnableEditing();
+            if (MapDescr != null)
+                EnableEditing();
+            else
+                ErrorMessage("No map is loaded.");
         }
 
         /// <summary>
@@ -568,6 +699,8 @@ namespace SanguineGenesis.GUI
                 DrawOpt = DrawOption.DRAW_NUTRIENTS;
             else if (addBuildingRB.Checked)
                 DrawOpt = DrawOption.ADD_BUILDING;
+            else if (removeBuildingRB.Checked)
+                DrawOpt = DrawOption.REMOVE_BUILDING;
         }
     }
 }

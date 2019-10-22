@@ -64,6 +64,8 @@
             this.brushSizeL = new System.Windows.Forms.Label();
             this.nutrientsRateL = new System.Windows.Forms.Label();
             this.nutrientsRateNUD = new System.Windows.Forms.NumericUpDown();
+            this.mapNameL = new System.Windows.Forms.Label();
+            this.removeBuildingRB = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.newMapPanel.SuspendLayout();
@@ -114,7 +116,6 @@
             this.rainforestRB.Name = "rainforestRB";
             this.rainforestRB.Size = new System.Drawing.Size(73, 17);
             this.rainforestRB.TabIndex = 1;
-            this.rainforestRB.TabStop = true;
             this.rainforestRB.Text = "Rainforest";
             this.rainforestRB.UseVisualStyleBackColor = true;
             // 
@@ -276,6 +277,7 @@
             // 
             // drawOptionsGB
             // 
+            this.drawOptionsGB.Controls.Add(this.removeBuildingRB);
             this.drawOptionsGB.Controls.Add(this.nutrientsRateL);
             this.drawOptionsGB.Controls.Add(this.nutrientsRateNUD);
             this.drawOptionsGB.Controls.Add(this.brushSizeL);
@@ -302,7 +304,6 @@
             this.addBuildingRB.Name = "addBuildingRB";
             this.addBuildingRB.Size = new System.Drawing.Size(83, 17);
             this.addBuildingRB.TabIndex = 7;
-            this.addBuildingRB.TabStop = true;
             this.addBuildingRB.Text = "Add building";
             this.addBuildingRB.UseVisualStyleBackColor = true;
             this.addBuildingRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
@@ -327,7 +328,6 @@
             this.rockRB.Name = "rockRB";
             this.rockRB.Size = new System.Drawing.Size(51, 17);
             this.rockRB.TabIndex = 9;
-            this.rockRB.TabStop = true;
             this.rockRB.Text = "Rock";
             this.rockRB.UseVisualStyleBackColor = true;
             this.rockRB.Click += new System.EventHandler(this.BuildingRB_Click);
@@ -339,7 +339,6 @@
             this.main1RB.Name = "main1RB";
             this.main1RB.Size = new System.Drawing.Size(88, 17);
             this.main1RB.TabIndex = 8;
-            this.main1RB.TabStop = true;
             this.main1RB.Text = "Main player 1";
             this.main1RB.UseVisualStyleBackColor = true;
             this.main1RB.Click += new System.EventHandler(this.BuildingRB_Click);
@@ -351,7 +350,6 @@
             this.bigRockRB.Name = "bigRockRB";
             this.bigRockRB.Size = new System.Drawing.Size(64, 17);
             this.bigRockRB.TabIndex = 8;
-            this.bigRockRB.TabStop = true;
             this.bigRockRB.Text = "Big rock";
             this.bigRockRB.UseVisualStyleBackColor = true;
             this.bigRockRB.Click += new System.EventHandler(this.BuildingRB_Click);
@@ -376,7 +374,6 @@
             this.nutrientsRB.Name = "nutrientsRB";
             this.nutrientsRB.Size = new System.Drawing.Size(67, 17);
             this.nutrientsRB.TabIndex = 5;
-            this.nutrientsRB.TabStop = true;
             this.nutrientsRB.Text = "Nutrients";
             this.nutrientsRB.UseVisualStyleBackColor = true;
             this.nutrientsRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
@@ -388,7 +385,6 @@
             this.landRB.Name = "landRB";
             this.landRB.Size = new System.Drawing.Size(49, 17);
             this.landRB.TabIndex = 4;
-            this.landRB.TabStop = true;
             this.landRB.Text = "Land";
             this.landRB.UseVisualStyleBackColor = true;
             this.landRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
@@ -400,7 +396,6 @@
             this.shallowWaterRB.Name = "shallowWaterRB";
             this.shallowWaterRB.Size = new System.Drawing.Size(91, 17);
             this.shallowWaterRB.TabIndex = 3;
-            this.shallowWaterRB.TabStop = true;
             this.shallowWaterRB.Text = "Shallow water";
             this.shallowWaterRB.UseVisualStyleBackColor = true;
             this.shallowWaterRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
@@ -419,7 +414,7 @@
             // coordinatesL
             // 
             this.coordinatesL.AutoSize = true;
-            this.coordinatesL.Location = new System.Drawing.Point(145, 140);
+            this.coordinatesL.Location = new System.Drawing.Point(14, 169);
             this.coordinatesL.Name = "coordinatesL";
             this.coordinatesL.Size = new System.Drawing.Size(39, 13);
             this.coordinatesL.TabIndex = 8;
@@ -427,7 +422,7 @@
             // 
             // brushSizeNUD
             // 
-            this.brushSizeNUD.Location = new System.Drawing.Point(90, 138);
+            this.brushSizeNUD.Location = new System.Drawing.Point(218, 143);
             this.brushSizeNUD.Maximum = new decimal(new int[] {
             10,
             0,
@@ -450,7 +445,7 @@
             // brushSizeL
             // 
             this.brushSizeL.AutoSize = true;
-            this.brushSizeL.Location = new System.Drawing.Point(6, 140);
+            this.brushSizeL.Location = new System.Drawing.Point(134, 145);
             this.brushSizeL.Name = "brushSizeL";
             this.brushSizeL.Size = new System.Drawing.Size(58, 13);
             this.brushSizeL.TabIndex = 10;
@@ -459,7 +454,7 @@
             // nutrientsRateL
             // 
             this.nutrientsRateL.AutoSize = true;
-            this.nutrientsRateL.Location = new System.Drawing.Point(6, 164);
+            this.nutrientsRateL.Location = new System.Drawing.Point(134, 169);
             this.nutrientsRateL.Name = "nutrientsRateL";
             this.nutrientsRateL.Size = new System.Drawing.Size(73, 13);
             this.nutrientsRateL.TabIndex = 12;
@@ -467,7 +462,7 @@
             // 
             // nutrientsRateNUD
             // 
-            this.nutrientsRateNUD.Location = new System.Drawing.Point(90, 162);
+            this.nutrientsRateNUD.Location = new System.Drawing.Point(218, 167);
             this.nutrientsRateNUD.Minimum = new decimal(new int[] {
             1,
             0,
@@ -482,11 +477,33 @@
             0,
             0});
             // 
+            // mapNameL
+            // 
+            this.mapNameL.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.mapNameL.Location = new System.Drawing.Point(291, 322);
+            this.mapNameL.Name = "mapNameL";
+            this.mapNameL.Size = new System.Drawing.Size(297, 49);
+            this.mapNameL.TabIndex = 13;
+            this.mapNameL.Text = "<map name>";
+            this.mapNameL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // removeBuildingRB
+            // 
+            this.removeBuildingRB.AutoSize = true;
+            this.removeBuildingRB.Location = new System.Drawing.Point(7, 134);
+            this.removeBuildingRB.Name = "removeBuildingRB";
+            this.removeBuildingRB.Size = new System.Drawing.Size(104, 17);
+            this.removeBuildingRB.TabIndex = 13;
+            this.removeBuildingRB.Text = "Remove building";
+            this.removeBuildingRB.UseVisualStyleBackColor = true;
+            this.removeBuildingRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
+            // 
             // MainMenuWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(606, 462);
+            this.Controls.Add(this.mapNameL);
             this.Controls.Add(this.errorMessageL);
             this.Controls.Add(this.drawOptionsGB);
             this.Controls.Add(this.playPanel);
@@ -552,5 +569,7 @@
         private System.Windows.Forms.NumericUpDown brushSizeNUD;
         private System.Windows.Forms.Label nutrientsRateL;
         private System.Windows.Forms.NumericUpDown nutrientsRateNUD;
+        private System.Windows.Forms.Label mapNameL;
+        private System.Windows.Forms.RadioButton removeBuildingRB;
     }
 }
