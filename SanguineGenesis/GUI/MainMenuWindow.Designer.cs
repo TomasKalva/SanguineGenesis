@@ -49,6 +49,12 @@
             this.playPanel = new System.Windows.Forms.Panel();
             this.deepWaterRB = new System.Windows.Forms.RadioButton();
             this.drawOptionsGB = new System.Windows.Forms.GroupBox();
+            this.removeBuildingRB = new System.Windows.Forms.RadioButton();
+            this.nutrientsRateL = new System.Windows.Forms.Label();
+            this.nutrientsRateNUD = new System.Windows.Forms.NumericUpDown();
+            this.brushSizeL = new System.Windows.Forms.Label();
+            this.brushSizeNUD = new System.Windows.Forms.NumericUpDown();
+            this.coordinatesL = new System.Windows.Forms.Label();
             this.addBuildingRB = new System.Windows.Forms.RadioButton();
             this.buildingSelectionGB = new System.Windows.Forms.GroupBox();
             this.rockRB = new System.Windows.Forms.RadioButton();
@@ -59,22 +65,16 @@
             this.landRB = new System.Windows.Forms.RadioButton();
             this.shallowWaterRB = new System.Windows.Forms.RadioButton();
             this.errorMessageL = new System.Windows.Forms.Label();
-            this.coordinatesL = new System.Windows.Forms.Label();
-            this.brushSizeNUD = new System.Windows.Forms.NumericUpDown();
-            this.brushSizeL = new System.Windows.Forms.Label();
-            this.nutrientsRateL = new System.Windows.Forms.Label();
-            this.nutrientsRateNUD = new System.Windows.Forms.NumericUpDown();
             this.mapNameL = new System.Windows.Forms.Label();
-            this.removeBuildingRB = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.newMapPanel.SuspendLayout();
             this.loadMapPanel.SuspendLayout();
             this.playPanel.SuspendLayout();
             this.drawOptionsGB.SuspendLayout();
-            this.buildingSelectionGB.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nutrientsRateNUD)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).BeginInit();
+            this.buildingSelectionGB.SuspendLayout();
             this.SuspendLayout();
             // 
             // mapPB
@@ -97,6 +97,7 @@
             this.playB.TabIndex = 1;
             this.playB.Text = "Play";
             this.playB.UseVisualStyleBackColor = true;
+            this.playB.Click += new System.EventHandler(this.PlayB_Click);
             // 
             // groupBox1
             // 
@@ -297,6 +298,83 @@
             this.drawOptionsGB.TabStop = false;
             this.drawOptionsGB.Text = "Draw options";
             // 
+            // removeBuildingRB
+            // 
+            this.removeBuildingRB.AutoSize = true;
+            this.removeBuildingRB.Location = new System.Drawing.Point(7, 134);
+            this.removeBuildingRB.Name = "removeBuildingRB";
+            this.removeBuildingRB.Size = new System.Drawing.Size(104, 17);
+            this.removeBuildingRB.TabIndex = 13;
+            this.removeBuildingRB.Text = "Remove building";
+            this.removeBuildingRB.UseVisualStyleBackColor = true;
+            this.removeBuildingRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
+            // 
+            // nutrientsRateL
+            // 
+            this.nutrientsRateL.AutoSize = true;
+            this.nutrientsRateL.Location = new System.Drawing.Point(134, 169);
+            this.nutrientsRateL.Name = "nutrientsRateL";
+            this.nutrientsRateL.Size = new System.Drawing.Size(73, 13);
+            this.nutrientsRateL.TabIndex = 12;
+            this.nutrientsRateL.Text = "Nutrients rate:";
+            // 
+            // nutrientsRateNUD
+            // 
+            this.nutrientsRateNUD.Location = new System.Drawing.Point(218, 167);
+            this.nutrientsRateNUD.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nutrientsRateNUD.Name = "nutrientsRateNUD";
+            this.nutrientsRateNUD.Size = new System.Drawing.Size(46, 20);
+            this.nutrientsRateNUD.TabIndex = 11;
+            this.nutrientsRateNUD.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // brushSizeL
+            // 
+            this.brushSizeL.AutoSize = true;
+            this.brushSizeL.Location = new System.Drawing.Point(134, 145);
+            this.brushSizeL.Name = "brushSizeL";
+            this.brushSizeL.Size = new System.Drawing.Size(58, 13);
+            this.brushSizeL.TabIndex = 10;
+            this.brushSizeL.Text = "Brush size:";
+            // 
+            // brushSizeNUD
+            // 
+            this.brushSizeNUD.Location = new System.Drawing.Point(218, 143);
+            this.brushSizeNUD.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.brushSizeNUD.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.brushSizeNUD.Name = "brushSizeNUD";
+            this.brushSizeNUD.Size = new System.Drawing.Size(46, 20);
+            this.brushSizeNUD.TabIndex = 9;
+            this.brushSizeNUD.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // coordinatesL
+            // 
+            this.coordinatesL.AutoSize = true;
+            this.coordinatesL.Location = new System.Drawing.Point(14, 169);
+            this.coordinatesL.Name = "coordinatesL";
+            this.coordinatesL.Size = new System.Drawing.Size(39, 13);
+            this.coordinatesL.TabIndex = 8;
+            this.coordinatesL.Text = "X=; Y=";
+            // 
             // addBuildingRB
             // 
             this.addBuildingRB.AutoSize = true;
@@ -411,72 +489,6 @@
             this.errorMessageL.Text = "Error messages";
             this.errorMessageL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // coordinatesL
-            // 
-            this.coordinatesL.AutoSize = true;
-            this.coordinatesL.Location = new System.Drawing.Point(14, 169);
-            this.coordinatesL.Name = "coordinatesL";
-            this.coordinatesL.Size = new System.Drawing.Size(39, 13);
-            this.coordinatesL.TabIndex = 8;
-            this.coordinatesL.Text = "X=; Y=";
-            // 
-            // brushSizeNUD
-            // 
-            this.brushSizeNUD.Location = new System.Drawing.Point(218, 143);
-            this.brushSizeNUD.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.brushSizeNUD.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.brushSizeNUD.Name = "brushSizeNUD";
-            this.brushSizeNUD.Size = new System.Drawing.Size(46, 20);
-            this.brushSizeNUD.TabIndex = 9;
-            this.brushSizeNUD.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // brushSizeL
-            // 
-            this.brushSizeL.AutoSize = true;
-            this.brushSizeL.Location = new System.Drawing.Point(134, 145);
-            this.brushSizeL.Name = "brushSizeL";
-            this.brushSizeL.Size = new System.Drawing.Size(58, 13);
-            this.brushSizeL.TabIndex = 10;
-            this.brushSizeL.Text = "Brush size:";
-            // 
-            // nutrientsRateL
-            // 
-            this.nutrientsRateL.AutoSize = true;
-            this.nutrientsRateL.Location = new System.Drawing.Point(134, 169);
-            this.nutrientsRateL.Name = "nutrientsRateL";
-            this.nutrientsRateL.Size = new System.Drawing.Size(73, 13);
-            this.nutrientsRateL.TabIndex = 12;
-            this.nutrientsRateL.Text = "Nutrients rate:";
-            // 
-            // nutrientsRateNUD
-            // 
-            this.nutrientsRateNUD.Location = new System.Drawing.Point(218, 167);
-            this.nutrientsRateNUD.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nutrientsRateNUD.Name = "nutrientsRateNUD";
-            this.nutrientsRateNUD.Size = new System.Drawing.Size(46, 20);
-            this.nutrientsRateNUD.TabIndex = 11;
-            this.nutrientsRateNUD.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
             // mapNameL
             // 
             this.mapNameL.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
@@ -486,17 +498,6 @@
             this.mapNameL.TabIndex = 13;
             this.mapNameL.Text = "<map name>";
             this.mapNameL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // removeBuildingRB
-            // 
-            this.removeBuildingRB.AutoSize = true;
-            this.removeBuildingRB.Location = new System.Drawing.Point(7, 134);
-            this.removeBuildingRB.Name = "removeBuildingRB";
-            this.removeBuildingRB.Size = new System.Drawing.Size(104, 17);
-            this.removeBuildingRB.TabIndex = 13;
-            this.removeBuildingRB.Text = "Remove building";
-            this.removeBuildingRB.UseVisualStyleBackColor = true;
-            this.removeBuildingRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
             // 
             // MainMenuWindow
             // 
@@ -523,10 +524,10 @@
             this.playPanel.ResumeLayout(false);
             this.drawOptionsGB.ResumeLayout(false);
             this.drawOptionsGB.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nutrientsRateNUD)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).EndInit();
             this.buildingSelectionGB.ResumeLayout(false);
             this.buildingSelectionGB.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nutrientsRateNUD)).EndInit();
             this.ResumeLayout(false);
 
         }

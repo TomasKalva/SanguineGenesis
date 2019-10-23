@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
 
 namespace SanguineGenesis
 {
@@ -62,7 +63,7 @@ namespace SanguineGenesis
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
 
-        public Game(Biome firstPlayersBiome)
+        public Game(MapDescription mapDescription, Biome firstPlayersBiome)
         {
             GameEnded = false;
             Winner = null;
@@ -75,9 +76,9 @@ namespace SanguineGenesis
             NeutralFaction = new Faction(FactionType.NEUTRAL);
 
              //map
-            var mapLoader = new MapLoader();
-            Map = mapLoader.LoadMap("Images\\NewMap\\nutrients.png", "Images\\NewMap\\terrain.png", this);
-            mapLoader.LoadBuildings(this, "Images\\NewMap\\buildings.png");
+            var mapLoader = new MapLoader2(mapDescription);
+            Map = mapLoader.LoadMap();
+            mapLoader.LoadBuildings(this);
 
             foreach(var kvp in Players)
                 kvp.Value.InitializeMapView(Map);

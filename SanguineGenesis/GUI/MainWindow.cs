@@ -14,13 +14,13 @@ using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI
 {
-    public partial class MainWinformWindow : Form
+    partial class MainWinformWindow : Form
     {
-        public MainWinformWindow()
+        public MainWinformWindow(MapDescription mapDescription, Biome playersBiome)
         {
             InitializeComponent();
 
-            Game = new Game(Biome.RAINFOREST);
+            Game = new Game(mapDescription, playersBiome);
             GameControls = new GameControls(Game.Map);
             TotalStopwatch = new Stopwatch();
             TotalStopwatch.Start();
