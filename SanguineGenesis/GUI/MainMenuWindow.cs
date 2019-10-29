@@ -320,6 +320,8 @@ namespace SanguineGenesis.GUI
                             break;
                     }
                 }
+                MapDescr.RepairMap();
+
                 mapPB.Refresh();
             }
         }
@@ -328,6 +330,7 @@ namespace SanguineGenesis.GUI
         {
             if (MapDescr != null)
             {
+                MapDescr.RepairMap();
                 MapDescr.Save();
                 DisableEditing();
                 LoadNamesOfCreatedMaps();
@@ -381,6 +384,7 @@ namespace SanguineGenesis.GUI
             {
                 if (MapDescr.MainBuildingsPresent())
                 {
+                    MapDescr.RepairMap();
                     DisableEditing();
 
                     var gameWindow = new MainWinformWindow(MapDescr, PlayersBiome);
@@ -782,6 +786,103 @@ namespace SanguineGenesis.GUI
                     }
             }
 
+            /// <summary>
+            /// Removes forbiden patterns from TerrainMap the following way:
+            /// 
+            /// +_  =>  +_
+            /// _+      ++
+            /// 
+            /// _+  =>  _+
+            /// +_      ++
+            /// 
+            /// iterates until all of the forbiden patterns are gone. The operation
+            /// is applied with priorities from highest to lowest: DeepWater, ShallowWater, Land.
+            /// </summary>
+            public void RepairMap()
+            {
+                if (Frozen)
+                    return;
+
+                bool changed = true;
+                while (changed)
+                {
+                    changed = false;
+                    for (int i = 0; i < Width - 1; i++)
+                        for (int j = 0; j < Height - 1; j++)
+                        {
+                            Color a = TerrainMap.GetPixel(i, j); Color b = TerrainMap.GetPixel(i + 1, j);
+                            Color c = TerrainMap.GetPixel(i, j + 1); Color d = TerrainMap.GetPixel(i + 1, j + 1);
+
+                            if (a.SameRGB(d) && ! a.SameRGB(c) && ! a.SameRGB(b))
+                            // +_
+                            // _+
+                            {
+                                if (c.SameRGB(b))
+                                // +-
+                                // -+
+                                {
+                                    if (TerrainHigherPriority(a, b))
+                                    {
+                                        TerrainMap.SetPixel(i, j + 1, a);
+                                    }
+                                    else
+                                    {
+                                        TerrainMap.SetPixel(i + 1, j + 1, b);
+                                    }
+                                }
+                                else
+                                // +.
+                                // -+
+                                    TerrainMap.SetPixel(i, j + 1, a);
+
+                                    changed = true;
+                            }
+                            if (c.SameRGB(b) && !c.SameRGB(a) && !c.SameRGB(d))
+                            // _+
+                            // +_
+                            {
+                                if (a.SameRGB(d))
+                                // -+
+                                // +-
+                                {
+                                    if (TerrainHigherPriority(a, b))
+                                    {
+                                        TerrainMap.SetPixel(i, j + 1, a);
+                                    }
+                                    else
+                                    {
+                                        TerrainMap.SetPixel(i + 1, j + 1, b);
+                                    }
+                                }
+                                else
+                                // .+
+                                // +-
+                                    TerrainMap.SetPixel(i, j + 1, a);
+
+                                changed = true;
+                            }
+                        }
+                }
+            }
+
+            /// <summary>
+            /// Returns true if a and b represent terrain and a has greater prioirity when repairing
+            /// map than b.
+            /// </summary>
+            private bool TerrainHigherPriority(Color a, Color b)
+            {
+                if (a.SameRGB(DeepWaterColor))
+                    return true;
+                else if (a.SameRGB(LandColor))
+                    return false;
+                else
+                {
+                    if (b.SameRGB(DeepWaterColor))
+                        return false;
+                    else
+                        return true;
+                }
+            }
             
             #endregion Mutating methods
 

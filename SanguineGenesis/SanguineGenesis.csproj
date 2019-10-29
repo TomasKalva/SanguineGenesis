@@ -103,7 +103,6 @@
     <Compile Include="GameLogic\Data\GameStaticData.cs" />
     <Compile Include="GameLogic\Maps\BfsPathfinding.cs" />
     <Compile Include="GameLogic\Maps\IPathfinding.cs" />
-    <Compile Include="GameLogic\Maps\MapLoader2.cs" />
     <Compile Include="GameLogic\Maps\MapLoader.cs" />
     <Compile Include="GameLogic\Maps\PushingMap.cs" />
     <Compile Include="GameLogic\Data\Entities\Structure.cs" />
