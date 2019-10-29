@@ -69,13 +69,6 @@ namespace SanguineGenesis.GUI
                 drawOpt = value;
             }
         }
-        private enum BuildingType
-        {
-            PLAYER_0_MAIN,
-            PLAYER_1_MAIN,
-            ROCK,
-            BIG_ROCK
-        }
         private BuildingType BuildingToPlace { get; set; }
 
         private void NewMapB_Click(object sender, EventArgs e)
@@ -217,19 +210,19 @@ namespace SanguineGenesis.GUI
                     switch (DrawOpt)
                     {
                         case DrawOption.DRAW_DEEP_WATER:
-                            MapDescr.DrawTerrain(Color.FromArgb(0, 0, 255), x, y, size, size);
+                            MapDescr.DrawTerrain(MapDescription.DeepWaterColor, x, y, size, size);
                             break;
                         case DrawOption.DRAW_SHALLOW_WATER:
-                            MapDescr.DrawTerrain(Color.FromArgb(0, 155, 255), x, y, size, size);
+                            MapDescr.DrawTerrain(MapDescription.ShallowWaterColor, x, y, size, size);
                             break;
                         case DrawOption.DRAW_LAND:
-                            MapDescr.DrawTerrain(Color.FromArgb(168, 142, 78), x, y, size, size);
+                            MapDescr.DrawTerrain(MapDescription.LandColor, x, y, size, size);
                             break;
                         case DrawOption.DRAW_NUTRIENTS:
                             MapDescr.AddNutrients(x, y, size, size, (int)nutrientsRateNUD.Value);
                             break;
                         case DrawOption.ADD_BUILDING:
-                            string error = MapDescr.AddBuilding(BuildingToPlace.ToString(), mapPoint.X, mapPoint.Y);
+                            string error = MapDescr.AddBuilding(BuildingToPlace, mapPoint.X, mapPoint.Y);
                             if (error != null)
                                 ErrorMessage(error);
                             break;
@@ -344,7 +337,7 @@ namespace SanguineGenesis.GUI
             DrawOpt = DrawOption.NO_ACTION;
 
             if (MapDescr != null)
-                MapDescr.Freeze();
+                ((IFreezable)MapDescr).Freeze();
         }
 
         /// <summary>
@@ -367,7 +360,7 @@ namespace SanguineGenesis.GUI
                 DrawOpt = DrawOption.REMOVE_BUILDING;
 
             if (MapDescr != null)
-                MapDescr.Unfreeze();
+                ((IFreezable)MapDescr).Unfreeze();
         }
 
         /// <summary>
@@ -393,6 +386,9 @@ namespace SanguineGenesis.GUI
                 ErrorMessage("Load or create a map before starting the game.");
         }
 
+        /// <summary>
+        /// Used for freezing classes to make them immutable.
+        /// </summary>
         private interface IFreezable
         {
             void Freeze();
@@ -409,6 +405,26 @@ namespace SanguineGenesis.GUI
             /// Name of directory where maps are saved.
             /// </summary>
             public const string DIRECTORY = "Maps/";
+            public static Color LandColor { get; }
+            public static Color DeepWaterColor { get; }
+            public static Color ShallowWaterColor { get; }
+            public static Color RockColor { get; }
+            public static Color BigRockColor { get; }
+            public static Color Player0MainColor { get; }
+            public static Color Player1MainColor { get; }
+            public static Color NothingColor { get; }
+
+            static MapDescription()
+            {
+                LandColor = Color.FromArgb(168, 142, 78);
+                DeepWaterColor = Color.FromArgb(0, 0, 200);
+                ShallowWaterColor = Color.FromArgb(100, 100, 200);
+                RockColor = Color.FromArgb(100, 100, 100);
+                BigRockColor = Color.FromArgb(200, 200, 200);
+                Player0MainColor = Color.FromArgb(0, 0, 255);
+                Player1MainColor = Color.FromArgb(255, 0, 0);
+                NothingColor = Color.FromArgb(255, 255, 255);
+            }
 
             /// <summary>
             /// True iff the map can be edited.
@@ -438,19 +454,19 @@ namespace SanguineGenesis.GUI
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
                     {
-                        TerrainMap.SetPixel(i, j, Color.FromArgb(168, 142, 78));
+                        TerrainMap.SetPixel(i, j, LandColor);
                     }
                 NutrientsMap = new Bitmap(width, height);
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
                     {
-                        NutrientsMap.SetPixel(i, j, Color.White);
+                        NutrientsMap.SetPixel(i, j, NothingColor);
                     }
                 BuildingsLocations = new Bitmap(width, height);
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
                     {
-                        BuildingsLocations.SetPixel(i, j, Color.White);
+                        BuildingsLocations.SetPixel(i, j, NothingColor);
                     }
                 Buildings = new List<BuildingDescriptor>();
                 Frozen = false;
@@ -478,7 +494,7 @@ namespace SanguineGenesis.GUI
                     for (int i = 0; i < BuildingsLocations.Width; i++)
                         for (int j = 0; j < BuildingsLocations.Height; j++)
                         {
-                            BuildingsLocations.SetPixel(i, j, Color.White);
+                            BuildingsLocations.SetPixel(i, j, NothingColor);
                         }
 
                     Buildings = new List<BuildingDescriptor>();
@@ -489,7 +505,7 @@ namespace SanguineGenesis.GUI
                         int x = int.Parse(param[0]);
                         int y = int.Parse(param[1]);
                         string type = param[2];
-                        AddBuilding(type, x, y);
+                        AddBuilding((BuildingType)Enum.Parse(typeof(BuildingType), type), x, y);
                     }
                 }
                 Name = mapDirectoryName;
@@ -515,42 +531,45 @@ namespace SanguineGenesis.GUI
                     }
                 foreach (var bd in Buildings)
                 {
+                    if(!TryGetBuildingSize(bd.Type, out int width, out int height))
+                        continue;
+
                     switch (bd.Type)
                     {
-                        case "PLAYER_0_MAIN":
-                            FillRectWithColor(total, Color.Blue, bd.X, bd.Y, 3, 3);
+                        case BuildingType.PLAYER_0_MAIN:
+                            FillRectWithColor(total, Player0MainColor, bd.X, bd.Y, width, height);
                             break;
-                        case "PLAYER_1_MAIN":
-                            FillRectWithColor(total, Color.Red, bd.X, bd.Y, 3, 3);
+                        case BuildingType.PLAYER_1_MAIN:
+                            FillRectWithColor(total, Player1MainColor, bd.X, bd.Y, width, height);
                             break;
-                        case "ROCK":
-                            FillRectWithColor(total, Color.Gray, bd.X, bd.Y, 1, 1);
+                        case BuildingType.ROCK:
+                            FillRectWithColor(total, RockColor, bd.X, bd.Y, width, height);
                             break;
-                        case "BIG_ROCK":
-                            FillRectWithColor(total, Color.DarkGray, bd.X, bd.Y, 2, 2);
+                        case BuildingType.BIG_ROCK:
+                            FillRectWithColor(total, BigRockColor, bd.X, bd.Y, width, height);
                             break;
                     }
                 }
                 return total;
             }
 
-            private bool TryGetBuildingSize(string buildingType, out int width, out int height)
+            private bool TryGetBuildingSize(BuildingType buildingType, out int width, out int height)
             {
                 switch (buildingType)
                 {
-                    case "PLAYER_0_MAIN":
+                    case BuildingType.PLAYER_0_MAIN:
                         width = 3;
                         height = 3;
                         return true;
-                    case "PLAYER_1_MAIN":
+                    case BuildingType.PLAYER_1_MAIN:
                         width = 3;
                         height = 3;
                         return true;
-                    case "ROCK":
+                    case BuildingType.ROCK:
                         width = 1;
                         height = 1;
                         return true;
-                    case "BIG_ROCK":
+                    case BuildingType.BIG_ROCK:
                         width = 2;
                         height = 2;
                         return true;
@@ -564,8 +583,8 @@ namespace SanguineGenesis.GUI
             /// </summary>
             public bool MainBuildingsPresent()
             {
-                return Buildings.Where(bd => bd.Type == "PLAYER_0_MAIN").Any() &&
-                    Buildings.Where(bd => bd.Type == "PLAYER_1_MAIN").Any();
+                return Buildings.Where(bd => bd.Type == BuildingType.PLAYER_0_MAIN).Any() &&
+                    Buildings.Where(bd => bd.Type == BuildingType.PLAYER_1_MAIN).Any();
             }
 
             /// <summary>
@@ -584,8 +603,8 @@ namespace SanguineGenesis.GUI
                 {
                     for (int i = x; i < x + width; i++)
                         for (int j = y; j < y + height; j++)
-                            if (ColorsEqual(BuildingsLocations.GetPixel(i, j), Color.Black) ||
-                                !ColorsEqual(TerrainMap.GetPixel(i, j), Color.FromArgb(168, 142, 78)))
+                            if (Color.Black.SameRGB(BuildingsLocations.GetPixel(i, j)) ||
+                                !LandColor.SameRGB(TerrainMap.GetPixel(i, j)))//buildings can be put only on land
                                 return false;
                     return true;
                 }
@@ -622,24 +641,24 @@ namespace SanguineGenesis.GUI
             /// Adds a new building of given type to the map. Returns error message.
             /// Does nothing if this object is frozen.
             /// </summary>
-            public string AddBuilding(string type, int x, int y)
+            public string AddBuilding(BuildingType type, int x, int y)
             {
                 if (Frozen)
                     return "Can't modify frozen map.";
 
                 if (TryGetBuildingSize(type, out int width, out int height))
                 {
-                    if (type == "PLAYER_0_MAIN" &&
+                    if (type == BuildingType.PLAYER_0_MAIN &&
                         Buildings.Where(bd => bd.Type == type).Any())
                         return "Main building for player 0 was already placed.";
 
-                    if (type == "PLAYER_1_MAIN" &&
+                    if (type == BuildingType.PLAYER_1_MAIN &&
                         Buildings.Where(bd => bd.Type == type).Any())
                         return "Main building for player 1 was already placed.";
 
                     if (CanBePlacedBuilding(x, y, width, height))
                     {
-                        Buildings.Add(new BuildingDescriptor(type.ToString(), x, y));
+                        Buildings.Add(new BuildingDescriptor(type, x, y));
                         FillRectWithColor(BuildingsLocations, Color.Black, x, y, width, height);
                         return null;
                     }
@@ -663,10 +682,10 @@ namespace SanguineGenesis.GUI
                     return;
 
                 //the square isn't occupied by any building
-                if (ColorsEqual(BuildingsLocations.GetPixel(x, y), Color.White))
+                if (NothingColor.SameRGB(BuildingsLocations.GetPixel(x, y)))
                     return;
 
-                BuildingDescriptor? toRemove = null;
+                BuildingDescriptor? toRemove = null;//BuildingDescriptor is struct but we need null value
                 foreach (var bd in Buildings)
                 {
                     TryGetBuildingSize(bd.Type, out int width, out int height);
@@ -712,7 +731,7 @@ namespace SanguineGenesis.GUI
                         int yy = y + j;
                         if (ValidCoordinates(xx, yy))
                         {
-                            if (ColorsEqual(BuildingsLocations.GetPixel(xx, yy), Color.White))
+                            if (NothingColor.SameRGB(BuildingsLocations.GetPixel(xx, yy)))
                                 TerrainMap.SetPixel(xx, yy, c);
                         }
                     }
@@ -769,14 +788,12 @@ namespace SanguineGenesis.GUI
                 }
             }
 
-            private static bool ColorsEqual(Color a, Color b) => a.R == b.R && a.G == b.G && a.B == b.B;
-
-            public void Freeze()
+            void IFreezable.Freeze()
             {
                 Frozen = true;
             }
 
-            public void Unfreeze()
+            void IFreezable.Unfreeze()
             {
                 Frozen = false;
             }
@@ -786,9 +803,9 @@ namespace SanguineGenesis.GUI
         {
             public int X { get; }
             public int Y { get; }
-            public string Type { get; }
+            public BuildingType Type { get; }
 
-            public BuildingDescriptor(string type, int x, int y)
+            public BuildingDescriptor(BuildingType type, int x, int y)
             {
                 Type = type;
                 X = x;
@@ -799,6 +816,14 @@ namespace SanguineGenesis.GUI
             {
                 return X + " " + Y + " " + Type;
             }
+        }
+
+        public enum BuildingType
+        {
+            PLAYER_0_MAIN,
+            PLAYER_1_MAIN,
+            ROCK,
+            BIG_ROCK
         }
     }
 }

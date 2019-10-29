@@ -26,9 +26,9 @@ namespace SanguineGenesis.GameLogic.Maps
 
             ColorToTerrain = new Dictionary<Color, Terrain>()
             {
-                {Color.FromArgb(168, 142, 78), Terrain.LAND },
-                {Color.FromArgb(0, 155, 255), Terrain.SHALLOW_WATER },
-                {Color.FromArgb(0, 0, 255), Terrain.DEEP_WATER }
+                {MapDescription.LandColor, Terrain.LAND },
+                {MapDescription.ShallowWaterColor, Terrain.SHALLOW_WATER },
+                {MapDescription.DeepWaterColor, Terrain.DEEP_WATER }
             };
         }
 
@@ -91,26 +91,26 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <summary>
         /// Places a building of the given type to the map.
         /// </summary>
-        private void SetBuilding(string type, Node n, Game game)
+        private void SetBuilding(BuildingType type, Node n, Game game)
         {
-            if (type == "PLAYER_0_MAIN")
+            if (type == BuildingType.PLAYER_0_MAIN)
             {
                 //main building of player 0
                 Player player = game.Players[FactionType.PLAYER0];
                 PlaceMainBuildingOfPlayer(n, game, player);
             }
-            else if (type == "PLAYER_1_MAIN")
+            else if (type == BuildingType.PLAYER_1_MAIN)
             {
                 //main building of player 1
                 Player player = game.Players[FactionType.PLAYER1];
                 PlaceMainBuildingOfPlayer(n, game, player);
             }
-            else if (type == "ROCK")
+            else if (type == BuildingType.ROCK)
             {
                 GameStaticData gsd = game.NeutralFaction.GameStaticData;
                 game.Map.PlaceBuilding(gsd.StructureFactories["ROCK"], game.NeutralFaction, n.X, n.Y);
             }
-            else if (type == "BIG_ROCK")
+            else if (type == BuildingType.BIG_ROCK)
             {
                 GameStaticData gsd = game.NeutralFaction.GameStaticData;
                 game.Map.PlaceBuilding(gsd.StructureFactories["BIG_ROCK"], game.NeutralFaction, n.X, n.Y);
