@@ -24,18 +24,20 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// How many times bigger is the drawing of the map than the map itself.
         /// </summary>
-        private int scale;
+        private int MapScale { get; }
 
         public MainMenuWindow()
         {
             InitializeComponent();
 
-            scale = mapPB.Width / MAX_MAP_WIDTH;
+            MapScale = mapPB.Width / MAX_MAP_WIDTH;
             DrawOpt = DrawOption.NO_ACTION;
             LoadNamesOfCreatedMaps();
         }
 
-
+        /// <summary>
+        /// Description of map that can be edited and used to start a new game.
+        /// </summary>
         private MapDescription MapDescr { get; set; }
         private enum DrawOption
         {
@@ -47,7 +49,13 @@ namespace SanguineGenesis.GUI
             REMOVE_BUILDING,
             NO_ACTION
         }
+        /// <summary>
+        /// Backing field for DrawOpt.
+        /// </summary>
         private DrawOption drawOpt;
+        /// <summary>
+        /// Determines what will be done when player clicks on the map.
+        /// </summary>
         private DrawOption DrawOpt
         {
             get => drawOpt;
@@ -69,41 +77,11 @@ namespace SanguineGenesis.GUI
                 drawOpt = value;
             }
         }
+
+        /// <summary>
+        /// Building that will be placed to the map on click while being in ADD_BUILDING mode.
+        /// </summary>
         private BuildingType BuildingToPlace { get; set; }
-
-        private void NewMapB_Click(object sender, EventArgs e)
-        {
-            if(!int.TryParse(widthTB.Text, out int width))
-            {
-                ErrorMessage("The width value \""+widthTB.Text + "\" is not a number.");
-                return;
-            }
-            if(!int.TryParse(heightTB.Text, out int height))
-            {
-                ErrorMessage("The height value \"" + heightTB.Text + "\" is not a valid number.");
-                return;
-            }
-            if (!(width > 0 && width <= MAX_MAP_WIDTH))
-            {
-
-                ErrorMessage("Width has to be between " + 0 + " and " + MAX_MAP_WIDTH + ".");
-                return;
-            }
-            if(!(height > 0 && height <= MAX_MAP_HEIGHT))
-            {
-                ErrorMessage("Height has to be between " + 0 + " and " + MAX_MAP_HEIGHT + ".");
-                return;
-            }
-            if(ValidName(newNameTB.Text))
-            {
-                MapDescr = new MapDescription(width, height, newNameTB.Text);
-                mapPB.Invalidate();
-                mapPB.Refresh();
-                EnableEditing();
-                mapNameL.Text = MapDescr.Name;
-                Message("The map \"" + MapDescr.Name + "\" was created.");
-            }
-        }
 
         /// <summary>
         /// Returns true if name can be used as a name of the map. Prints error message.
@@ -130,9 +108,120 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private Point MapCoordinates(int x, int y)
         {
-            int left = (mapPB.Width - scale * MapDescr.Width) / 2;
-            int bottom = (mapPB.Height - scale * MapDescr.Height) / 2;
-            return new Point((x - left) / scale, MapDescr.Height - (y - bottom) / scale - 1);
+            int left = (mapPB.Width - MapScale * MapDescr.Width) / 2;
+            int bottom = (mapPB.Height - MapScale * MapDescr.Height) / 2;
+            return new Point((x - left) / MapScale, MapDescr.Height - (y - bottom) / MapScale - 1);
+        }
+
+        /// <summary>
+        /// Loads names of maps in MapDescription.DIRECTORY to combo box mapNamesCB.
+        /// </summary>
+        private void LoadNamesOfCreatedMaps()
+        {
+            string dirName = MapDescription.DIRECTORY;
+            if (!Directory.Exists(dirName))
+                Directory.CreateDirectory(dirName);
+
+            mapNamesCB.Items.Clear();
+            foreach (var d in Directory.GetDirectories(dirName))
+            {
+                mapNamesCB.Items.Add(Path.GetFileName(d));
+            }
+        }
+
+        /// <summary>
+        /// Prints error message.
+        /// </summary>
+        private void ErrorMessage(string message)
+        {
+            errorMessageL.ForeColor = Color.Red;
+            errorMessageL.Text = message;
+        }
+
+        /// <summary>
+        /// Prints message.
+        /// </summary>
+        private void Message(string message)
+        {
+            errorMessageL.ForeColor = Color.Green;
+            errorMessageL.Text = message;
+        }
+
+        /// <summary>
+        /// Disables editing of the map.
+        /// </summary>
+        private void DisableEditing()
+        {
+            drawOptionsGB.Enabled = false;
+            DrawOpt = DrawOption.NO_ACTION;
+
+            if (MapDescr != null)
+                ((IFreezable)MapDescr).Freeze();
+        }
+
+        /// <summary>
+        /// Enables editing of the map.
+        /// </summary>
+        private void EnableEditing()
+        {
+            drawOptionsGB.Enabled = true;
+            if (deepWaterRB.Checked)
+                DrawOpt = DrawOption.DRAW_DEEP_WATER;
+            else if (shallowWaterRB.Checked)
+                DrawOpt = DrawOption.DRAW_SHALLOW_WATER;
+            else if (landRB.Checked)
+                DrawOpt = DrawOption.DRAW_LAND;
+            else if (nutrientsRB.Checked)
+                DrawOpt = DrawOption.DRAW_NUTRIENTS;
+            else if (addBuildingRB.Checked)
+                DrawOpt = DrawOption.ADD_BUILDING;
+            else if (removeBuildingRB.Checked)
+                DrawOpt = DrawOption.REMOVE_BUILDING;
+
+            if (MapDescr != null)
+                ((IFreezable)MapDescr).Unfreeze();
+        }
+
+        /// <summary>
+        /// Returns Biome to be played by the player.
+        /// </summary>
+        private Biome PlayersBiome => savannaRB.Checked ? Biome.SAVANNA : Biome.RAINFOREST;
+
+
+        #region Event handlers
+
+        private void NewMapB_Click(object sender, EventArgs e)
+        {
+            if (!int.TryParse(widthTB.Text, out int width))
+            {
+                ErrorMessage("The width value \"" + widthTB.Text + "\" is not a number.");
+                return;
+            }
+            if (!int.TryParse(heightTB.Text, out int height))
+            {
+                ErrorMessage("The height value \"" + heightTB.Text + "\" is not a valid number.");
+                return;
+            }
+            if (!(width > 0 && width <= MAX_MAP_WIDTH))
+            {
+
+                ErrorMessage("Width has to be between " + 0 + " and " + MAX_MAP_WIDTH + ".");
+                return;
+            }
+            if (!(height > 0 && height <= MAX_MAP_HEIGHT))
+            {
+                ErrorMessage("Height has to be between " + 0 + " and " + MAX_MAP_HEIGHT + ".");
+                return;
+            }
+            if (ValidName(newNameTB.Text))
+            {
+                MapDescr = new MapDescription(width, height, newNameTB.Text);
+                mapPB.Invalidate();
+                mapPB.Refresh();
+                EnableEditing();
+                mapNameL.Text = MapDescr.Name;
+                Message("The map \"" + MapDescr.Name + "\" was created.");
+            }
         }
 
         private void DrawOptionsRB_Click(object sender, EventArgs e)
@@ -166,10 +255,10 @@ namespace SanguineGenesis.GUI
             {
                 Graphics g = e.Graphics;
                 g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                int left = (mapPB.Width - scale * MapDescr.Width) / 2;
-                int bottom = (mapPB.Height - scale * MapDescr.Height) / 2;
+                int left = (mapPB.Width - MapScale * MapDescr.Width) / 2;
+                int bottom = (mapPB.Height - MapScale * MapDescr.Height) / 2;
                 Bitmap total = MapDescr.TotalMap();
-                g.DrawImage(total, left + scale/2 , bottom - scale/2 + scale * MapDescr.Height, scale * total.Width, -scale * total.Height);
+                g.DrawImage(total, left + MapScale / 2, bottom - MapScale / 2 + MapScale * MapDescr.Height, MapScale * total.Width, -MapScale * total.Height);
             }
         }
 
@@ -264,7 +353,7 @@ namespace SanguineGenesis.GUI
                 mapNameL.Text = MapDescr.Name;
                 Message("The map \"" + mapDirName + "\" was loaded.");
             }
-            catch(Exception)
+            catch (Exception)
             {
                 ErrorMessage("Map \"" + mapDirName + "\" was not loaded, because it doesn't exist or has incorrect format.");
             }
@@ -286,88 +375,6 @@ namespace SanguineGenesis.GUI
             }
         }
 
-        /// <summary>
-        /// Loads names of maps in MapDescription.DIRECTORY to combo box mapNamesCB.
-        /// </summary>
-        private void LoadNamesOfCreatedMaps()
-        {
-            string dirName = MapDescription.DIRECTORY;
-            if (!Directory.Exists(dirName))
-                Directory.CreateDirectory(dirName);
-
-            mapNamesCB.Items.Clear();
-            foreach (var d in Directory.GetDirectories(dirName))
-            {
-                mapNamesCB.Items.Add(Path.GetFileName(d));
-            }
-        }
-
-        /// <summary>
-        /// Prints error message.
-        /// </summary>
-        private void ErrorMessage(string message)
-        {
-            errorMessageL.ForeColor = Color.Red;
-            errorMessageL.Text = message;
-        }
-
-        /// <summary>
-        /// Prints message.
-        /// </summary>
-        private void Message(string message)
-        {
-            errorMessageL.ForeColor = Color.Green;
-            errorMessageL.Text = message;
-        }
-
-        private void EditB_Click(object sender, EventArgs e)
-        {
-            if (MapDescr != null)
-                EnableEditing();
-            else
-                ErrorMessage("No map is loaded.");
-        }
-
-        /// <summary>
-        /// Disables editing of the map.
-        /// </summary>
-        private void DisableEditing()
-        {
-            drawOptionsGB.Enabled = false;
-            DrawOpt = DrawOption.NO_ACTION;
-
-            if (MapDescr != null)
-                ((IFreezable)MapDescr).Freeze();
-        }
-
-        /// <summary>
-        /// Enables editing of the map.
-        /// </summary>
-        private void EnableEditing()
-        {
-            drawOptionsGB.Enabled = true;
-            if (deepWaterRB.Checked)
-                DrawOpt = DrawOption.DRAW_DEEP_WATER;
-            else if (shallowWaterRB.Checked)
-                DrawOpt = DrawOption.DRAW_SHALLOW_WATER;
-            else if (landRB.Checked)
-                DrawOpt = DrawOption.DRAW_LAND;
-            else if (nutrientsRB.Checked)
-                DrawOpt = DrawOption.DRAW_NUTRIENTS;
-            else if (addBuildingRB.Checked)
-                DrawOpt = DrawOption.ADD_BUILDING;
-            else if (removeBuildingRB.Checked)
-                DrawOpt = DrawOption.REMOVE_BUILDING;
-
-            if (MapDescr != null)
-                ((IFreezable)MapDescr).Unfreeze();
-        }
-
-        /// <summary>
-        /// Returns Biome to be played by the player.
-        /// </summary>
-        private Biome PlayersBiome => savannaRB.Checked ? Biome.SAVANNA : Biome.RAINFOREST;
-
         private void PlayB_Click(object sender, EventArgs e)
         {
             if (MapDescr != null)
@@ -385,6 +392,16 @@ namespace SanguineGenesis.GUI
             else
                 ErrorMessage("Load or create a map before starting the game.");
         }
+
+        private void EditB_Click(object sender, EventArgs e)
+        {
+            if (MapDescr != null)
+                EnableEditing();
+            else
+                ErrorMessage("No map is loaded.");
+        }
+
+        #endregion Event handlers
 
         /// <summary>
         /// Used for freezing classes to make them immutable.
@@ -412,6 +429,9 @@ namespace SanguineGenesis.GUI
             public static Color BigRockColor { get; }
             public static Color Player0MainColor { get; }
             public static Color Player1MainColor { get; }
+            /// <summary>
+            /// Color of something that isn't important.
+            /// </summary>
             public static Color NothingColor { get; }
 
             static MapDescription()
@@ -427,13 +447,16 @@ namespace SanguineGenesis.GUI
             }
 
             /// <summary>
-            /// True iff the map can be edited.
+            /// True iff the map can't be edited.
             /// </summary>
             private bool Frozen { get; set; }
             private Bitmap TerrainMap { get; }
             public Color GetTerrain(int i, int j) => TerrainMap.GetPixel(i, j);
             private Bitmap NutrientsMap { get; }
             public Color GetNutrients(int i, int j) => NutrientsMap.GetPixel(i, j);
+            /// <summary>
+            /// Bitmap that contains black pixels on squares taken by buildings.
+            /// </summary>
             private Bitmap BuildingsLocations { get; }
             private List<BuildingDescriptor> Buildings { get; }
             /// <summary>
@@ -531,7 +554,7 @@ namespace SanguineGenesis.GUI
                     }
                 foreach (var bd in Buildings)
                 {
-                    if(!TryGetBuildingSize(bd.Type, out int width, out int height))
+                    if(!TryGetBuildingExtents(bd.Type, out int width, out int height))
                         continue;
 
                     switch (bd.Type)
@@ -553,25 +576,24 @@ namespace SanguineGenesis.GUI
                 return total;
             }
 
-            private bool TryGetBuildingSize(BuildingType buildingType, out int width, out int height)
+            /// <summary>
+            /// Returns the extents of a building with the given type.
+            /// </summary>
+            private bool TryGetBuildingExtents(BuildingType buildingType, out int width, out int height)
             {
                 switch (buildingType)
                 {
                     case BuildingType.PLAYER_0_MAIN:
-                        width = 3;
-                        height = 3;
+                        width = height = 3;
                         return true;
                     case BuildingType.PLAYER_1_MAIN:
-                        width = 3;
-                        height = 3;
+                        width = height = 3;
                         return true;
                     case BuildingType.ROCK:
-                        width = 1;
-                        height = 1;
+                        width = height = 1;
                         return true;
                     case BuildingType.BIG_ROCK:
-                        width = 2;
-                        height = 2;
+                        width = height = 2;
                         return true;
                 }
                 width = height = 0;
@@ -646,7 +668,7 @@ namespace SanguineGenesis.GUI
                 if (Frozen)
                     return "Can't modify frozen map.";
 
-                if (TryGetBuildingSize(type, out int width, out int height))
+                if (TryGetBuildingExtents(type, out int width, out int height))
                 {
                     if (type == BuildingType.PLAYER_0_MAIN &&
                         Buildings.Where(bd => bd.Type == type).Any())
@@ -688,7 +710,7 @@ namespace SanguineGenesis.GUI
                 BuildingDescriptor? toRemove = null;//BuildingDescriptor is struct but we need null value
                 foreach (var bd in Buildings)
                 {
-                    TryGetBuildingSize(bd.Type, out int width, out int height);
+                    TryGetBuildingExtents(bd.Type, out int width, out int height);
                     if (bd.X <= x && x < bd.X + width && bd.Y <= y && y < bd.Y + height)
                     {
                         toRemove = bd;
@@ -799,6 +821,9 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Location and type of building.
+        /// </summary>
         public struct BuildingDescriptor
         {
             public int X { get; }

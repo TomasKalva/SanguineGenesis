@@ -1,10 +1,12 @@
-﻿using System;
+﻿using SanguineGenesis.GUI;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static SanguineGenesis.GUI.MainMenuWindow;
 
 namespace SanguineGenesis.GameLogic.Maps
 {
@@ -13,30 +15,35 @@ namespace SanguineGenesis.GameLogic.Maps
     /// </summary>
     class MapLoader
     {
+        /// <summary>
+        /// Terrain types corresponding to the colors in the terrain map.
+        /// </summary>
         private Dictionary<Color, Terrain> ColorToTerrain { get; }
-        private Dictionary<Color, Building> ColorToBuilding { get; }
 
-        public MapLoader()
+        /// <summary>
+        /// Description of the map used for generating the game map.
+        /// </summary>
+        private MapDescription MapDescription { get; }
+
+        public MapLoader(MapDescription mapDescription)
         {
+            MapDescription = mapDescription;
+
             ColorToTerrain = new Dictionary<Color, Terrain>()
             {
-                {Color.FromArgb(168, 142, 78), Terrain.LAND },
-                {Color.FromArgb(0, 155, 255), Terrain.SHALLOW_WATER },
-                {Color.FromArgb(0, 0, 255), Terrain.DEEP_WATER }
+                {MapDescription.LandColor, Terrain.LAND },
+                {MapDescription.ShallowWaterColor, Terrain.SHALLOW_WATER },
+                {MapDescription.DeepWaterColor, Terrain.DEEP_WATER }
             };
         }
 
         /// <summary>
-        /// Loads information about nodes from the files.
+        /// Loads information about nodes from the MapDescription.
         /// </summary>
-        public Map LoadMap(string nutrientsMapFileName,
-            string terrainFileName, Game game)
+        public Map LoadMap()
         {
-            Bitmap nutrients = new Bitmap(nutrientsMapFileName);
-            Bitmap terrain = new Bitmap(terrainFileName);
-
-            int width = nutrients.Width + 2;
-            int height = nutrients.Height + 2;
+            int width = MapDescription.Width + 2;
+            int height = MapDescription.Height + 2;
 
             //create nodes
             Node[,] mapNodes = new Node[width, height];
@@ -49,9 +56,9 @@ namespace SanguineGenesis.GameLogic.Maps
                     else
                     {
                         int x = i - 1; int y = j - 1;
-                        int mapsX = x; int mapsY = height - y - 3;
-                        Terrain terr = GetTerrain(terrain.GetPixel(mapsX, mapsY));
-                        decimal nutr = (nutrients.GetPixel(mapsX, mapsY).A / 256m) * Node.MAX_NUTRIENTS;
+                        int mapsX = x; int mapsY = y;
+                        Terrain terr = GetTerrain(MapDescription.GetTerrain(mapsX, mapsY));
+                        decimal nutr = ((256 - MapDescription.GetNutrients(mapsX, mapsY).R) / 256m) * Node.MAX_NUTRIENTS;
 
                         mapNodes[x + 1, y + 1] = new Node(x, y, nutr, Biome.DEFAULT, terr);
                     }
@@ -72,59 +79,52 @@ namespace SanguineGenesis.GameLogic.Maps
         /// Loads buildings to the game, the image with map of buildings has to have the same size
         /// as the game map.
         /// </summary>
-        public void LoadBuildings(Game game, string buildingsMapFileName)
+        public void LoadBuildings(Game game)
         {
             Map map = game.Map;
-            Bitmap buildings = new Bitmap(buildingsMapFileName);
+            List<BuildingDescriptor> buildings = MapDescription.GetBuildings;
             //add buildings
-            for (int i = 0; i < map.Width; i++)
-                for (int j = map.Height - 1; j >= 0; j--)
-                {
-                    int mapX = i; int mapY = j;
-                    if (buildings.GetPixel(mapX, mapY).A != 0)
-                        SetBuilding(buildings.GetPixel(mapX, mapY), map[i, map.Height - (j + 1)], game, buildings);
-                }
+            foreach(BuildingDescriptor bd in buildings)
+            {
+                SetBuilding(bd.Type, map[bd.X, bd.Y], game);
+            }
         }
 
         /// <summary>
-        /// Returns building corresponding to the color c.
+        /// Places a building of the given type to the map.
         /// </summary>
-        private void SetBuilding(Color c, Node n, Game game, Bitmap buildings)
+        private void SetBuilding(BuildingType type, Node n, Game game)
         {
-            if (c.Is(Color.Blue))
+            if (type == BuildingType.PLAYER_0_MAIN)
             {
                 //main building of player 0
                 Player player = game.Players[FactionType.PLAYER0];
                 PlaceMainBuildingOfPlayer(n, game, player);
             }
-            else if (c.Is(Color.Red))
+            else if (type == BuildingType.PLAYER_1_MAIN)
             {
                 //main building of player 1
                 Player player = game.Players[FactionType.PLAYER1];
                 PlaceMainBuildingOfPlayer(n, game, player);
             }
-            else if (c.Is(Color.Black))
+            else if (type == BuildingType.ROCK)
             {
-                //rock
-                int x = n.X; int y = buildings.Height - (n.Y + 1);
+                //neutral rock
                 GameStaticData gsd = game.NeutralFaction.GameStaticData;
-                bool bigRock = false;
-                //if there is enough space, place big rock instead of the small one
-                if ((x + 1 < buildings.Width) && (y - 1 >= 0))
-                {
-                    if (buildings.GetPixel(x + 1, y).Is(Color.Black) &&
-                       buildings.GetPixel(x, y - 1).Is(Color.Black) &&
-                       buildings.GetPixel(x + 1, y - 1).Is(Color.Black))
-                        bigRock = true;
-                }
-                if (bigRock)
-                    game.Map.PlaceBuilding(gsd.StructureFactories["BIG_ROCK"], game.NeutralFaction, n.X, n.Y);
-                else
-                    game.Map.PlaceBuilding(gsd.StructureFactories["ROCK"], game.NeutralFaction, n.X, n.Y);
+                game.Map.PlaceBuilding(gsd.StructureFactories["ROCK"], game.NeutralFaction, n.X, n.Y);
+            }
+            else if (type == BuildingType.BIG_ROCK)
+            {
+                //neutral big rock
+                GameStaticData gsd = game.NeutralFaction.GameStaticData;
+                game.Map.PlaceBuilding(gsd.StructureFactories["BIG_ROCK"], game.NeutralFaction, n.X, n.Y);
 
             }
         }
 
+        /// <summary>
+        /// Places main building of player to node.
+        /// </summary>
         private void PlaceMainBuildingOfPlayer(Node n, Game game, Player player)
         {
             //main buildings can only stand on land
@@ -133,6 +133,7 @@ namespace SanguineGenesis.GameLogic.Maps
 
             BuildingFactory buildingFactory = player.GetMainBuildingFactory();
 
+            //set correct biome and number of nutrients
             int size = buildingFactory.Size;
             Node[,] buildNodes = GameQuerying.SelectNodes(game.Map, n.X, n.Y, n.X + (size - 1), n.Y + (size - 1));
             decimal minNutr = n.Terrain.Nutrients(player.Biome, SoilQuality.LOW);
@@ -142,15 +143,8 @@ namespace SanguineGenesis.GameLogic.Maps
                     buildNodes[i, j].Biome = player.Biome;
                     buildNodes[i, j].Nutrients = minNutr;
                 }
+
             game.Map.PlaceBuilding(buildingFactory, player, n.X, n.Y);
         }
-    }
-
-    public static class ColorExtensions
-    {
-        /// <summary>
-        /// Returns true if the color is the same. Doesn't compare alpha channel.
-        /// </summary>
-        public static bool Is(this Color a, Color b) => a.R == b.R && a.G == b.G && a.B == b.B;
     }
 }

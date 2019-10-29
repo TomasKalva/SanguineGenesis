@@ -77,7 +77,7 @@ namespace SanguineGenesis
             NeutralFaction = new Faction(FactionType.NEUTRAL);
 
              //map
-            var mapLoader = new MapLoader2(mapDescription);
+            var mapLoader = new MapLoader(mapDescription);
             Map = mapLoader.LoadMap();
             mapLoader.LoadBuildings(this);
 
