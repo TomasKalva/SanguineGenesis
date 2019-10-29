@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static SanguineGenesis.GUI.MainMenuWindow;
 
 namespace SanguineGenesis.GameLogic.Maps
 {
@@ -36,11 +37,11 @@ namespace SanguineGenesis.GameLogic.Maps
         /// </summary>
         public Map LoadMap()
         {
-            Bitmap nutrients = MapDescription.NutrientsMap;
-            Bitmap terrain = MapDescription.TerrainMap;
+            //Bitmap nutrients = MapDescription.NutrientsMap;
+            //Bitmap terrain = MapDescription.TerrainMap;
 
-            int width = nutrients.Width + 2;
-            int height = nutrients.Height + 2;
+            int width = MapDescription.Width + 2;
+            int height = MapDescription.Height + 2;
 
             //create nodes
             Node[,] mapNodes = new Node[width, height];
@@ -54,8 +55,8 @@ namespace SanguineGenesis.GameLogic.Maps
                     {
                         int x = i - 1; int y = j - 1;
                         int mapsX = x; int mapsY = y;
-                        Terrain terr = GetTerrain(terrain.GetPixel(mapsX, mapsY));
-                        decimal nutr = ((256 - nutrients.GetPixel(mapsX, mapsY).R) / 256m) * Node.MAX_NUTRIENTS;
+                        Terrain terr = GetTerrain(MapDescription.GetTerrain(mapsX, mapsY));
+                        decimal nutr = ((256 - MapDescription.GetNutrients(mapsX, mapsY).R) / 256m) * Node.MAX_NUTRIENTS;
 
                         mapNodes[x + 1, y + 1] = new Node(x, y, nutr, Biome.DEFAULT, terr);
                     }
@@ -79,7 +80,7 @@ namespace SanguineGenesis.GameLogic.Maps
         public void LoadBuildings(Game game)
         {
             Map map = game.Map;
-            List<BuildingDescriptor> buildings = MapDescription.Buildings;
+            List<BuildingDescriptor> buildings = MapDescription.GetBuildings;
             //add buildings
             foreach(BuildingDescriptor bd in buildings)
             {

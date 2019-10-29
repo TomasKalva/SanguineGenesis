@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using static SanguineGenesis.GUI.MainMenuWindow;
 
 namespace SanguineGenesis.GUI
 {

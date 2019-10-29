@@ -342,6 +342,9 @@ namespace SanguineGenesis.GUI
         {
             drawOptionsGB.Enabled = false;
             DrawOpt = DrawOption.NO_ACTION;
+
+            if (MapDescr != null)
+                MapDescr.Freeze();
         }
 
         /// <summary>
@@ -362,6 +365,9 @@ namespace SanguineGenesis.GUI
                 DrawOpt = DrawOption.ADD_BUILDING;
             else if (removeBuildingRB.Checked)
                 DrawOpt = DrawOption.REMOVE_BUILDING;
+
+            if (MapDescr != null)
+                MapDescr.Unfreeze();
         }
 
         /// <summary>
@@ -375,6 +381,8 @@ namespace SanguineGenesis.GUI
             {
                 if (MapDescr.MainBuildingsPresent())
                 {
+                    DisableEditing();
+
                     var gameWindow = new MainWinformWindow(MapDescr, PlayersBiome);
                     gameWindow.ShowDialog();
                 }
@@ -384,354 +392,413 @@ namespace SanguineGenesis.GUI
             else
                 ErrorMessage("Load or create a map before starting the game.");
         }
-    }
 
-    struct BuildingDescriptor
-    {
-        public int X { get; }
-        public int Y { get; }
-        public string Type { get; }
-
-        public BuildingDescriptor(string type, int x, int y)
+        private interface IFreezable
         {
-            Type = type;
-            X = x;
-            Y = y;
-        }
-
-        public override string ToString()
-        {
-            return X + " " + Y + " " + Type;
-        }
-    }
-
-    class MapDescription
-    {
-        /// <summary>
-        /// Name of directory where maps are saved.
-        /// </summary>
-        public const string DIRECTORY = "Maps/";
-        public Bitmap TerrainMap { get; }
-        public Bitmap NutrientsMap { get; }
-        private Bitmap BuildingsLocations { get; }
-        public List<BuildingDescriptor> Buildings { get; }
-        public string Name { get; }
-        public int Width => TerrainMap.Width;
-        public int Height => TerrainMap.Height;
-
-        public MapDescription(int width, int height, string name)
-        {
-            Name = name;
-            TerrainMap = new Bitmap(width, height);
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                {
-                    TerrainMap.SetPixel(i, j, Color.FromArgb(168, 142, 78));
-                }
-            NutrientsMap = new Bitmap(width, height);
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                {
-                    NutrientsMap.SetPixel(i, j, Color.White);
-                }
-            BuildingsLocations = new Bitmap(width, height);
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                {
-                    BuildingsLocations.SetPixel(i, j, Color.White);
-                }
-            Buildings = new List<BuildingDescriptor>();
+            void Freeze();
+            void Unfreeze();
         }
 
         /// <summary>
-        /// Visualization of the map.
+        /// Description of the map. Can be loaded from and saved to file. Can only be
+        /// edited inside of the class MainMenuWindow.
         /// </summary>
-        public Bitmap TotalMap()
+        public class MapDescription:IFreezable
         {
-            Bitmap total = new Bitmap(Width, Height);
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                {
-                    Color terC = TerrainMap.GetPixel(i, j);
-                    Color nutC = NutrientsMap.GetPixel(i, j);
-                    float brightness = nutC.R / 256f;
-                    Color newColor = Color.FromArgb((int)(terC.R * brightness),
-                        (int)(terC.G * brightness),
-                        (int)(terC.B * brightness));
-                    total.SetPixel(i, j, newColor);
-                }
-            foreach (var bd in Buildings)
+            /// <summary>
+            /// Name of directory where maps are saved.
+            /// </summary>
+            public const string DIRECTORY = "Maps/";
+
+            /// <summary>
+            /// True iff the map can be edited.
+            /// </summary>
+            private bool Frozen { get; set; }
+            private Bitmap TerrainMap { get; }
+            public Color GetTerrain(int i, int j) => TerrainMap.GetPixel(i, j);
+            private Bitmap NutrientsMap { get; }
+            public Color GetNutrients(int i, int j) => NutrientsMap.GetPixel(i, j);
+            private Bitmap BuildingsLocations { get; }
+            private List<BuildingDescriptor> Buildings { get; }
+            /// <summary>
+            /// Returns copy of Buildings.
+            /// </summary>
+            public List<BuildingDescriptor> GetBuildings => Buildings.ToList();
+            public string Name { get; }
+            public int Width => TerrainMap.Width;
+            public int Height => TerrainMap.Height;
+
+            /// <summary>
+            /// Creates a new empty map with the given extents and name.
+            /// </summary>
+            public MapDescription(int width, int height, string name)
             {
-                switch (bd.Type)
-                {
-                    case "PLAYER_0_MAIN":
-                        FillRectWithColor(total, Color.Blue, bd.X, bd.Y, 3, 3);
-                        break;
-                    case "PLAYER_1_MAIN":
-                        FillRectWithColor(total, Color.Red, bd.X, bd.Y, 3, 3);
-                        break;
-                    case "ROCK":
-                        FillRectWithColor(total, Color.Gray, bd.X, bd.Y, 1, 1);
-                        break;
-                    case "BIG_ROCK":
-                        FillRectWithColor(total, Color.DarkGray, bd.X, bd.Y, 2, 2);
-                        break;
-                }
-            }
-            return total;
-        }
-
-        private bool TryGetBuildingSize(string buildingType, out int width, out int height)
-        {
-            switch (buildingType)
-            {
-                case "PLAYER_0_MAIN":
-                    width = 3;
-                    height = 3;
-                    return true;
-                case "PLAYER_1_MAIN":
-                    width = 3;
-                    height = 3;
-                    return true;
-                case "ROCK":
-                    width = 1;
-                    height = 1;
-                    return true;
-                case "BIG_ROCK":
-                    width = 2;
-                    height = 2;
-                    return true;
-            }
-            width = height = 0;
-            return false;
-        }
-
-        /// <summary>
-        /// Returns true iff the map contains main buildings of both players.
-        /// </summary>
-        public bool MainBuildingsPresent()
-        {
-            return Buildings.Where(bd => bd.Type == "PLAYER_0_MAIN").Any() &&
-                Buildings.Where(bd => bd.Type == "PLAYER_1_MAIN").Any();
-        }
-
-        /// <summary>
-        /// Fills the rectangle in bitmap with color c. Coordiantes can be out of range.
-        /// </summary>
-        private void FillRectWithColor(Bitmap bitmap, Color c, int x, int y, int width, int height)
-        {
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                {
-                    int xx = x + i;
-                    int yy = y + j;
-                    if (ValidCoordinates(xx, yy))
+                Name = name;
+                TerrainMap = new Bitmap(width, height);
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
                     {
-                        bitmap.SetPixel(xx, yy, c);
+                        TerrainMap.SetPixel(i, j, Color.FromArgb(168, 142, 78));
                     }
-                }
-        }
-
-        /// <summary>
-        /// Fills the terrain map in the given rectangle with the color c but 
-        /// ignores the squares with buildings. Coordiantes can be out of range.
-        /// </summary>
-        private void FillTerrainIgnoreBuildings(Color c, int x, int y, int width, int height)
-        {
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                {
-                    int xx = x + i;
-                    int yy = y + j;
-                    if (ValidCoordinates(xx, yy))
+                NutrientsMap = new Bitmap(width, height);
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
                     {
-                        if (ColorsEqual(BuildingsLocations.GetPixel(xx, yy), Color.White))
-                            TerrainMap.SetPixel(xx, yy, c);
+                        NutrientsMap.SetPixel(i, j, Color.White);
                     }
-                }
-        }
-
-        /// <summary>
-        /// Adds the rectangle in bitmap with color c. Coordiantes can be out of range. Intensity
-        /// is between 0 and 255.
-        /// </summary>
-        private void AddRectIntensity(Bitmap bitmap, int intensity, int x, int y, int width, int height)
-        {
-            for (int i = 0; i < width; i++)
-                for (int j = 0; j < height; j++)
-                {
-                    int xx = x + i;
-                    int yy = y + j;
-                    if (xx >= 0 && xx < bitmap.Width && yy >= 0 && yy < bitmap.Height)
-                    {
-                        Color color = bitmap.GetPixel(xx, yy);
-                        bitmap.SetPixel(xx, yy,
-                            Color.FromArgb(
-                                Math.Max(color.R + intensity, 0),
-                                Math.Max(color.G + intensity, 0),
-                                Math.Max(color.B + intensity, 0)));
-                    }
-                }
-        }
-
-        /// <summary>
-        /// Returns true iff the coordinate on the map is valid.
-        /// </summary>
-        public bool ValidCoordinates(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
-
-        /// <summary>
-        /// Draws the color to the terrain map.
-        /// </summary>
-        public void DrawTerrain(Color color, int x, int y, int width, int height)
-        {
-            FillTerrainIgnoreBuildings(color, x, y, width, height);
-        }
-
-        /// <summary>
-        /// Draws to the nutrients map.
-        /// </summary>
-        public void AddNutrients(int x, int y, int width, int height, int intensity)
-        {
-            AddRectIntensity(NutrientsMap, -intensity, x, y, width, height);
-        }
-
-        /// <summary>
-        /// Returns true iff building of width and height can be placed to coordinates x,y.
-        /// </summary>
-        private bool CanBePlacedBuilding(int x, int y, int width, int height)
-        {
-            if (ValidCoordinates(x, y) &&
-                ValidCoordinates(x + width - 1, y + height - 1))
-            {
-                for (int i = x; i < x + width; i++)
-                    for (int j = y; j < y + height; j++)
-                        if (ColorsEqual(BuildingsLocations.GetPixel(i, j), Color.Black) ||
-                            !ColorsEqual(TerrainMap.GetPixel(i, j), Color.FromArgb(168, 142, 78)))
-                            return false;
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Adds a new building of given type to the map. Returns error message.
-        /// </summary>
-        public string AddBuilding(string type, int x, int y)
-        {
-            if (TryGetBuildingSize(type, out int width, out int height))
-            {
-                if (type == "PLAYER_0_MAIN" &&
-                    Buildings.Where(bd => bd.Type == type).Any())
-                    return "Main building for player 0 was already placed.";
-
-                if (type == "PLAYER_1_MAIN" &&
-                    Buildings.Where(bd => bd.Type == type).Any())
-                    return "Main building for player 1 was already placed.";
-
-                if (CanBePlacedBuilding(x, y, width, height))
-                {
-                    Buildings.Add(new BuildingDescriptor(type.ToString(), x, y));
-                    FillRectWithColor(BuildingsLocations, Color.Black, x, y, width, height);
-                    return null;
-                }
-                else
-                    return "The building cannot be placed at the coordinates (" + x + ", " + y + ").";
-            }
-            else
-                return "The building with a type \"" + type + "\" doesn't exist.";
-        }
-
-        /// <summary>
-        /// Removes the building that lies on position (x,y).
-        /// </summary>
-        public void RemoveBuilding(int x, int y)
-        {
-            if (!ValidCoordinates(x, y))
-                return;
-
-            //the square isn't occupied by any building
-            if (ColorsEqual(BuildingsLocations.GetPixel(x, y), Color.White))
-                return;
-
-            BuildingDescriptor? toRemove = null;
-            foreach (var bd in Buildings)
-            {
-                TryGetBuildingSize(bd.Type, out int width, out int height);
-                if (bd.X <= x && x < bd.X + width && bd.Y <= y && y < bd.Y + height)
-                {
-                    toRemove = bd;
-                    FillRectWithColor(BuildingsLocations, Color.White, bd.X, bd.Y, width, height);
-                    break;
-                }
-            }
-            if (toRemove.HasValue)
-                Buildings.Remove(toRemove.Value);
-        }
-
-        /// <summary>
-        /// Creates a new directory with this map's name and puts there this map's data.
-        /// </summary>
-        public void Save()
-        {
-            string dirName = DIRECTORY + Name;
-            if (Directory.Exists(dirName))
-                foreach (var f in Directory.GetFiles(dirName))
-                    File.Delete(f);
-
-            Directory.CreateDirectory(dirName);
-            using (var terrainWriter = new FileStream(dirName + "/terrain.bmp", FileMode.OpenOrCreate))
-            using (var nutrientsWriter = new FileStream(dirName + "/nutrients.bmp", FileMode.OpenOrCreate))
-            using (var sw = new StreamWriter(dirName + "/buildings.txt"))
-            {
-                ImageConverter ic = new ImageConverter();
-                var terBytes = (byte[])ic.ConvertTo(TerrainMap, typeof(byte[]));
-                terrainWriter.Write(terBytes, 0, terBytes.Length);
-                var nutBytes = (byte[])ic.ConvertTo(NutrientsMap, typeof(byte[]));
-                nutrientsWriter.Write(nutBytes, 0, nutBytes.Length);
-                foreach (var building in Buildings)
-                    sw.WriteLine(building);
-            }
-        }
-
-        /// <summary>
-        /// Loads map from the directory.
-        /// </summary>
-        /// <param name="mapDirectoryName">Name of the directory.</param>
-        /// <exception cref="IOException">Thrown if the directory or some of the required files don't exist.</exception>
-        public MapDescription(string mapDirectoryName)
-        {
-            string dirName = DIRECTORY + mapDirectoryName;
-
-            if (!Directory.Exists(dirName))
-                throw new IOException("Directory " + dirName + " doesn't exist!");
-
-            using (var terrainReader = new FileStream(dirName + "/terrain.bmp", FileMode.Open))
-            using (var nutrientsReader = new FileStream(dirName + "/nutrients.bmp", FileMode.Open))
-            using (var sr = new StreamReader(dirName + "/buildings.txt"))
-            {
-                TerrainMap = new Bitmap(terrainReader);
-                NutrientsMap = new Bitmap(nutrientsReader);
-                BuildingsLocations = new Bitmap(TerrainMap.Width, TerrainMap.Height);
-                for (int i = 0; i < BuildingsLocations.Width; i++)
-                    for (int j = 0; j < BuildingsLocations.Height; j++)
+                BuildingsLocations = new Bitmap(width, height);
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
                     {
                         BuildingsLocations.SetPixel(i, j, Color.White);
                     }
-
                 Buildings = new List<BuildingDescriptor>();
-                string line;
-                while ((line = sr.ReadLine()) != null)
+                Frozen = false;
+            }
+
+            /// <summary>
+            /// Loads map from the directory.
+            /// </summary>
+            /// <param name="mapDirectoryName">Name of the directory.</param>
+            /// <exception cref="IOException">Thrown if the directory or some of the required files don't exist.</exception>
+            public MapDescription(string mapDirectoryName)
+            {
+                string dirName = DIRECTORY + mapDirectoryName;
+
+                if (!Directory.Exists(dirName))
+                    throw new IOException("Directory " + dirName + " doesn't exist!");
+
+                using (var terrainReader = new FileStream(dirName + "/terrain.bmp", FileMode.Open))
+                using (var nutrientsReader = new FileStream(dirName + "/nutrients.bmp", FileMode.Open))
+                using (var sr = new StreamReader(dirName + "/buildings.txt"))
                 {
-                    string[] param = line.Split(' ');
-                    int x = int.Parse(param[0]);
-                    int y = int.Parse(param[1]);
-                    string type = param[2];
-                    AddBuilding(type, x, y);
+                    TerrainMap = new Bitmap(terrainReader);
+                    NutrientsMap = new Bitmap(nutrientsReader);
+                    BuildingsLocations = new Bitmap(TerrainMap.Width, TerrainMap.Height);
+                    for (int i = 0; i < BuildingsLocations.Width; i++)
+                        for (int j = 0; j < BuildingsLocations.Height; j++)
+                        {
+                            BuildingsLocations.SetPixel(i, j, Color.White);
+                        }
+
+                    Buildings = new List<BuildingDescriptor>();
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string[] param = line.Split(' ');
+                        int x = int.Parse(param[0]);
+                        int y = int.Parse(param[1]);
+                        string type = param[2];
+                        AddBuilding(type, x, y);
+                    }
+                }
+                Name = mapDirectoryName;
+                Frozen = true;
+            }
+
+            /// <summary>
+            /// Visualization of the map.
+            /// </summary>
+            public Bitmap TotalMap()
+            {
+                Bitmap total = new Bitmap(Width, Height);
+                for (int i = 0; i < Width; i++)
+                    for (int j = 0; j < Height; j++)
+                    {
+                        Color terC = TerrainMap.GetPixel(i, j);
+                        Color nutC = NutrientsMap.GetPixel(i, j);
+                        float brightness = nutC.R / 256f;
+                        Color newColor = Color.FromArgb((int)(terC.R * brightness),
+                            (int)(terC.G * brightness),
+                            (int)(terC.B * brightness));
+                        total.SetPixel(i, j, newColor);
+                    }
+                foreach (var bd in Buildings)
+                {
+                    switch (bd.Type)
+                    {
+                        case "PLAYER_0_MAIN":
+                            FillRectWithColor(total, Color.Blue, bd.X, bd.Y, 3, 3);
+                            break;
+                        case "PLAYER_1_MAIN":
+                            FillRectWithColor(total, Color.Red, bd.X, bd.Y, 3, 3);
+                            break;
+                        case "ROCK":
+                            FillRectWithColor(total, Color.Gray, bd.X, bd.Y, 1, 1);
+                            break;
+                        case "BIG_ROCK":
+                            FillRectWithColor(total, Color.DarkGray, bd.X, bd.Y, 2, 2);
+                            break;
+                    }
+                }
+                return total;
+            }
+
+            private bool TryGetBuildingSize(string buildingType, out int width, out int height)
+            {
+                switch (buildingType)
+                {
+                    case "PLAYER_0_MAIN":
+                        width = 3;
+                        height = 3;
+                        return true;
+                    case "PLAYER_1_MAIN":
+                        width = 3;
+                        height = 3;
+                        return true;
+                    case "ROCK":
+                        width = 1;
+                        height = 1;
+                        return true;
+                    case "BIG_ROCK":
+                        width = 2;
+                        height = 2;
+                        return true;
+                }
+                width = height = 0;
+                return false;
+            }
+
+            /// <summary>
+            /// Returns true iff the map contains main buildings of both players.
+            /// </summary>
+            public bool MainBuildingsPresent()
+            {
+                return Buildings.Where(bd => bd.Type == "PLAYER_0_MAIN").Any() &&
+                    Buildings.Where(bd => bd.Type == "PLAYER_1_MAIN").Any();
+            }
+
+            /// <summary>
+            /// Returns true iff the coordinate on the map is valid.
+            /// </summary>
+            public bool ValidCoordinates(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
+
+
+            /// <summary>
+            /// Returns true iff building of width and height can be placed to coordinates x,y.
+            /// </summary>
+            private bool CanBePlacedBuilding(int x, int y, int width, int height)
+            {
+                if (ValidCoordinates(x, y) &&
+                    ValidCoordinates(x + width - 1, y + height - 1))
+                {
+                    for (int i = x; i < x + width; i++)
+                        for (int j = y; j < y + height; j++)
+                            if (ColorsEqual(BuildingsLocations.GetPixel(i, j), Color.Black) ||
+                                !ColorsEqual(TerrainMap.GetPixel(i, j), Color.FromArgb(168, 142, 78)))
+                                return false;
+                    return true;
+                }
+                return false;
+            }
+
+            #region Mutating methods
+
+            #region Public api mutating methods
+            
+            /// <summary>
+            /// Draws the color to the terrain map. Does nothing if this object is frozen.
+            /// </summary>
+            public void DrawTerrain(Color color, int x, int y, int width, int height)
+            {
+                if (Frozen)
+                    return;
+
+                FillTerrainIgnoreBuildings(color, x, y, width, height);
+            }
+
+            /// <summary>
+            /// Draws to the nutrients map. Does nothing if this object is frozen.
+            /// </summary>
+            public void AddNutrients(int x, int y, int width, int height, int intensity)
+            {
+                if (Frozen)
+                    return;
+
+                AddRectIntensity(NutrientsMap, -intensity, x, y, width, height);
+            }
+
+            /// <summary>
+            /// Adds a new building of given type to the map. Returns error message.
+            /// Does nothing if this object is frozen.
+            /// </summary>
+            public string AddBuilding(string type, int x, int y)
+            {
+                if (Frozen)
+                    return "Can't modify frozen map.";
+
+                if (TryGetBuildingSize(type, out int width, out int height))
+                {
+                    if (type == "PLAYER_0_MAIN" &&
+                        Buildings.Where(bd => bd.Type == type).Any())
+                        return "Main building for player 0 was already placed.";
+
+                    if (type == "PLAYER_1_MAIN" &&
+                        Buildings.Where(bd => bd.Type == type).Any())
+                        return "Main building for player 1 was already placed.";
+
+                    if (CanBePlacedBuilding(x, y, width, height))
+                    {
+                        Buildings.Add(new BuildingDescriptor(type.ToString(), x, y));
+                        FillRectWithColor(BuildingsLocations, Color.Black, x, y, width, height);
+                        return null;
+                    }
+                    else
+                        return "The building cannot be placed at the coordinates (" + x + ", " + y + ").";
+                }
+                else
+                    return "The building with a type \"" + type + "\" doesn't exist.";
+            }
+
+            /// <summary>
+            /// Removes the building that lies on position (x,y).
+            /// Does nothing if this object is frozen.
+            /// </summary>
+            public void RemoveBuilding(int x, int y)
+            {
+                if (Frozen)
+                    return;
+
+                if (!ValidCoordinates(x, y))
+                    return;
+
+                //the square isn't occupied by any building
+                if (ColorsEqual(BuildingsLocations.GetPixel(x, y), Color.White))
+                    return;
+
+                BuildingDescriptor? toRemove = null;
+                foreach (var bd in Buildings)
+                {
+                    TryGetBuildingSize(bd.Type, out int width, out int height);
+                    if (bd.X <= x && x < bd.X + width && bd.Y <= y && y < bd.Y + height)
+                    {
+                        toRemove = bd;
+                        FillRectWithColor(BuildingsLocations, Color.White, bd.X, bd.Y, width, height);
+                        break;
+                    }
+                }
+                if (toRemove.HasValue)
+                    Buildings.Remove(toRemove.Value);
+            }
+            #endregion Public api mutating methods
+
+            /// <summary>
+            /// Fills the rectangle in bitmap with color c. Coordiantes can be out of range.
+            /// </summary>
+            private void FillRectWithColor(Bitmap bitmap, Color c, int x, int y, int width, int height)
+            {
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
+                    {
+                        int xx = x + i;
+                        int yy = y + j;
+                        if (ValidCoordinates(xx, yy))
+                        {
+                            bitmap.SetPixel(xx, yy, c);
+                        }
+                    }
+            }
+
+            /// <summary>
+            /// Fills the terrain map in the given rectangle with the color c but 
+            /// ignores the squares with buildings. Coordiantes can be out of range.
+            /// </summary>
+            private void FillTerrainIgnoreBuildings(Color c, int x, int y, int width, int height)
+            {
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
+                    {
+                        int xx = x + i;
+                        int yy = y + j;
+                        if (ValidCoordinates(xx, yy))
+                        {
+                            if (ColorsEqual(BuildingsLocations.GetPixel(xx, yy), Color.White))
+                                TerrainMap.SetPixel(xx, yy, c);
+                        }
+                    }
+            }
+
+            /// <summary>
+            /// Adds the rectangle in bitmap with color c. Coordiantes can be out of range. Intensity
+            /// is between 0 and 255.
+            /// </summary>
+            private void AddRectIntensity(Bitmap bitmap, int intensity, int x, int y, int width, int height)
+            {
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
+                    {
+                        int xx = x + i;
+                        int yy = y + j;
+                        if (xx >= 0 && xx < bitmap.Width && yy >= 0 && yy < bitmap.Height)
+                        {
+                            Color color = bitmap.GetPixel(xx, yy);
+                            bitmap.SetPixel(xx, yy,
+                                Color.FromArgb(
+                                    Math.Max(color.R + intensity, 0),
+                                    Math.Max(color.G + intensity, 0),
+                                    Math.Max(color.B + intensity, 0)));
+                        }
+                    }
+            }
+
+            
+            #endregion Mutating methods
+
+            /// <summary>
+            /// Creates a new directory with this map's name and puts there this map's data.
+            /// </summary>
+            public void Save()
+            {
+                string dirName = DIRECTORY + Name;
+                if (Directory.Exists(dirName))
+                    foreach (var f in Directory.GetFiles(dirName))
+                        File.Delete(f);
+
+                Directory.CreateDirectory(dirName);
+                using (var terrainWriter = new FileStream(dirName + "/terrain.bmp", FileMode.OpenOrCreate))
+                using (var nutrientsWriter = new FileStream(dirName + "/nutrients.bmp", FileMode.OpenOrCreate))
+                using (var sw = new StreamWriter(dirName + "/buildings.txt"))
+                {
+                    ImageConverter ic = new ImageConverter();
+                    var terBytes = (byte[])ic.ConvertTo(TerrainMap, typeof(byte[]));
+                    terrainWriter.Write(terBytes, 0, terBytes.Length);
+                    var nutBytes = (byte[])ic.ConvertTo(NutrientsMap, typeof(byte[]));
+                    nutrientsWriter.Write(nutBytes, 0, nutBytes.Length);
+                    foreach (var building in Buildings)
+                        sw.WriteLine(building);
                 }
             }
-            Name = mapDirectoryName;
+
+            private static bool ColorsEqual(Color a, Color b) => a.R == b.R && a.G == b.G && a.B == b.B;
+
+            public void Freeze()
+            {
+                Frozen = true;
+            }
+
+            public void Unfreeze()
+            {
+                Frozen = false;
+            }
         }
 
-        private static bool ColorsEqual(Color a, Color b) => a.R == b.R && a.G == b.G && a.B == b.B;
+        public struct BuildingDescriptor
+        {
+            public int X { get; }
+            public int Y { get; }
+            public string Type { get; }
+
+            public BuildingDescriptor(string type, int x, int y)
+            {
+                Type = type;
+                X = x;
+                Y = y;
+            }
+
+            public override string ToString()
+            {
+                return X + " " + Y + " " + Type;
+            }
+        }
     }
 }

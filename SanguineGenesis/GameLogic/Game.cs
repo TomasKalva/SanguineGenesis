@@ -14,6 +14,7 @@ using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
+using static SanguineGenesis.GUI.MainMenuWindow;
 
 namespace SanguineGenesis
 {

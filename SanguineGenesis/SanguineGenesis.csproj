@@ -117,6 +117,7 @@
     <Compile Include="GameLogic\Maps\RayPathfinding.cs" />
     <Compile Include="GameLogic\Maps\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityMap.cs" />
+    <Compile Include="GUI\ColorExtensionMethods.cs" />
     <Compile Include="GUI\MainMenuWindow.cs">
       <SubType>Form</SubType>
     </Compile>
