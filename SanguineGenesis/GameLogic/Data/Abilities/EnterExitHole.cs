@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class EnterHole : TargetAbility<Animal, Structure>
     {
-        internal EnterHole(decimal energyCost, float enteringTime)
+        internal EnterHole(float energyCost, float enteringTime)
             : base(0.1f, energyCost, false, false, duration:enteringTime)
         {
         }
@@ -67,7 +67,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class ExitHole : TargetAbility<Structure, Nothing>
     {
-        internal ExitHole(decimal energyCost, float exitingTime)
+        internal ExitHole(float energyCost, float exitingTime)
             : base(0.1f, energyCost, false, false, duration:exitingTime)
         {
         }

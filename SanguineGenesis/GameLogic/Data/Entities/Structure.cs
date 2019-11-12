@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     class Structure : Building
     {
-        public Structure(Faction faction, string buildingType, Node[,] nodes, decimal maxHealth, decimal maxEnergy, int size,
+        public Structure(Faction faction, string buildingType, Node[,] nodes, float maxHealth, float maxEnergy, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)
             : base(faction, buildingType, nodes, maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, viewRange, abilities)
         {

@@ -57,11 +57,11 @@ namespace SanguineGenesis
         /// <summary>
         /// If health reaches 0 the unit dies and is removed from the game.
         /// </summary>
-        public DecRange Health { get; set; }
+        public FloatRange Health { get; set; }
         /// <summary>
         /// Used for casting abilities.
         /// </summary>
-        public DecRange Energy { get; set; }
+        public FloatRange Energy { get; set; }
         /// <summary>
         /// Name of the entity.
         /// </summary>
@@ -87,18 +87,18 @@ namespace SanguineGenesis
         public float Width => Right - Left;
         public float Height => Top - Bottom;
 
-        public Entity(Faction faction, string entityType, decimal maxHealth, float viewRange, decimal maxEnergy, bool physical, List<Ability> abilities)
+        public Entity(Faction faction, string entityType, float maxHealth, float viewRange, float maxEnergy, bool physical, List<Ability> abilities)
         {
             Faction = faction;
             ViewRange = viewRange;
             Selected = false;
             CommandQueue = new CommandQueue();
             EntityType = entityType;
-            Health = new DecRange(maxHealth, maxHealth);
+            Health = new FloatRange(maxHealth, maxHealth);
             if (this is Animal)
-                Energy = new DecRange(maxEnergy,maxEnergy);
+                Energy = new FloatRange(maxEnergy,maxEnergy);
             else
-                Energy = new DecRange(maxEnergy, maxEnergy);
+                Energy = new FloatRange(maxEnergy, maxEnergy);
             SetAnimation("IDLE");
             Physical = physical;
             Abilities = abilities;
@@ -242,7 +242,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Deals damage to the entity, equal to the damage.
         /// </summary>
-        public virtual void Damage(decimal damage)
+        public virtual void Damage(float damage)
         {
             //only damage entity if the damage is positive
             if (damage > 0)

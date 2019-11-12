@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     {
         public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
 
-        internal ConsumeAnimal(decimal energyCost, float timeToConsume, ConsumedAnimalFactory consumedAnimalFactory)
+        internal ConsumeAnimal(float energyCost, float timeToConsume, ConsumedAnimalFactory consumedAnimalFactory)
             : base(0.1f, energyCost, false, false, duration:timeToConsume)
         {
             ConsumedAnimalFactory = consumedAnimalFactory;

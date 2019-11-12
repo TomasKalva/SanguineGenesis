@@ -35,7 +35,7 @@ namespace SanguineGenesis
         /// Throws argument exception if the combination is not valid.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if the parameters are not valid.</exception>
-        public static SoilQuality Quality(this Terrain terrain, Biome biome, decimal nutrients)
+        public static SoilQuality Quality(this Terrain terrain, Biome biome, float nutrients)
         {
             switch (terrain)
             {
@@ -93,7 +93,7 @@ namespace SanguineGenesis
         /// Throws argument exception if the combination is not valid.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if the parameters are not valid.</exception>
-        public static decimal Nutrients(this Terrain terrain, Biome biome, SoilQuality soilQuality)
+        public static float Nutrients(this Terrain terrain, Biome biome, SoilQuality soilQuality)
         {
             switch (terrain) {
                 case Terrain.LAND:
@@ -161,40 +161,40 @@ namespace SanguineGenesis
         /// <summary>
         /// Returns amount of nutrients that can be produced by a Node with soilQuality.
         /// </summary>
-        public static decimal NutrientsProduction(this SoilQuality soilQuality)
+        public static float NutrientsProduction(this SoilQuality soilQuality)
         {
             switch (soilQuality)
             {
                 case SoilQuality.BAD:
-                    return 0.05m;
+                    return 0.05f;
                 case SoilQuality.LOW:
-                    return 0.01m;
+                    return 0.01f;
                 case SoilQuality.MEDIUM:
-                    return 0.02m;
+                    return 0.02f;
                 case SoilQuality.HIGH:
-                    return 0.03m;
+                    return 0.03f;
                 default:
-                    return 0m;
+                    return 0f;
             }
         }
 
         /// <summary>
         /// Returns amount of nutrients that can be transfered by a Node with soilQuality.
         /// </summary>
-        public static decimal TransferCapacity(this SoilQuality soilQuality)
+        public static float TransferCapacity(this SoilQuality soilQuality)
         {
             switch (soilQuality)
             {
                 case SoilQuality.BAD:
-                    return 0m;
+                    return 0f;
                 case SoilQuality.LOW:
-                    return 0.05m;
+                    return 0.05f;
                 case SoilQuality.MEDIUM:
-                    return 0.005m;
+                    return 0.005f;
                 case SoilQuality.HIGH:
-                    return 0m;
+                    return 0f;
                 default:
-                    return 0m;
+                    return 0f;
             }
         }
     }

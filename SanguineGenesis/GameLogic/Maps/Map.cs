@@ -264,7 +264,7 @@ namespace SanguineGenesis
             //transfer nutrients
             int width = Width + 2;
             int height = Height + 2;
-            decimal[,] newNutrients = new decimal[width, height];
+            float[,] newNutrients = new float[width, height];
             Node[] neighbours = new Node[4];
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
@@ -285,15 +285,15 @@ namespace SanguineGenesis
                     }
 
                     //transfer only if the neighbour has less nutrients
-                    decimal dif = current.Nutrients - lowestNutr.Nutrients;
+                    float dif = current.Nutrients - lowestNutr.Nutrients;
                     if (dif > 0)
                     {
                         //diffuse nutrients, limited by soil transfer capacity
 
                         //maximum amount of transported nutrients supported by the soil
-                        decimal suppTrans = Math.Min(dif / 2m, current.SoilQuality.TransferCapacity());
+                        float suppTrans = Math.Min(dif / 2f, current.SoilQuality.TransferCapacity());
                         //maximum amount of transported nutrients so the soil doesn't downgrade
-                        decimal noDownTrans = Math.Min(suppTrans, current.Nutrients - current.Terrain.Nutrients(current.Biome,current.SoilQuality));
+                        float noDownTrans = Math.Min(suppTrans, current.Nutrients - current.Terrain.Nutrients(current.Biome,current.SoilQuality));
                         newNutrients[i + 1, j + 1] += current.Nutrients - noDownTrans;
                         newNutrients[lowestNutr.X + 1, lowestNutr.Y + 1] += noDownTrans;
                     }

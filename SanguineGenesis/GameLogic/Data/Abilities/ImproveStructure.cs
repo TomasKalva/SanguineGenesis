@@ -11,9 +11,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class ImproveStructure : TargetAbility<Animal, Structure>
     {
-        public decimal EnergyPerS { get; }
+        public float EnergyPerS { get; }
 
-        internal ImproveStructure(decimal energyPerS)
+        internal ImproveStructure(float energyPerS)
             : base(0.1f, 0, false, false)
         {
             EnergyPerS = energyPerS;
@@ -42,7 +42,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             //calculate transfered energy so that no energy is gained or lost during the transfer
-            decimal transferedEn = Math.Min(((decimal)deltaT) * Ability.EnergyPerS, CommandedEntity.Energy);
+            float transferedEn = Math.Min(((float)deltaT) * Ability.EnergyPerS, CommandedEntity.Energy);
             transferedEn = Math.Min(transferedEn, Targ.Energy.AmountNotFilled);
 
             //transfer the energy

@@ -62,7 +62,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// <summary>
         /// Damage that the poison does in one tick.
         /// </summary>
-        public decimal TickDamage { get; }
+        public float TickDamage { get; }
         /// <summary>
         /// Number of ticks of the poison.
         /// </summary>
@@ -72,7 +72,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public float TickTime { get; }
 
-        public PoisonFactory(decimal tickDamage, int totalNumberOfTicks, float tickTime)
+        public PoisonFactory(float tickDamage, int totalNumberOfTicks, float tickTime)
             : base(false)
         {
             TickDamage = tickDamage;
@@ -93,9 +93,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// <summary>
         /// Energy unit has to pay each second to have this status.
         /// </summary>
-        public decimal EnergyCostPerS { get; }
+        public float EnergyCostPerS { get; }
 
-        public SprintFactory(float speedBonus, decimal energyPerS)
+        public SprintFactory(float speedBonus, float energyPerS)
             : base(true)
         {
             SpeedBonus = speedBonus;

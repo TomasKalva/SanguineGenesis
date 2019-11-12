@@ -110,15 +110,15 @@ namespace SanguineGenesis.GameLogic
             CarnivoreEat.SetAbilities(this);
 
             //poisonous spit
-            PoisonousSpit = new PoisonousSpit(4f, 0.2f, 10m, new Data.Entities.PoisonFactory(tickDamage:6, totalNumberOfTicks:4, tickTime:1.2f));
+            PoisonousSpit = new PoisonousSpit(4f, 0.2f, 10f, new Data.Entities.PoisonFactory(tickDamage:6, totalNumberOfTicks:4, tickTime:1.2f));
             PoisonousSpit.SetAbilities(this);
 
             //sprint
-            ActivateSprint = new ApplyStatus(10, new Data.Entities.SprintFactory(speedBonus:1f, energyPerS:10m));
+            ActivateSprint = new ApplyStatus(10, new Data.Entities.SprintFactory(speedBonus:1f, energyPerS:10f));
             ActivateSprint.SetAbilities(this);
 
             //piercing bite
-            PiercingBite = new PiercingBite(25, 100m, 1.2f);
+            PiercingBite = new PiercingBite(25, 100f, 1.2f);
             PiercingBite.SetAbilities(this);
 
             //consume animal
@@ -170,15 +170,15 @@ namespace SanguineGenesis.GameLogic
             ActivateFastStrikes.SetAbilities(this);
 
             //improve structure
-            ImproveStructure = new ImproveStructure(3m);
+            ImproveStructure = new ImproveStructure(3f);
             ImproveStructure.SetAbilities(this);
 
             //charge to
-            ChargeTo = new ChargeTo(20m, 3f, 2.5m, 10f);
+            ChargeTo = new ChargeTo(20f, 3f, 2.5f, 10f);
             ChargeTo.SetAbilities(this);
 
             //kick
-            Kick = new Kick(20m, 0.1f, 0.2f, 30m);
+            Kick = new Kick(20f, 0.1f, 0.2f, 30f);
             Kick.SetAbilities(this);
 
             //move to cast has to be initialized last because it uses other abilities

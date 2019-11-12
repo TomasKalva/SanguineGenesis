@@ -13,7 +13,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     {
         public float JumpSpeed { get; }
 
-        internal Jump(decimal energyCost, float distance, float preparationTime, float jumpSpeed)
+        internal Jump(float energyCost, float distance, float preparationTime, float jumpSpeed)
             : base(distance, energyCost, false, false, false, duration:preparationTime)
         {
             JumpSpeed = jumpSpeed;

@@ -11,9 +11,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class Kick : TargetAbility<Animal, Animal>
     {
-        public decimal EnergyDamage { get; }
+        public float EnergyDamage { get; }
 
-        internal Kick(decimal energyCost, float distance, float preparationTime, decimal energyDamage)
+        internal Kick(float energyCost, float distance, float preparationTime, float energyDamage)
             : base(distance, energyCost, false, false, duration:preparationTime)
         {
             EnergyDamage = energyDamage;

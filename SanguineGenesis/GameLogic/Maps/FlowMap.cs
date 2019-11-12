@@ -143,16 +143,16 @@ namespace SanguineGenesis
     }
 
     /// <summary>
-    /// Represents decimal range [0,MaxValue].
+    /// Represents float range [0,MaxValue].
     /// </summary>
-    public struct DecRange
+    public struct FloatRange
     {
         /// <summary>
         /// Maximum value of value.
         /// </summary>
-        public decimal MaxValue { get; }
-        private decimal value;
-        public decimal Value
+        public float MaxValue { get; }
+        private float value;
+        public float Value
         {
             get => value;
             set
@@ -161,42 +161,42 @@ namespace SanguineGenesis
             }
         }
 
-        public DecRange(decimal max, decimal value)
+        public FloatRange(float max, float value)
         {
             MaxValue = max;
             this.value = Math.Max(0, Math.Min(MaxValue, value));
         }
 
-        public static DecRange operator +(DecRange decR, decimal dec) 
-            => new DecRange(decR.MaxValue,decR.Value + dec);
-        public static DecRange operator -(DecRange decR, decimal dec)
-            => new DecRange(decR.MaxValue, decR.Value - dec);
-        public static DecRange operator *(DecRange decR, decimal dec)
-            => new DecRange(decR.MaxValue, decR.Value * dec);
-        public static DecRange operator /(DecRange decR, decimal dec)
-            => new DecRange(decR.MaxValue, decR.Value / dec);
-        public static bool operator ==(DecRange decR, decimal dec)
+        public static FloatRange operator +(FloatRange decR, float dec) 
+            => new FloatRange(decR.MaxValue,decR.Value + dec);
+        public static FloatRange operator -(FloatRange decR, float dec)
+            => new FloatRange(decR.MaxValue, decR.Value - dec);
+        public static FloatRange operator *(FloatRange decR, float dec)
+            => new FloatRange(decR.MaxValue, decR.Value * dec);
+        public static FloatRange operator /(FloatRange decR, float dec)
+            => new FloatRange(decR.MaxValue, decR.Value / dec);
+        public static bool operator ==(FloatRange decR, float dec)
            => decR.Value == dec;
-        public static bool operator !=(DecRange decR, decimal dec)
+        public static bool operator !=(FloatRange decR, float dec)
            => decR.Value != dec;
-        public static bool operator ==(DecRange decRa, DecRange decRb)
+        public static bool operator ==(FloatRange decRa, FloatRange decRb)
            => decRa.Value == decRb.Value;
-        public static bool operator !=(DecRange decRa, DecRange decRb)
+        public static bool operator !=(FloatRange decRa, FloatRange decRb)
            => decRa.Value != decRb.Value;
-        public static bool operator <(DecRange decR, decimal dec)
+        public static bool operator <(FloatRange decR, float dec)
            => decR.Value < dec;
-        public static bool operator >(DecRange decR, decimal dec)
+        public static bool operator >(FloatRange decR, float dec)
            => decR.Value > dec;
-        public static bool operator <=(DecRange decR, decimal dec)
+        public static bool operator <=(FloatRange decR, float dec)
            => decR.Value <= dec;
-        public static bool operator >=(DecRange decR, decimal dec)
+        public static bool operator >=(FloatRange decR, float dec)
            => decR.Value >= dec;
         public override bool Equals(object o)
         {
-            if (o is DecRange)
-                return this == (DecRange)o;
-            else if (o is decimal)
-                return this == (decimal)o;
+            if (o is FloatRange)
+                return this == (FloatRange)o;
+            else if (o is float)
+                return this == (float)o;
             else
                 return false;
         }
@@ -204,11 +204,11 @@ namespace SanguineGenesis
         {
             return value.GetHashCode();
         }
-        public static implicit operator decimal(DecRange decR)
+        public static implicit operator float(FloatRange decR)
           => decR.Value;
 
-        public decimal Percentage => MaxValue!=0 ? Value / MaxValue : 0;
-        public decimal AmountNotFilled => MaxValue - Value;
+        public float Percentage => MaxValue!=0 ? Value / MaxValue : 0;
+        public float AmountNotFilled => MaxValue - Value;
         public bool Full => Value == MaxValue;
         public override string ToString() => Value +"/"+MaxValue;
     }

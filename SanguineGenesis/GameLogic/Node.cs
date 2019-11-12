@@ -16,7 +16,8 @@ namespace SanguineGenesis
         /// <summary>
         /// Maximal number of nutrients a node can have.
         /// </summary>
-        public const decimal MAX_NUTRIENTS = 9.9m;
+        public const float MAX_NUTRIENTS = 9.9f 
+            + 0.0001f; // it is easier to get correct digits of 9.9f if the number is slightly larger
         
         /// <summary>
         /// X coordinate on the map.
@@ -34,11 +35,11 @@ namespace SanguineGenesis
         /// <summary>
         /// Backing field for Nutrients.
         /// </summary>
-        private decimal nutrients;
+        private float nutrients;
         /// <summary>
         /// Amount of nutrients in this node. Belongs to [0, MAX_NUTRIENTS].
         /// </summary>
-        public decimal Nutrients
+        public float Nutrients
         {
             get => nutrients;
             set
@@ -93,7 +94,7 @@ namespace SanguineGenesis
         /// </summary>
         public Vector2 Center => new Vector2(X + 0.5f, Y + 0.5f);
 
-        public Node(int x, int y, decimal nutrients, Biome biome, Terrain terrain)
+        public Node(int x, int y, float nutrients, Biome biome, Terrain terrain)
         {
             Terrain = terrain;
             Biome = biome;
@@ -124,7 +125,7 @@ namespace SanguineGenesis
         bool IFood.FoodLeft => Nutrients > 0;
         void IFood.EatFood(Animal eater)
         {
-            decimal nutrientsToEat = Math.Min(eater.FoodEnergyRegen / 10, Nutrients);
+            float nutrientsToEat = Math.Min(eater.FoodEnergyRegen / 10, Nutrients);
             Nutrients -= nutrientsToEat;
             eater.Energy += nutrientsToEat * 10;
         }

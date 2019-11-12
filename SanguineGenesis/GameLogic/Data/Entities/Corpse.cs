@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// </summary>
     class Corpse:Unit, ICarnivoreFood
     {
-        public Corpse(Faction faction, string corpseType, decimal maxHealth, decimal maxEnergy, Vector2 pos, float range)
+        public Corpse(Faction faction, string corpseType, float maxHealth, float maxEnergy, Vector2 pos, float range)
             : base(faction, corpseType, maxHealth, 0, maxEnergy, new List<Ability>(), pos, range, false)
         {
         }
@@ -31,7 +31,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         bool IFood.FoodLeft => !IsDead;
         void IFood.EatFood(Animal eater)
         {
-            decimal nutrientsToEat = Math.Min(eater.FoodEnergyRegen, Health);
+            float nutrientsToEat = Math.Min(eater.FoodEnergyRegen, Health);
             Health -= nutrientsToEat;
             eater.Energy += nutrientsToEat;
         }

@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     {
         public PoisonFactory PoisonFactory { get; }
 
-        internal PoisonousSpit(float distance, float timeUntilSpit, decimal energyCost, PoisonFactory poisonFactory)
+        internal PoisonousSpit(float distance, float timeUntilSpit, float energyCost, PoisonFactory poisonFactory)
             : base(distance, energyCost, false, false, duration:timeUntilSpit)
         {
             PoisonFactory = poisonFactory;

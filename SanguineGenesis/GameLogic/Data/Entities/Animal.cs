@@ -42,7 +42,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Energy regenerated from eating food.
         /// </summary>
-        public decimal FoodEnergyRegen { get; }
+        public float FoodEnergyRegen { get; }
         /// <summary>
         /// Time it takes to eat food once in s.
         /// </summary>
@@ -50,11 +50,11 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Energy required to spawn/create this animal.
         /// </summary>
-        public decimal EnergyCost { get; }
+        public float EnergyCost { get; }
         /// <summary>
         /// Damage this animal deals in one attack.
         /// </summary>
-        public decimal AttackDamage { get; }
+        public float AttackDamage { get; }
         /// <summary>
         /// Time it takes this animal to do one attack.
         /// </summary>
@@ -105,12 +105,12 @@ namespace SanguineGenesis.GameLogic
             Faction faction,
             Vector2 position,
             string unitType,
-            decimal maxHealth,
-            decimal maxEnergy,
-            decimal foodEnergyRegen,
+            float maxHealth,
+            float maxEnergy,
+            float foodEnergyRegen,
             float foodEatingPeriod,
             float range,
-            decimal attackDamage,
+            float attackDamage,
             float attackPeriod,
             float attackDistance,
             bool mechanicalDamage,
@@ -121,7 +121,7 @@ namespace SanguineGenesis.GameLogic
             Diet diet,
             float spawningTime,
             bool physical,
-            decimal energyCost,
+            float energyCost,
             float viewRange,
             List<Ability> abilities,
             int air)
@@ -235,7 +235,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Deals damage to this animal.
         /// </summary>
-        public override void Damage(decimal damage)
+        public override void Damage(float damage)
         {
             //thick skin prevents some damage
             if (ThickSkin)

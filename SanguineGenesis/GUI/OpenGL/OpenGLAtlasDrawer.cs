@@ -155,14 +155,14 @@ namespace SanguineGenesis
             gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, map.VertexCount);
             
             //draw nutrients map
-            //if (gameplayOptions.NutrientsVisible)
+            if (gameplayOptions.NutrientsVisible)
             {
                 nutrientsMap.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, nutrientsMap.VertexCount);
             }
 
             //draw flowfield
-            //if (gameplayOptions.ShowFlowfield)
+            if (gameplayOptions.ShowFlowfield)
             {
                 flowField.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, flowField.VertexCount);
@@ -448,8 +448,10 @@ namespace SanguineGenesis
                         continue;
 
                     //find digits and their glyphs
-                    int leftDig = (int)current.Nutrients;
-                    int rightDig = (int)((current.Nutrients - leftDig) * 10);//(int)((((1000*current.Nutrients))%1000)/100);
+                    int nutrients100 = (int)(current.Nutrients * 10);
+                    int leftDig = nutrients100 / 10;
+                    int rightDig = nutrients100 % 10;
+
                     Rect leftDigAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(leftDig);
                     Rect rightDigAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(rightDig);
                     Rect decPointAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(-1);
@@ -470,7 +472,7 @@ namespace SanguineGenesis
                     texCoord +=  6 * 2;
                     bottomLeftInd += 6 * 4;
 
-                    //decimal point position
+                    //float point position
                     left = (current.X - viewLeft + 0.4f) * sqW;
                     right = (current.X - viewLeft + 0.6f) * sqW;
 

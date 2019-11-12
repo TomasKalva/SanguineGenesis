@@ -13,7 +13,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Maximum energy taken from one source per second.
         /// </summary>
-        public decimal MaxEnergyIntake { get; }
+        public float MaxEnergyIntake { get; }
         /// <summary>
         /// Sources from which the building takes energy.
         /// </summary>
@@ -21,7 +21,7 @@ namespace SanguineGenesis.GameLogic
         public int Air { get; }
 
 
-        public Tree(Faction faction, string treeType, Node[,] nodes, Node[,] rootNodes, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
+        public Tree(Faction faction, string treeType, Node[,] nodes, Node[,] rootNodes, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int air, List<Ability> abilities)
             : base(faction, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, viewRange, abilities)
         {
@@ -35,7 +35,7 @@ namespace SanguineGenesis.GameLogic
         bool IFood.FoodLeft => !IsDead;
         void IFood.EatFood(Animal eater)
         {
-            decimal nutrientsToEat = Math.Min(eater.FoodEnergyRegen, Health);
+            float nutrientsToEat = Math.Min(eater.FoodEnergyRegen, Health);
             Health -= nutrientsToEat;
             eater.Energy += nutrientsToEat;
         }
@@ -77,7 +77,7 @@ namespace SanguineGenesis.GameLogic
                     n.Biome == Biome)
                 {
                     //take nutrients from this node
-                    decimal nutrientsTaken;
+                    float nutrientsTaken;
 
                     //building can't take amount of nutrients that would reduce soil quality
                     nutrientsTaken = Math.Min(MaxEnergyIntake, n.Nutrients - n.Terrain.Nutrients(n.Biome, n.SoilQuality));

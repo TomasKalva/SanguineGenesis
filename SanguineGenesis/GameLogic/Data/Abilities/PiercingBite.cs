@@ -11,9 +11,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class PiercingBite : TargetAbility<Animal, Animal>
     {
-        public decimal Damage { get; }
+        public float Damage { get; }
 
-        internal PiercingBite(decimal energyCost, decimal damage, float timeToAttack)
+        internal PiercingBite(float energyCost, float damage, float timeToAttack)
             : base(0.1f, energyCost, false, true, duration:timeToAttack)
         {
             Damage = damage;

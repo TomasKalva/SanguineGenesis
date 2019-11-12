@@ -58,7 +58,7 @@ namespace SanguineGenesis.GameLogic.Maps
                         int x = i - 1; int y = j - 1;
                         int mapsX = x; int mapsY = y;
                         Terrain terr = GetTerrain(MapDescription.GetTerrain(mapsX, mapsY));
-                        decimal nutr = ((256 - MapDescription.GetNutrients(mapsX, mapsY).R) / 256m) * Node.MAX_NUTRIENTS;
+                        float nutr = ((256 - MapDescription.GetNutrients(mapsX, mapsY).R) / 256f) * Node.MAX_NUTRIENTS;
 
                         mapNodes[x + 1, y + 1] = new Node(x, y, nutr, Biome.DEFAULT, terr);
                     }
@@ -136,7 +136,7 @@ namespace SanguineGenesis.GameLogic.Maps
             //set correct biome and number of nutrients
             int size = buildingFactory.Size;
             Node[,] buildNodes = GameQuerying.SelectNodes(game.Map, n.X, n.Y, n.X + (size - 1), n.Y + (size - 1));
-            decimal minNutr = n.Terrain.Nutrients(player.Biome, SoilQuality.LOW);
+            float minNutr = n.Terrain.Nutrients(player.Biome, SoilQuality.LOW);
             for (int i = 0; i < buildNodes.GetLength(0); i++)
                 for (int j = 0; j < buildNodes.GetLength(1); j++)
                 {

@@ -74,7 +74,7 @@ namespace SanguineGenesis.GameLogic
         public new int Width => Right - Left;
         public new int Height => Top - Bottom;
 
-        public Building(Faction faction, string buildingType, Node[,] nodes, decimal maxHealth, decimal maxEnergy, int size,
+        public Building(Faction faction, string buildingType, Node[,] nodes, float maxHealth, float maxEnergy, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)
             : base(faction, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {

@@ -13,16 +13,16 @@ namespace SanguineGenesis.GameLogic
     abstract class EntityFactory
     {
         public string EntityType { get; }
-        public decimal MaxHealth { get; }
-        public decimal MaxEnergy { get; }
+        public float MaxHealth { get; }
+        public float MaxEnergy { get; }
         public bool Physical { get; }
-        public decimal EnergyCost { get; }
+        public float EnergyCost { get; }
         public float ViewRange { get; }
         public List<Ability> Abilities { get; }
         public List<StatusFactory> StatusFactories { get; }
 
-        public EntityFactory(string entityType, decimal maxHealth, decimal maxEnergy,
-            bool physical, decimal energyCost, float viewRange, List<StatusFactory> statusFactories)
+        public EntityFactory(string entityType, float maxHealth, float maxEnergy,
+            bool physical, float energyCost, float viewRange, List<StatusFactory> statusFactories)
         {
             EntityType = entityType;
             MaxHealth = maxHealth;
@@ -56,8 +56,8 @@ namespace SanguineGenesis.GameLogic
         public SoilQuality SoilQuality { get; }
         public bool Producer { get; }
 
-        public BuildingFactory(string buildingType, decimal maxHealth, decimal maxEnergy, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<StatusFactory> statusFactories)
+        public BuildingFactory(string buildingType, float maxHealth, float maxEnergy, int size,
+            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<StatusFactory> statusFactories)
             : base(buildingType, maxHealth, maxEnergy, physical, energyCost, viewRange, statusFactories)
         {
             Size = size;
@@ -83,7 +83,7 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     class TreeFactory : BuildingFactory
     {
-        public decimal MaxEnergyIntake { get; }
+        public float MaxEnergyIntake { get; }
         public int RootsDistance { get; }
         public int Air { get; }
 
@@ -96,8 +96,8 @@ namespace SanguineGenesis.GameLogic
                 Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Air, Abilities.ToList()));
         }
 
-        public TreeFactory(string buildingType, decimal maxHealth, decimal maxEnergy, decimal maxEnergyIntake, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int rootsDistance, int air, List<StatusFactory> statusFactories)
+        public TreeFactory(string buildingType, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
+            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int rootsDistance, int air, List<StatusFactory> statusFactories)
             : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange, statusFactories)
 
         {
@@ -121,8 +121,8 @@ namespace SanguineGenesis.GameLogic
                 Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Abilities.ToList()));
         }
 
-        public StructureFactory(string buildingType, decimal maxHealth, decimal maxEnergy, int size,
-            bool physical, decimal energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<StatusFactory> statusFactories)
+        public StructureFactory(string buildingType, float maxHealth, float maxEnergy, int size,
+            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<StatusFactory> statusFactories)
             : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange, statusFactories)
 
         {
@@ -136,7 +136,7 @@ namespace SanguineGenesis.GameLogic
     {
         public float Range { get; }//range of the circle collider
 
-        public UnitFactory(string unitType, decimal maxHealth, decimal maxEnergy, float range, bool physical, decimal energyCost,
+        public UnitFactory(string unitType, float maxHealth, float maxEnergy, float range, bool physical, float energyCost,
             float viewRange, List<StatusFactory> statusFactories)
             : base(unitType, maxHealth, maxEnergy, physical, energyCost, viewRange, statusFactories)
         {
@@ -149,9 +149,9 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     class AnimalFactory : UnitFactory
     {
-        public decimal FoodEnergyRegen { get; }
+        public float FoodEnergyRegen { get; }
         public float FoodEatingPeriod { get; }
-        public decimal AttackDamage { get; }
+        public float AttackDamage { get; }
         public float AttackPeriod { get; }
         public float AttackDistance { get; }
         public bool MechanicalDamage { get; }
@@ -196,12 +196,12 @@ namespace SanguineGenesis.GameLogic
 
         public AnimalFactory(
             string unitType,
-            decimal maxHealth,
-            decimal maxEnergy,
-            decimal foodEnergyRegen,
+            float maxHealth,
+            float maxEnergy,
+            float foodEnergyRegen,
             float foodEatingPeriod,
             float range,
-            decimal attackDamage,
+            float attackDamage,
             float attackPeriod,
             float attackDistance,
             bool mechanicalDamage,
@@ -212,7 +212,7 @@ namespace SanguineGenesis.GameLogic
             Diet diet,
             float spawningTime,
             bool physical,
-            decimal energyCost,
+            float energyCost,
             float viewRange,
             List<StatusFactory> statusFactories,
             int air)

@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     {
         public StatusFactory StatusFactory { get; }
 
-        internal ApplyStatus(decimal energyCost, StatusFactory statusFactory)
+        internal ApplyStatus(float energyCost, StatusFactory statusFactory)
             : base(0, energyCost, false, false)
         {
             StatusFactory = statusFactory;

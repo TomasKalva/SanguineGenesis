@@ -13,7 +13,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     {
         public float PullSpeed { get; }
 
-        internal Pull(decimal energyCost, float distance, float preparationTime, float pullSpeed)
+        internal Pull(float energyCost, float distance, float preparationTime, float pullSpeed)
             : base(distance, energyCost, false, false, false, duration:preparationTime)
         {
             PullSpeed = pullSpeed;

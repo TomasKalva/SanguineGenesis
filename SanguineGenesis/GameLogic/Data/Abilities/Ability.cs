@@ -35,7 +35,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Energy required to use this ability.
         /// </summary>
-        public decimal EnergyCost { get; }
+        public float EnergyCost { get; }
         /// <summary>
         /// True iff this ability should be performed only by one of the selected units.
         /// </summary>
@@ -74,7 +74,7 @@ namespace SanguineGenesis.GameLogic
         /// <exception cref="InvalidCastException">If caster or target has incompatible type.</exception>
         public abstract Command NewCommand(Entity caster, ITargetable target);
 
-        public Ability(float? distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable, float duration)
+        public Ability(float? distance, float energyCost, bool onlyOne, bool selfCastable, bool interruptable, float duration)
         {
             Distance = distance;
             EnergyCost = energyCost;
@@ -98,7 +98,7 @@ namespace SanguineGenesis.GameLogic
     abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
-        public TargetAbility(float? distance, decimal energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
+        public TargetAbility(float? distance, float energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
             :base(distance, energyCost, onlyOne, selfCastable, interruptable, duration)
         {
         }

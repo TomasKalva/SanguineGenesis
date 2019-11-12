@@ -77,7 +77,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public override bool Step(Game game, float deltaT)
         {
             //remove the status if the animal doesn't have enough energy
-            AffectedEntity.Energy -= StatusInfo.EnergyCostPerS * (decimal)deltaT;
+            AffectedEntity.Energy -= StatusInfo.EnergyCostPerS * (float)deltaT;
             if (AffectedEntity.Energy <= 0)
                 return true;
             return false;

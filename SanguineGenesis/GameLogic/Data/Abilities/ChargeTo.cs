@@ -11,10 +11,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class ChargeTo : TargetAbility<Animal, Entity>
     {
-        public decimal AttackDamageMultiplier { get; }
+        public float AttackDamageMultiplier { get; }
         public float ChargeSpeed { get; }
 
-        internal ChargeTo(decimal energyCost, float distance, decimal attackDamageMultiplier, float charageSpeed)
+        internal ChargeTo(float energyCost, float distance, float attackDamageMultiplier, float charageSpeed)
             : base(distance, energyCost, false, false, false)
         {
             AttackDamageMultiplier = attackDamageMultiplier;

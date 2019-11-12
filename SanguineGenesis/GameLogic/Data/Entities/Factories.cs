@@ -208,13 +208,13 @@ namespace SanguineGenesis.GameLogic
         {
             string[] fields = description.Split(',');
             string treeType = fields[0];
-            decimal maxHealth=decimal.Parse(fields[1], CultureInfo.InvariantCulture);
-            decimal maxEnergy = decimal.Parse(fields[2], CultureInfo.InvariantCulture);
-            decimal energyRegen = decimal.Parse(fields[3], CultureInfo.InvariantCulture);
+            float maxHealth=float.Parse(fields[1], CultureInfo.InvariantCulture);
+            float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture);
+            float energyRegen = float.Parse(fields[3], CultureInfo.InvariantCulture);
             bool physical = fields[4] == "yes";
             int size = int.Parse(fields[5], CultureInfo.InvariantCulture);
             int rootsDistance = int.Parse(fields[6], CultureInfo.InvariantCulture);
-            decimal energyCost = decimal.Parse(fields[7], CultureInfo.InvariantCulture);
+            float energyCost = float.Parse(fields[7], CultureInfo.InvariantCulture);
             Biome biome = (Biome)Enum.Parse(typeof(Biome),fields[8]);
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain),fields[9]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality),fields[10]);
@@ -238,11 +238,11 @@ namespace SanguineGenesis.GameLogic
         {
             string[] fields = description.Split(',');
             string structureType = fields[0];
-            decimal maxHealth = decimal.Parse(fields[1], CultureInfo.InvariantCulture);
-            decimal maxEnergy = decimal.Parse(fields[2], CultureInfo.InvariantCulture);
+            float maxHealth = float.Parse(fields[1], CultureInfo.InvariantCulture);
+            float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture);
             bool physical = fields[3] == "yes";
             int size = int.Parse(fields[4], CultureInfo.InvariantCulture);
-            decimal energyCost = decimal.Parse(fields[5], CultureInfo.InvariantCulture);
+            float energyCost = float.Parse(fields[5], CultureInfo.InvariantCulture);
             Biome biome = (Biome)Enum.Parse(typeof(Biome), fields[6]);
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[7]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[8]);
@@ -265,13 +265,13 @@ namespace SanguineGenesis.GameLogic
         {
             string[] fields = description.Split(',');
             string unitType = fields[0];
-            decimal maxHealth = decimal.Parse(fields[1], CultureInfo.InvariantCulture);
-            decimal maxEnergy = decimal.Parse(fields[2], CultureInfo.InvariantCulture);
-            decimal foodEnergyRegen = decimal.Parse(fields[3], CultureInfo.InvariantCulture);
+            float maxHealth = float.Parse(fields[1], CultureInfo.InvariantCulture);
+            float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture);
+            float foodEnergyRegen = float.Parse(fields[3], CultureInfo.InvariantCulture);
             float foodEatingPeriod = float.Parse(fields[4], CultureInfo.InvariantCulture);
             float range = float.Parse(fields[5], CultureInfo.InvariantCulture);
-            decimal energyCost = decimal.Parse(fields[6], CultureInfo.InvariantCulture);
-            decimal attackDamage = decimal.Parse(fields[7], CultureInfo.InvariantCulture);
+            float energyCost = float.Parse(fields[6], CultureInfo.InvariantCulture);
+            float attackDamage = float.Parse(fields[7], CultureInfo.InvariantCulture);
             float attackDistance = float.Parse(fields[8], CultureInfo.InvariantCulture);
             float attackPeriod = float.Parse(fields[9], CultureInfo.InvariantCulture);
             bool mechanicalDamage = fields[10] == "yes";

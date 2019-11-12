@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     {
         public AnimalsOnTreeFactory AnimalsOnTreeFactory { get; }
 
-        internal ClimbTree(decimal energyCost, float climbingTime)
+        internal ClimbTree(float energyCost, float climbingTime)
             : base(0.1f, energyCost, false, false, duration:climbingTime)
         {
             AnimalsOnTreeFactory = new AnimalsOnTreeFactory();
@@ -62,7 +62,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class ClimbDownTree : TargetAbility<Tree, Nothing>
     {
-        internal ClimbDownTree(decimal energyCost, float climbingTime)
+        internal ClimbDownTree(float energyCost, float climbingTime)
             : base(0.1f, energyCost, false, false, duration:climbingTime)
         {
         }
