@@ -420,14 +420,15 @@ namespace SanguineGenesis
             int width = visible.GetLength(0);
             int height = visible.GetLength(1);
 
-            //extents of one rectangle
+            // extents of one rectangle
             float sqW = nodeSize;
             float sqH = nodeSize;
 
-            int verticesPerOne = width * height * 6 * 3;
-            int verticesSize = verticesPerOne * 3;
-            int textureSize = verticesPerOne * 2;
-            int textureAtlasSize = verticesPerOne * 4;
+            int numberOfChars = 6;
+            int vertexCount = width * height * 6 * numberOfChars;
+            int verticesSize = vertexCount * 3;
+            int textureSize = vertexCount * 2;
+            int textureAtlasSize = vertexCount * 4;
 
             nutrientsMap.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
             float[] vertices = nutrientsMap.vertices;
@@ -439,23 +440,74 @@ namespace SanguineGenesis
                 for (int j = 0; j < height; j++)
                 {
                     //buffer indices
-                    int coord = (i + j * width) * 6 * 3 * 3;
-                    int texCoord = (i + j * width) * 6 * 2 * 3;
-                    int bottomLeftInd = (i + j * width) * 6 * 4 * 3;
+                    int coord = (i + j * width) * 6 * 3 * numberOfChars;
+                    int texCoord = (i + j * width) * 6 * 2 * numberOfChars;
+                    int bottomLeftInd = (i + j * width) * 6 * 4 * numberOfChars;
 
                     Node current = visible[i, j];
                     if (current == null)
                         continue;
 
                     //find digits and their glyphs
-                    int nutrients100 = (int)(current.Nutrients * 10);
-                    int leftDig = nutrients100 / 10;
-                    int rightDig = nutrients100 % 10;
 
-                    Rect leftDigAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(leftDig);
-                    Rect rightDigAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(rightDig);
-                    Rect decPointAtlasCoords = ImageAtlas.GetImageAtlas.GetGlyph(-1);
+                    //active nutrients
+                    int nutrients100 = (int)(current.ActiveNutrients * 10);
+                    int leftDigA = nutrients100 / 10;
+                    int rightDigA = nutrients100 % 10;
 
+                    //passive nutrients
+                    int remainingNutrients100 = (int)current.PassiveNutrients;
+                    int leftDigP = remainingNutrients100 / 10;
+                    int rightDigP = remainingNutrients100 % 10;
+
+                    Rect[] glyphs = new Rect[3 * 2];
+                    //glyphs
+                    glyphs[0] = ImageAtlas.GetImageAtlas.GetGlyph(11);
+                    glyphs[1] = ImageAtlas.GetImageAtlas.GetGlyph(leftDigP);
+                    glyphs[2] = ImageAtlas.GetImageAtlas.GetGlyph(rightDigP);
+                    glyphs[3] = ImageAtlas.GetImageAtlas.GetGlyph(leftDigA);
+                    glyphs[4] = ImageAtlas.GetImageAtlas.GetGlyph(10);
+                    glyphs[5] = ImageAtlas.GetImageAtlas.GetGlyph(rightDigA);
+
+                    float[] rowScale = new float[2];
+                    rowScale[0] = 0.8f;
+                    rowScale[1] = 1f;
+
+                    //extents of one character
+                    float charWidth = 0.22f;
+                    float charHeight = 0.37f;
+
+                    float paddingX = 0f;
+                    float paddingY = 0f;
+
+                    float leftOffset = 0.15f;
+                    float bottomOffset = 0.15f;
+
+                    for (int n = 0; n < 2; n++)
+                        for (int m = 0; m < 3; m++)
+                        {
+                            //skip writing zero as first digit of number
+                            if (n == 0 && m == 1 && leftDigP == 0)
+                                continue;
+
+                            //numbers y position
+                            float bottom = (current.Y - viewBottom + bottomOffset + n*(paddingY + charHeight)) * sqH;
+                            float top = (current.Y - viewBottom + bottomOffset + n * (paddingY + charHeight) + charHeight * rowScale[n]) * sqH;
+
+                            //left digit position
+                            float left = (current.X - viewLeft + leftOffset + m * (paddingX + charWidth)) * sqW;
+                            float right = (current.X - viewLeft + leftOffset + m * (paddingX + charWidth) + charWidth * rowScale[n]) * sqW;
+
+                            SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
+                            SetSquareTextureCoordinates(texture, texCoord);
+                            SetAtlasCoordinates(texAtlas, glyphs[m + n * 3], bottomLeftInd, 6);
+
+                            //increase indices
+                            coord += 6 * 3;
+                            texCoord += 6 * 2;
+                            bottomLeftInd += 6 * 4;
+                        }
+                    /*
                     //numbers y position
                     float bottom = (current.Y - viewBottom + 0.25f) * sqH;
                     float top = (current.Y - viewBottom + 0.75f) * sqH;
@@ -466,7 +518,7 @@ namespace SanguineGenesis
 
                     SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
                     SetSquareTextureCoordinates(texture, texCoord);
-                    SetAtlasCoordinates(texAtlas, leftDigAtlasCoords, bottomLeftInd, 6);
+                    SetAtlasCoordinates(texAtlas, leftDigAtlasCoordsA, bottomLeftInd, 6);
 
                     coord += 6 * 3;
                     texCoord +=  6 * 2;
@@ -490,7 +542,7 @@ namespace SanguineGenesis
 
                     SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
                     SetSquareTextureCoordinates(texture, texCoord);
-                    SetAtlasCoordinates(texAtlas, rightDigAtlasCoords, bottomLeftInd, 6);
+                    SetAtlasCoordinates(texAtlas, rightDigAtlasCoordsA, bottomLeftInd, 6);*/
                 }
             }
 

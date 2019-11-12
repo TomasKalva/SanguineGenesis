@@ -207,7 +207,8 @@ namespace SanguineGenesis
                         Node destN=VisibleMap[i, j];
                         Node sourceN = map[i, j];
                         destN.Biome = sourceN.Biome;
-                        destN.Nutrients = sourceN.Nutrients;
+                        destN.ActiveNutrients = sourceN.ActiveNutrients;
+                        destN.PassiveNutrients = sourceN.PassiveNutrients;
                         destN.Terrain = sourceN.Terrain;
                     }
                 }

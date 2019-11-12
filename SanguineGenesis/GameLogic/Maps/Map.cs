@@ -55,7 +55,7 @@ namespace SanguineGenesis
                 for (int j = 0; j < height; j++)
                 {
                     Node n = map[i, j];
-                    this[i, j] = new Node(i, j, n.Nutrients, n.Biome, n.Terrain);
+                    this[i, j] = new Node(i, j,n.PassiveNutrients, n.ActiveNutrients, n.Biome, n.Terrain);
                 }
             }
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
@@ -280,12 +280,12 @@ namespace SanguineGenesis
                     Node lowestNutr = neighbours[0];
                     foreach(Node n in neighbours)
                     {
-                        if (n.Nutrients < lowestNutr.Nutrients)
+                        if (n.ActiveNutrients < lowestNutr.ActiveNutrients)
                             lowestNutr = n;
                     }
 
                     //transfer only if the neighbour has less nutrients
-                    float dif = current.Nutrients - lowestNutr.Nutrients;
+                    float dif = current.ActiveNutrients - lowestNutr.ActiveNutrients;
                     if (dif > 0)
                     {
                         //diffuse nutrients, limited by soil transfer capacity
@@ -293,19 +293,19 @@ namespace SanguineGenesis
                         //maximum amount of transported nutrients supported by the soil
                         float suppTrans = Math.Min(dif / 2f, current.SoilQuality.TransferCapacity());
                         //maximum amount of transported nutrients so the soil doesn't downgrade
-                        float noDownTrans = Math.Min(suppTrans, current.Nutrients - current.Terrain.Nutrients(current.Biome,current.SoilQuality));
-                        newNutrients[i + 1, j + 1] += current.Nutrients - noDownTrans;
+                        float noDownTrans = Math.Min(suppTrans, current.ActiveNutrients - current.Terrain.Nutrients(current.Biome,current.SoilQuality));
+                        newNutrients[i + 1, j + 1] += current.ActiveNutrients - noDownTrans;
                         newNutrients[lowestNutr.X + 1, lowestNutr.Y + 1] += noDownTrans;
                     }
                     else
                     {
-                        newNutrients[i + 1, j + 1] += current.Nutrients;
+                        newNutrients[i + 1, j + 1] += current.ActiveNutrients;
                     }
                 }
 
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
-                    this[i, j].Nutrients=newNutrients[i + 1, j + 1];
+                    this[i, j].ActiveNutrients=newNutrients[i + 1, j + 1];
         }
 
         /// <summary>
@@ -355,14 +355,14 @@ namespace SanguineGenesis
                         else if (n.Biome == Biome.SAVANNA)
                             rainMsav--;
 
-                    if (this[i, j].Nutrients >= this[i,j].Terrain.Nutrients(Biome.SAVANNA, SoilQuality.LOW))
+                    if (this[i, j].ActiveNutrients >= this[i,j].Terrain.Nutrients(Biome.SAVANNA, SoilQuality.LOW))
                     {
                         //node has enough nutrients to become savanna
                         if (rainMsav < 0)
                             //majority of nondefault neighbour biomes is savanna
                             newBiomes[i, j] = Biome.SAVANNA;
                     }
-                    if (this[i, j].Nutrients >= this[i, j].Terrain.Nutrients(Biome.RAINFOREST, SoilQuality.LOW))
+                    if (this[i, j].ActiveNutrients >= this[i, j].Terrain.Nutrients(Biome.RAINFOREST, SoilQuality.LOW))
                     {
                         //node has enough nutrients to become rainforest
                         if (rainMsav > 0)

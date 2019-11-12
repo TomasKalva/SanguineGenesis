@@ -80,16 +80,16 @@ namespace SanguineGenesis.GameLogic
                     float nutrientsTaken;
 
                     //building can't take amount of nutrients that would reduce soil quality
-                    nutrientsTaken = Math.Min(MaxEnergyIntake, n.Nutrients - n.Terrain.Nutrients(n.Biome, n.SoilQuality));
+                    nutrientsTaken = Math.Min(MaxEnergyIntake, n.ActiveNutrients - n.Terrain.Nutrients(n.Biome, n.SoilQuality));
 
                     //nutrients can't drop below zero
-                    nutrientsTaken = Math.Min(nutrientsTaken, n.Nutrients);
+                    nutrientsTaken = Math.Min(nutrientsTaken, n.ActiveNutrients);
 
                     //building only takes energy it can use
                     nutrientsTaken = Math.Min(nutrientsTaken, Energy.AmountNotFilled);
 
                     Energy += nutrientsTaken;
-                    n.Nutrients -= nutrientsTaken;
+                    n.ActiveNutrients -= nutrientsTaken;
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace SanguineGenesis.GameLogic
         {
             foreach (Node n in RootNodes)
             {
-                n.Nutrients += MaxEnergyIntake * 2;
+                n.ActiveNutrients += MaxEnergyIntake * 2;
             }
         }
         #endregion Energy manipulation

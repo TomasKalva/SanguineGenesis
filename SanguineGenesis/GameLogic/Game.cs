@@ -137,6 +137,9 @@ namespace SanguineGenesis
 
             //generate and drain nutrients by trees
             Map.UpdateNutrientsMap(trees, deltaT);
+            
+            //update players' visibility map
+            VisibilityGeneratorInteraction(buildings);
 
             //update parts of map that can be seen for each player
             foreach (var p in Players)
@@ -186,9 +189,6 @@ namespace SanguineGenesis
             NeutralFaction.RemoveDeadEntities(this);
             foreach (var kvp in Players)
                 kvp.Value.RemoveDeadVisibleBuildings();
-
-            //update players' visibility map
-            VisibilityGeneratorInteraction(buildings);
 
             //set and refresh movement commands
             MovementGeneratorInteraction();

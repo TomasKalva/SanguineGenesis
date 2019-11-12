@@ -14,11 +14,15 @@ namespace SanguineGenesis
     class Node:ITargetable,IMovementTarget, IHerbivoreFood
     {
         /// <summary>
-        /// Maximal number of nutrients a node can have.
+        /// Maximal number of active nutrients a node can have.
         /// </summary>
-        public const float MAX_NUTRIENTS = 9.9f 
+        public const float MAX_ACTIVE_NUTRIENTS = 9.9f 
             + 0.0001f; // it is easier to get correct digits of 9.9f if the number is slightly larger
-        
+        /// <summary>
+        /// Maximal number of passive nutrients a node can have.
+        /// </summary>
+        public const int MAX_PASSIVE_NUTRIENTS = 99;
+
         /// <summary>
         /// X coordinate on the map.
         /// </summary>
@@ -35,19 +39,23 @@ namespace SanguineGenesis
         /// <summary>
         /// Backing field for Nutrients.
         /// </summary>
-        private float nutrients;
+        private float activeNutrients;
         /// <summary>
         /// Amount of nutrients in this node. Belongs to [0, MAX_NUTRIENTS].
         /// </summary>
-        public float Nutrients
+        public float ActiveNutrients
         {
-            get => nutrients;
+            get => activeNutrients;
             set
             {
-                nutrients = Math.Min(MAX_NUTRIENTS, Math.Max(0, value));
-                SoilQuality = Terrain.Quality(Biome, Nutrients);
+                activeNutrients = Math.Min(MAX_ACTIVE_NUTRIENTS, Math.Max(0, value));
+                SoilQuality = Terrain.Quality(Biome, ActiveNutrients);
             }
         }
+        /// <summary>
+        /// The amount of nutrients that can be extracted from this node.
+        /// </summary>
+        public FloatRange PassiveNutrients { get; set; }
         /// <summary>
         /// Backing field for Biome.
         /// </summary>
@@ -61,7 +69,7 @@ namespace SanguineGenesis
             set
             {
                 biome = value;
-                SoilQuality = Terrain.Quality(Biome, Nutrients);
+                SoilQuality = Terrain.Quality(Biome, ActiveNutrients);
             }
         }
         /// <summary>
@@ -94,11 +102,12 @@ namespace SanguineGenesis
         /// </summary>
         public Vector2 Center => new Vector2(X + 0.5f, Y + 0.5f);
 
-        public Node(int x, int y, float nutrients, Biome biome, Terrain terrain)
+        public Node(int x, int y, float passiveNutrients, float activeNutrients, Biome biome, Terrain terrain)
         {
             Terrain = terrain;
             Biome = biome;
-            Nutrients = nutrients;
+            ActiveNutrients = activeNutrients;
+            PassiveNutrients = new FloatRange(MAX_PASSIVE_NUTRIENTS, passiveNutrients);
             X = x;
             Y = y;
             Blocked = false;
@@ -110,7 +119,7 @@ namespace SanguineGenesis
         /// </summary>
         public Node Copy(int x, int y)
         {
-            return new Node(x, y, Nutrients, Biome, Terrain);
+            return new Node(x, y, PassiveNutrients, ActiveNutrients, Biome, Terrain);
         }
 
         /// <summary>
@@ -118,15 +127,17 @@ namespace SanguineGenesis
         /// </summary>
         public void GenerateNutrients()
         {
-            Nutrients += SoilQuality.NutrientsProduction();
+            float extracted = Math.Min(PassiveNutrients, SoilQuality.NutrientsProduction());
+            ActiveNutrients += extracted;
+            PassiveNutrients -= extracted;
         }
 
         #region IFood
-        bool IFood.FoodLeft => Nutrients > 0;
+        bool IFood.FoodLeft => ActiveNutrients > 0;
         void IFood.EatFood(Animal eater)
         {
-            float nutrientsToEat = Math.Min(eater.FoodEnergyRegen / 10, Nutrients);
-            Nutrients -= nutrientsToEat;
+            float nutrientsToEat = Math.Min(eater.FoodEnergyRegen / 10, ActiveNutrients);
+            ActiveNutrients -= nutrientsToEat;
             eater.Energy += nutrientsToEat * 10;
         }
         #endregion IFood

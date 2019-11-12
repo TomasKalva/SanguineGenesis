@@ -74,7 +74,7 @@ namespace SanguineGenesis.GameLogic
         {
             return node.Terrain == Terrain &&
                 node.Biome == Biome &&
-                node.Nutrients >= Terrain.Nutrients(Biome, SoilQuality);
+                node.ActiveNutrients >= Terrain.Nutrients(Biome, SoilQuality);
         }
     }
 

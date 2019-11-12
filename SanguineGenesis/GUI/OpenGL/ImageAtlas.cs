@@ -104,7 +104,7 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Initialize glyphs with images of digits and '.'.
+        /// Initialize glyphs with images of digits, '.' and '/'.
         /// </summary>
         private void InitializeDigitImages()
         {
@@ -130,7 +130,9 @@ namespace SanguineGenesis.GUI
             offset += 0.5f;
             AddGlyphImage(9, offset, 3, 0.5f, 1);
             offset += 0.5f;
-            AddGlyphImage(-1, offset, 3, 0.5f, 1);
+            AddGlyphImage(10, offset, 3, 0.5f, 1);
+            offset += 0.5f;
+            AddGlyphImage(11, offset, 3, 0.5f, 1);
         }
 
         /// <summary>
@@ -343,7 +345,8 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Returns image for the char. If it doesn't exist, argument exception is thrown.
+        /// Returns image for the int. Digits correspond to numbers 0-9, 10 is '.', 11 is '/'.
+        /// For other values argument exception is thrown.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if the image for the char doesn't exist.</exception>
         public Rect GetGlyph(int glyph)

@@ -52,15 +52,15 @@ namespace SanguineGenesis.GameLogic.Maps
                 {
                     if (i <= 0 || i > width - 2 || j <= 0 || j > height - 2)
                         //nodes outside of the map have default biome and maximal nutrients
-                        mapNodes[i, j] = new Node(i - 1, j - 1, Node.MAX_NUTRIENTS, Biome.DEFAULT, Terrain.LAND);
+                        mapNodes[i, j] = new Node(i - 1, j - 1, Node.MAX_PASSIVE_NUTRIENTS, Node.MAX_ACTIVE_NUTRIENTS, Biome.DEFAULT, Terrain.LAND);
                     else
                     {
                         int x = i - 1; int y = j - 1;
                         int mapsX = x; int mapsY = y;
                         Terrain terr = GetTerrain(MapDescription.GetTerrain(mapsX, mapsY));
-                        float nutr = ((256 - MapDescription.GetNutrients(mapsX, mapsY).R) / 256f) * Node.MAX_NUTRIENTS;
+                        float nutr = ((256 - MapDescription.GetNutrients(mapsX, mapsY).R) / 256f) * Node.MAX_PASSIVE_NUTRIENTS;
 
-                        mapNodes[x + 1, y + 1] = new Node(x, y, nutr, Biome.DEFAULT, terr);
+                        mapNodes[x + 1, y + 1] = new Node(x, y, nutr, 0, Biome.DEFAULT, terr);
                     }
                 }
 
@@ -141,7 +141,7 @@ namespace SanguineGenesis.GameLogic.Maps
                 for (int j = 0; j < buildNodes.GetLength(1); j++)
                 {
                     buildNodes[i, j].Biome = player.Biome;
-                    buildNodes[i, j].Nutrients = minNutr;
+                    buildNodes[i, j].ActiveNutrients = minNutr;
                 }
 
             game.Map.PlaceBuilding(buildingFactory, player, n.X, n.Y);
