@@ -19,10 +19,10 @@ void main(void) {
 		out_Color = texture(atlas0,vec2(pass_TexLeftBottomWidthHeight[0] //left coordinate
 									+pass_TexCoord[0]*pass_TexLeftBottomWidthHeight[2],
 									pass_TexLeftBottomWidthHeight[1]//bottom coordinate
-									+pass_TexCoord[1]*pass_TexLeftBottomWidthHeight[3]))*vec4(pass_Color,1.0);
+									+pass_TexCoord[1]*pass_TexLeftBottomWidthHeight[3])));
 	else*/
 		out_Color = texture(atlas1,vec2(pass_TexLeftBottomWidthHeight[0] //left coordinate
 									+pass_TexCoord[0]*pass_TexLeftBottomWidthHeight[2],
 									pass_TexLeftBottomWidthHeight[1]//bottom coordinate
-									+pass_TexCoord[1]*pass_TexLeftBottomWidthHeight[3]))*vec4(pass_Color,1.0);
+									+pass_TexCoord[1]*pass_TexLeftBottomWidthHeight[3]));
 }

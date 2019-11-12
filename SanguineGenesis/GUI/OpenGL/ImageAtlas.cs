@@ -38,17 +38,42 @@ namespace SanguineGenesis.GUI
         private Dictionary<int, Rect> glyphs;
 
         /// <summary>
-        /// Position of unit circle in the atlas.
+        /// Position of white unit circle in the atlas.
         /// </summary>
-        public Rect UnitCircle { get; }
+        public Rect UnitCircleGray { get; }
+        /// <summary>
+        /// Position of red unit circle in the atlas.
+        /// </summary>
+        public Rect UnitCircleRed { get; }
+        /// <summary>
+        /// Position of blue unit circle in the atlas.
+        /// </summary>
+        public Rect UnitCircleBlue { get; }
+        /// <summary>
+        /// Position of yellow unit circle in the atlas.
+        /// </summary>
+        public Rect UnitCircleYellow { get; }
         /// <summary>
         /// Position of transparent square in the atlas.
         /// </summary>
         public Rect UnitsSelector { get; }
+
         /// <summary>
-        /// Position of blank white square in the atlas.
+        /// Position of black square in the atlas.
         /// </summary>
-        public Rect BlankWhite { get; }
+        public Rect BlackSquare { get; }
+        /// <summary>
+        /// Position of black square in the atlas.
+        /// </summary>
+        public Rect RedSquare { get; }
+        /// <summary>
+        /// Position of black square in the atlas.
+        /// </summary>
+        public Rect BlueSquare { get; }
+        /// <summary>
+        /// Position of black square in the atlas.
+        /// </summary>
+        public Rect GreenSquare { get; }
 
         private static ImageAtlas imageAtlas;
         public static ImageAtlas GetImageAtlas => imageAtlas;
@@ -62,9 +87,19 @@ namespace SanguineGenesis.GUI
             InitializeDigitImages();
             LoadEntitiesAnimations("Images/atlas0.xml");
 
-            UnitCircle = ToRelative(GridToCoordinates(2, 0, 1, 1));
+            //circles
+            UnitCircleGray = ToRelative(GridToCoordinates(0, 19, 2, 2));
+            UnitCircleRed = ToRelative(GridToCoordinates(2, 19, 2, 2));
+            UnitCircleBlue = ToRelative(GridToCoordinates(4, 19, 2, 2));
+            UnitCircleYellow = ToRelative(GridToCoordinates(6, 19, 2, 2));
+
             UnitsSelector = ToRelative(GridToCoordinates(3, 0, 1, 1));
-            BlankWhite = ToRelative(GridToCoordinates(0, 1, 1, 1));
+
+            //squares
+            BlackSquare = ToRelative(GridToCoordinates(0, 1, 1, 1));
+            RedSquare = ToRelative(GridToCoordinates(0, 2, 1, 1));
+            GreenSquare = ToRelative(GridToCoordinates(1, 2, 1, 1));
+            BlueSquare = ToRelative(GridToCoordinates(2, 2, 1, 1));
 
         }
 
@@ -216,10 +251,10 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Get coordinates, where the image for the terrain is located in the atlas. The coordinates
-        /// are relative to the atlas.
+        /// Get coordinates, where the image for the terrain is located in the atlas. Returns darker
+        /// copy of the texture, if visible is false. The coordinates are relative to the atlas.
         /// </summary>
-        public Rect GetTileCoords(Biome biome, SoilQuality soilQuality, Terrain terrain)
+        public Rect GetTileCoords(Biome biome, SoilQuality soilQuality, Terrain terrain, bool visible)
         {
             Rect coords=default(Rect);
             if(terrain==Terrain.SHALLOW_WATER)
@@ -285,6 +320,10 @@ namespace SanguineGenesis.GUI
                         break;
                 }
             }
+            //use darker variant of the square if it's not visible
+            if (!visible)
+                coords = new Rect(coords.Left, coords.Bottom + 17, coords.Right, coords.Top + 17);
+
             if(coords.Equals(default(Rect)))
                 throw new ArgumentException("Combination " + terrain + ", " + biome + ", " + soilQuality + " isn't valid");
 

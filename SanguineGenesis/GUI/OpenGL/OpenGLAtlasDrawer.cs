@@ -31,7 +31,6 @@ namespace SanguineGenesis
 
         //vertex shader attribute indices
         const uint attributeIndexPosition = 0;
-        const uint attributeIndexcolor = 1;
         const uint attributeIndexTexCoord = 2;
         const uint attributeIndexTexBL = 3;
         
@@ -62,7 +61,6 @@ namespace SanguineGenesis
 
             //set indices for the shader program attributes
             shaderProgram.BindAttributeLocation(gl, attributeIndexPosition, "in_Position");
-            shaderProgram.BindAttributeLocation(gl, attributeIndexcolor, "in_Color");
             shaderProgram.BindAttributeLocation(gl, attributeIndexTexCoord, "in_TexCoord");
             shaderProgram.BindAttributeLocation(gl, attributeIndexTexBL, "in_TexLeftBottomWidthHeight");
 
@@ -213,12 +211,10 @@ namespace SanguineGenesis
         {
             public VertexBufferArray VertexBufferArray { get; set; }
             public VertexBuffer VertexDataBuffer { get; set; }
-            public VertexBuffer ColorDataBuffer { get; set; }
             public VertexBuffer TextureDataBuffer { get; set; }
             public VertexBuffer TexAtlasDataBuffer { get; set; }
 
             public float[] vertices;
-            public float[] colors;
             public float[] texture;
             public float[] texAtlas;
 
@@ -238,10 +234,6 @@ namespace SanguineGenesis
                 VertexDataBuffer = new VertexBuffer();
                 VertexDataBuffer.Create(gl);
 
-                //initialize empty ColorDataBuffer
-                ColorDataBuffer = new VertexBuffer();
-                ColorDataBuffer.Create(gl);
-
                 //initialize empty TextureDataBuffer
                 TextureDataBuffer = new VertexBuffer();
                 TextureDataBuffer.Create(gl);
@@ -254,7 +246,6 @@ namespace SanguineGenesis
 
                 //create initial arrays so that they are not null
                 vertices = new float[0];
-                colors = new float[0];
                 texture = new float[0];
                 texAtlas = new float[0];
             }
@@ -263,7 +254,6 @@ namespace SanguineGenesis
             /// Binds the data to this vertex buffer array.
             /// </summary>
             public void BindData(OpenGL gl, int vStride, float[] vValues,
-                                            int cStride, float[] cValues,
                                             int tStride, float[] tValues,
                                             int aStride, float[] aValues)
             {
@@ -271,11 +261,7 @@ namespace SanguineGenesis
 
                 VertexDataBuffer.Bind(gl);
                 VertexDataBuffer.SetData(gl, attributeIndexPosition, vValues, false, vStride);
-                //gl.BufferData(OpenGL.GL_ARRAY_BUFFER, vValues, OpenGL.GL_STREAM_DRAW);
                 VertexDataBuffer.Unbind(gl);
-
-                ColorDataBuffer.Bind(gl);
-                ColorDataBuffer.SetData(gl, attributeIndexcolor, cValues, false, cStride);
 
                 TextureDataBuffer.Bind(gl);
                 TextureDataBuffer.SetData(gl, attributeIndexTexCoord, tValues, false, tStride);
@@ -291,10 +277,9 @@ namespace SanguineGenesis
             /// <summary>
             /// Initialize arrays with zeros with the given sizes.
             /// </summary>
-            public void InitializeArrays(int verticesSize, int colorsSize, int textureSize, int texAtlasSize)
+            public void InitializeArrays(int verticesSize, int textureSize, int texAtlasSize)
             {
                 InitArray(ref vertices, verticesSize);
-                InitArray(ref colors, colorsSize);
                 InitArray(ref texture, textureSize);
                 InitArray(ref texAtlas, texAtlasSize);
             }
@@ -315,7 +300,6 @@ namespace SanguineGenesis
             public void ClearBuffers(OpenGL gl)
             {
                 BindData(gl, 1, new float[1],
-                            1, new float[1],
                             1, new float[1],
                             1, new float[1]);
                 Clear = true;
@@ -374,9 +358,8 @@ namespace SanguineGenesis
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
             
-            map.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            map.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
             float[] vertices = map.vertices;
-            float[] colors = map.colors;
             float[] texture = map.texture;
             float[] texAtlas = map.texAtlas;
 
@@ -397,7 +380,7 @@ namespace SanguineGenesis
                     if (visibleVisibility != null)
                         isVisible = visibleVisibility[i, j];
                     
-                    Rect atlasCoords = ImageAtlas.GetImageAtlas.GetTileCoords(current.Biome,current.SoilQuality,current.Terrain);
+                    Rect atlasCoords = ImageAtlas.GetImageAtlas.GetTileCoords(current.Biome,current.SoilQuality,current.Terrain, isVisible);
 
                     //tile position
                     float bottom = (current.Y - viewBottom) * sqH;
@@ -406,16 +389,12 @@ namespace SanguineGenesis
                     float right = (current.X - viewLeft + 1) * sqW;
 
                     SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                    if(isVisible)
-                        SetColor(colors, 1f, 1f, 1f, coord,6);
-                    else
-                        SetColor(colors, .8f, .8f, .8f, coord, 6);
                     SetSquareTextureCoordinates(texture, texCoord);
                     SetAtlasCoordinates(texAtlas, atlasCoords, bottomLeftInd, 6);
                 }
             }
 
-            map.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            map.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
         }
 
         #endregion Map
@@ -468,9 +447,8 @@ namespace SanguineGenesis
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            nutrientsMap.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            nutrientsMap.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
             float[] vertices = nutrientsMap.vertices;
-            float[] colors = nutrientsMap.colors;
             float[] texture = nutrientsMap.texture;
             float[] texAtlas = nutrientsMap.texAtlas;
 
@@ -503,7 +481,6 @@ namespace SanguineGenesis
                     float right = (current.X - viewLeft + 0.45f) * sqW;
 
                     SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                    SetColor(colors, 1f, 1f, 1f, coord, 6);
                     SetSquareTextureCoordinates(texture, texCoord);
                     SetAtlasCoordinates(texAtlas, leftDigAtlasCoords, bottomLeftInd, 6);
 
@@ -516,7 +493,6 @@ namespace SanguineGenesis
                     right = (current.X - viewLeft + 0.6f) * sqW;
 
                     SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                    SetColor(colors, 1f, 1f, 1f, coord, 6);
                     SetSquareTextureCoordinates(texture, texCoord);
                     SetAtlasCoordinates(texAtlas, decPointAtlasCoords, bottomLeftInd, 6);
 
@@ -529,13 +505,12 @@ namespace SanguineGenesis
                     right = (current.X - viewLeft + 0.8f) * sqW;
 
                     SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                    SetColor(colors, 1f, 1f, 1f, coord, 6);
                     SetSquareTextureCoordinates(texture, texCoord);
                     SetAtlasCoordinates(texAtlas, rightDigAtlasCoords, bottomLeftInd, 6);
                 }
             }
 
-            nutrientsMap.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            nutrientsMap.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
         }
 
         #endregion Nutrients map
@@ -583,9 +558,8 @@ namespace SanguineGenesis
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            entityCircles.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            entityCircles.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
             float[] vertices = entityCircles.vertices;
-            float[] colors = entityCircles.colors;
             float[] texture = entityCircles.texture;
             float[] texAtlas = entityCircles.texAtlas;
 
@@ -613,6 +587,7 @@ namespace SanguineGenesis
                     //vertices
                     SetRectangleVertices(vertices, bottom, top, left, right, -8, index);
 
+                    Rect atlasCoords;
                     //colors
                     if (!current.Selected)
                     {
@@ -620,30 +595,32 @@ namespace SanguineGenesis
                         switch (current.Faction.FactionID)
                         {
                             case FactionType.PLAYER0:
-                                SetColor(colors, 0f, 0f, 1f, index, 6);
+                                atlasCoords= ImageAtlas.GetImageAtlas.UnitCircleBlue;
                                 break;
                             case FactionType.PLAYER1:
-                                SetColor(colors, 1f, 0f, 0f, index, 6);
+                                atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleRed;
                                 break;
                             case FactionType.NEUTRAL:
-                                SetColor(colors, .5f, .5f, .5f, index, 6);
+                                atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleGray;
+                                break;
+                            default:
+                                atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleGray;
                                 break;
                         }
                     }
                     else
                         //fill the circle with selected entity circle color
-                        SetColor(colors, 1f, 1f, 0f, index, 6);
+                        atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleYellow;
 
                     //texture coordinates
                     SetSquareTextureCoordinates(texture, texIndex);
 
                     //atlas coordinates
-                    Rect atlasCoords = ImageAtlas.GetImageAtlas.UnitCircle;
                     SetAtlasCoordinates(texAtlas, atlasCoords, atlasInd, 6);
                 }
             }
 
-            entityCircles.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            entityCircles.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
         }
         #endregion Entity circles
 
@@ -690,9 +667,8 @@ namespace SanguineGenesis
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            entities.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            entities.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
             float[] vertices = entities.vertices;
-            float[] colors = entities.colors;
             float[] texture = entities.texture;
             float[] texAtlas = entities.texAtlas;
 
@@ -732,9 +708,6 @@ namespace SanguineGenesis
                     //vertices
                     SetRectangleVertices(vertices, bottom, top, left, right, -depth, index);
 
-                    //colors
-                    SetColor(colors, 1f, 1f, 1f, index, 6);
-
                     //texture coordinates
                     if(current is Animal && !((Animal)current).FacingLeft)
                         SetHorizFlipSquareTextureCoordinates(texture, texIndex);
@@ -747,7 +720,7 @@ namespace SanguineGenesis
                 }
             }
 
-            entities.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            entities.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
         }
         #endregion Entity
 
@@ -794,9 +767,8 @@ namespace SanguineGenesis
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            entityIndicators.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            entityIndicators.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
             float[] vertices = entityIndicators.vertices;
-            float[] colors = entityIndicators.colors;
             float[] texture = entityIndicators.texture;
             float[] texAtlas = entityIndicators.texAtlas;
 
@@ -814,8 +786,6 @@ namespace SanguineGenesis
                 if (current == null)
                     continue;
 
-                Rect indicatorImage = ImageAtlas.GetImageAtlas.BlankWhite;
-
                 float unitSize = nodeSize;
 
                 float indicatorWidth = current.Range * 1.5f;
@@ -831,16 +801,19 @@ namespace SanguineGenesis
 
                     //depth is from [2,3]
                     float depth = 2f + current.Center.Y / game.Map.Height;
-                    
+
+                    Rect blackRect = ImageAtlas.GetImageAtlas.BlackSquare;
+                    Rect redRect = ImageAtlas.GetImageAtlas.RedSquare;
+                    Rect greenRect = ImageAtlas.GetImageAtlas.GreenSquare;
                     //energy
-                    AddRectangle(left, bottom, right, top, indicatorImage, depth, index, vertices,
-                        index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
+                    AddRectangle(left, bottom, right, top, blackRect, depth, index, vertices,
+                         texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
                     index += 6 * 3;
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
                     float energyRight = Math.Max(left, left + (right - left) * (float)(current.Energy.Percentage));
-                    AddRectangle(left, bottom, energyRight, top, indicatorImage, depth, index, vertices,
-                        index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 1f, 0f);
+                    AddRectangle(left, bottom, energyRight, top, redRect, depth, index, vertices,
+                         texIndex, texture, atlasInd, texAtlas, 0f, 1f, 0f);
                     index += 6 * 3;
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
@@ -848,18 +821,18 @@ namespace SanguineGenesis
                     //health
                     bottom += indicatorHeight*unitSize;
                     top += indicatorHeight*unitSize;
-                    AddRectangle(left, bottom, right, top, indicatorImage, depth, index, vertices,
-                        index, colors, texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
+                    AddRectangle(left, bottom, right, top, blackRect, depth, index, vertices,
+                         texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
                     index += 6 * 3;
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
                     float healthRight =Math.Max(left, left + (right - left) * (float)(current.Health.Percentage));
-                    AddRectangle(left, bottom, healthRight, top, indicatorImage, depth, index, vertices,
-                        index, colors, texIndex, texture, atlasInd, texAtlas, 1f, 0f, 0f);
+                    AddRectangle(left, bottom, healthRight, top, greenRect, depth, index, vertices,
+                         texIndex, texture, atlasInd, texAtlas, 1f, 0f, 0f);
                 }
             }
 
-            entityIndicators.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            entityIndicators.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
         }
 
         #endregion Entity indicators
@@ -911,9 +884,8 @@ namespace SanguineGenesis
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            flowField.InitializeArrays(verticesSize, colorsSize, textureSize, textureAtlasSize);
+            flowField.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
             float[] vertices = flowField.vertices;
-            float[] colors = flowField.colors;
             float[] texture = flowField.texture;
             float[] texAtlas = flowField.texAtlas;
 
@@ -1000,14 +972,13 @@ namespace SanguineGenesis
                     //top right
                     texture[texCoord + texOffset + 0] = 1;
                     texture[texCoord + texOffset + 1] = 0.5f;
-
-                    SetColor(colors, 0f, 0f, 0f, coord,3);
-                    Rect atlasCoords = ImageAtlas.GetImageAtlas.BlankWhite;//the triangles are black
+                    
+                    Rect atlasCoords = ImageAtlas.GetImageAtlas.BlackSquare;//the triangles are black
                     SetAtlasCoordinates(texAtlas, atlasCoords, bottomLeftInd, 3);
                 }
             }
 
-            flowField.BindData(gl, 3, vertices, 3, colors, 2, texture, 4, texAtlas);
+            flowField.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
         }
 
         #endregion Flowfield
@@ -1060,7 +1031,7 @@ namespace SanguineGenesis
                 SetAtlasCoordinates(texBottomLeft, atlasCoords, 0, 6);
             }
 
-            selectionFrame.BindData(gl, 3, vertices, 3, colors, 2, textureCoords, 4, texBottomLeft);
+            selectionFrame.BindData(gl, 3, vertices, 2, textureCoords, 4, texBottomLeft);
         }
         #endregion Selection frame
 
@@ -1261,16 +1232,12 @@ namespace SanguineGenesis
         /// </summary>
         public static void AddRectangle(float left, float bottom, float right, float top, Rect image, float depth,
                                             int vInd, float[] vertices,
-                                            int cInd, float[] colors,
                                             int tInd, float[] textureCoords,
                                             int aInd, float[] texAtlas,
                                             float r, float g, float b)
         {
             //vertices
             SetRectangleVertices(vertices, bottom, top, left, right, -depth, vInd);
-
-            //colors
-            SetColor(colors, r, g, b, cInd, 6);
 
             //texture coordinates
             SetSquareTextureCoordinates(textureCoords, tInd);
