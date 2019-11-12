@@ -31,8 +31,8 @@ namespace SanguineGenesis
 
         //vertex shader attribute indices
         const uint attributeIndexPosition = 0;
-        const uint attributeIndexTexCoord = 2;
-        const uint attributeIndexTexBL = 3;
+        const uint attributeIndexTexCoord = 1;
+        const uint attributeIndexTexBL = 2;
         
         //the shader program for the vertex and fragment shader
         static private ShaderProgram shaderProgram;
@@ -116,41 +116,25 @@ namespace SanguineGenesis
         /// <param name="gl">The instance of OpenGL to which the texture will be loaded.</param>
         private static void LoadTexture(String fileName, OpenGL gl, ShaderProgram shaderProgram)
         {
-            //load image and flip it vertically
+            //load image and flip it vertically for easier indexing
             Bitmap textureImage = new Bitmap(fileName);
-            Bitmap test = (Bitmap)textureImage.Clone();
             textureImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
-
             //generate id for the texture and then bind the image with this id
-            uint[] textureIds = new uint[2];
-            gl.GenTextures(2, textureIds);
+            uint[] textureIds = new uint[1];
+            gl.GenTextures(1, textureIds);
             gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[0]);
-            gl.TexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, test.Width, test.Height, 0, OpenGL.GL_BGRA, OpenGL.GL_UNSIGNED_BYTE,
-                test.LockBits(new Rectangle(0, 0, test.Width, test.Height),
-                ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb).Scan0);
-
-            gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[1]);
             gl.TexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, textureImage.Width, textureImage.Height, 0, OpenGL.GL_BGRA, OpenGL.GL_UNSIGNED_BYTE,
                 textureImage.LockBits(new Rectangle(0, 0, textureImage.Width, textureImage.Height),
                 ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb).Scan0);
 
             shaderProgram.Bind(gl);
 
-            int atlas0 = shaderProgram.GetUniformLocation(gl, "atlas0");
-            int atlas1 = shaderProgram.GetUniformLocation(gl, "atlas1");
-            gl.Uniform1(atlas0, 0);
-            gl.Uniform1(atlas1, 1);
+            int atlas = shaderProgram.GetUniformLocation(gl, "atlas");
+            gl.Uniform1(atlas, 0);
 
             gl.ActiveTexture(OpenGL.GL_TEXTURE0);
             gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[0]);
-            gl.ActiveTexture(OpenGL.GL_TEXTURE1);
-            gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[1]);
-
-            /*shaderProgram.SetUniform1(gl, "atlas0", textureIds[0]);
-            shaderProgram.SetUniform1(gl, "atlas1", textureIds[1]);*/
-
-
         }
 
         #endregion Initialization
@@ -307,7 +291,7 @@ namespace SanguineGenesis
         }
 
         //vertex buffer arrays which contain the buffers for vertex, 
-        //color, texture and bottom left coordinates of textures
+        //texture and bottom left coordinates of textures
         private static MyBufferArray map;
         private static MyBufferArray flowField;
         private static MyBufferArray nutrientsMap;
@@ -354,7 +338,6 @@ namespace SanguineGenesis
 
             int verticesPerOne = width * height * 6;
             int verticesSize = verticesPerOne * 3;
-            int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
             
@@ -443,7 +426,6 @@ namespace SanguineGenesis
 
             int verticesPerOne = width * height * 6 * 3;
             int verticesSize = verticesPerOne * 3;
-            int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
@@ -554,7 +536,6 @@ namespace SanguineGenesis
 
             int verticesPerOne = size * 6;
             int verticesSize = verticesPerOne * 3;
-            int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
@@ -663,7 +644,6 @@ namespace SanguineGenesis
             
             int verticesPerOne = size * 6;
             int verticesSize = verticesPerOne * 3;
-            int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
@@ -763,7 +743,6 @@ namespace SanguineGenesis
             
             int verticesPerOne = size * 24;
             int verticesSize = verticesPerOne * 3;
-            int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
@@ -812,7 +791,7 @@ namespace SanguineGenesis
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
                     float energyRight = Math.Max(left, left + (right - left) * (float)(current.Energy.Percentage));
-                    AddRectangle(left, bottom, energyRight, top, redRect, depth, index, vertices,
+                    AddRectangle(left, bottom, energyRight, top, greenRect, depth, index, vertices,
                          texIndex, texture, atlasInd, texAtlas, 0f, 1f, 0f);
                     index += 6 * 3;
                     texIndex += 6 * 2;
@@ -827,7 +806,7 @@ namespace SanguineGenesis
                     texIndex += 6 * 2;
                     atlasInd += 6 * 4;
                     float healthRight =Math.Max(left, left + (right - left) * (float)(current.Health.Percentage));
-                    AddRectangle(left, bottom, healthRight, top, greenRect, depth, index, vertices,
+                    AddRectangle(left, bottom, healthRight, top, redRect, depth, index, vertices,
                          texIndex, texture, atlasInd, texAtlas, 1f, 0f, 0f);
                 }
             }
@@ -880,7 +859,6 @@ namespace SanguineGenesis
             
             int verticesPerOne = width * height * 3;
             int verticesSize = verticesPerOne * 3;
-            int colorsSize = verticesPerOne * 3;
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
@@ -1012,7 +990,6 @@ namespace SanguineGenesis
             float sqH = nodeSize;
 
             float[] vertices = new float[6 * 3];
-            float[] colors = new float[6 * 3];
             float[] textureCoords = new float[6 * 2];
             float[] texBottomLeft = new float[6 * 4];
             
@@ -1026,7 +1003,6 @@ namespace SanguineGenesis
                 SetRectangleVertices(vertices, bottom * nodeSize, top * nodeSize,
                     left * nodeSize, right * nodeSize, -1f, 0);
                 SetSquareTextureCoordinates(textureCoords, 0);
-                SetColor(colors, 1f, 1f, 1f, 0, 6);
                 Rect atlasCoords = ImageAtlas.GetImageAtlas.UnitsSelector;
                 SetAtlasCoordinates(texBottomLeft, atlasCoords, 0, 6);
             }
@@ -1091,28 +1067,6 @@ namespace SanguineGenesis
             vertices[index + offset + 0] = right;
             vertices[index + offset + 1] = top;
             vertices[index + offset + 2] = depth;
-        }
-
-        /// <summary>
-        /// Write vertex colors with the given parameters to the index of the array.
-        /// </summary>
-        /// <param name="colors">Writing array.</param>
-        /// <param name="index">Index of the first color in array.</param>
-        /// <param name="vertCount">Number of times this color should be repeated (for each vertex once).</param>
-        private static void SetColor(float[] colors, float red, float green, float blue, int index,
-            int vertCount)
-        {
-            int offset = 0;
-
-            for (int i = 0; i < vertCount; i++)
-            {
-                colors[index + offset + 0] = red;
-                colors[index + offset + 1] = green;
-                colors[index + offset + 2] = blue;
-
-                offset += 3;
-
-            }
         }
 
         /// <summary>
