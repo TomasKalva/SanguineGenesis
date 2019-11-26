@@ -378,10 +378,16 @@ namespace SanguineGenesis
         /// Return the command queue as a list.
         /// </summary>
         public List<Command> ToList() => Queue.ToList();
+
         /// <summary>
         /// True iff the queue is not empty.
         /// </summary>
         public bool Any() => Queue.Any();
+
+        /// <summary>
+        /// Returns number of elements in this command queue.
+        /// </summary>
+        public int Count => Queue.Count;
 
         /// <summary>
         /// Returns commands in the queue from first to the last.

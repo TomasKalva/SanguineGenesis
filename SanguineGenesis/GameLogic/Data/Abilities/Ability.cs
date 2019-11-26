@@ -170,8 +170,16 @@ namespace SanguineGenesis.GameLogic
             if (!validCasters.Any())
                 return;
 
+            //if the ability should be cast only by one caster,
+            //find the most suitable caster to cast this ability
             if (OnlyOne)
-                validCasters = validCasters.Take(1).ToList();
+            {
+                //minimal nuber of active commands of casters
+                int minCom = validCasters.Min(c => c.CommandQueue.Count);
+                validCasters = validCasters.Where(c=>c.CommandQueue.Count == minCom)
+                    .Take(1)//validCasters is nonempty and it has to have item with minimum command queue length
+                    .ToList();
+            }
 
             if(resetCommandQueue)
                 //reset all commands
