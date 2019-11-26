@@ -15,7 +15,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// <summary>
         /// Called when the status is added to the entity.
         /// </summary>
-        public abstract void Added();
+        public virtual void Added() { }
         /// <summary>
         /// Called on game update. Returns true if the status was finished and should be removed.
         /// </summary>
@@ -23,7 +23,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// <summary>
         /// Called when the status is removed from the entity.
         /// </summary>
-        public abstract void Removed();
+        public virtual void Removed() { }
 
         #region IShowable
         public abstract string GetName();
@@ -174,16 +174,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             ticksPerformed = 0;
             tickTimeElapsed = 0f;
-        }
-
-        public override void Added()
-        {
-            //nothing to do
-        }
-
-        public override void Removed()
-        {
-            //nothing to do
         }
 
         public override bool Step(Game game, float deltaT)
@@ -366,16 +356,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
         }
 
-        public override void Added()
-        {
-            //do nothing
-        }
-
-        public override void Removed()
-        {
-            //do nothing
-        }
-
         public override bool Step(Game game, float deltaT)
         {
             return false;
@@ -483,6 +463,42 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public override string Description()
         {
             return "This animal is being knocked away.";
+        }
+    }
+
+    /// <summary>
+    /// Animal is taking damage continously.
+    /// </summary>
+    class Suffocating : Status<Animal, SuffocatingFactory>
+    {
+        public Suffocating(Animal affectedEntity, SuffocatingFactory suffocatingInfo)
+            : base(affectedEntity, suffocatingInfo)
+        {
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            AffectedEntity.Damage(deltaT * StatusInfo.DamagePerS);
+
+            // remove the status if the animal can move on the terrain that is below it
+            int x = (int)AffectedEntity.Position.X;
+            int y = (int)AffectedEntity.Position.Y;
+            return AffectedEntity.CanMoveOn(game.Map[x, y].Terrain);
+        }
+
+        public override string GetName() => "Suffocating";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Dmg per s", StatusInfo.DamagePerS.ToString())
+            };
+        }
+
+        public override string Description()
+        {
+            return "This animal is out of its natural terrain and is therefore suffocating.";
         }
     }
 }

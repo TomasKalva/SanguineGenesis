@@ -271,4 +271,22 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return new KnockAway(affectedEntity, this);
         }
     }
+
+    class SuffocatingFactory : StatusFactory<Animal>
+    {
+        /// <summary>
+        /// How much damage the animal takes per second.
+        /// </summary>
+        public float DamagePerS { get; }
+
+        public SuffocatingFactory(float damagePerS)
+            : base(true)
+        {
+            DamagePerS = damagePerS;
+        }
+        protected override Status NewInstance(Animal affectedEntity)
+        {
+            return new Suffocating(affectedEntity, this);
+        }
+    }
 }

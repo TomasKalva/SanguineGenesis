@@ -12,10 +12,12 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     class Statuses
     {
         public UndergroundFactory UndergroundFactory { get; }
+        public SuffocatingFactory SuffocatingFactory { get; }
 
         public Statuses()
         {
             UndergroundFactory = new UndergroundFactory();
+            SuffocatingFactory = new SuffocatingFactory(5);
         }
 
     }

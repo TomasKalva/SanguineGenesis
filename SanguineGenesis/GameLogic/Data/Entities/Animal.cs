@@ -186,10 +186,14 @@ namespace SanguineGenesis.GameLogic
                 StopMoving = false;
                 WantsToMove = false;
                 Velocity = new Vector2(0, 0);
+                return;
             }
+            // move the animal
             Position = new Vector2(
                 Math.Max(Range, Math.Min(Center.X + deltaT * Velocity.X, map.Width - Range)),
                 Math.Max(Range, Math.Min(Center.Y + deltaT * Velocity.Y, map.Height - Range)));
+            
+            // set direction
             if (WantsToMove && Velocity.Length != 0)
                 Direction = Velocity.UnitVector();
         }
@@ -208,6 +212,33 @@ namespace SanguineGenesis.GameLogic
                 vel = MaxSpeedWater * direction;
 
             Velocity = vel;
+        }
+
+        /// <summary>
+        /// Returns true if the animal can move on the terrain.
+        /// </summary>
+        public bool CanMoveOn(Terrain terrain)
+        {
+            switch (Movement)
+            {
+                case Movement.LAND:
+                    // land animal can only move on land
+                    if (terrain == Terrain.LAND)
+                        return true;
+                    else
+                        return false;
+                case Movement.WATER:
+                    // water animal can not move only on land
+                    if (terrain == Terrain.LAND)
+                        return false;
+                    else
+                        return true;
+                case Movement.LAND_WATER:
+                    // land water animal can move everywhere
+                    return true;
+                default:
+                    return false;
+            }
         }
         #endregion Movement
 
@@ -261,6 +292,10 @@ namespace SanguineGenesis.GameLogic
         LAND,
         WATER,
         LAND_WATER
+    }
+
+    public static class MovementExtensions
+    {
     }
 
     public enum Diet

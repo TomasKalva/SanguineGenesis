@@ -151,6 +151,17 @@ namespace SanguineGenesis
                 e.StepStatuses(this, deltaT);
             }
 
+            // add suffocating status to animals on wrong terrain
+            foreach(Animal a in animals)
+            {
+                int x = (int)a.Position.X;
+                int y = (int)a.Position.Y;
+                if (!a.CanMoveOn(Map[x, y].Terrain))
+                {
+                    NeutralFaction.GameStaticData.Statuses.SuffocatingFactory.ApplyToAffected(a);
+                }
+            }
+
             //one step of commands
             foreach (Entity e in entities)
             {
