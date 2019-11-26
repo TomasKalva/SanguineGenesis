@@ -89,12 +89,12 @@ namespace SanguineGenesis
                             if (e is Building)
                             {
                                 //buildings can't be pushed
-                                a.Push(-2 * pushVec);
+                                a.Push(-2 * pushVec, map);
                             }
                             else if (e is Corpse)
                             {
                                 //corpse isn't pushed
-                                a.Push(pushVec);
+                                a.Push(pushVec, map);
                             }
                             else
                             {
@@ -105,18 +105,18 @@ namespace SanguineGenesis
                                     //if both or none want to move, push both of them
                                     if (a.WantsToMove && !a1.WantsToMove)
                                     {
-                                        a.Push(-2 * pushVec);
+                                        a.Push(-2 * pushVec, map);
 
                                     }
                                     else if (a1.WantsToMove && !a.WantsToMove)
                                     {
-                                        a1.Push(2 * pushVec);
+                                        a1.Push(2 * pushVec, map);
 
                                     }
                                     else
                                     {
-                                        a.Push(-1 * pushVec);
-                                        a1.Push(pushVec);
+                                        a.Push(-1 * pushVec, map);
+                                        a1.Push(pushVec, map);
 
                                     }
                                 }
@@ -126,17 +126,17 @@ namespace SanguineGenesis
                                     //if both or none want to move, push both of them
                                     if (a.CanBeMoved && !a1.CanBeMoved)
                                     {
-                                        a.Push(-2 * pushVec);
+                                        a.Push(-2 * pushVec, map);
 
                                     }
                                     else if (a1.CanBeMoved && !a.CanBeMoved)
                                     {
-                                        a1.Push(2 * pushVec);
+                                        a1.Push(2 * pushVec, map);
                                     }
                                     else
                                     {
-                                        a.Push(-1 * pushVec);
-                                        a1.Push(pushVec);
+                                        a.Push(-1 * pushVec, map);
+                                        a1.Push(pushVec, map);
                                     }
                                 }
                                 //push animal with a pushing map if it gets into 

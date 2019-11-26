@@ -177,7 +177,7 @@ namespace SanguineGenesis.GameLogic
 
         #region Movement
         /// <summary>
-        /// Unit moves using its velocity.
+        /// Animal moves using its velocity.
         /// </summary>
         public void Move(Map map, float deltaT)
         {
@@ -186,12 +186,10 @@ namespace SanguineGenesis.GameLogic
                 StopMoving = false;
                 WantsToMove = false;
                 Velocity = new Vector2(0, 0);
-                return;
             }
             // move the animal
-            Position = new Vector2(
-                Math.Max(Range, Math.Min(Center.X + deltaT * Velocity.X, map.Width - Range)),
-                Math.Max(Range, Math.Min(Center.Y + deltaT * Velocity.Y, map.Height - Range)));
+            Position += deltaT * Velocity;
+            PushBackToMap(map);
             
             // set direction
             if (WantsToMove && Velocity.Length != 0)
@@ -278,9 +276,17 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Pushes animal by displacement. Should be only used in collision handling.
         /// </summary>
-        public void Push(Vector2 displacement)
+        public void Push(Vector2 displacement, Map map)
         {
             Position += displacement;
+            PushBackToMap(map);
+        }
+
+        public void PushBackToMap(Map map)
+        {
+            Position = new Vector2(
+                Math.Max(Range, Math.Min(Position.X, map.Width - Range)),
+                Math.Max(Range, Math.Min(Position.Y, map.Height - Range)));
         }
     }
 

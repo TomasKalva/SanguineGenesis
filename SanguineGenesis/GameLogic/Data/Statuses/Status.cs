@@ -483,7 +483,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             // remove the status if the animal can move on the terrain that is below it
             int x = (int)AffectedEntity.Position.X;
             int y = (int)AffectedEntity.Position.Y;
-            return AffectedEntity.CanMoveOn(game.Map[x, y].Terrain);
+            var n = game.Map[x, y];
+            if(n!=null)
+                return AffectedEntity.CanMoveOn(n.Terrain);
+            return true;
         }
 
         public override string GetName() => "Suffocating";
