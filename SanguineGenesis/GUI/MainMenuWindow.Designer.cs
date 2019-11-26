@@ -38,8 +38,6 @@
             this.saveB = new System.Windows.Forms.Button();
             this.mapNamesCB = new System.Windows.Forms.ComboBox();
             this.newNameTB = new System.Windows.Forms.TextBox();
-            this.widthTB = new System.Windows.Forms.TextBox();
-            this.heightTB = new System.Windows.Forms.TextBox();
             this.widthL = new System.Windows.Forms.Label();
             this.heightL = new System.Windows.Forms.Label();
             this.newMapPanel = new System.Windows.Forms.Panel();
@@ -66,6 +64,8 @@
             this.shallowWaterRB = new System.Windows.Forms.RadioButton();
             this.errorMessageL = new System.Windows.Forms.Label();
             this.mapNameL = new System.Windows.Forms.Label();
+            this.widthNUD = new System.Windows.Forms.NumericUpDown();
+            this.heightNUD = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.newMapPanel.SuspendLayout();
@@ -75,6 +75,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nutrientsRateNUD)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).BeginInit();
             this.buildingSelectionGB.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.widthNUD)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.heightNUD)).BeginInit();
             this.SuspendLayout();
             // 
             // mapPB
@@ -177,20 +179,6 @@
             this.newNameTB.Size = new System.Drawing.Size(141, 20);
             this.newNameTB.TabIndex = 7;
             // 
-            // widthTB
-            // 
-            this.widthTB.Location = new System.Drawing.Point(67, 43);
-            this.widthTB.Name = "widthTB";
-            this.widthTB.Size = new System.Drawing.Size(88, 20);
-            this.widthTB.TabIndex = 8;
-            // 
-            // heightTB
-            // 
-            this.heightTB.Location = new System.Drawing.Point(67, 69);
-            this.heightTB.Name = "heightTB";
-            this.heightTB.Size = new System.Drawing.Size(88, 20);
-            this.heightTB.TabIndex = 9;
-            // 
             // widthL
             // 
             this.widthL.AutoSize = true;
@@ -211,12 +199,12 @@
             // 
             // newMapPanel
             // 
+            this.newMapPanel.Controls.Add(this.heightNUD);
+            this.newMapPanel.Controls.Add(this.widthNUD);
             this.newMapPanel.Controls.Add(this.newNameTB);
             this.newMapPanel.Controls.Add(this.heightL);
             this.newMapPanel.Controls.Add(this.newMapB);
             this.newMapPanel.Controls.Add(this.widthL);
-            this.newMapPanel.Controls.Add(this.widthTB);
-            this.newMapPanel.Controls.Add(this.heightTB);
             this.newMapPanel.Location = new System.Drawing.Point(12, 268);
             this.newMapPanel.Name = "newMapPanel";
             this.newMapPanel.Size = new System.Drawing.Size(273, 103);
@@ -499,6 +487,50 @@
             this.mapNameL.Text = "<map name>";
             this.mapNameL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // widthNUD
+            // 
+            this.widthNUD.Location = new System.Drawing.Point(109, 41);
+            this.widthNUD.Maximum = new decimal(new int[] {
+            150,
+            0,
+            0,
+            0});
+            this.widthNUD.Minimum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.widthNUD.Name = "widthNUD";
+            this.widthNUD.Size = new System.Drawing.Size(46, 20);
+            this.widthNUD.TabIndex = 14;
+            this.widthNUD.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            // 
+            // heightNUD
+            // 
+            this.heightNUD.Location = new System.Drawing.Point(109, 67);
+            this.heightNUD.Maximum = new decimal(new int[] {
+            150,
+            0,
+            0,
+            0});
+            this.heightNUD.Minimum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.heightNUD.Name = "heightNUD";
+            this.heightNUD.Size = new System.Drawing.Size(46, 20);
+            this.heightNUD.TabIndex = 15;
+            this.heightNUD.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            // 
             // MainMenuWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -528,6 +560,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).EndInit();
             this.buildingSelectionGB.ResumeLayout(false);
             this.buildingSelectionGB.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.widthNUD)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.heightNUD)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -544,8 +578,6 @@
         private System.Windows.Forms.Button saveB;
         private System.Windows.Forms.ComboBox mapNamesCB;
         private System.Windows.Forms.TextBox newNameTB;
-        private System.Windows.Forms.TextBox widthTB;
-        private System.Windows.Forms.TextBox heightTB;
         private System.Windows.Forms.Label widthL;
         private System.Windows.Forms.Label heightL;
         private System.Windows.Forms.Panel newMapPanel;
@@ -572,5 +604,7 @@
         private System.Windows.Forms.NumericUpDown nutrientsRateNUD;
         private System.Windows.Forms.Label mapNameL;
         private System.Windows.Forms.RadioButton removeBuildingRB;
+        private System.Windows.Forms.NumericUpDown heightNUD;
+        private System.Windows.Forms.NumericUpDown widthNUD;
     }
 }

@@ -14,9 +14,17 @@ namespace SanguineGenesis.GUI
     public partial class MainMenuWindow : Form
     {
         /// <summary>
+        /// Minimum width of the map.
+        /// </summary>
+        private const int MIN_MAP_WIDTH = 30;
+        /// <summary>
         /// Maximum width of the map.
         /// </summary>
         private const int MAX_MAP_WIDTH = 100;
+        /// <summary>
+        /// Minimum height of the map.
+        /// </summary>
+        private const int MIN_MAP_HEIGHT = 30;
         /// <summary>
         /// Maximum height of the map.
         /// </summary>
@@ -29,6 +37,10 @@ namespace SanguineGenesis.GUI
         public MainMenuWindow()
         {
             InitializeComponent();
+            heightNUD.Minimum = MIN_MAP_HEIGHT;
+            widthNUD.Minimum = MIN_MAP_WIDTH;
+            heightNUD.Maximum = MAX_MAP_HEIGHT;
+            widthNUD.Maximum = MAX_MAP_WIDTH;
 
             MapScale = mapPB.Width / MAX_MAP_WIDTH;
             DrawOpt = DrawOption.NO_ACTION;
@@ -192,25 +204,16 @@ namespace SanguineGenesis.GUI
 
         private void NewMapB_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(widthTB.Text, out int width))
+            int width = (int)widthNUD.Value;
+            int height = (int)heightNUD.Value;
+            if (!(width >= MIN_MAP_WIDTH && width <= MAX_MAP_WIDTH))
             {
-                ErrorMessage("The width value \"" + widthTB.Text + "\" is not a number.");
+                ErrorMessage("Width has to be between " + MIN_MAP_WIDTH + " and " + MAX_MAP_WIDTH + ".");
                 return;
             }
-            if (!int.TryParse(heightTB.Text, out int height))
+            if (!(height >= MIN_MAP_HEIGHT && height <= MAX_MAP_HEIGHT))
             {
-                ErrorMessage("The height value \"" + heightTB.Text + "\" is not a valid number.");
-                return;
-            }
-            if (!(width > 0 && width <= MAX_MAP_WIDTH))
-            {
-
-                ErrorMessage("Width has to be between " + 0 + " and " + MAX_MAP_WIDTH + ".");
-                return;
-            }
-            if (!(height > 0 && height <= MAX_MAP_HEIGHT))
-            {
-                ErrorMessage("Height has to be between " + 0 + " and " + MAX_MAP_HEIGHT + ".");
+                ErrorMessage("Height has to be between " + MIN_MAP_HEIGHT + " and " + MAX_MAP_HEIGHT + ".");
                 return;
             }
             if (ValidName(newNameTB.Text))
@@ -365,7 +368,14 @@ namespace SanguineGenesis.GUI
 
         private void DeleteB_Click(object sender, EventArgs e)
         {
-            string dirName = MapDescription.DIRECTORY + mapNamesCB.Text;
+            string deletedName = mapNamesCB.Text;
+            string dirName = MapDescription.DIRECTORY + deletedName;
+            if (deletedName == "")
+            { 
+                ErrorMessage("Select a map to delete.");
+                return;
+            }
+
             if (Directory.Exists(dirName))
             {
                 Directory.Delete(dirName, true);
