@@ -131,14 +131,22 @@ namespace SanguineGenesis.GUI
         private void LoadNamesOfCreatedMaps()
         {
             string dirName = MapDescription.DIRECTORY;
-            if (!Directory.Exists(dirName))
-                Directory.CreateDirectory(dirName);
-
-            mapNamesCB.Items.Clear();
-            foreach (var d in Directory.GetDirectories(dirName))
+            try
             {
-                mapNamesCB.Items.Add(Path.GetFileName(d));
+                if (!Directory.Exists(dirName))
+                    Directory.CreateDirectory(dirName);
+
+                mapNamesCB.Items.Clear();
+                foreach (var d in Directory.GetDirectories(dirName))
+                {
+                    mapNamesCB.Items.Add(Path.GetFileName(d));
+                }
             }
+            catch(IOException e)
+            {
+                ErrorMessage("List of maps can't be loaded.");
+            }
+
         }
 
         /// <summary>
@@ -376,15 +384,22 @@ namespace SanguineGenesis.GUI
                 return;
             }
 
-            if (Directory.Exists(dirName))
+            try
             {
-                Directory.Delete(dirName, true);
-                LoadNamesOfCreatedMaps();
-                Message("The map \"" + mapNamesCB.Text + "\" was deleted.");
+                if (Directory.Exists(dirName))
+                {
+                    Directory.Delete(dirName, true);
+                    LoadNamesOfCreatedMaps();
+                    Message("The map \"" + mapNamesCB.Text + "\" was deleted.");
+                }
+                else
+                {
+                    ErrorMessage("No map is loaded.");
+                }
             }
-            else
+            catch (IOException)
             {
-                ErrorMessage("No map is loaded.");
+                ErrorMessage("The map can't be deleted.");
             }
         }
 
