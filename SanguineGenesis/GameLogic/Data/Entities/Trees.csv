@@ -1,5 +1,5 @@
 name,max health,max energy,energy regen,physical,size,roots distance,energy cost,biome,terrain,soil quality,abilities,statuses,producer,air
-BAOBAB,250,100,0.02,yes,3,3,50,SAVANNA,LAND,LOW,build:RHODE_GRASS;build:PANDANI;build:MIAMBO;rallyPoint,,yes,8
+BAOBAB,250,100,0.02,yes,2,3,50,SAVANNA,LAND,LOW,build:RHODE_GRASS;build:PANDANI;build:MIAMBO;rallyPoint,,yes,8
 RHODE_GRASS,50,60,0.02,no,2,4,30,SAVANNA,LAND,LOW,create:ZEBRA;create:GAZZELE;build:KIWI_TREE;build:CANDELABRA;rallyPoint,,yes,3
 CANDELABRA,130,75,0.04,yes,2,2,30,SAVANNA,LAND,MEDIUM,create:RHINO;build:ACACIA;rallyPoint,,no,4
 ACACIA,220,120,0.03,yes,3,2,30,SAVANNA,LAND,MEDIUM,create:GIRAFFE;rallyPoint,,no,5
@@ -12,7 +12,7 @@ MIAMBO,110,70,0.04,yes,2,2,30,SAVANNA,LAND,LOW,create:HYENA;create:CHEETAH;build
 SPIKE_THORN,100,50,0.10,yes,2,1,30,SAVANNA,LAND,LOW,create:TARANTULA;transform_to:DEAD_SPIKE_THORN;rallyPoint,THORNY,no,3
 ELEPHANT_GRASS,65,55,0.01,no,2,5,30,SAVANNA,LAND,LOW,create:INDIAN_ELEPHANT;build:JACKAL_BERRY_TREE;rallyPoint,,yes,2
 JACKAL_BERRY_TREE,140,80,0.03,yes,3,2,30,SAVANNA,LAND,MEDIUM,create:ELEPHANT;rallyPoint,,no,6
-KAPOC,250,100,0.02,yes,3,3,30,RAINFOREST,LAND,LOW,build:BANNANA_TREE;build:BAMBOO;build:PITCHER;build:CYCAD;build:MANGROVE,,yes,8
+KAPOC,250,100,0.02,yes,2,3,30,RAINFOREST,LAND,LOW,build:BANNANA_TREE;build:BAMBOO;build:PITCHER;build:CYCAD;build:MANGROVE,,yes,8
 BANNANA_TREE,80,60,0.10,yes,2,1,30,RAINFOREST,LAND,MEDIUM,create:CHIMPANZEE;build:COCONUT_TREE;rallyPoint,,no,3
 COCONUT_TREE,80,60,0.18,yes,1,1,30,RAINFOREST,LAND,MEDIUM,create:BABOON;build:CANNONBALL_TREE;rallyPoint,,no,4
 CANNONBALL_TREE,110,80,0.04,yes,2,2,30,RAINFOREST,LAND,HIGH,create:GORILLA;rallyPoint,,no,5

@@ -613,10 +613,10 @@ namespace SanguineGenesis.GUI
                 switch (buildingType)
                 {
                     case BuildingType.PLAYER_0_MAIN:
-                        width = height = 3;
+                        width = height = 2;
                         return true;
                     case BuildingType.PLAYER_1_MAIN:
-                        width = height = 3;
+                        width = height = 2;
                         return true;
                     case BuildingType.ROCK:
                         width = height = 1;
