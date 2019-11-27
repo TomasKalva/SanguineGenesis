@@ -244,17 +244,6 @@
     <Folder Include="Maps\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\NewMap\buildings.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Images\NewMap\nutrients.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Images\NewMap\terrain.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="SharpGL.png" />
   </ItemGroup>
   <ItemGroup>
