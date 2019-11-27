@@ -154,19 +154,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 && blockingBuilding.Physical)
             {
                 //go outside of node with building to be able to use flowfield
-                CommandedEntity.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos), game.Map);
+                CommandedEntity.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos),1000, game.Map);
             }
             else if (((int)Targ.Center.X != (int)CommandedEntity.Center.X ||
                  (int)Targ.Center.Y != (int)CommandedEntity.Center.Y))
             {
                 //use flowfield
-                CommandedEntity.Accelerate(FlowField.GetIntensity(CommandedEntity.Center, 1), game.Map);
+                CommandedEntity.Accelerate(FlowField.GetIntensity(CommandedEntity.Center, 1), Targ.DistanceTo(CommandedEntity), game.Map);
             }
             else
             {
                 //go in straight line
                 Vector2 direction = CommandedEntity.Center.UnitDirectionTo(Targ.Center);
-                CommandedEntity.Accelerate(direction, game.Map);
+                CommandedEntity.Accelerate(direction, Targ.DistanceTo(CommandedEntity), game.Map);
             }
 
             //update last four positions

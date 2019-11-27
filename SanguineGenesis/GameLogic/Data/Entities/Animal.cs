@@ -19,6 +19,10 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public Vector2 Velocity { get; set; }
         /// <summary>
+        /// Max distance that will be moved in the current step.
+        /// </summary>
+        private float MaxDistToMove { get; set; }
+        /// <summary>
         /// False if the unit has to stand still.
         /// </summary>
         public bool CanBeMoved { get; set; }
@@ -187,6 +191,13 @@ namespace SanguineGenesis.GameLogic
                 WantsToMove = false;
                 Velocity = new Vector2(0, 0);
             }
+            var dPos = deltaT * Velocity;
+            //make the position delta shorter if it's to long
+            if (dPos.Length > MaxDistToMove)
+            {
+                Velocity = MaxDistToMove * Velocity.UnitVector();
+            }
+
             // move the animal
             Position += deltaT * Velocity;
             PushBackToMap(map);
@@ -197,9 +208,9 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Add acceleration to units velocity.
+        /// Add acceleration to units velocity. The length of the result velocity will be at most maxDistance.
         /// </summary>
-        public void Accelerate(Vector2 direction, Map map)
+        public void Accelerate(Vector2 direction, float maxDistance, Map map)
         {
             Vector2 vel;
             //determine current max speed
@@ -209,6 +220,7 @@ namespace SanguineGenesis.GameLogic
             else
                 vel = MaxSpeedWater * direction;
 
+            MaxDistToMove = maxDistance;
             Velocity = vel;
         }
 
