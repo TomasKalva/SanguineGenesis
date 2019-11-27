@@ -110,11 +110,11 @@ namespace SanguineGenesis.GameLogic
             CarnivoreEat.SetAbilities(this);
 
             //poisonous spit
-            PoisonousSpit = new PoisonousSpit(4f, 0.2f, 10f, new Data.Entities.PoisonFactory(tickDamage:6, totalNumberOfTicks:4, tickTime:1.2f));
+            PoisonousSpit = new PoisonousSpit(4f, 0.2f, 10f, gameStaticData.Statuses.PoisonFactory);
             PoisonousSpit.SetAbilities(this);
 
             //sprint
-            ActivateSprint = new ApplyStatus(10, new Data.Entities.SprintFactory(speedBonus:1f, energyPerS:10f));
+            ActivateSprint = new ApplyStatus(10, gameStaticData.Statuses.SprintFactory);
             ActivateSprint.SetAbilities(this);
 
             //piercing bite
@@ -122,11 +122,11 @@ namespace SanguineGenesis.GameLogic
             PiercingBite.SetAbilities(this);
 
             //consume animal
-            ConsumeAnimal = new ConsumeAnimal(25, 1.2f, new Data.Entities.ConsumedAnimalFactory(3f));
+            ConsumeAnimal = new ConsumeAnimal(25, 1.2f, gameStaticData.Statuses.ConsumedAnimalFactory);
             ConsumeAnimal.SetAbilities(this);
             
             //shell
-            ActivateShell = new ApplyStatus(20, new Data.Entities.ShellFactory(duration:6f));
+            ActivateShell = new ApplyStatus(20, gameStaticData.Statuses.ShellFactory);
             ActivateShell.SetAbilities(this);
 
             //jump
@@ -142,11 +142,11 @@ namespace SanguineGenesis.GameLogic
             BigPull.SetAbilities(this);
 
             //activate far sight
-            ActivateFarSight = new ApplyStatus(20, new Data.Entities.FarSightFactory(rangeExtension: 6f));
+            ActivateFarSight = new ApplyStatus(20, gameStaticData.Statuses.FarSightFactory);
             ActivateFarSight.SetAbilities(this);
 
             //knockback
-            KnockBack = new KnockBack(20, 0.1f, 0.3f, new Data.Entities.KnockAwayFactory(distance:2f, speed: 6f));
+            KnockBack = new KnockBack(20, 0.1f, 0.3f, gameStaticData.Statuses.KnockAwayFactory);
             KnockBack.SetAbilities(this);
 
             //climb tree
@@ -166,7 +166,7 @@ namespace SanguineGenesis.GameLogic
             ExitHole.SetAbilities(this);
 
             //fast strikes
-            ActivateFastStrikes = new ApplyStatus(20, new Data.Entities.FastStrikesFactory(duration: 4f));
+            ActivateFastStrikes = new ApplyStatus(20, gameStaticData.Statuses.FastStrikesFactory);
             ActivateFastStrikes.SetAbilities(this);
 
             //improve structure
