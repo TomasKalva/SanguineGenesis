@@ -124,6 +124,7 @@ namespace SanguineGenesis
         }
 
         /// <summary>
+        /// Transfers TemporaryGroup to TotalGroup using NextOperation. 
         /// Sorts entities by their entity type and hash code.
         /// </summary>
         public void CommitEntities()

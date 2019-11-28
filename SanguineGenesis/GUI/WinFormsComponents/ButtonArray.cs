@@ -407,12 +407,12 @@ namespace SanguineGenesis.GUI
                             if (entities.Any())
                             {
                                 ControlGroups[index] = new ControlGroup(entities);
-                                b.Text = entities.Count.ToString();
+                                b.Text = '(' + (index+1).ToString() + ')' + entities.Count.ToString();
                             }
                             else
                             {
                                 ControlGroups[index] = null;
-                                b.Text = "";
+                                b.Text = '('+(index+1).ToString()+')';
                             }
                         }
                     }
@@ -427,11 +427,15 @@ namespace SanguineGenesis.GUI
                             if(selectedGroup.NextOperation == Operation.ALREADY_SELECTED)
                                 selectedGroup.NextOperation = Operation.REPLACE;
 
-                            if (ControlGroups[index]!=null)
+                            if (ControlGroups[index] != null)
+                            {
                                 selectedGroup.SetEntities(ControlGroups[index].Entities);
+                                gameControls.EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
+                            }
                             else
                                 selectedGroup.SetEntities(new List<Entity>());
                             selectedGroup.CommitEntities();
+
                         }
                     }
                 };
