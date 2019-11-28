@@ -6,7 +6,7 @@ using SanguineGenesis.GameLogic.Maps;
 namespace GameLogicTests
 {
     [TestClass]
-    class RayTests
+    public class RayTests
     {
         /// <summary>
         /// Tests if the ray outputs the expected coordinates.

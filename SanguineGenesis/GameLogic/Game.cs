@@ -228,7 +228,9 @@ namespace SanguineGenesis
                                         SanguineGenesis.FactionType.PLAYER0;
 
                 //update current player's visibility map
-                Players[current].SetVisibilityMap(visibilityGenerator.VisibilityMap, allBuildings);
+                var newMap = visibilityGenerator.VisibilityMap;
+                if (newMap != null)
+                    Players[current].SetVisibilityMap(newMap, allBuildings);
 
                 //generated visibility map for the other player
                 nextVisibilityPlayer = other;

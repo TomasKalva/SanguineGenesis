@@ -246,6 +246,11 @@ namespace SanguineGenesis
         /// </summary>
         public void SetVisibilityMap(VisibilityMap visMap, List<Building> buildings)
         {
+            //add vision under this player's buildings
+            foreach (Building b in GetAll<Building>())
+                foreach (Node n in b.Nodes)
+                    visMap[n.X, n.Y] = true;
+
             VisibilityMap = visMap;
             UpdateBuildingsView(buildings);
         }

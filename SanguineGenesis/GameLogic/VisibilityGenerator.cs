@@ -152,9 +152,9 @@ namespace SanguineGenesis.GameLogic
         public void AddVisibility(View v)
         {
             float viewRange = v.Range;
-            int left = (int)(v.Position.X - viewRange);
+            int left = (int)(v.Position.X - viewRange) - 1;
             int right = (int)(v.Position.X + viewRange) + 1;
-            int bottom = (int)(v.Position.Y - viewRange);
+            int bottom = (int)(v.Position.Y - viewRange) - 1;
             int top = (int)(v.Position.Y + viewRange) + 1;
             //cast rays to the lines on bottom and top of the square around v
             for (int i = left; i <= right; i++)
@@ -223,7 +223,7 @@ namespace SanguineGenesis.GameLogic
             for (int i = 0; i < VisibilityMap.Width; i++)
                 for (int j = 0; j < VisibilityMap.Height; j++)
                     VisibilityMap[i, j] = true;
-            //sleep so that the updates aren't to frequent
+            //sleep so that the updates aren't too frequent
             Thread.Sleep(10);
             return VisibilityMap;
         }

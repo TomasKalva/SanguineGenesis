@@ -282,6 +282,14 @@
     <Animation Action="IDLE" CenterX="0.5" CenterY="0.25">
       <Image X="25" Y="5"  Width="1" Height="1"/>
     </Animation>
+    <Animation Action="ATTACKING" CenterX="0.5" CenterY="0.25">
+      <Image X="24" Y="12"  Width="1" Height="1" Duration="0.15"/>
+      <Image X="25" Y="12"  Width="1" Height="1" Duration="0.15"/>
+      <Image X="26" Y="12"  Width="1" Height="1" Duration="0.1"/>
+      <Image X="27" Y="12"  Width="1" Height="1" Duration="0.1"/>
+      <Image X="28" Y="12"  Width="1" Height="1" Duration="0.1"/>
+      <Image X="29" Y="12"  Width="1" Height="1" Duration="0.1"/>
+    </Animation>
   </Entity>
   <Entity EntityType="HYENA">
     <Animation Action="IDLE" CenterX="0.6" CenterY="0.3">

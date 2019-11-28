@@ -79,7 +79,7 @@
     <Compile Include="GameLogic\Data\Abilities\CreateAnimal.cs" />
     <Compile Include="GameLogic\Data\Abilities\Eat.cs" />
     <Compile Include="GameLogic\Data\Abilities\EnterExitHole.cs" />
-    <Compile Include="GameLogic\Data\Abilities\Growcs.cs" />
+    <Compile Include="GameLogic\Data\Abilities\Grow.cs" />
     <Compile Include="GameLogic\Data\Abilities\ImproveStructure.cs" />
     <Compile Include="GameLogic\Data\Abilities\Jump.cs" />
     <Compile Include="GameLogic\Data\Abilities\Kick.cs" />

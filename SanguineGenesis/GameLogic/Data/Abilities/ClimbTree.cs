@@ -31,6 +31,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             return "The animal climbs on the tree.";
         }
+
+        public override bool ValidArguments(Animal caster, Tree target) => caster.Faction.FactionID == target.Faction.FactionID;
     }
 
     class ClimbTreeCommand : Command<Animal, Tree, ClimbTree>, IAnimalStateManipulator
