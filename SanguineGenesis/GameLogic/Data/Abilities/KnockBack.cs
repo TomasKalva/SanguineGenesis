@@ -15,7 +15,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public KnockAwayFactory KnockAwayFactory { get; }
 
         internal KnockBack(float energyCost, float distance, float preparationTime, KnockAwayFactory knockAwayFactory)
-            : base(distance, energyCost, false, true, duration:preparationTime)
+            : base(distance, energyCost, true, false, duration:preparationTime)
         {
             KnockAwayFactory = knockAwayFactory;
         }

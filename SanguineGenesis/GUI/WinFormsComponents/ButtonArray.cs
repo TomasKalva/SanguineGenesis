@@ -433,7 +433,10 @@ namespace SanguineGenesis.GUI
                                 gameControls.EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
                             }
                             else
+                            {
                                 selectedGroup.SetEntities(new List<Entity>());
+                                gameControls.EntityCommandsInput.State = EntityCommandsInputState.IDLE;
+                            }
                             selectedGroup.CommitEntities();
 
                         }

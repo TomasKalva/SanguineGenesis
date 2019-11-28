@@ -137,16 +137,25 @@ namespace SanguineGenesis
                 return;
 
             AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3f, 0.5f, 0.4f, 5f, 0.5f, 0.1f, false, 3f, 2f, Movement.LAND, false, Diet.CARNIVORE, 5f, true, 20f, 5f, new List<StatusFactory>(), 1);
-                //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
+            int id = 0;
+            foreach (AnimalFactory a in GameStaticData.AnimalFactories.Factorys.Select(kvp => kvp.Value))
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    Entities.Add(a.NewInstance(this, new Vector2(2+5*(id%8) , 2+5*(id/8))));
+                }
+                id++;
+            }
+            //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
             /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
             UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/
-            for (int i = 0; i < 20; i++)
+            /*for (int i = 0; i < 20; i++)
             {
                 for (int j = 0; j < 10; j++)
                 {
                     Entities.Add(normalUnits.NewInstance(this, new Vector2(20 + i*.25f,10+ j*.25f)));
                 }
-            }
+            }*/
             /*Entities.Add(bigUnits.NewInstance(this, new Vector2(5f, 6f)));
             Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(5f, 6f)));
             Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(7f, 6f)));

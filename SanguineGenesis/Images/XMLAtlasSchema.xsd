@@ -25,7 +25,7 @@
     <xs:sequence>
       <xs:element name='Image' type='Image' minOccurs='1' maxOccurs='unbounded' />
     </xs:sequence>
-    <xs:attribute name='Action' type='xs:string'/>
+    <xs:attribute name='Action' type='xs:string'/><!--IDLE/RUNNING/ATTACKING-->
     <xs:attribute name='CenterX' type='xs:float'/>
     <xs:attribute name='CenterY' type='xs:float'/>
   </xs:complexType>

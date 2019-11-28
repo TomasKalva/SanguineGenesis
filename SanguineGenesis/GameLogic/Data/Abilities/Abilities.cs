@@ -110,7 +110,7 @@ namespace SanguineGenesis.GameLogic
             CarnivoreEat.SetAbilities(this);
 
             //poisonous spit
-            PoisonousSpit = new PoisonousSpit(4f, 0.2f, 10f, gameStaticData.Statuses.PoisonFactory);
+            PoisonousSpit = new PoisonousSpit(4f, 0.2f, 30f, gameStaticData.Statuses.PoisonFactory);
             PoisonousSpit.SetAbilities(this);
 
             //sprint

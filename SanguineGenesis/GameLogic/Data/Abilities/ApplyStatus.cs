@@ -29,7 +29,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The unit gain status from " + nameof(StatusFactory) + ".";
+            return "The unit gain status from " + StatusFactory.ToString() + ".";
         }
     }
 

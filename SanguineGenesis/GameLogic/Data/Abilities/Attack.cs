@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class Attack : TargetAbility<Animal, Entity>
     {
-        internal Attack() : base(0.1f, 0, false, false) { }
+        internal Attack() : base(null, 0, false, false) { }
 
         public override Command NewCommand(Animal caster, Entity target)
         {

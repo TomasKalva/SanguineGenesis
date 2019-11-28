@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public float EnergyDamage { get; }
 
         internal Kick(float energyCost, float distance, float preparationTime, float energyDamage)
-            : base(distance, energyCost, false, false, duration:preparationTime)
+            : base(distance, energyCost, true, true, duration:preparationTime)
         {
             EnergyDamage = energyDamage;
         }
