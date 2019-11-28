@@ -5,7 +5,7 @@ RHINO,130,50,3,1.5,0.5,80,13,0.1,1.2,yes,10.8,2,1.4,LAND,yes,HERBIVORE,35,,moveT
 GIRAFFE,90,50,3,1.5,0.5,80,5,2,1.5,no,3.3,2.5,1.5,LAND_WATER,no,HERBIVORE,25,,moveTo;attack;eat;farSight,3
 HIPPO,115,50,3,1.5,0.5,60,8,0.1,1.1,yes,7.3,2,2.4,LAND_WATER,yes,HERBIVORE,30,,moveTo;attack;eat;consumeAnimal,2
 TURTLE,60,50,3,1.5,0.5,30,4,0.1,0.6,no,6.7,1.5,2.2,LAND_WATER,yes,HERBIVORE,15,,moveTo;attack;eat;activateShell,1
-MEERKAT,25,50,3,1.5,0.2,10,1,0.1,0.2,no,5,1.8,2,LAND,no,CARNIVORE,8,,moveTo;attack;eat;farSight;build:HOLE,1
+MEERKAT,25,50,3,1.5,0.2,10,1,0.1,0.2,no,5,1.8,2,LAND,no,CARNIVORE,8,,moveTo;attack;eat;farSight;build:HOLE;enterHole,1
 KANGAROO,40,50,3,1.5,0.2,15,0.8,0.1,0.6,no,1.3,1.4,1,LAND,no,HERBIVORE,8,,moveTo;attack;eat;jump,1
 HYENA,65,50,3,1.5,0.4,30,5,0.1,0.6,no,8.3,2.1,1,LAND,no,CARNIVORE,16,,moveTo;attack;eat,2
 CHEETAH,40,50,3,1.5,0.3,35,3,0.1,0.2,no,15,3.4,2,LAND,no,CARNIVORE,18,,moveTo;attack;eat;activateSprint,2

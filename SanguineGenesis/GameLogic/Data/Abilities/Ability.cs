@@ -222,7 +222,7 @@ namespace SanguineGenesis.GameLogic
             new Stat( "Distance", Distance==null?"att dist" : Distance.ToString()),
             new Stat( "Self castable", SelfCastable.ToString()),
             new Stat("Only one", OnlyOne.ToString()),
-            new Stat( "Target type", TargetType.ToString()),
+            new Stat( "Target type", TargetType.Name),
             new Stat( "Interruptable", Interruptable.ToString()),
             };
             return stats;

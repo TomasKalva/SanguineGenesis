@@ -1,5 +1,4 @@
 name,max health,max energy,physical,size,energy cost,biome,terrain,soil quality,abilities,statuses,producer
-HOLE,50,0,yes,1,10,SAVANNA,LAND,LOW,exitHole,underground,no
-ROCK,50,0,yes,1,30,DEFAULT,LAND,BAD,,,no
-BIG_ROCK,50,0,yes,2,30,DEFAULT,LAND,BAD,,,no
+HOLE,50,0,yes,1,40,SAVANNA,LAND,LOW,exitHole,underground,no
+ROCK,50,0,yes,2,30,SAVANNA,LAND,LOW,,,no
 MAJESTIC_ROCK,130,75,yes,2,30,SAVANNA,LAND,MEDIUM,create:LION;create:KOMODO_DRAGON;rallyPoint,,no

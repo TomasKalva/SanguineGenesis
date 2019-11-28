@@ -105,6 +105,7 @@ namespace SanguineGenesis.GameLogic
                     string abName = abPar[0];
                     if (abPar.Length == 1)
                     {
+                        //abilities with no parameters
                         switch (abName)
                         {
                             case "moveTo":
@@ -181,6 +182,7 @@ namespace SanguineGenesis.GameLogic
                         }
                     }else if (abPar.Length == 2)
                     {
+                        //abilities with one parameter
                         switch (abName)
                         {
                             case "build":

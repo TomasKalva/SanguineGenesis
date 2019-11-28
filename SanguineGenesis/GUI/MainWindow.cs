@@ -183,7 +183,7 @@ namespace SanguineGenesis.GUI
             Controls.Add(EntityInfoPanel);
 
             //additional info
-            AdditionalInfo = new AdditionalInfo(100, 200);
+            AdditionalInfo = new AdditionalInfo(150, 200);
             Controls.Add(AdditionalInfo);
             AdditionalInfo.Stats.SetStats(
                 new List<Stat>());
