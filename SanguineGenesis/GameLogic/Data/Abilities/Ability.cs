@@ -124,13 +124,13 @@ namespace SanguineGenesis.GameLogic
         public virtual bool ValidArguments(Caster caster, Target target) => true;
 
         /// <summary>
-        /// Set commands to the units. Calls the generic version of this method.
+        /// Set commands to the units. Does nothing if target has wrong type. Calls the generic version of this method.
         /// </summary>
-        /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
         /// <exception cref="NullReferenceException">If some casters are null.</exception>
         public sealed override void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue)
         {
-            SetCommands(casters.Cast<Caster>(), (Target)target, resetCommandQueue);
+            if(target is Target t)
+                SetCommands(casters.Where(c=>c is Caster).Cast<Caster>(), t, resetCommandQueue);
         }
         
         /// <summary>

@@ -305,6 +305,11 @@
     <Animation Action="IDLE" CenterX="0.8" CenterY="0.3">
       <Image X="29" Y="5"  Width="2" Height="2"/>
     </Animation>
+    <Animation Action="ATTACKING" CenterX="0.8" CenterY="0.3">
+      <Image X="24" Y="13"  Width="2" Height="2" Duration="0.2"/>
+      <Image X="26" Y="13"  Width="2" Height="2" Duration="0.2"/>
+      <Image X="29" Y="5"  Width="2" Height="2" Duration="0.2"/>
+    </Animation>
   </Entity>
   <Entity EntityType="ANACONDA">
     <Animation Action="IDLE" CenterX="0.5" CenterY="0.5">
