@@ -456,7 +456,7 @@ namespace SanguineGenesis.GUI
             public static Color ShallowWaterColor { get; }
             public static Color RockColor { get; }
             public static Color BigRockColor { get; }
-            public static Color Player0MainColor { get; }
+            public static Color Player0MainColor { get; }//is yellow not to coincide with water
             public static Color Player1MainColor { get; }
             /// <summary>
             /// Color of something that isn't important.
@@ -470,7 +470,7 @@ namespace SanguineGenesis.GUI
                 ShallowWaterColor = Color.FromArgb(100, 100, 200);
                 RockColor = Color.FromArgb(100, 100, 100);
                 BigRockColor = Color.FromArgb(200, 200, 200);
-                Player0MainColor = Color.FromArgb(0, 0, 255);
+                Player0MainColor = Color.FromArgb(255, 255, 0);
                 Player1MainColor = Color.FromArgb(255, 0, 0);
                 NothingColor = Color.FromArgb(255, 255, 255);
             }
@@ -569,18 +569,22 @@ namespace SanguineGenesis.GUI
             /// </summary>
             public Bitmap TotalMap()
             {
+                // draw terrain and nutrients
                 Bitmap total = new Bitmap(Width, Height);
                 for (int i = 0; i < Width; i++)
                     for (int j = 0; j < Height; j++)
                     {
                         Color terC = TerrainMap.GetPixel(i, j);
                         Color nutC = NutrientsMap.GetPixel(i, j);
-                        float brightness = nutC.R / 256f;
+                        // brightness has nonzero default value
+                        // so that terrain and buildings can always be seen through it
+                        float brightness = 0.5f + nutC.R / 512f;
                         Color newColor = Color.FromArgb((int)(terC.R * brightness),
                             (int)(terC.G * brightness),
                             (int)(terC.B * brightness));
                         total.SetPixel(i, j, newColor);
                     }
+                // draw buildings
                 foreach (var bd in Buildings)
                 {
                     if(!TryGetBuildingExtents(bd.Type, out int width, out int height))
