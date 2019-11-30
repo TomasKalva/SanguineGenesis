@@ -261,7 +261,7 @@ namespace SanguineGenesis.GameLogic
 
             //spawn a corpse of this animal if the animal has any energy left
             if(Energy > 0)
-                Faction.Entities.Add(
+                game.NeutralFaction.Entities.Add(
                     new Corpse(game.NeutralFaction, "CORPSE", Energy, 0, Position, 0.2f));
         }
 
