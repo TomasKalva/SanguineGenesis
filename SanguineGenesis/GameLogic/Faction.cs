@@ -98,7 +98,7 @@ namespace SanguineGenesis
         }
     }
 
-    class Player:Faction
+    class Player : Faction
     {
         /// <summary>
         /// Describes the area of map view by the player.
@@ -136,13 +136,13 @@ namespace SanguineGenesis
             if (FactionID == FactionType.PLAYER1)
                 return;
 
-            AnimalFactory normalUnits = new AnimalFactory("TIGER" , 200, 150, 0.3f, 0.5f, 0.4f, 5f, 0.5f, 0.1f, false, 3f, 2f, Movement.LAND, false, Diet.CARNIVORE, 5f, true, 20f, 5f, new List<StatusFactory>(), 1);
+            AnimalFactory normalUnits = new AnimalFactory("TIGER", 200, 150, 0.3f, 0.5f, 0.4f, 5f, 0.5f, 0.1f, false, 3f, 2f, Movement.LAND, false, Diet.CARNIVORE, 5f, true, 20f, 5f, new List<StatusFactory>(), 1);
             int id = 0;
             foreach (AnimalFactory a in GameStaticData.AnimalFactories.Factorys.Select(kvp => kvp.Value))
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    Entities.Add(a.NewInstance(this, new Vector2(2+5*(id%8) , 2+5*(id/8))));
+                    Entities.Add(a.NewInstance(this, new Vector2(2 + 5 * (id % 8), 2 + 5 * (id / 8))));
                 }
                 id++;
             }
@@ -207,13 +207,13 @@ namespace SanguineGenesis
                 return;
 
             //update view of nodes
-            for (int i=0;i<map.Width;i++)
-                for(int j = 0; j < map.Height; j++)
+            for (int i = 0; i < map.Width; i++)
+                for (int j = 0; j < map.Height; j++)
                 {
                     //update node if it can be seen
                     if (VisibilityMap[i, j])
                     {
-                        Node destN=VisibleMap[i, j];
+                        Node destN = VisibleMap[i, j];
                         Node sourceN = map[i, j];
                         destN.Biome = sourceN.Biome;
                         destN.ActiveNutrients = sourceN.ActiveNutrients;
@@ -260,7 +260,7 @@ namespace SanguineGenesis
         /// </summary>
         public void RemoveDeadVisibleBuildings()
         {
-            VisibleBuildings.ForEach((building)=> 
+            VisibleBuildings.ForEach((building) =>
             {
                 if (building.IsDead) VisibleMap.RemoveBuilding(building);
             });
@@ -297,5 +297,18 @@ namespace SanguineGenesis
         PLAYER0,
         PLAYER1,
         NEUTRAL
+    }
+
+    public static class FactionTypeExtensions
+    {
+        public static FactionType Opposite(this FactionType ft)
+        {
+            switch (ft)
+            {
+                case FactionType.PLAYER0: return FactionType.PLAYER1;
+                case FactionType.PLAYER1: return FactionType.PLAYER0;
+                default: return FactionType.NEUTRAL;
+            }
+        }
     }
 }

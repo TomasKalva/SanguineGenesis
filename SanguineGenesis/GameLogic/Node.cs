@@ -143,11 +143,11 @@ namespace SanguineGenesis
         #endregion IFood
 
         /// <summary>
-        /// Distance to animal.
+        /// Distance to entity.
         /// </summary>
         float ITargetable.DistanceTo(Entity entity)
         {
-            return (entity.Center - Center).Length;
+            return Math.Max(0, (entity.Center - Center).Length - 0.5f);
         }
     }
 }

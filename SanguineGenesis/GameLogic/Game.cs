@@ -188,8 +188,9 @@ namespace SanguineGenesis
             {
                 if(!a.CommandQueue.Any())
                 {
-                    //unit isn't doing anything
-                    Entity en = units.Where((v) => v.Faction!=a.Faction && a.DistanceTo(v) < a.AttackDistance).FirstOrDefault();
+                    //animal isn't doing anything
+                    var opposite = a.Faction.FactionID.Opposite();
+                    Entity en = units.Where((v) => v.Faction.FactionID==opposite && a.DistanceTo(v) < a.AttackDistance).FirstOrDefault();
                     if(en!=null)
                         a.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(a, en));
                 }
