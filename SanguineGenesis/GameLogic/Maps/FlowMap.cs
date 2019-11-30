@@ -133,7 +133,7 @@ namespace SanguineGenesis
 
         public float Length => (float)Math.Sqrt(X * X + Y * Y);
 
-        float IMovementTarget.DistanceTo(Animal animal)
+        float ITargetable.DistanceTo(Animal animal)
         {
             return (animal.Position - this).Length;
         }

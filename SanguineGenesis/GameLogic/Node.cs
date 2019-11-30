@@ -145,7 +145,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Distance to animal.
         /// </summary>
-        float IMovementTarget.DistanceTo(Animal animal)
+        float ITargetable.DistanceTo(Animal animal)
         {
             return (animal.Position - Center).Length;
         }

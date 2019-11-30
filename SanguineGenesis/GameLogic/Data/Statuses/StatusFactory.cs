@@ -244,7 +244,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
     }
 
-    class KnockAwayFactory : StatusFactory<Animal>
+    class KnockBackFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// How far the animal is knocked away.
@@ -260,7 +260,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Vector2 Direction { get; set; }
 
-        public KnockAwayFactory(float distance, float speed)
+        public KnockBackFactory(float distance, float speed)
             : base(true)
         {
             Distance=distance;

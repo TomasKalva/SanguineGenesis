@@ -12,12 +12,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class KnockBack : TargetAbility<Animal, Animal>
     {
-        public KnockAwayFactory KnockAwayFactory { get; }
+        public KnockBackFactory KnockBackFactory { get; }
 
-        internal KnockBack(float energyCost, float distance, float preparationTime, KnockAwayFactory knockAwayFactory)
+        internal KnockBack(float energyCost, float distance, float preparationTime, KnockBackFactory knockBackFactory)
             : base(distance, energyCost, true, false, duration:preparationTime)
         {
-            KnockAwayFactory = knockAwayFactory;
+            KnockBackFactory = knockBackFactory;
         }
 
         public override Command NewCommand(Animal caster, Animal target)
@@ -44,8 +44,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             //try to apply the status to the caster, if
             //the application fails, caster gets refunded
-            Ability.KnockAwayFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Targ.Position);
-            if (!Ability.KnockAwayFactory.ApplyToEntity(Targ))
+            Ability.KnockBackFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Targ.Position);
+            if (!Ability.KnockBackFactory.ApplyToEntity(Targ))
                 Refund();
 
             return true;

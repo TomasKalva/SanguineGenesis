@@ -424,11 +424,11 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Animal is being knocked away.
     /// </summary>
-    class KnockAway : Status<Animal, KnockAwayFactory>, IAnimalStateManipulator
+    class KnockAway : Status<Animal, KnockBackFactory>, IAnimalStateManipulator
     {
         private MoveAnimalToPoint moveAnimalToPoint;
 
-        public KnockAway(Animal affectedEntity, KnockAwayFactory knockBackInfo)
+        public KnockAway(Animal affectedEntity, KnockBackFactory knockBackInfo)
             : base(affectedEntity, knockBackInfo)
         {
             Vector2 targetPoint = affectedEntity.Position + StatusInfo.Distance * StatusInfo.Direction;

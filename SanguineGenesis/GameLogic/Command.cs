@@ -214,6 +214,7 @@ namespace SanguineGenesis
                 return true;
 
             //follow the target animal if caster is animal and too far away
+            //if(Targ.DistanceTo(CommandedEntity)>Distance)
             bool moving = TryFollowTarget(game, deltaT);
             if (moving)
                 return false;
@@ -238,13 +239,13 @@ namespace SanguineGenesis
                 Targ.GetType() != typeof(Nothing) &&
                 animal != null)
             {
-                float distance = ((IMovementTarget)Targ).DistanceTo(animal);
+                float distance = Targ.DistanceTo(animal);
                 if (distance > Distance)
                 {
                     ElapsedTime = 0;
                     if (!animal.WantsToMove)
                         animal.SetAnimation("RUNNING");
-                    FollowCommand.PerformCommandLogic(game, deltaT);
+                    FollowCommand.PerformCommand(game, deltaT);
                     return true;
                 }
                 else

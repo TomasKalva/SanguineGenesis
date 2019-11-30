@@ -19,7 +19,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public ShellFactory ShellFactory { get; }
         public FastStrikesFactory FastStrikesFactory { get; }
         public FarSightFactory FarSightFactory { get; }
-        public KnockAwayFactory KnockAwayFactory { get; }
+        public KnockBackFactory KnockAwayFactory { get; }
         public SuffocatingFactory SuffocatingFactory { get; }
 
 
@@ -33,7 +33,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             ShellFactory = new ShellFactory(duration: 6f);
             FastStrikesFactory = new FastStrikesFactory(duration: 4f);
             FarSightFactory = new FarSightFactory(rangeExtension: 6f);
-            KnockAwayFactory = new KnockAwayFactory(distance: 2f, speed: 6f);
+            KnockAwayFactory = new KnockBackFactory(distance: 2f, speed: 6f);
             SuffocatingFactory = new SuffocatingFactory(5);
         }
 

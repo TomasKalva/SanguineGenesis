@@ -279,7 +279,7 @@ namespace SanguineGenesis
             ResetCommands();
         }
 
-        float IMovementTarget.DistanceTo(Animal animal)
+        float ITargetable.DistanceTo(Animal animal)
         {
             return (animal.Position - Center).Length - animal.Range - Range;
         }

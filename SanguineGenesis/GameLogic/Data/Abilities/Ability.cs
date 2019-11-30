@@ -235,6 +235,10 @@ namespace SanguineGenesis.GameLogic
     interface ITargetable
     {
         Vector2 Center { get; }
+        /// <summary>
+        /// Distance to animal.
+        /// </summary>
+        float DistanceTo(Animal animal);
     }
 
     /// <summary>
@@ -242,10 +246,6 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     interface IMovementTarget : ITargetable
     {
-        /// <summary>
-        /// Distance to animal.
-        /// </summary>
-        float DistanceTo(Animal animal);
     }
 
     /// <summary>
@@ -267,6 +267,11 @@ namespace SanguineGenesis.GameLogic
             Get = new Nothing();
         }
         private Nothing() { }
+
+        /// <summary>
+        /// Distance to nothing is 0.
+        /// </summary>
+        public float DistanceTo(Animal animal) => 0;
     }
 
     //Marks classes that can manipulate animal's movement.
