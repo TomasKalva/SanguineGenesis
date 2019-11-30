@@ -84,40 +84,36 @@ namespace SanguineGenesis
 
         /// <summary>
         /// Returns sub-rectangle of the map visible by this MapView.
+        /// Returns Node[0, 0] if actual extents haven't been set.
         /// </summary>
-        /// <exception cref="InvalidOperationException">If actual extents haven't been set.</exception>
         public Node[,] GetVisibleNodes(Map map)
         {
             if (actualHeight == 0 || actualWidth == 0)
-                throw new InvalidOperationException(
-                    "The actual extents have to be specified before calling this method");
+                return new Node[0, 0];
 
             return GameQuerying.SelectPartOfMap(map, ((IRectangle)this).GetRect());
         }
 
         /// <summary>
         /// Returns sub-rectangle of game's FlowField visible by this MapView.
+        /// Returns float[0,0] if actual extents haven't been set.
         /// </summary>
-        /// <exception cref="InvalidOperationException">If actual extents haven't been set.</exception>
         public float?[,] GetVisibleFlowField(FlowField flowField)
         {
             if (actualHeight == 0 || actualWidth == 0)
-                throw new InvalidOperationException(
-                    "The actual extents have to be specified before calling this method");
+                return new float?[0, 0];
 
             return GameQuerying.SelectPartOfMap(flowField, ((IRectangle)this).GetRect());
         }
 
         /// <summary>
         /// Returns sub-rectangle of the VisibilityMap visible by this MapView.
-        /// Returns null if the map doesn't exist.
+        /// Returns null if the map doesn't exist. Returns null if actual extents haven't been set.
         /// </summary>
-        /// <exception cref="InvalidOperationException">If actual extents haven't been set.</exception>
         public bool[,] GetVisibleVisibilityMap(VisibilityMap visibilityMap)
         {
             if (actualHeight == 0 || actualWidth == 0)
-                throw new InvalidOperationException(
-                    "The actual extents have to be specified before calling this method");
+                return null;
             if (visibilityMap == null)
                 return null;
 
@@ -126,13 +122,12 @@ namespace SanguineGenesis
 
         /// <summary>
         /// Returns all entities visible by this MapView and also visible by observer.
+        /// Returns empty list if actual extents haven't been set.
         /// </summary>
-        /// <exception cref="InvalidOperationException">If actual extents haven't been set.</exception>
         public List<Entity> GetVisibleEntities(Game game, Player observer)
         {
             if (actualHeight == 0 || actualWidth == 0)
-                throw new InvalidOperationException(
-                    "The actual extents have to be specified before calling this method");
+                return new List<Entity>(); ;
 
             return GameQuerying
                 .SelectVisibleEntities(observer, game.GetAll<Entity>())
@@ -227,15 +222,14 @@ namespace SanguineGenesis
 
         /// <summary>
         /// Finds map coordinates (relative to the size of one node) that
-        /// correspond to the point on the screen.
+        /// correspond to the point on the screen. Returns 0 vector if actual extents haven't been set.
         /// </summary>
         /// <param name="screenPoint">Point on the screen.</param>
-        /// <exception cref="InvalidOperationException">If actual extents haven't been set.</exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public Vector2 ScreenToMap(Vector2 screenPoint)
         {
             if (actualHeight == 0 || actualWidth == 0)
-                throw new InvalidOperationException(
-                    "The actual extents have to be specified before calling this method");
+                return new Vector2(0, 0);
 
             return new Vector2(Left + screenPoint.X / NodeSize,
                 Bottom + (actualHeight - screenPoint.Y)/ NodeSize);
