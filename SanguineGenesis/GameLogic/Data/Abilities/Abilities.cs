@@ -122,7 +122,7 @@ namespace SanguineGenesis.GameLogic
             PiercingBite.SetAbilities(this);
 
             //consume animal
-            ConsumeAnimal = new ConsumeAnimal(25, 1.2f, gameStaticData.Statuses.ConsumedAnimalFactory);
+            ConsumeAnimal = new ConsumeAnimal(25, 0.5f, gameStaticData.Statuses.ConsumedAnimalFactory);
             ConsumeAnimal.SetAbilities(this);
             
             //shell
@@ -134,11 +134,11 @@ namespace SanguineGenesis.GameLogic
             Jump.SetAbilities(this);
 
             //pull
-            Pull = new Pull(25, 4f, 0.5f, 8f);
+            Pull = new Pull(25, 4f, 1f, 8f);
             Pull.SetAbilities(this);
 
             //big pull
-            BigPull = new Pull(40, 6f, 0.6f, 8f);
+            BigPull = new Pull(40, 6f, 1.2f, 8f);
             BigPull.SetAbilities(this);
 
             //activate far sight

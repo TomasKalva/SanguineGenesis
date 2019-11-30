@@ -133,9 +133,9 @@ namespace SanguineGenesis
 
         public float Length => (float)Math.Sqrt(X * X + Y * Y);
 
-        float ITargetable.DistanceTo(Animal animal)
+        float ITargetable.DistanceTo(Entity entity)
         {
-            return (animal.Position - this).Length;
+            return (entity.Center - this).Length;
         }
 
         public float AngleTo(Vector2 v)

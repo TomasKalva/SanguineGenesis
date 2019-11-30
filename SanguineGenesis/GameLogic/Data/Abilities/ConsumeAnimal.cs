@@ -42,10 +42,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            ConsumedAnimalFactory consumedFact = Ability.ConsumedAnimalFactory;
-            consumedFact.AnimalConsumed = Targ;
-            consumedFact.ApplyToAffected(CommandedEntity);
-            return true;
+            //animal is preparing to consume
+            if (ElapsedTime >= Ability.Duration)
+            {
+                ConsumedAnimalFactory consumedFact = Ability.ConsumedAnimalFactory;
+                consumedFact.AnimalConsumed = Targ;
+                consumedFact.ApplyToAffected(CommandedEntity);
+                return true;
+            }
+
+            return false;
         }
     }
 

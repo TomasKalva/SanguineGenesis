@@ -279,9 +279,9 @@ namespace SanguineGenesis
             ResetCommands();
         }
 
-        float ITargetable.DistanceTo(Animal animal)
+        float ITargetable.DistanceTo(Entity entity)
         {
-            return (animal.Position - Center).Length - animal.Range - Range;
+            return (entity.Center - Center).Length - entity.Range - Range;
         }
 
         #region IShowable

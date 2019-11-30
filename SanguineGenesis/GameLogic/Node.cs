@@ -145,9 +145,9 @@ namespace SanguineGenesis
         /// <summary>
         /// Distance to animal.
         /// </summary>
-        float ITargetable.DistanceTo(Animal animal)
+        float ITargetable.DistanceTo(Entity entity)
         {
-            return (animal.Position - Center).Length;
+            return (entity.Center - Center).Length;
         }
     }
 }

@@ -213,11 +213,23 @@ namespace SanguineGenesis
                 //finish command if paying was unsuccessful
                 return true;
 
-            //follow the target animal if caster is animal and too far away
-            //if(Targ.DistanceTo(CommandedEntity)>Distance)
-            bool moving = TryFollowTarget(game, deltaT);
-            if (moving)
-                return false;
+            //check CommandedEntity and Targ are close enough
+            {
+                if (FollowCommand != null)
+                {
+                    // follow the target animal if caster is animal and too far away
+                    bool moving = TryFollowTarget(game, deltaT);
+                    if (moving)
+                        return false;
+                }
+                else // FollowCommand == null
+                {
+                    // target is too far away and CommandedEntity can't follow it
+                    // => finish ability
+                    if (Targ.DistanceTo(CommandedEntity) > Distance*1.2f)
+                        return true;
+                }
+            }
 
             ElapsedTime += deltaT;
             bool finished = PerformCommandLogic(game, deltaT);
@@ -234,8 +246,7 @@ namespace SanguineGenesis
         private bool TryFollowTarget(Game game, float deltaT)
         {
             Animal animal = CommandedEntity as Animal;
-            if (FollowCommand != null &&
-                FollowTarget() &&
+            if (FollowTarget() &&
                 Targ.GetType() != typeof(Nothing) &&
                 animal != null)
             {

@@ -57,8 +57,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Targ.StateChangeLock = this;
 
             CommandedEntity.TurnToPoint(Targ.Position);
-
-            ElapsedTime += deltaT;
+            
             if (!pulling)
             {
                 //animal is preparing to pull

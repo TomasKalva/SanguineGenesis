@@ -238,7 +238,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Distance to animal.
         /// </summary>
-        float DistanceTo(Animal animal);
+        float DistanceTo(Entity entity);
     }
 
     /// <summary>
@@ -271,7 +271,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Distance to nothing is 0.
         /// </summary>
-        public float DistanceTo(Animal animal) => 0;
+        public float DistanceTo(Entity entity) => 0;
     }
 
     //Marks classes that can manipulate animal's movement.
