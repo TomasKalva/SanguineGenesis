@@ -47,7 +47,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 //apply poison to the target and finish the command
-                Ability.PoisonFactory.ApplyToAffected(Targ);
+                Ability.PoisonFactory.ApplyToAffected(Target);
                 return true;
             }
 

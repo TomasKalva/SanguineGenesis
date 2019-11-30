@@ -47,12 +47,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             CommandedEntity.StateChangeLock = this;
-            CommandedEntity.TurnToPoint(Targ.Center);
+            CommandedEntity.TurnToPoint(Target.Center);
 
             if (moveAnimalToPoint.Step(deltaT))
             {
                 CommandedEntity.StateChangeLock = null;
-                Targ.Damage(Ability.AttackDamageMultiplier * CommandedEntity.AttackDamage);
+                Target.Damage(Ability.AttackDamageMultiplier * CommandedEntity.AttackDamage);
                 return true;
             }
 

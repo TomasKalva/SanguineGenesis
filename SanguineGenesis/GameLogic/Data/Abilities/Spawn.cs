@@ -50,7 +50,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 var newUnitOwner = CommandedEntity.Faction;
-                Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Targ);
+                Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Target);
                 newUnitOwner.Entities.Add(newUnit);
                 return true;
             }

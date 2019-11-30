@@ -43,7 +43,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            CommandedEntity.RallyPoint = Targ;
+            CommandedEntity.RallyPoint = Target;
             return true;
         }
 

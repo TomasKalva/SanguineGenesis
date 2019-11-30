@@ -23,7 +23,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         private float MaxDistToMove { get; set; }
         /// <summary>
-        /// False if the unit has to stand still.
+        /// False if the unit shouldn't be pushed by physics.
         /// </summary>
         public bool CanBeMoved { get; set; }
         /// <summary>
@@ -87,11 +87,23 @@ namespace SanguineGenesis.GameLogic
         /// Animals with thick skin take less damage.
         /// </summary>
         public bool ThickSkin { get; set; }
+        private IAnimalStateManipulator _stateChangeLock;
         /// <summary>
         /// Command or status that is manipulating the animal's physical state - changing position,
         /// removing it from the map...
         /// </summary>
-        public IAnimalStateManipulator StateChangeLock { get; set; }
+        public IAnimalStateManipulator StateChangeLock
+        {
+            get => _stateChangeLock;
+            set
+            {
+                _stateChangeLock = value;
+                if (value == null)
+                    CanBeMoved = true;
+                else
+                    CanBeMoved = false;
+            }
+        }
         /// <summary>
         /// The food this entity can eat.
         /// </summary>

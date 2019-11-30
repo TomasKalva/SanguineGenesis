@@ -36,26 +36,26 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            CommandedEntity.TurnToPoint(Targ.Center);
+            CommandedEntity.TurnToPoint(Target.Center);
 
             CommandedEntity.CanBeMoved = false;
             if (ElapsedTime >= CommandedEntity.AttackPeriod)
             {
                 ElapsedTime -= CommandedEntity.AttackPeriod;
 
-                if (Targ is Building && !CommandedEntity.MechanicalDamage)
+                if (Target is Building && !CommandedEntity.MechanicalDamage)
                 {
                     //deal less damage if animal without mechanical damage attacks a building
-                    Targ.Damage(CommandedEntity.AttackDamage / 10);
+                    Target.Damage(CommandedEntity.AttackDamage / 10);
                 }
                 else
                 {
                     //damage target
-                    Targ.Damage(CommandedEntity.AttackDamage);
+                    Target.Damage(CommandedEntity.AttackDamage);
                 }
             }
 
-            bool finished = CommandedEntity.DistanceTo(Targ) >= CommandedEntity.AttackDistance;
+            bool finished = CommandedEntity.DistanceTo(Target) >= CommandedEntity.AttackDistance;
             if (finished)
             {
                 return true;

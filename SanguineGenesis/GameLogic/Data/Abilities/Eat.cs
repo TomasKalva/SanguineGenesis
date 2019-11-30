@@ -43,19 +43,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!Targ.FoodLeft)
+            if (!Target.FoodLeft)
             {
                 CommandedEntity.CanBeMoved = true;
                 return true;
             }
 
-            CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
+            CommandedEntity.Direction = Target.Center - CommandedEntity.Center;
 
             CommandedEntity.CanBeMoved = false;
             if (ElapsedTime >= CommandedEntity.FoodEatingPeriod)
             {
                 //eat
-                Targ.EatFood(CommandedEntity);
+                Target.EatFood(CommandedEntity);
                 //reset timer
                 ElapsedTime -= CommandedEntity.FoodEatingPeriod;
             }
@@ -104,19 +104,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!Targ.FoodLeft)
+            if (!Target.FoodLeft)
             {
                 CommandedEntity.CanBeMoved = true;
                 return true;
             }
 
-            CommandedEntity.Direction = Targ.Center - CommandedEntity.Center;
+            CommandedEntity.Direction = Target.Center - CommandedEntity.Center;
 
             CommandedEntity.CanBeMoved = false;
             if (ElapsedTime >= CommandedEntity.FoodEatingPeriod)
             {
                 //eat
-                Targ.EatFood(CommandedEntity);
+                Target.EatFood(CommandedEntity);
                 //reset timer
                 ElapsedTime -= CommandedEntity.FoodEatingPeriod;
             }

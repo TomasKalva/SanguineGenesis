@@ -41,13 +41,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            CommandedEntity.TurnToPoint(Targ.Position);
+            CommandedEntity.TurnToPoint(Target.Position);
 
             ElapsedTime += deltaT;
             if (ElapsedTime >= Ability.Duration)
             {
                 //remove some of the target's energy
-                Targ.Energy -= Ability.EnergyDamage;
+                Target.Energy -= Ability.EnergyDamage;
                 return true;
             }
             return false;

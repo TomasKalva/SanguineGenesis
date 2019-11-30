@@ -46,7 +46,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 ConsumedAnimalFactory consumedFact = Ability.ConsumedAnimalFactory;
-                consumedFact.AnimalConsumed = Targ;
+                consumedFact.AnimalConsumed = Target;
                 consumedFact.ApplyToAffected(CommandedEntity);
                 return true;
             }

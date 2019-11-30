@@ -45,18 +45,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             : base(commandedEntity, target, pull)
         {
             pulling = false;
-            CommandedEntity.TurnToPoint(Targ.Position);
-            Vector2 frontOfAnimal = commandedEntity.Position + (commandedEntity.Range + target.Range) * commandedEntity.Direction;
-            moveAnimalToPoint = new MoveAnimalToPoint(target, frontOfAnimal, Ability.PullSpeed, Distance/Ability.PullSpeed);
+            CommandedEntity.TurnToPoint(Target.Position);
             firstPullingStep = true;
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             CommandedEntity.StateChangeLock = this;
-            Targ.StateChangeLock = this;
+            Target.StateChangeLock = this;
 
-            CommandedEntity.TurnToPoint(Targ.Position);
+            CommandedEntity.TurnToPoint(Target.Position);
             
             if (!pulling)
             {
@@ -72,12 +70,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 if (firstPullingStep)
                 {
+                    //clear the command queue of Targ, so that it can't move away
+                    Target.CommandQueue.Clear();
+                    //create instance of MoveAnimalToPoint that will be moving Targ to CommandedEntity
+                    Vector2 frontOfAnimal = CommandedEntity.Position + (CommandedEntity.Range + Target.Range) * CommandedEntity.Direction;
+                    float dist = (Target.Center - frontOfAnimal).Length;
+                    moveAnimalToPoint = new MoveAnimalToPoint(Target, frontOfAnimal, Ability.PullSpeed, dist / Ability.PullSpeed);
+
                     firstPullingStep = false;
                 }
                 if (moveAnimalToPoint.Step(deltaT))
                 {
                     CommandedEntity.StateChangeLock = null;
-                    Targ.StateChangeLock = null;
+                    Target.StateChangeLock = null;
                     return true;
                 }
             }
@@ -87,5 +92,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         public override int Progress => pulling ? 100 : base.Progress;
+
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            CommandedEntity.StateChangeLock = null;
+            Target.StateChangeLock = null;
+        }
     }
 }

@@ -47,7 +47,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             if (ElapsedTime >= Ability.Duration)
             {
-                Underground underground = (Underground)Targ.Statuses.Where((s) => s is Underground).FirstOrDefault();
+                Underground underground = (Underground)Target.Statuses.Where((s) => s is Underground).FirstOrDefault();
                 if (underground != null)
                 {
                     //put the animal in the target hole

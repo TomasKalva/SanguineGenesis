@@ -65,14 +65,14 @@ namespace SanguineGenesis
         public MoveToCommand FollowCommand { get; set; }
     }
 
-    abstract class Command<Caster, Target, Abil> : Command where Caster : Entity
-                                                                    where Target : ITargetable
-                                                                    where Abil : TargetAbility<Caster, Target>
+    abstract class Command<Caster, TargetT, AbilityT> : Command where Caster : Entity
+                                                                    where TargetT : ITargetable
+                                                                    where AbilityT : TargetAbility<Caster, TargetT>
     {
         /// <summary>
         /// The ability this command is performing.
         /// </summary>
-        public Abil Ability { get; }
+        public AbilityT Ability { get; }
         /// <summary>
         /// The entity who performs this command.
         /// </summary>
@@ -80,7 +80,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Target of the ability.
         /// </summary>
-        public Target Targ { get; }
+        public TargetT Target { get; }
         /// <summary>
         /// Required distance between the animal and the target.
         /// </summary>
@@ -118,11 +118,11 @@ namespace SanguineGenesis
         public override int Progress 
             => Math.Min(100, Ability.Duration!=0 ? (int)((ElapsedTime / Ability.Duration) * 100) : 0);
 
-        protected Command(Caster commandedEntity, Target target, Abil ability)
+        protected Command(Caster commandedEntity, TargetT target, AbilityT ability)
         {
             Ability = ability;
             CommandedEntity = commandedEntity;
-            Targ = target;
+            Target = target;
             ElapsedTime = 0;
         }
 
@@ -180,7 +180,7 @@ namespace SanguineGenesis
         {
             if (CommandedEntity.IsDead)
                 return false;
-            Entity targEnt = Targ as Entity;
+            Entity targEnt = Target as Entity;
             if (targEnt!=null && targEnt.IsDead)
                 return false;
 
@@ -190,7 +190,7 @@ namespace SanguineGenesis
                 if (commandedA.StateChangeLock != null && commandedA.StateChangeLock != this)
                     return false;
             }
-            Animal targA = Targ as Animal;
+            Animal targA = Target as Animal;
             if (targA != null)
             {
                 if (targA.StateChangeLock != null && targA.StateChangeLock != this)
@@ -226,7 +226,7 @@ namespace SanguineGenesis
                 {
                     // target is too far away and CommandedEntity can't follow it
                     // => finish ability
-                    if (Targ.DistanceTo(CommandedEntity) > Distance*1.2f)
+                    if (Target.DistanceTo(CommandedEntity) > Distance*1.2f)
                         return true;
                 }
             }
@@ -247,10 +247,10 @@ namespace SanguineGenesis
         {
             Animal animal = CommandedEntity as Animal;
             if (FollowTarget() &&
-                Targ.GetType() != typeof(Nothing) &&
+                Target.GetType() != typeof(Nothing) &&
                 animal != null)
             {
-                float distance = Targ.DistanceTo(animal);
+                float distance = Target.DistanceTo(animal);
                 if (distance > Distance)
                 {
                     ElapsedTime = 0;

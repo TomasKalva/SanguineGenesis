@@ -48,12 +48,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            if (!CanBeUsed() || (Targ.Center - CommandedEntity.Center).Length > Ability.Distance)
+            if (!CanBeUsed() || (Target.Center - CommandedEntity.Center).Length > Ability.Distance)
                 //finish if the command can't be used
                 return true;
 
-            int nX = Targ.X;
-            int nY = Targ.Y;
+            int nX = Target.X;
+            int nY = Target.Y;
 
             if (game.Map.BuildingCanBePlaced(Ability.BuildingFactory, nX, nY))
             {

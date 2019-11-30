@@ -51,7 +51,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
                 AnimalsOnTreeFactory anOnTreeFact = Ability.AnimalsOnTreeFactory;
                 anOnTreeFact.PutOnTree = CommandedEntity;
-                anOnTreeFact.ApplyToAffected(Targ);
+                anOnTreeFact.ApplyToAffected(Target);
                 return true;
             }
 

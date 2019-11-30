@@ -43,11 +43,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             //calculate transfered energy so that no energy is gained or lost during the transfer
             float transferedEn = Math.Min(((float)deltaT) * Ability.EnergyPerS, CommandedEntity.Energy);
-            transferedEn = Math.Min(transferedEn, Targ.Energy.AmountNotFilled);
+            transferedEn = Math.Min(transferedEn, Target.Energy.AmountNotFilled);
 
             //transfer the energy
             CommandedEntity.Energy -= transferedEn;
-            Targ.Energy += transferedEn;
+            Target.Energy += transferedEn;
 
             //if the commanded entity doesn't have energy anymore, it can't give energy to the structure
             if (CommandedEntity.Energy == 0)
