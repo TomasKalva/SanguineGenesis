@@ -39,17 +39,19 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public sealed override bool ApplyToEntity(Entity affectedEntity)
             => ApplyToAffected((Affected)affectedEntity);
 
+        /// <summary>
+        /// Returns true iff the status was successfuly applied.
+        /// </summary>
         public virtual bool ApplyToAffected(Affected affectedEntity)
         {
-            Status newStatus = NewInstance(affectedEntity);
-
             //if this status can be only applied once, check if it is already applied to the entity
             if (OnlyOnce &&
-                affectedEntity.Statuses.Where((s) => s.GetType() == newStatus.GetType()).Any())
+                affectedEntity.Statuses.Where((s) => s.Creator.GetType() == GetType()).Any())
                 //status can't be applied second time
                 return false;
 
             //status can be applied
+            Status newStatus = NewInstance(affectedEntity);
             affectedEntity.AddStatus(newStatus);
             return true;
         }

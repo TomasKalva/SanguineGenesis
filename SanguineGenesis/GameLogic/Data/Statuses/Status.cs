@@ -24,6 +24,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// Called when the status is removed from the entity.
         /// </summary>
         public virtual void Removed() { }
+        /// <summary>
+        /// Returns status factory, this status was created by.
+        /// </summary>
+        public abstract StatusFactory Creator { get; }
 
         #region IShowable
         public abstract string GetName();
@@ -38,6 +42,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     abstract class Status<Affected,Info>:Status where Info:StatusFactory<Affected>
                                                         where Affected:Entity
     {
+        public override StatusFactory Creator => StatusInfo;
         /// <summary>
         /// Entity affected by this status.
         /// </summary>
@@ -45,7 +50,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// <summary>
         /// Immutable information about the status.
         /// </summary>
-        protected Info StatusInfo { get; }
+        public Info StatusInfo { get; }
 
         public Status(Affected affectedEntity, Info statusInfo)
         {
