@@ -87,23 +87,11 @@ namespace SanguineGenesis.GameLogic
         /// Animals with thick skin take less damage.
         /// </summary>
         public bool ThickSkin { get; set; }
-        private IAnimalStateManipulator _stateChangeLock;
         /// <summary>
         /// Command or status that is manipulating the animal's physical state - changing position,
         /// removing it from the map...
         /// </summary>
-        public IAnimalStateManipulator StateChangeLock
-        {
-            get => _stateChangeLock;
-            set
-            {
-                _stateChangeLock = value;
-                if (value == null)
-                    CanBeMoved = true;
-                else
-                    CanBeMoved = false;
-            }
-        }
+        public IAnimalStateManipulator StateChangeLock { get; set; }
         /// <summary>
         /// The food this entity can eat.
         /// </summary>

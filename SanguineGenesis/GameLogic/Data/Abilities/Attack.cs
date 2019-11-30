@@ -37,8 +37,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             CommandedEntity.TurnToPoint(Target.Center);
-
-            CommandedEntity.CanBeMoved = false;
+            
             if (ElapsedTime >= CommandedEntity.AttackPeriod)
             {
                 ElapsedTime -= CommandedEntity.AttackPeriod;
@@ -69,7 +68,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             base.OnRemove();
             CommandedEntity.SetAnimation("IDLE");
-            CommandedEntity.CanBeMoved = true;
         }
 
         public override bool FollowTarget() => true;

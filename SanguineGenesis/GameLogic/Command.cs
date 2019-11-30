@@ -231,6 +231,10 @@ namespace SanguineGenesis
                 }
             }
 
+            Animal a;
+            if ((a = CommandedEntity as Animal) != null)
+                a.CanBeMoved = false;
+
             ElapsedTime += deltaT;
             bool finished = PerformCommandLogic(game, deltaT);
             if (finished)
@@ -290,6 +294,15 @@ namespace SanguineGenesis
         public override void Remove()
         {
             CommandedEntity.RemoveCommand(this);
+        }
+
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            //animal loses low priority of getting pushed by physics
+            Animal a;
+            if((a = CommandedEntity as Animal)!=null)
+                a.CanBeMoved = true;
         }
 
         public override string GetName() => Ability.GetName();

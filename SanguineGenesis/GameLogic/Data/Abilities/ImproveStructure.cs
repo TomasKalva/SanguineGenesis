@@ -45,6 +45,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             float transferedEn = Math.Min(((float)deltaT) * Ability.EnergyPerS, CommandedEntity.Energy);
             transferedEn = Math.Min(transferedEn, Target.Energy.AmountNotFilled);
 
+
             //transfer the energy
             CommandedEntity.Energy -= transferedEn;
             Target.Energy += transferedEn;

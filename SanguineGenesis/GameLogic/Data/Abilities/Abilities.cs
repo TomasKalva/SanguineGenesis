@@ -118,7 +118,7 @@ namespace SanguineGenesis.GameLogic
             ActivateSprint.SetAbilities(this);
 
             //piercing bite
-            PiercingBite = new PiercingBite(25, 100f, 1.2f);
+            PiercingBite = new PiercingBite(25, 100f, 0.5f);
             PiercingBite.SetAbilities(this);
 
             //consume animal
