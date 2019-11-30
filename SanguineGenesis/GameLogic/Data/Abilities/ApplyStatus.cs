@@ -40,21 +40,14 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (CanPay())
-            {
-                //if caster can pay, try to apply the status to the caster, if
-                //the application succeeds, caster pays
-                if (Ability.StatusFactory.ApplyToEntity(CommandedEntity))
-                    TryPay();
+            //try to apply the status to the caster, if
+            //the application fails, caster gets refunded
+            if (!Ability.StatusFactory.ApplyToEntity(CommandedEntity))
+                Refund();
 
-            }
             return true;
         }
-
-        public override bool PerformCommandLogic(Game game, float deltaT)
-            => throw new NotImplementedException("This method is never used.");
-
     }
 }

@@ -112,7 +112,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             NoMovementDetection = new NoMovementDetection();
         }
 
-        public override bool PerformCommandLogic(Game game, float deltaT)
+        public override bool PerformCommand(Game game, float deltaT)
         {
             //command immediately finishes if the assignment was invalidated
             if (Assignment != null && Assignment.Invalid)
@@ -187,6 +187,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             }
             return false;
         }
+
+        public override bool PerformCommandLogic(Game game, float deltaT)
+            => throw new NotImplementedException("This method is never used.");
 
         /// <summary>
         /// Returns true iff the animal is close enough to the target.

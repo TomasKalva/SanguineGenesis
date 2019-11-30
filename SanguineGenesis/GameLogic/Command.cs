@@ -152,6 +152,16 @@ namespace SanguineGenesis
         }
 
         /// <summary>
+        /// Refunds energy paid for this ability. Only works if Paid == true;
+        /// </summary>
+        protected void Refund()
+        {
+            if (Paid)
+                //the ability was paid already
+                CommandedEntity.Energy += Ability.EnergyCost;
+        }
+
+        /// <summary>
         /// Returns if entity can pay this ability.
         /// </summary>
         protected bool CanPay()
