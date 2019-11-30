@@ -40,22 +40,15 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override bool PerformCommand(Game game, float deltaT)
+        public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (CanPay() && CanBeUsed())
-            {
+            //try to apply the status to the caster, if
+            //the application fails, caster gets refunded
+            Ability.KnockAwayFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Targ.Position);
+            if (!Ability.KnockAwayFactory.ApplyToEntity(Targ))
+                Refund();
 
-                //if caster can pay, try to apply the status to the caster, if
-                //the application succeeds, caster pays
-                Ability.KnockAwayFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Targ.Position);
-                if (Ability.KnockAwayFactory.ApplyToEntity(Targ))
-                    TryPay();
-            }
             return true;
         }
-
-        public override bool PerformCommandLogic(Game game, float deltaT)
-            => throw new NotImplementedException("This method is never used.");
-
     }
 }
