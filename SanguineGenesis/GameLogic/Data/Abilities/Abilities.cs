@@ -191,7 +191,11 @@ namespace SanguineGenesis.GameLogic
             foreach(Ability a in AllAbilities)
             {
                 //move to cast abilities are not in AllAbilities to avoid infinite recursion
-                MoveTo moveToAbility = new MoveTo(a.Distance, false, false);
+                bool attackEnemyInstead = false;
+                if (a is Attack)
+                    attackEnemyInstead = true;
+
+                MoveTo moveToAbility = new MoveTo(a.Distance, attackEnemyInstead, false);
                 moveToCast.Add(a, moveToAbility);
             }
         }

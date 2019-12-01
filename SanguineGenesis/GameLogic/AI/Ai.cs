@@ -57,7 +57,21 @@ namespace SanguineGenesis.GameLogic.AI
             {
                 PlaceBuildings(game.Map);
                 SpawnAnimals();
+                AttackEnemies(game);
                 TimeUntilDecision += DecisionPeriod;
+            }
+        }
+
+        public void AttackEnemies(Game game)
+        {
+            var idleAnimals = ControlledPlayer.GetAll<Animal>()
+                .Where(a => !a.CommandQueue.Any());
+            var target = game.Players[ControlledPlayer.FactionID.Opposite()].GetAll<Building>().FirstOrDefault();
+
+            if (idleAnimals.Any()
+                && target != null)
+            {
+                ControlledPlayer.GameStaticData.Abilities.Attack.SetCommands(idleAnimals, target, false);
             }
         }
 
