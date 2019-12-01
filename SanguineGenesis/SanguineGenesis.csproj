@@ -69,6 +69,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameLogic\AI\Ai.cs" />
     <Compile Include="GameLogic\Data\Abilities\Abilities.cs" />
     <Compile Include="GameLogic\Data\Abilities\ApplyStatus.cs" />
     <Compile Include="GameLogic\Data\Abilities\Attack.cs" />
@@ -240,7 +241,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GameLogic\AI\" />
     <Folder Include="Maps\" />
   </ItemGroup>
   <ItemGroup>

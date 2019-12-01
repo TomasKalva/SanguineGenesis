@@ -166,13 +166,13 @@ namespace SanguineGenesis
             switch (soilQuality)
             {
                 case SoilQuality.BAD:
-                    return 0.05f;
+                    return 0.3f;//0.05f;
                 case SoilQuality.LOW:
-                    return 0.01f;
+                    return 0.5f;//0.01f;
                 case SoilQuality.MEDIUM:
-                    return 0.02f;
+                    return 0.7f;//0.02f;
                 case SoilQuality.HIGH:
-                    return 0.03f;
+                    return 1f;//0.03f;
                 default:
                     return 0f;
             }

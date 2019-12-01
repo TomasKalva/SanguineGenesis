@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.AI;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
@@ -71,8 +72,8 @@ namespace SanguineGenesis
 
             //players
             Players = new Dictionary<FactionType, Player>();
-            Players.Add(SanguineGenesis.FactionType.PLAYER0, new Player(SanguineGenesis.FactionType.PLAYER0, firstPlayersBiome));
-            Players.Add(SanguineGenesis.FactionType.PLAYER1, new Player(SanguineGenesis.FactionType.PLAYER1, firstPlayersBiome==Biome.SAVANNA?Biome.RAINFOREST: Biome.SAVANNA));
+            Players.Add(SanguineGenesis.FactionType.PLAYER0, new Player(SanguineGenesis.FactionType.PLAYER0, firstPlayersBiome, null));
+            Players.Add(SanguineGenesis.FactionType.PLAYER1, new Player(SanguineGenesis.FactionType.PLAYER1, firstPlayersBiome==Biome.SAVANNA?Biome.RAINFOREST: Biome.SAVANNA, new DumbAiFactory()));
             CurrentPlayer = Players[SanguineGenesis.FactionType.PLAYER0];
             NeutralFaction = new Faction(FactionType.NEUTRAL);
 
@@ -124,6 +125,11 @@ namespace SanguineGenesis
         /// </summary>
         public void Update(float deltaT)
         {
+            //ai
+            foreach (var p in Players.Values)
+                if (p.Ai != null)
+                    p.Ai.Update(deltaT, this);
+
             //map changing phase
             List<Entity> entities = GetAll<Entity>();
             List<Unit> units = GetAll<Unit>();

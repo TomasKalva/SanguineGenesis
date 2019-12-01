@@ -142,7 +142,7 @@ namespace SanguineGenesis.GUI
                     mapNamesCB.Items.Add(Path.GetFileName(d));
                 }
             }
-            catch(IOException e)
+            catch(IOException)
             {
                 ErrorMessage("List of maps can't be loaded.");
             }

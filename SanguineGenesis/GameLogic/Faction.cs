@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.AI;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 
@@ -121,13 +122,19 @@ namespace SanguineGenesis
         /// Biome this player is playing.
         /// </summary>
         public Biome Biome { get; }
+        /// <summary>
+        /// Aritificial intelligence that controls this player.
+        /// </summary>
+        public IAi Ai { get; }
 
-        public Player(FactionType factionID, Biome biome)
+        public Player(FactionType factionID, Biome biome, IAiFactory aiFactory)
             : base(factionID)
         {
             InitUnits();
             VisibleBuildings = new List<Building>();
             Biome = biome;
+            if(aiFactory!=null)
+                Ai = aiFactory.NewInstance(this);
         }
 
         //todo: remove this things
