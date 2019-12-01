@@ -72,7 +72,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             throw new NotImplementedException("This method is not necessary because the virtual method " + nameof(SetCommands) + " was overriden");
         }
 
-        public override string GetName() => "Move to";
+        public override string GetName() => AttackEnemyInstead?"Move to":"Unbr move to";
 
         public override string Description()
         {
@@ -129,7 +129,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             //if an enemy is in attack range, attack it instead of other commands
             if (Ability.AttackEnemyInstead)
             {
-                Entity enemy = game.GetAll<Animal>().Where(
+                Entity enemy = game.GetAll<Entity>().Where(
                             (a) => a.Faction != CommandedEntity.Faction
                             && CommandedEntity.DistanceTo(a) <= CommandedEntity.AttackDistance).FirstOrDefault();
                 if (enemy != null)

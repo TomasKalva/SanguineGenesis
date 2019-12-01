@@ -22,6 +22,7 @@ namespace SanguineGenesis.GameLogic
         private Dictionary<string, CreateAnimal> unitCreate;
         private Dictionary<string, BuildBuilding> buildBuilding;
 
+        public MoveTo UnbreakableMoveTo { get; }
         public MoveTo MoveTo { get; }
         public MoveTo MoveToCast(Ability ability) => moveToCast[ability];
         public Attack Attack { get; }
@@ -55,8 +56,12 @@ namespace SanguineGenesis.GameLogic
         {
             AllAbilities = new List<Ability>();
 
+            UnbreakableMoveTo = new MoveTo(0.1f, false, false);
+            UnbreakableMoveTo.SetAbilities(this);
+
             MoveTo = new MoveTo(0.1f, true, false);
             MoveTo.SetAbilities(this);
+
             Attack = new Attack();
             Attack.SetAbilities(this);
             

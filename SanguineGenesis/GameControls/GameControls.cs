@@ -148,7 +148,7 @@ namespace SanguineGenesis
             if (enemy == null)
             {
                 //no enemy selected, move to the clicked coordiantes
-                game.CurrentPlayer.GameStaticData.Abilities.MoveTo.SetCommands(SelectedGroup.Entities
+                game.CurrentPlayer.GameStaticData.Abilities.UnbreakableMoveTo.SetCommands(SelectedGroup.Entities
                     .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), targetCoords, resetQueue);
             }
             else

@@ -108,8 +108,11 @@ namespace SanguineGenesis.GameLogic
                         //abilities with no parameters
                         switch (abName)
                         {
+                            case "unbreakableMoveTo":
+                                 factory.Abilities.Add(abilities.UnbreakableMoveTo);
+                                break;
                             case "moveTo":
-                                 factory.Abilities.Add(abilities.MoveTo);
+                                factory.Abilities.Add(abilities.MoveTo);
                                 break;
                             case "attack":
                                 factory.Abilities.Add(abilities.Attack);
