@@ -242,11 +242,19 @@ namespace SanguineGenesis
         /// <summary>
         /// Deals damage to the entity, equal to the damage.
         /// </summary>
-        public virtual void Damage(float damage)
+        protected void Damage(float damage)
         {
             //only damage entity if the damage is positive
             if (damage > 0)
                 Health -= damage;
+        }
+
+        /// <summary>
+        /// Deals damage to the entity, equal to the damage.
+        /// </summary>
+        public virtual void Damage(float damage, bool physical)
+        {
+            Damage(damage);
         }
 
         /// <summary>

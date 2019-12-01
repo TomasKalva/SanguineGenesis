@@ -39,6 +39,7 @@ namespace SanguineGenesis.GameLogic.AI
         private float TimeUntilDecision { get; set; }
         private float DecisionPeriod { get; }
         private Dictionary<Tree, BuildBuilding> ToBuildNext { get; }
+        private Dictionary<Building, CreateAnimal> ToCreateAnimalNext { get; }
 
         public DumbAi(Player controlledPlayer, float decisionPeriod)
         {
@@ -46,6 +47,7 @@ namespace SanguineGenesis.GameLogic.AI
             DecisionPeriod = decisionPeriod;
             TimeUntilDecision = DecisionPeriod;
             ToBuildNext = new Dictionary<Tree, BuildBuilding>();
+            ToCreateAnimalNext = new Dictionary<Building, CreateAnimal>();
         }
 
         public void Update(float deltaT, Game game)
@@ -54,15 +56,50 @@ namespace SanguineGenesis.GameLogic.AI
             if(TimeUntilDecision <= 0)
             {
                 PlaceBuildings(game.Map);
+                SpawnAnimals();
                 TimeUntilDecision += DecisionPeriod;
+            }
+        }
+
+        private void SpawnAnimals()
+        {
+            var buildings = ControlledPlayer.GetAll<Building>();
+
+            foreach (Building b in buildings.ToRandomizedList().Take(3))//only do it for 3 buildings so that the ai doesn't have too much apm
+            {
+                SpawnAnimals(b);
+            }
+        }
+
+        private void SpawnAnimals(Building caster)
+        {
+            if (!ToCreateAnimalNext.ContainsKey(caster))
+            {
+                var spawningAbilities = caster.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
+                if (!spawningAbilities.Any())
+                    return;
+
+                ToCreateAnimalNext.Add(caster, spawningAbilities[random.Next(spawningAbilities.Count)]);
+            }
+
+
+            CreateAnimal ability = ToCreateAnimalNext[caster];
+            if (caster.Energy >= ability.EnergyCost)
+            {
+                ability.SetCommands(new List<Building>() { caster }, Nothing.Get, false);
+
+                var spawningAbilities = caster.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
+                if (!spawningAbilities.Any())
+                    return;
+                ToCreateAnimalNext[caster] = spawningAbilities[random.Next(spawningAbilities.Count)];
             }
         }
 
         public void PlaceBuildings(Map map)
         {
-            var buildings = ControlledPlayer.GetAll<Tree>();
+            var trees = ControlledPlayer.GetAll<Tree>();
 
-            foreach(Tree b in buildings.ToRandomizedList().Take(3))//only do it for 3 buildings so that it doesn't take too much time
+            foreach(Tree b in trees.ToRandomizedList().Take(3))//only do it for 3 buildings so that it doesn't take too much time
             {
                 PlaceBuildings(b, map);
             }
@@ -84,7 +121,6 @@ namespace SanguineGenesis.GameLogic.AI
             
             BuildBuilding ability = ToBuildNext[caster];
             if (caster.Energy >= ability.EnergyCost)
-
                 foreach (Node n in possibleTargets)
                 {
                     if(map.BuildingCanBePlaced(ability.BuildingFactory, n.X, n.Y))

@@ -43,7 +43,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             if (ElapsedTime > Ability.Duration)
             {
-                Target.Damage(Ability.Damage);
+                Target.Damage(Ability.Damage, true);
                 return true;
             }
 

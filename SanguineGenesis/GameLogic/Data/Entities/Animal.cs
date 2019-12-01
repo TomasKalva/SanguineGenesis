@@ -156,24 +156,24 @@ namespace SanguineGenesis.GameLogic
             {
                 new Stat( "Faction", Faction.FactionID.ToString()),
             new Stat( "EntityType", EntityType),
-            new Stat( "Health", Health.ToString()),
-            new Stat("Energy", Energy.ToString()),
-            new Stat( "Food regen", FoodEnergyRegen.ToString()),
-            new Stat( "Eating period", FoodEatingPeriod.ToString()),
-            new Stat( "Size", (2 * Range).ToString()),
-            new Stat( "Att damage", AttackDamage.ToString()),
-            new Stat( "Att period", AttackPeriod.ToString()),
-            new Stat( "Att Distance", AttackDistance.ToString()),
+            new Stat( "Health", Health.ToString("0.0")),
+            new Stat("Energy", Energy.ToString("0.0")),
+            new Stat( "Food regen", FoodEnergyRegen.ToString("0.0")),
+            new Stat( "Eating period", FoodEatingPeriod.ToString("0.0")),
+            new Stat( "Size", (2 * Range).ToString("0.0")),
+            new Stat( "Att damage", AttackDamage.ToString("0.0")),
+            new Stat( "Att period", AttackPeriod.ToString("0.0")),
+            new Stat( "Att Distance", AttackDistance.ToString("0.0")),
             new Stat( "Mech dmg", MechanicalDamage.ToString()),
-            new Stat( "Speed land", MaxSpeedLand.ToString()),
-            new Stat( "Speed water", MaxSpeedWater.ToString()),
+            new Stat( "Speed land", MaxSpeedLand.ToString("0.0")),
+            new Stat( "Speed water", MaxSpeedWater.ToString("0.0")),
             new Stat( "Movement", Movement.ToString()),
             new Stat( "Thick skin", ThickSkin.ToString()),
             new Stat( "Diet", Diet.ToString()),
             new Stat( "Spawning time", SpawningTime.ToString()),
             new Stat( "Physical", Physical.ToString()),
-            new Stat( "Energy cost", EnergyCost.ToString()),
-            new Stat( "View range", ViewRange.ToString()),
+            new Stat( "Energy cost", EnergyCost.ToString("0.0")),
+            new Stat( "View range", ViewRange.ToString("0.0")),
             };
             return stats;
         }
@@ -276,13 +276,13 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Deals damage to this animal.
         /// </summary>
-        public override void Damage(float damage)
+        public override void Damage(float damage, bool physical)
         {
             //thick skin prevents some damage
-            if (ThickSkin)
+            if (ThickSkin && physical)
                 damage -= 1;
 
-            base.Damage(damage);
+            Damage(damage);
         }
 
         /// <summary>

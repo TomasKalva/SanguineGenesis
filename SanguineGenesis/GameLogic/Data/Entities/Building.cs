@@ -65,7 +65,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Point to which created units go after they spawn.
         /// </summary>
-        public Vector2 RallyPoint { get; set; }
+        public Vector2? RallyPoint { get; set; }
         // Map extents
         public new int Left => NodeLeft;
         public new int Right => Left + Nodes.GetLength(0);
@@ -88,7 +88,7 @@ namespace SanguineGenesis.GameLogic
             NodeLeft = nodes[0, 0].X;
             NodeBottom = nodes[0, 0].Y;
             Center = new Vector2(nodes[0, 0].X + Range, nodes[0, 0].Y + Range);
-            RallyPoint = new Vector2(Center.X, Bottom - 1);
+            //RallyPoint = new Vector2(Center.X, Bottom - 1);
         }
 
         /// <summary>

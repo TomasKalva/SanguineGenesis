@@ -189,7 +189,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 //reset timer
                 tickTimeElapsed -= StatusInfo.TickTime;
                 //deal damage to the entity and increment number of performed ticks
-                AffectedEntity.Damage(StatusInfo.TickDamage);
+                AffectedEntity.Damage(StatusInfo.TickDamage, false);
                 ticksPerformed++;
             }
 
@@ -483,7 +483,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
         public override bool Step(Game game, float deltaT)
         {
-            AffectedEntity.Damage(deltaT * StatusInfo.DamagePerS);
+            AffectedEntity.Damage(deltaT * StatusInfo.DamagePerS, false);
 
             // remove the status if the animal can move on the terrain that is below it
             int x = (int)AffectedEntity.Position.X;

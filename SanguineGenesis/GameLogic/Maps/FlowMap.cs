@@ -211,5 +211,6 @@ namespace SanguineGenesis
         public float AmountNotFilled => MaxValue - Value;
         public bool Full => Value == MaxValue;
         public override string ToString() => Value +"/"+MaxValue;
+        public string ToString(string format) => Value.ToString(format) + "/" + MaxValue.ToString(format);
     }
 }

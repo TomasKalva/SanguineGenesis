@@ -113,16 +113,16 @@ namespace SanguineGenesis.GameLogic
             {
                 new Stat( "Faction", Faction.FactionID.ToString()),
             new Stat( "EntityType", EntityType),
-            new Stat( "Health", Health.ToString()),
-            new Stat("Energy", Energy.ToString()),
+            new Stat( "Health", Health.ToString("0.0")),
+            new Stat("Energy", Energy.ToString("0.0")),
             new Stat( "Air", Air.ToString()),
             new Stat( "Size", Size.ToString()),
             new Stat( "Biome", Biome.ToString()),
             new Stat( "Terrain", Terrain.ToString()),
             new Stat( "Soil quality", SoilQuality.ToString()),
-            new Stat( "Energy intake", MaxEnergyIntake.ToString()),
+            new Stat( "Energy intake", MaxEnergyIntake.ToString("0.0")),
             new Stat( "Physical", Physical.ToString()),
-            new Stat( "View range", ViewRange.ToString()),
+            new Stat( "View range", ViewRange.ToString("0.0")),
             };
             return stats;
         }

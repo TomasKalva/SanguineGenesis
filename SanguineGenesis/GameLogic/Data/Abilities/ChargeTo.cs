@@ -52,7 +52,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (moveAnimalToPoint.Step(deltaT))
             {
                 CommandedEntity.StateChangeLock = null;
-                Target.Damage(Ability.AttackDamageMultiplier * CommandedEntity.AttackDamage);
+                Target.Damage(Ability.AttackDamageMultiplier * CommandedEntity.AttackDamage, true);
                 return true;
             }
 
