@@ -274,11 +274,6 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Returns true if the entity is visible on visibilityMap.
-        /// </summary>
-        public abstract bool IsVisible(VisibilityMap visibilityMap);
-
-        /// <summary>
         /// Called after this entity dies.
         /// </summary>
         public virtual void Die(Game game)

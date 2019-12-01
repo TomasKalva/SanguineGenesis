@@ -45,7 +45,8 @@ namespace SanguineGenesis
             {
                 if (e is Unit u)
                 {
-                    return u.IsVisible(observer.VisibilityMap);
+                    //return u.IsVisible(observer.VisibilityMap);
+                    return observer.CanSee(u);
                 }
                 else
                 {

@@ -196,7 +196,7 @@ namespace SanguineGenesis
                 {
                     //animal isn't doing anything
                     var opposite = a.Faction.FactionID.Opposite();
-                    Entity en = units.Where((v) => v.Faction.FactionID==opposite && a.DistanceTo(v) < a.AttackDistance).FirstOrDefault();
+                    Entity en = units.Where((v) => v.Faction.FactionID==opposite && a.DistanceTo(v) < a.AttackDistance && a.Faction.CanSee(v)).FirstOrDefault();
                     if(en!=null)
                         a.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(a, en));
                 }

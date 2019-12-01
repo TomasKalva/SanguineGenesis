@@ -18,14 +18,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             : base(faction, corpseType, maxHealth, 0, maxEnergy, new List<Ability>(), pos, range, false)
         {
         }
-        
-        /// <summary>
-        /// Returns true if the entity is visible on visibilityMap.
-        /// </summary>
-        public override bool IsVisible(VisibilityMap visibilityMap)
-        {
-            return true;
-        }
 
         #region IFood
         bool IFood.FoodLeft => !IsDead;

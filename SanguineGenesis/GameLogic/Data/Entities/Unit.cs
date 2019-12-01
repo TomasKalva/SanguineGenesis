@@ -31,17 +31,5 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Position = position;
             Range = range;
         }
-
-        /// <summary>
-        /// Returns true if at least part of the unit is visible.
-        /// </summary>
-        public override bool IsVisible(VisibilityMap visibilityMap)
-        {
-            if (visibilityMap == null)
-                return false;
-
-            //todo: check for intersection with the circle instead of the center
-            return visibilityMap[(int)Center.X, (int)Center.Y];
-        }
     }
 }

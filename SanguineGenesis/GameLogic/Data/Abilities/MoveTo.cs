@@ -130,8 +130,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (Ability.AttackEnemyInstead)
             {
                 Entity enemy = game.GetAll<Entity>().Where(
-                            (a) => a.Faction != CommandedEntity.Faction
-                            && CommandedEntity.DistanceTo(a) <= CommandedEntity.AttackDistance).FirstOrDefault();
+                            (a) => a.Faction.FactionID == CommandedEntity.Faction.FactionID.Opposite()
+                            && CommandedEntity.DistanceTo(a) <= CommandedEntity.AttackDistance
+                            && CommandedEntity.Faction.CanSee(a)).FirstOrDefault();
                 if (enemy != null)
                 {
                     //attack the enemy

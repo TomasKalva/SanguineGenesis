@@ -97,6 +97,14 @@ namespace SanguineGenesis
 
             Entities.RemoveAll((entity) => entity.IsDead);
         }
+
+        /// <summary>
+        /// Returns true iff this faction can see entity.
+        /// </summary>
+        public virtual bool CanSee(Entity entity)
+        {
+            return true;
+        }
     }
 
     class Player : Faction
@@ -185,7 +193,7 @@ namespace SanguineGenesis
             {
                 Node bottomLeft = b.Nodes[0, 0];
                 //check if the building is visible and if it wasn't added to the view map yet
-                if (b.IsVisible(VisibilityMap)
+                if (CanSee(b)
                     && VisibleMap[bottomLeft.X, bottomLeft.Y].Building != b)
                 {
                     //remove buildings that no longer exist
@@ -201,7 +209,7 @@ namespace SanguineGenesis
             }
 
             //remove visible buildings for which it can be seen that they no longer exist
-            VisibleBuildings.RemoveAll((b) => b.IsVisible(VisibilityMap) &&
+            VisibleBuildings.RemoveAll((b) => CanSee(b) &&
                                                 !buildings.Contains(b));
         }
 
@@ -293,6 +301,39 @@ namespace SanguineGenesis
                 case Biome.RAINFOREST: return GameStaticData.TreeFactories["KAPOC"];
                 default: return GameStaticData.StructureFactories["ROCK"];
             }
+        }
+
+        /// <summary>
+        /// Returns true iff this player can see entity. It is assumed that entity lies on the map,
+        /// otherwise OutOfRangeException is thrown.
+        /// </summary>
+        /// <exception cref="IndexOutOfRangeException">When entity doesn't lie on the map (shouldn't happen
+        /// because of constraints on entity.</exception>
+        public override bool CanSee(Entity entity)
+        {
+            if (VisibilityMap != null)
+            {
+                if (entity is Unit)
+                {
+                    int x = (int)entity.Center.X;
+                    int y = (int)entity.Center.Y;
+                    return VisibilityMap[x, y];
+                }
+                else //entity is Building
+                {
+                    foreach(Node n in (entity as Building).Nodes)
+                    {
+                        int x = (int)n.X;
+                        int y = (int)n.Y;
+                        if (VisibilityMap[x, y])
+                            return true;
+                    }
+                    return false;
+                }
+            }
+            else
+                //visibility map is null => player can't see anything
+                return false;
         }
     }
 

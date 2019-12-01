@@ -88,23 +88,6 @@ namespace SanguineGenesis.GameLogic
             NodeLeft = nodes[0, 0].X;
             NodeBottom = nodes[0, 0].Y;
             Center = new Vector2(nodes[0, 0].X + Range, nodes[0, 0].Y + Range);
-            //RallyPoint = new Vector2(Center.X, Bottom - 1);
-        }
-
-        /// <summary>
-        /// Returns true if at least one of the building's nodes is visible.
-        /// </summary>
-        public override bool IsVisible(VisibilityMap visibilityMap)
-        {
-            if (visibilityMap == null)
-                return false;
-
-            foreach (Node n in Nodes)
-            {
-                if (visibilityMap[n.X, n.Y])
-                    return true;
-            }
-            return false;
         }
 
         /// <summary>

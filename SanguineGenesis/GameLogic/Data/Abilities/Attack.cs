@@ -45,12 +45,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 if (Target is Building && !CommandedEntity.MechanicalDamage)
                 {
                     //deal less damage if animal without mechanical damage attacks a building
-                    Target.Damage(CommandedEntity.AttackDamage / 10);
+                    Target.Damage(CommandedEntity.AttackDamage / 10, true);
                 }
                 else
                 {
                     //damage target
-                    Target.Damage(CommandedEntity.AttackDamage);
+                    Target.Damage(CommandedEntity.AttackDamage, true);
                 }
             }
 
