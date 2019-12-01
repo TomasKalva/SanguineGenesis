@@ -514,7 +514,11 @@
       <Image X="27" Y="9"  Width="2" Height="1"/>
     </Animation>
     <Animation Action="RUNNING" CenterX="1" CenterY="0.2">
-      <Image X="27" Y="9"  Width="2" Height="1"/>
+      <Image X="24" Y="15"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="26" Y="15"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="28" Y="15"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="26" Y="15"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="30" Y="15"  Width="2" Height="1" Duration="0.1"/>
     </Animation>
     <Animation Action="ATTACKING" CenterX="1" CenterY="0.2">
       <Image X="27" Y="9"  Width="2" Height="1"/>
@@ -522,13 +526,17 @@
   </Entity>
   <Entity EntityType="LION">
     <Animation Action="IDLE" CenterX="1" CenterY="0.2">
-      <Image X="27" Y="9"  Width="2" Height="1"/>
+      <Image X="28" Y="13"  Width="2" Height="1"/>
     </Animation>
     <Animation Action="RUNNING" CenterX="1" CenterY="0.2">
-      <Image X="27" Y="9"  Width="2" Height="1"/>
+      <Image X="24" Y="16"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="26" Y="16"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="28" Y="16"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="26" Y="16"  Width="2" Height="1" Duration="0.1"/>
+      <Image X="30" Y="16"  Width="2" Height="1" Duration="0.1"/>
     </Animation>
     <Animation Action="ATTACKING" CenterX="1" CenterY="0.2">
-      <Image X="27" Y="9"  Width="2" Height="1"/>
+      <Image X="28" Y="13"  Width="2" Height="1"/>
     </Animation>
   </Entity>
   <Entity EntityType="CORPSE">
