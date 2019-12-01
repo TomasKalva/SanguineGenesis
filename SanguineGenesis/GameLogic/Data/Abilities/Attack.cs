@@ -11,14 +11,22 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class Attack : TargetAbility<Animal, Entity>
     {
-        internal Attack() : base(null, 0, false, false) { }
+        /// <summary>
+        /// Used just to return correct name.
+        /// </summary>
+        private bool Unbreakable { get; }
+
+        internal Attack(bool unbreakable) : base(null, 0, false, false)
+        {
+            Unbreakable = unbreakable;
+        }
 
         public override Command NewCommand(Animal caster, Entity target)
         {
             return new AttackCommand(caster, target, this);
         }
 
-        public override string GetName() => "Attack";
+        public override string GetName() => Unbreakable?"Unbr attack":"Attack";
 
         public override string Description()
         {

@@ -114,6 +114,9 @@ namespace SanguineGenesis.GameLogic
                             case "moveTo":
                                 factory.Abilities.Add(abilities.MoveTo);
                                 break;
+                            case "unbreakableAttack":
+                                factory.Abilities.Add(abilities.UnbreakableAttack);
+                                break;
                             case "attack":
                                 factory.Abilities.Add(abilities.Attack);
                                 break;

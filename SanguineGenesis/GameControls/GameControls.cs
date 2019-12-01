@@ -154,7 +154,7 @@ namespace SanguineGenesis
             else
             {
                 //enemy selected => attack it
-                game.CurrentPlayer.GameStaticData.Abilities.Attack.SetCommands(SelectedGroup.Entities, enemy, resetQueue);
+                game.CurrentPlayer.GameStaticData.Abilities.UnbreakableAttack.SetCommands(SelectedGroup.Entities, enemy, resetQueue);
             }
         }
 

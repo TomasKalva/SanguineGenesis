@@ -257,6 +257,7 @@ namespace SanguineGenesis
                 float distance = Target.DistanceTo(animal);
                 if (distance > Distance)
                 {
+                    animal.CanBeMoved = true;
                     ElapsedTime = 0;
                     if (!animal.WantsToMove)
                         animal.SetAnimation("RUNNING");
@@ -265,6 +266,7 @@ namespace SanguineGenesis
                 }
                 else
                 {
+                    animal.CanBeMoved = false;
                     if (animal.WantsToMove)
                     {
                         if (this is AttackCommand)

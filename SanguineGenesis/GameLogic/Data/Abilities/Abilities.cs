@@ -26,6 +26,7 @@ namespace SanguineGenesis.GameLogic
         public MoveTo MoveTo { get; }
         public MoveTo MoveToCast(Ability ability) => moveToCast[ability];
         public Attack Attack { get; }
+        public Attack UnbreakableAttack { get; }
         public Spawn UnitSpawn(string type) => unitSpawn[type];
         public CreateAnimal UnitCreate(string type) => unitCreate[type];
         public BuildBuilding BuildBuilding(string type) => buildBuilding[type];
@@ -62,9 +63,12 @@ namespace SanguineGenesis.GameLogic
             MoveTo = new MoveTo(0.1f, true, false);
             MoveTo.SetAbilities(this);
 
-            Attack = new Attack();
+            Attack = new Attack(false);
             Attack.SetAbilities(this);
-            
+
+            UnbreakableAttack = new Attack(true);
+            UnbreakableAttack.SetAbilities(this);
+
             //unit spawn
             unitSpawn = new Dictionary<string, Spawn>();
             foreach (var unitFac in gameStaticData.AnimalFactories.Factorys)
@@ -188,14 +192,17 @@ namespace SanguineGenesis.GameLogic
 
             //move to cast has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();
-            foreach(Ability a in AllAbilities)
+
+            MoveTo moveToAbility = new MoveTo(Attack.Distance, true, false);
+            moveToCast.Add(Attack, moveToAbility);
+
+            moveToAbility = new MoveTo(UnbreakableAttack.Distance, false, false);
+            moveToCast.Add(UnbreakableAttack, moveToAbility);
+
+            foreach (Ability a in AllAbilities.Where(ab=>!(ab is Attack)))
             {
                 //move to cast abilities are not in AllAbilities to avoid infinite recursion
-                bool attackEnemyInstead = false;
-                if (a is Attack)
-                    attackEnemyInstead = true;
-
-                MoveTo moveToAbility = new MoveTo(a.Distance, attackEnemyInstead, false);
+                moveToAbility = new MoveTo(a.Distance, false, false);
                 moveToCast.Add(a, moveToAbility);
             }
         }
