@@ -15,7 +15,7 @@ namespace SanguineGenesis
     /// <summary>
     /// Represents an object on the map.
     /// </summary>
-    abstract class Entity: ITargetable, IMovementTarget, IRectangle, IShowable
+    abstract class Entity: ITargetable, IMovementTarget, IRectangle, IShowable, IStatusOwner
     {
         /// <summary>
         /// Center of this entity on the map.
@@ -51,9 +51,9 @@ namespace SanguineGenesis
         /// </summary>
         public AnimationState AnimationState { get; set; }
         /// <summary>
-        /// The entity has no more health left.
+        /// The entity will be removed from the game.
         /// </summary>
-        public bool IsDead => Health <= 0;
+        public virtual bool IsDead => Health <= 0;
         /// <summary>
         /// If health reaches 0 the unit dies and is removed from the game.
         /// </summary>

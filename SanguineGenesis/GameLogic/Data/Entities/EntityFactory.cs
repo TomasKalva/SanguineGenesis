@@ -40,7 +40,7 @@ namespace SanguineGenesis.GameLogic
         public Entity SetStatuses(Entity entity)
         {
             foreach(StatusFactory statFac in StatusFactories)
-                statFac.ApplyToEntity(entity);
+                statFac.ApplyToStatusOwner(entity);
             return entity;
         }
     }

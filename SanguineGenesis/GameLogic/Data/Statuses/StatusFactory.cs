@@ -19,7 +19,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// Applies the status created by this factory to the entity. Returns true iff
         /// application was successful.
         /// </summary>
-        public abstract bool ApplyToEntity(Entity affectedEntity);
+        public abstract bool ApplyToStatusOwner(IStatusOwner affected);
 
         public StatusFactory(bool onlyOnce)
         {
@@ -27,36 +27,55 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
     }
 
-    abstract class StatusFactory<Affected>:StatusFactory where Affected:Entity
+    abstract class StatusFactory<Affected>:StatusFactory where Affected : class , IStatusOwner
     {
         public StatusFactory(bool onlyOnce)
             :base(onlyOnce)
         {
         }
 
-        protected abstract Status NewInstance(Affected affectedEntity);
+        protected abstract Status NewInstance(Affected affected);
 
-        public sealed override bool ApplyToEntity(Entity affectedEntity)
-            => ApplyToAffected((Affected)affectedEntity);
+        public sealed override bool ApplyToStatusOwner(IStatusOwner affected)
+            => ApplyToAffected((Affected)affected);
 
         /// <summary>
         /// Returns true iff the status was successfuly applied.
         /// </summary>
-        public virtual bool ApplyToAffected(Affected affectedEntity)
+        public virtual bool ApplyToAffected(Affected affected)
         {
             //if this status can be only applied once, check if it is already applied to the entity
             if (OnlyOnce &&
-                affectedEntity.Statuses.Where((s) => s.Creator.GetType() == GetType()).Any())
+                affected.Statuses.Where((s) => s.Creator.GetType() == GetType()).Any())
                 //status can't be applied second time
                 return false;
 
             //status can be applied
-            Status newStatus = NewInstance(affectedEntity);
-            affectedEntity.AddStatus(newStatus);
+            Status newStatus = NewInstance(affected);
+            affected.AddStatus(newStatus);
             return true;
         }
 
         public override string ToString() => NewInstance(null).GetName();
+    }
+
+    /// <summary>
+    /// Marks classes that can own statuses.
+    /// </summary>
+    interface IStatusOwner
+    {
+        /// <summary>
+        /// Statuses that are affecting this owner.
+        /// </summary>
+        List<Status> Statuses { get; }
+        /// <summary>
+        /// Adds status to Statuses.
+        /// </summary>
+        void AddStatus(Status status);
+        /// <summary>
+        /// Removes status from Statuses.
+        /// </summary>
+        void RemoveStatus(Status status);
     }
 
     class PoisonFactory : StatusFactory<Entity>
@@ -82,8 +101,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             TickTime = tickTime;
         }
 
-        protected override Status NewInstance(Entity affectedEntity)
-            => new Poison(affectedEntity, this);
+        protected override Status NewInstance(Entity affected)
+            => new Poison(affected, this);
     }
 
     class SprintFactory : StatusFactory<Animal>
@@ -103,9 +122,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             SpeedBonus = speedBonus;
             EnergyCostPerS = energyPerS;
         }
-        protected override Status NewInstance(Animal affectedEntity)
+        protected override Status NewInstance(Animal affected)
         {
-            return new Sprint(affectedEntity, this);
+            return new Sprint(affected, this);
         }
     }
 
@@ -125,9 +144,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             Duration = duration;
         }
-        protected override Status NewInstance(Animal affectedEntity)
+        protected override Status NewInstance(Animal affected)
         {
-            return new ConsumedAnimal(affectedEntity, this, AnimalConsumed);
+            return new ConsumedAnimal(affected, this, AnimalConsumed);
         }
     }
 
@@ -142,15 +161,15 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             : base(true)
         {
         }
-        protected override Status NewInstance(Tree affectedEntity)
+        protected override Status NewInstance(Tree affected)
         {
-            return new AnimalsOnTree(affectedEntity, this, PutOnTree);
+            return new AnimalsOnTree(affected, this, PutOnTree);
         }
 
 
-        public override bool ApplyToAffected(Tree affectedEntity)
+        public override bool ApplyToAffected(Tree affected)
         {
-            AnimalsOnTree alreadyApplied = (AnimalsOnTree)affectedEntity.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
+            AnimalsOnTree alreadyApplied = (AnimalsOnTree)affected.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
             if(alreadyApplied!=null)
             {
                 if (PutOnTree != null)
@@ -162,8 +181,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             }
             else
             {
-                AnimalsOnTree newStatus = (AnimalsOnTree)NewInstance(affectedEntity);
-                affectedEntity.AddStatus(newStatus);
+                AnimalsOnTree newStatus = (AnimalsOnTree)NewInstance(affected);
+                affected.AddStatus(newStatus);
             }
             return true;
         }
@@ -185,9 +204,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             AnimalsUnderGround = new List<Animal>();
         }
 
-        protected override Status NewInstance(Structure affectedEntity)
+        protected override Status NewInstance(Structure affected)
         {
-            return new Underground(affectedEntity, this);
+            return new Underground(affected, this);
         }
     }
 
@@ -203,9 +222,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             Duration = duration;
         }
-        protected override Status NewInstance(Animal affectedEntity)
+        protected override Status NewInstance(Animal affected)
         {
-            return new Shell(affectedEntity, this);
+            return new Shell(affected, this);
         }
     }
 
@@ -222,9 +241,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             Duration = duration;
         }
-        protected override Status NewInstance(Animal affectedEntity)
+        protected override Status NewInstance(Animal affected)
         {
-            return new FastStrikes(affectedEntity, this);
+            return new FastStrikes(affected, this);
         }
     }
 
@@ -240,9 +259,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             RangeExtension = rangeExtension;
         }
-        protected override Status NewInstance(Animal affectedEntity)
+        protected override Status NewInstance(Animal affected)
         {
-            return new FarSight(affectedEntity, this);
+            return new FarSight(affected, this);
         }
     }
 
@@ -268,9 +287,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Distance=distance;
             Speed = speed;
         }
-        protected override Status NewInstance(Animal affectedEntity)
+        protected override Status NewInstance(Animal affected)
         {
-            return new KnockAway(affectedEntity, this);
+            return new KnockAway(affected, this);
         }
     }
 
@@ -286,9 +305,27 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             DamagePerS = damagePerS;
         }
-        protected override Status NewInstance(Animal affectedEntity)
+        protected override Status NewInstance(Animal affected)
         {
-            return new Suffocating(affectedEntity, this);
+            return new Suffocating(affected, this);
+        }
+    }
+
+    class DecayFactory : StatusFactory<IDecayable>
+    {
+        /// <summary>
+        /// How much energy the corpse/dead tree loses per second.
+        /// </summary>
+        public float EnergyLossPerS { get; }
+
+        public DecayFactory(float energyLossPerS)
+            : base(true)
+        {
+            EnergyLossPerS = energyLossPerS;
+        }
+        protected override Status NewInstance(IDecayable affected)
+        {
+            return new Decay(affected, this);
         }
     }
 }

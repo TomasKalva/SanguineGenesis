@@ -12,15 +12,21 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// <summary>
     /// Represents a dead animal. Can be used as food for carnivores.
     /// </summary>
-    class Corpse:Unit, ICarnivoreFood
+    class Corpse:Unit, ICarnivoreFood, IDecayable
     {
+        public bool Decayed { get; set; }
+        public override bool IsDead => base.IsDead || Decayed;
+
         public Corpse(Faction faction, string corpseType, float maxHealth, float maxEnergy, Vector2 pos, float range)
             : base(faction, corpseType, maxHealth, 0, maxEnergy, new List<Ability>(), pos, range, false)
         {
+            Decayed = false;
+            Energy = maxEnergy;
         }
 
         #region IFood
         bool IFood.FoodLeft => !IsDead;
+
         void IFood.EatFood(Animal eater)
         {
             float nutrientsToEat = Math.Min(eater.FoodEnergyRegen, Health);
@@ -41,5 +47,24 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return stats;
         }
         #endregion IShowable
+
+        public void Decay(float energyDamage)
+        {
+            Energy -= energyDamage;
+            if (Energy <= 0)
+                Decayed = true;
+        }
+    }
+
+    /// <summary>
+    /// Marks entities that can die when their energy drops to 0.
+    /// </summary>
+    interface IDecayable :IStatusOwner
+    {
+        /// <summary>
+        /// If true, the entity should die.
+        /// </summary>
+        bool Decayed { get; set; }
+        void Decay(float energyDamage);
     }
 }

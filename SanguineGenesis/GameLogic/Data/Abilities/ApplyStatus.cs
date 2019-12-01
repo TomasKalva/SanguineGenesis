@@ -44,7 +44,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             //try to apply the status to the caster, if
             //the application fails, caster gets refunded
-            if (!Ability.StatusFactory.ApplyToEntity(CommandedEntity))
+            if (!Ability.StatusFactory.ApplyToStatusOwner(CommandedEntity))
                 Refund();
 
             return true;

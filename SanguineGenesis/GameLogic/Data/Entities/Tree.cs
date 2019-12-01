@@ -57,8 +57,9 @@ namespace SanguineGenesis.GameLogic
             //after physical tree dies and has energy left, spawn a dead tree
             if(Physical && Energy > 0)
             {
-                Structure deadTree = new Structure(game.NeutralFaction, "DEAD_TREE", Nodes, Energy, 0, Size,
+                Structure deadTree = new Structure(game.NeutralFaction, "DEAD_TREE", Nodes, Energy, Energy, Size,
                     Physical, Biome, Terrain, SoilQuality.BAD, false, 0, new List<Ability>());
+                Faction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(deadTree);
                 Faction.Entities.Add(deadTree);
                 game.Map.AddBuilding(deadTree);
             }

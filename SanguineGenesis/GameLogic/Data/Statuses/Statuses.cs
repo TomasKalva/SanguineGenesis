@@ -21,6 +21,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public FarSightFactory FarSightFactory { get; }
         public KnockBackFactory KnockAwayFactory { get; }
         public SuffocatingFactory SuffocatingFactory { get; }
+        public DecayFactory DecayFactory { get; }
 
 
         public Statuses()
@@ -35,6 +36,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             FarSightFactory = new FarSightFactory(rangeExtension: 6f);
             KnockAwayFactory = new KnockBackFactory(distance: 2f, speed: 6f);
             SuffocatingFactory = new SuffocatingFactory(5);
+            DecayFactory = new DecayFactory(5);
         }
 
     }

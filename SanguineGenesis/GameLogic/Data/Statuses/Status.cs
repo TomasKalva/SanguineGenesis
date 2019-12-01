@@ -40,7 +40,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     }
 
     abstract class Status<Affected,Info>:Status where Info:StatusFactory<Affected>
-                                                        where Affected:Entity
+                                                        where Affected: class, IStatusOwner
     {
         public override StatusFactory Creator => StatusInfo;
         /// <summary>
@@ -52,9 +52,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Info StatusInfo { get; }
 
-        public Status(Affected affectedEntity, Info statusInfo)
+        public Status(Affected affected, Info statusInfo)
         {
-            AffectedEntity = affectedEntity;
+            AffectedEntity = affected;
             StatusInfo = statusInfo;
         }
     }
@@ -64,8 +64,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// </summary>
     class Sprint : Status<Animal, SprintFactory>
     {
-        public Sprint(Animal affectedEntity, SprintFactory sprintInfo)
-            :base(affectedEntity, sprintInfo)
+        public Sprint(Animal affected, SprintFactory sprintInfo)
+            :base(affected, sprintInfo)
         {
         }
         
@@ -110,8 +110,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         private float timeElapsed;
 
-        public ConsumedAnimal(Animal affectedEntity, ConsumedAnimalFactory consumeInfo, Animal animalConsumed)
-            : base(affectedEntity, consumeInfo)
+        public ConsumedAnimal(Animal affected, ConsumedAnimalFactory consumeInfo, Animal animalConsumed)
+            : base(affected, consumeInfo)
         {
             AnimalConsumed = animalConsumed;
             AnimalConsumed.StateChangeLock = this;
@@ -174,8 +174,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         private int ticksPerformed;
 
 
-        public Poison(Entity affectedEntity, PoisonFactory poisonInfo)
-            : base(affectedEntity, poisonInfo)
+        public Poison(Entity affected, PoisonFactory poisonInfo)
+            : base(affected, poisonInfo)
         {
             ticksPerformed = 0;
             tickTimeElapsed = 0f;
@@ -222,8 +222,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     {
         private float timer;
 
-        public Shell(Animal affectedEntity, ShellFactory shellInfo)
-            : base(affectedEntity, shellInfo)
+        public Shell(Animal affected, ShellFactory shellInfo)
+            : base(affected, shellInfo)
         {
             timer = 0f;
         }
@@ -262,8 +262,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     {
         private float timer;
 
-        public FastStrikes(Animal affectedEntity, FastStrikesFactory fastStrikesInfo)
-            : base(affectedEntity, fastStrikesInfo)
+        public FastStrikes(Animal affected, FastStrikesFactory fastStrikesInfo)
+            : base(affected, fastStrikesInfo)
         {
             timer = 0f;
         }
@@ -310,8 +310,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     {
         public List<Animal> Animals { get; }
 
-        public AnimalsOnTree(Tree affectedEntity, AnimalsOnTreeFactory animalsOnTreenfo, Animal putOnTree)
-            : base(affectedEntity, animalsOnTreenfo)
+        public AnimalsOnTree(Tree affected, AnimalsOnTreeFactory animalsOnTreenfo, Animal putOnTree)
+            : base(affected, animalsOnTreenfo)
         {
             Animals = new List<Animal>(1) { putOnTree };
         }
@@ -356,8 +356,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     {
         public List<Animal> AnimalsUnderGround => StatusInfo.AnimalsUnderGround;
 
-        public Underground(Structure affectedEntity, UndergroundFactory undergroundInfo)
-            : base(affectedEntity, undergroundInfo)
+        public Underground(Structure affected, UndergroundFactory undergroundInfo)
+            : base(affected, undergroundInfo)
         {
         }
 
@@ -387,8 +387,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// </summary>
     class FarSight : Status<Animal, FarSightFactory>
     {
-        public FarSight(Animal affectedEntity, FarSightFactory farSightInfo)
-            : base(affectedEntity, farSightInfo)
+        public FarSight(Animal affected, FarSightFactory farSightInfo)
+            : base(affected, farSightInfo)
         {
         }
 
@@ -433,11 +433,11 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     {
         private MoveAnimalToPoint moveAnimalToPoint;
 
-        public KnockAway(Animal affectedEntity, KnockBackFactory knockBackInfo)
-            : base(affectedEntity, knockBackInfo)
+        public KnockAway(Animal affected, KnockBackFactory knockBackInfo)
+            : base(affected, knockBackInfo)
         {
-            Vector2 targetPoint = affectedEntity.Position + StatusInfo.Distance * StatusInfo.Direction;
-            moveAnimalToPoint = new MoveAnimalToPoint(affectedEntity, targetPoint, StatusInfo.Speed, StatusInfo.Distance / StatusInfo.Speed);
+            Vector2 targetPoint = affected.Position + StatusInfo.Distance * StatusInfo.Direction;
+            moveAnimalToPoint = new MoveAnimalToPoint(affected, targetPoint, StatusInfo.Speed, StatusInfo.Distance / StatusInfo.Speed);
         }
 
         public override void Added()
@@ -476,8 +476,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// </summary>
     class Suffocating : Status<Animal, SuffocatingFactory>
     {
-        public Suffocating(Animal affectedEntity, SuffocatingFactory suffocatingInfo)
-            : base(affectedEntity, suffocatingInfo)
+        public Suffocating(Animal affected, SuffocatingFactory suffocatingInfo)
+            : base(affected, suffocatingInfo)
         {
         }
 
@@ -507,6 +507,40 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public override string Description()
         {
             return "This animal is out of its natural terrain and is therefore suffocating.";
+        }
+    }
+
+    /// <summary>
+    /// Owner loses energy. Once energy drops to 0, it dies.
+    /// </summary>
+    class Decay : Status<IDecayable, DecayFactory>
+    {
+        public Decay(IDecayable affected, DecayFactory decayInfo)
+            : base(affected, decayInfo)
+        {
+        }
+
+        public override bool Step(Game game, float deltaT)
+        {
+            AffectedEntity.Decay(deltaT * StatusInfo.EnergyLossPerS);
+
+            // remove the status if the animal can move on the terrain that is below it
+            return false;
+        }
+
+        public override string GetName() => "Decay";
+
+        public override List<Stat> Stats()
+        {
+            return new List<Stat>()
+            {
+                new Stat( "Eng loss ", StatusInfo.EnergyLossPerS.ToString())
+            };
+        }
+
+        public override string Description()
+        {
+            return "This entity is decaying. Once its energy reaches 0 it disappears.";
         }
     }
 }

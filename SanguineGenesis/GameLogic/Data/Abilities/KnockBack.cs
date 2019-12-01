@@ -45,7 +45,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             //try to apply the status to the caster, if
             //the application fails, caster gets refunded
             Ability.KnockBackFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Target.Position);
-            if (!Ability.KnockBackFactory.ApplyToEntity(Target))
+            if (!Ability.KnockBackFactory.ApplyToStatusOwner(Target))
                 Refund();
 
             return true;

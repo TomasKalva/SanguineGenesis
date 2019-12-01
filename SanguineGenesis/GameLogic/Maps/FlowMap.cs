@@ -167,6 +167,8 @@ namespace SanguineGenesis
             this.value = Math.Max(0, Math.Min(MaxValue, value));
         }
 
+        public static implicit operator FloatRange(float fl)
+            => new FloatRange(fl, fl);
         public static FloatRange operator +(FloatRange decR, float dec) 
             => new FloatRange(decR.MaxValue,decR.Value + dec);
         public static FloatRange operator -(FloatRange decR, float dec)

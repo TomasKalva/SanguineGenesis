@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GUI;
 
 namespace SanguineGenesis.GameLogic
@@ -10,12 +11,16 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Represent building that doesn't do anything special.
     /// </summary>
-    class Structure : Building
+    class Structure : Building, IDecayable
     {
+        public bool Decayed { get; set; }
+        public override bool IsDead => base.IsDead || Decayed;
+
         public Structure(Faction faction, string buildingType, Node[,] nodes, float maxHealth, float maxEnergy, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)
             : base(faction, buildingType, nodes, maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, viewRange, abilities)
         {
+            Decayed = false;
         }
 
         #region IShowable
@@ -37,5 +42,12 @@ namespace SanguineGenesis.GameLogic
             return stats;
         }
         #endregion IShowable
+
+        public void Decay(float energyDamage)
+        {
+            Energy -= energyDamage;
+            if (Energy <= 0)
+                Decayed = true;
+        }
     }
 }
