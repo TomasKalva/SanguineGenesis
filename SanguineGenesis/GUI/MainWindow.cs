@@ -237,7 +237,6 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void InitializeOpenGL()
         {
-            openGLControl.FrameRate = 60;
             OpenGL gl = openGLControl.OpenGL;
             OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl.Width, (float)openGLControl.Height);
             OpenGLAtlasDrawer.CreateMap(gl);

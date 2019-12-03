@@ -100,18 +100,34 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private bool ValidName(string name)
         {
+            //check emptyness
             if (name == "")
             {
                 ErrorMessage("The name of the map cannot be empty.");
                 return false;
             }
-            foreach(string mapName in mapNamesCB.Items)
-                if(mapName == name)
+            //check if name contains only alphanumeric characters and '_'
+            foreach(char a in name)
+                if (!(char.IsLetterOrDigit(a) || a=='_'))
                 {
-                    ErrorMessage("The name \"" + name + "\" already exits.");
+                    ErrorMessage("The name of the map can only contain alphanumeric characters and '_'.");
                     return false;
                 }
             return true;
+        }
+
+        /// <summary>
+        /// Returns true iff the name of the map already exists.
+        /// </summary>
+        public bool MapAlreadyExists(string name)
+        {
+            //check if the name already exists
+            foreach (string mapName in mapNamesCB.Items)
+                if (mapName == name)
+                {
+                    return true;
+                }
+            return false;
         }
 
         /// <summary>
@@ -139,7 +155,9 @@ namespace SanguineGenesis.GUI
                 mapNamesCB.Items.Clear();
                 foreach (var d in Directory.GetDirectories(dirName))
                 {
-                    mapNamesCB.Items.Add(Path.GetFileName(d));
+                    string name = Path.GetFileName(d);
+                    if (ValidName(name))
+                        mapNamesCB.Items.Add(name);
                 }
             }
             catch(IOException)
@@ -206,8 +224,7 @@ namespace SanguineGenesis.GUI
         /// Returns Biome to be played by the player.
         /// </summary>
         private Biome PlayersBiome => savannaRB.Checked ? Biome.SAVANNA : Biome.RAINFOREST;
-
-
+        
         #region Event handlers
 
         private void NewMapB_Click(object sender, EventArgs e)
@@ -224,8 +241,15 @@ namespace SanguineGenesis.GUI
                 ErrorMessage("Height has to be between " + MIN_MAP_HEIGHT + " and " + MAX_MAP_HEIGHT + ".");
                 return;
             }
-            if (ValidName(newNameTB.Text))
+
+            string mapName = newNameTB.Text;
+            if (ValidName(mapName))
             {
+                if (MapAlreadyExists(mapName))
+                {
+                    ErrorMessage("The name \"" + mapName + "\" already exits.");
+                    return;
+                }
                 MapDescr = new MapDescription(width, height, newNameTB.Text);
                 mapPB.Invalidate();
                 mapPB.Refresh();
@@ -354,11 +378,8 @@ namespace SanguineGenesis.GUI
         private void LoadB_Click(object sender, EventArgs e)
         {
             string mapDirName = mapNamesCB.Text;
-            if (mapDirName == "")
-            {
-                ErrorMessage("Empty string can't be a name of a map.");
+            if (!ValidName(mapDirName))
                 return;
-            }
 
             try
             {
