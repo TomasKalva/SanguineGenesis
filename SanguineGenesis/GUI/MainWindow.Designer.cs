@@ -32,17 +32,16 @@
             ((System.ComponentModel.ISupportInitialize)(this.openGLControl)).BeginInit();
             this.SuspendLayout();
             // 
-            // openGLControl1
+            // openGLControl
             // 
             this.openGLControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.openGLControl.DrawFPS = false;
             this.openGLControl.Location = new System.Drawing.Point(0, 0);
-            this.openGLControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.openGLControl.Name = "openGLControl1";
+            this.openGLControl.Name = "openGLControl";
             this.openGLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
             this.openGLControl.RenderContextType = SharpGL.RenderContextType.FBO;
-            this.openGLControl.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
-            this.openGLControl.Size = new System.Drawing.Size(800, 450);
+            this.openGLControl.RenderTrigger = SharpGL.RenderTrigger.Manual;
+            this.openGLControl.Size = new System.Drawing.Size(533, 292);
             this.openGLControl.TabIndex = 0;
             this.openGLControl.OpenGLDraw += new SharpGL.RenderEventHandler(this.UpdateAndDraw);
             this.openGLControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyDown);
@@ -53,11 +52,12 @@
             // 
             // MainWinformWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(533, 292);
             this.Controls.Add(this.openGLControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "MainWinformWindow";
             this.Text = "MainWindow";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;

@@ -263,6 +263,8 @@ namespace SanguineGenesis.GUI
             MainLoopStep();
 
             OpenGL gl = openGLControl.OpenGL;
+            Console.WriteLine("Game tick length:\t" + sw.Elapsed.Milliseconds);
+            sw.Restart();
             //set correct extents of the window to game controls
             GameControls.MapView.SetActualExtents(openGLControl.Width, openGLControl.Height);
 
@@ -291,9 +293,7 @@ namespace SanguineGenesis.GUI
             
             //update bottom panel
             UpdateBottomPanel();
-
-            sw.Stop();
-            //Console.WriteLine("Tick length: " + sw.Elapsed.Milliseconds);
+            Console.WriteLine("Graphics tick length:\t" + sw.Elapsed.Milliseconds);
 
             UpdatesDone++;
             Console.WriteLine("Updates per second: " + UpdatesDone / TotalTime * 1000);
@@ -531,6 +531,8 @@ namespace SanguineGenesis.GUI
                     GameControls.MapMovementInput.RemoveDirection(Direction.DOWN);
                 }
             }
+
+            openGLControl.Refresh();
         }
 
         #endregion event handlers

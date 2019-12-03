@@ -155,7 +155,7 @@ namespace SanguineGenesis
             int id = 0;
             foreach (AnimalFactory a in GameStaticData.AnimalFactories.Factorys.Select(kvp => kvp.Value))
             {
-                for (int j = 0; j < 10; j++)
+                for (int j = 0; j < 4; j++)
                 {
                     Entities.Add(a.NewInstance(this, new Vector2(2 + 5 * (id % 8), 2 + 5 * (id / 8))));
                 }

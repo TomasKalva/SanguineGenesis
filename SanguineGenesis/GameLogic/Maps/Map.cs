@@ -238,6 +238,7 @@ namespace SanguineGenesis
                 nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
                 //nodes with roots produce nutrients
                 ProduceNutrients();
+                SpreadBiomes();
 
                 //trees drain energy from nodes
                 foreach (Tree t in trees)
@@ -248,7 +249,7 @@ namespace SanguineGenesis
 
 
             //nutrients biomes and terrain can't be updated in this step after calling this method
-            UpdateBiomes();
+            LoseBiome();
         }
 
         /// <summary>
@@ -323,9 +324,9 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Change biome by the amount of nutrients and neighbour biomes.
+        /// Spread biomes to neighbour nodes.
         /// </summary>
-        public void UpdateBiomes()
+        public void SpreadBiomes()
         {
             //spread biome to neighbours
             Biome[,] newBiomes = new Biome[Width, Height];
@@ -375,6 +376,13 @@ namespace SanguineGenesis
                 for (int j = 0; j < Height; j++)
                     this[i, j].Biome = newBiomes[i, j];
 
+        }
+
+        /// <summary>
+        /// Node loses biome if the soil quality is bad.
+        /// </summary>
+        public void LoseBiome()
+        {
             //lose biome if the soil quality is too bad
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
@@ -383,6 +391,7 @@ namespace SanguineGenesis
                     if ((n = this[i, j]).SoilQuality == SoilQuality.BAD)
                         n.Biome = Biome.DEFAULT;
                 }
+
         }
     }
 }
