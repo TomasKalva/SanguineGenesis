@@ -193,11 +193,11 @@ namespace SanguineGenesis
             sw.Restart();
 
             //physics
-            List<Entity> physicalEntities = entities.Where((e) => e.Physical).ToList();
+            List<Animal> physicalAnimals = animals.Where((a) => a.Physical).ToList();
             physics.MoveAnimals(Map, animals, deltaT);
             //perform two steps of collision checking
             //physics.PushAway(Map, animals, physicalEntities);
-            physics.PushAway(Map, animals, physicalEntities);
+            physics.PushAway(Map, physicalAnimals);
             physics.PushOutsideOfObstacles(Map, animals);
             Console.WriteLine("Physics:\t" + sw.ElapsedMilliseconds);
             sw.Restart();

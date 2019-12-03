@@ -50,101 +50,119 @@ namespace SanguineGenesis
         /// Handles collisions between animals and entities. If animal gets pushed to blocked node,
         /// use corresponding PushingMap to push it back.
         /// </summary>
-        public void PushAway(Map map, List<Animal> animals, List<Entity> entities)
+        public void PushAway(Map map, List<Animal> physicalAnimals)
         {
             //set push maps so that colliding animals can be correctly pushed to not blocked squares
             SetPushMaps(map);
             
-            foreach (Animal a in animals)
+            foreach (Animal a in physicalAnimals)
             {
                 //animals that aren't physical don't need to check for collisions
                 if (!a.Physical)
                     continue;
 
-                foreach (Entity e in entities)
+                //resolve collisions with other animals
+                foreach (Entity e in physicalAnimals)
                 {
-                    //entities that aren't physical don't need to check for collisions
-                    if (!e.Physical)
-                        continue;
-
-                    //calculate collisions for each pair of unit and entity only once
-                    if (a.GetHashCode() < e.GetHashCode() || e is Building)
+                    Push(a, e, map);
+                }
+                //resolve collisions with nearby buildings
+                int animalX = (int)a.Position.X;
+                int animalY = (int)a.Position.Y;
+                var nearbyNodes = GameQuerying.SelectNodes(map, animalX - 1, animalY - 1, animalX + 1, animalY + 1);
+                foreach(Node n in nearbyNodes)
+                {
+                    Building b;
+                    if ((b = n.Building) != null)
                     {
+                        Push(a, b, map);
+                    }
+                }
+            }
+        }
 
-                        float dist = (a.Center - e.Center).Length;
-                        //if two units get stuck on top of each other, move them apart
-                        if (dist == 0)
+        private void Push(Animal a, Entity e, Map map)
+        {
+            //entities that aren't physical don't need to check for collisions
+            if (!e.Physical)
+                return;
+
+            //calculate collisions for each pair of unit and entity only once
+            if (a.GetHashCode() < e.GetHashCode() || e is Building)
+            {
+
+                float dist = (a.Center - e.Center).Length;
+                //if two units get stuck on top of each other, move them apart
+                if (dist == 0)
+                {
+                    Vector2 epsilon = new Vector2(0.1f, 0.1f);
+                    a.Position = a.Center + epsilon;
+                    dist = epsilon.Length;
+                }
+                float totalR = a.Range + e.Range;
+                //check if u and e are in collision
+                if (dist < totalR && dist != 0)
+                {
+                    //push centres of the units from each other
+                    Vector2 dirAtoE = a.Center.UnitDirectionTo(e.Center);
+                    Vector2 pushVec = (totalR - dist) / 2 * dirAtoE;
+                    if (e is Building)
+                    {
+                        //buildings can't be pushed
+                        a.Push(-2 * pushVec, map);
+                    }
+                    else if (e is Corpse)
+                    {
+                        //corpse isn't pushed
+                        a.Push(pushVec, map);
+                    }
+                    else
+                    {
+                        Animal a1 = (Animal)e;
+                        if (a.Faction != a1.Faction)
                         {
-                            Vector2 epsilon = new Vector2(0.1f, 0.1f);
-                            a.Position = a.Center + epsilon;
-                            dist = epsilon.Length;
-                        }
-                        float totalR = a.Range + e.Range;
-                        //check if u and e are in collision
-                        if (dist < totalR && dist != 0)
-                        {
-                            //push centres of the units from each other
-                            Vector2 dirAtoE = a.Center.UnitDirectionTo(e.Center);
-                            Vector2 pushVec = (totalR - dist) / 2 * dirAtoE;
-                            if (e is Building)
+                            //if the players are different, push the animal that wants to move
+                            //if both or none want to move, push both of them
+                            if (a.WantsToMove && !a1.WantsToMove)
                             {
-                                //buildings can't be pushed
                                 a.Push(-2 * pushVec, map);
+
                             }
-                            else if (e is Corpse)
+                            else if (a1.WantsToMove && !a.WantsToMove)
                             {
-                                //corpse isn't pushed
-                                a.Push(pushVec, map);
+                                a1.Push(2 * pushVec, map);
+
                             }
                             else
                             {
-                                Animal a1 = (Animal)e;
-                                if (a.Faction != a1.Faction)
-                                {
-                                    //if the players are different, push the animal that wants to move
-                                    //if both or none want to move, push both of them
-                                    if (a.WantsToMove && !a1.WantsToMove)
-                                    {
-                                        a.Push(-2 * pushVec, map);
+                                a.Push(-1 * pushVec, map);
+                                a1.Push(pushVec, map);
 
-                                    }
-                                    else if (a1.WantsToMove && !a.WantsToMove)
-                                    {
-                                        a1.Push(2 * pushVec, map);
-
-                                    }
-                                    else
-                                    {
-                                        a.Push(-1 * pushVec, map);
-                                        a1.Push(pushVec, map);
-
-                                    }
-                                }
-                                else
-                                {
-                                    //if the players are different, push the animal that wants to move
-                                    //if both or none want to move, push both of them
-                                    if (a.CanBeMoved && !a1.CanBeMoved)
-                                    {
-                                        a.Push(-2 * pushVec, map);
-
-                                    }
-                                    else if (a1.CanBeMoved && !a.CanBeMoved)
-                                    {
-                                        a1.Push(2 * pushVec, map);
-                                    }
-                                    else
-                                    {
-                                        a.Push(-1 * pushVec, map);
-                                        a1.Push(pushVec, map);
-                                    }
-                                }
-                                //push animal with a pushing map if it gets into 
-                                //collision with blocked node
-                                PushOutsideOfObstacles(a);
-                                PushOutsideOfObstacles(a1);
                             }
                         }
+                        else
+                        {
+                            //if the players are different, push the animal that wants to move
+                            //if both or none want to move, push both of them
+                            if (a.CanBeMoved && !a1.CanBeMoved)
+                            {
+                                a.Push(-2 * pushVec, map);
+
+                            }
+                            else if (a1.CanBeMoved && !a.CanBeMoved)
+                            {
+                                a1.Push(2 * pushVec, map);
+                            }
+                            else
+                            {
+                                a.Push(-1 * pushVec, map);
+                                a1.Push(pushVec, map);
+                            }
+                        }
+                        //push animal with a pushing map if it gets into 
+                        //collision with blocked node
+                        PushOutsideOfObstacles(a);
+                        PushOutsideOfObstacles(a1);
                     }
                 }
             }
