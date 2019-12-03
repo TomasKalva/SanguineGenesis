@@ -433,14 +433,17 @@
     </Animation>
   </Entity>
   <Entity EntityType="TYRANNOSAUR">
-    <Animation Action="IDLE" CenterX="2.1" CenterY="0.2">
-      <Image X="25" Y="7"  Width="4" Height="2"/>
+    <Animation Action="IDLE" CenterX="1.6" CenterY="0.2">
+      <Image X="21" Y="9"  Width="3" Height="2"/>
     </Animation>
-    <Animation Action="RUNNING" CenterX="2.1" CenterY="0.2">
-      <Image X="25" Y="7"  Width="4" Height="2"/>
+    <Animation Action="RUNNING" CenterX="1.6" CenterY="0.2">
+      <Image X="21" Y="9"  Width="3" Height="2"/>
     </Animation>
-    <Animation Action="ATTACKING" CenterX="2.1" CenterY="0.2">
-      <Image X="25" Y="7"  Width="4" Height="2"/>
+    <Animation Action="ATTACKING" CenterX="1.6" CenterY="0.2">
+      <Image X="23" Y="7"  Width="3" Height="2" Duration="0.45"/>
+      <Image X="26" Y="7"  Width="3" Height="2" Duration="0.45"/>
+      <Image X="23" Y="7"  Width="3" Height="2" Duration="0.45"/>
+      <Image X="21" Y="9"  Width="3" Height="2" Duration="0.45"/>
     </Animation>
   </Entity>
   <Entity EntityType="TRICERATOPS">
