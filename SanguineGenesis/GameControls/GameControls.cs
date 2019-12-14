@@ -31,14 +31,14 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Has to be called from the window thread.
+        /// Moves MapView using MapMovementInput.
         /// </summary>
-        public void UpdateMapView(Map map)
+        public void MoveMapView(Map map, float deltaT)
         {
             //move map view only if player isn't currently selecting units
             if (EntityCommandsInput.State != EntityCommandsInputState.SELECTING_UNITS)
                 foreach (Direction d in MapMovementInput.MapDirection)
-                    MapView.Move(d, map);
+                    MapView.Move(d, map, deltaT);
         }
 
         /// <summary>

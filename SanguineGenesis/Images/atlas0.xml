@@ -64,8 +64,8 @@
     </Animation>
   </Entity>
   <Entity EntityType="ROCK">
-    <Animation Action="IDLE" CenterX="1" CenterY="0.4">
-      <Image X="16" Y="8" Width="2" Height="2"></Image>
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.3">
+      <Image X="13" Y="16" Width="1" Height="1"></Image>
     </Animation>
   </Entity>
   <Entity EntityType="WHISTLING_THORN">

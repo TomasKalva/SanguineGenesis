@@ -36,6 +36,10 @@ namespace SanguineGenesis.GUI
         /// -1 is glyph for '.'.
         /// </summary>
         private Dictionary<int, Rect> glyphs;
+        /// <summary>
+        /// Contains triangles with numbers from 0 to 99.
+        /// </summary>
+        private Rect[] numberedTriangles;
 
         /// <summary>
         /// Position of white unit circle in the atlas.
@@ -63,17 +67,18 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public Rect BlackSquare { get; }
         /// <summary>
-        /// Position of black square in the atlas.
+        /// Position of red square in the atlas.
         /// </summary>
         public Rect RedSquare { get; }
         /// <summary>
-        /// Position of black square in the atlas.
+        /// Position of blue square in the atlas.
         /// </summary>
         public Rect BlueSquare { get; }
         /// <summary>
-        /// Position of black square in the atlas.
+        /// Position of green square in the atlas.
         /// </summary>
         public Rect GreenSquare { get; }
+
 
         private static ImageAtlas imageAtlas;
         public static ImageAtlas GetImageAtlas => imageAtlas;
@@ -86,6 +91,7 @@ namespace SanguineGenesis.GUI
         {
             InitializeDigitImages();
             LoadEntitiesAnimations("Images/atlas0.xml");
+            InitializeNumberedTriangles();
 
             //circles
             UnitCircleGray = ToRelative(GridToCoordinates(0, 19, 2, 2));
@@ -144,14 +150,27 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
+        /// Initialize numbered triangles.
+        /// </summary>
+        private void InitializeNumberedTriangles()
+        {
+            numberedTriangles = new Rect[100];
+            int tableTop = 30;
+            int tableLeft = 0;
+            for (int i = 0; i < 100; i++)
+            {
+                int x = tableLeft + (i / 10);
+                int y = tableTop - (i % 10);
+                numberedTriangles[i] = ToRelative(GridToCoordinates(new Rect(x, y, x+1, y+1)));
+            }
+        }
+
+        /// <summary>
         /// Loads animations from the file.
         /// </summary>
         /// <param name="animationDescriptionFileName">The file name.</param>
         private void LoadEntitiesAnimations(string animationDescriptionFileName)
         {
-            //try block used ONLY for easier debugging
-            try
-            {
             XmlDocument doc = new XmlDocument();
             doc.Load(animationDescriptionFileName);
 
@@ -161,7 +180,7 @@ namespace SanguineGenesis.GUI
             {
                 string entityType = entity.GetAttribute("EntityType");
                 //iterate over all animations of the entity
-                foreach(XmlElement animation in entity.ChildNodes)
+                foreach (XmlElement animation in entity.ChildNodes)
                 {
                     XmlElement firstImage = (XmlElement)animation.FirstChild;
                     float centerX = float.Parse(animation.GetAttribute("CenterX"), CultureInfo.InvariantCulture);
@@ -183,7 +202,7 @@ namespace SanguineGenesis.GUI
                         animationImages.Add(
                             ToRelative(
                                 GridToCoordinates(x, y, width, height)));
-                        
+
                         //load duration of the image
                         string dur = image.GetAttribute("Duration");
                         if (dur != "")
@@ -203,11 +222,6 @@ namespace SanguineGenesis.GUI
                     AddEntitiesAnimation(animationName, action, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
                 }
             }
-            }catch(Exception e)
-            {
-                ;
-            }
-
 
         }
 
@@ -355,6 +369,18 @@ namespace SanguineGenesis.GUI
                 return rect;
             else
                 throw new ArgumentException(glyph + " is not a valid glyph!");
+        }
+
+        /// <summary>
+        /// Returns triangle with number between 0 and 99. Returns triangle with 
+        /// number 0 if number is out of range.
+        /// </summary>
+        public Rect GetNumberedTriangle(int number)
+        {
+            if(number>= 0 && number<100)
+                return numberedTriangles[number];
+            else
+                return numberedTriangles[0];
         }
     }
 

@@ -31,7 +31,7 @@ namespace SanguineGenesis
 
         //vertex shader attribute indices
         const uint attributeIndexPosition = 0;
-        const uint attributeIndexTexCoord = 1;
+        const uint attributeIndexUVCoord = 1;
         const uint attributeIndexTexBL = 2;
         
         //the shader program for the vertex and fragment shader
@@ -61,7 +61,7 @@ namespace SanguineGenesis
 
             //set indices for the shader program attributes
             shaderProgram.BindAttributeLocation(gl, attributeIndexPosition, "in_Position");
-            shaderProgram.BindAttributeLocation(gl, attributeIndexTexCoord, "in_TexCoord");
+            shaderProgram.BindAttributeLocation(gl, attributeIndexUVCoord, "in_TexCoord");
             shaderProgram.BindAttributeLocation(gl, attributeIndexTexBL, "in_TexLeftBottomWidthHeight");
 
             //compile the program
@@ -195,11 +195,17 @@ namespace SanguineGenesis
         {
             public VertexBufferArray VertexBufferArray { get; set; }
             public VertexBuffer VertexDataBuffer { get; set; }
-            public VertexBuffer TextureDataBuffer { get; set; }
+            public VertexBuffer UVDataBuffer { get; set; }
             public VertexBuffer TexAtlasDataBuffer { get; set; }
 
+            /// <summary>
+            /// Fills the array with uv textures when it is created or resized.
+            /// </summary>
+            public delegate float[] UVFiller(int size);
+            public UVFiller UvFiller { get; }
+
             public float[] vertices;
-            public float[] texture;
+            public float[] uv;
             public float[] texAtlas;
 
             /// <summary>
@@ -207,7 +213,7 @@ namespace SanguineGenesis
             /// </summary>
             public bool Clear { get; private set; }
 
-            public MyBufferArray(OpenGL gl)
+            public MyBufferArray(OpenGL gl, UVFiller uvFiller)
             {
                 //initialize VertexBufferArray and link it to its VertexBuffers
                 VertexBufferArray = new VertexBufferArray();
@@ -219,8 +225,8 @@ namespace SanguineGenesis
                 VertexDataBuffer.Create(gl);
 
                 //initialize empty TextureDataBuffer
-                TextureDataBuffer = new VertexBuffer();
-                TextureDataBuffer.Create(gl);
+                UVDataBuffer = new VertexBuffer();
+                UVDataBuffer.Create(gl);
 
                 //initialize empty TexBLDataBuffer
                 TexAtlasDataBuffer = new VertexBuffer();
@@ -230,15 +236,17 @@ namespace SanguineGenesis
 
                 //create initial arrays so that they are not null
                 vertices = new float[0];
-                texture = new float[0];
+                uv = new float[0];
                 texAtlas = new float[0];
+
+                UvFiller = uvFiller;
             }
 
             /// <summary>
-            /// Binds the data to this vertex buffer array.
+            /// Binds the data to this vertex buffer array. Binds vertices, uv and atlas coordinates.
             /// </summary>
             public void BindData(OpenGL gl, int vStride, float[] vValues,
-                                            int tStride, float[] tValues,
+                                            int uvStride, float[] uvValues,
                                             int aStride, float[] aValues)
             {
                 VertexBufferArray.Bind(gl);
@@ -247,8 +255,28 @@ namespace SanguineGenesis
                 VertexDataBuffer.SetData(gl, attributeIndexPosition, vValues, false, vStride);
                 VertexDataBuffer.Unbind(gl);
 
-                TextureDataBuffer.Bind(gl);
-                TextureDataBuffer.SetData(gl, attributeIndexTexCoord, tValues, false, tStride);
+                UVDataBuffer.Bind(gl);
+                UVDataBuffer.SetData(gl, attributeIndexUVCoord, uvValues, false, uvStride);
+
+                TexAtlasDataBuffer.Bind(gl);
+                TexAtlasDataBuffer.SetData(gl, attributeIndexTexBL, aValues, false, aStride);
+
+                VertexBufferArray.Unbind(gl);
+
+                Clear = false;
+            }
+
+            /// <summary>
+            /// Binds the data to this vertex buffer array. Binds vertices and atlas coordinates.
+            /// </summary>
+            public void BindData(OpenGL gl, int vStride, float[] vValues,
+                                            int aStride, float[] aValues)
+            {
+                VertexBufferArray.Bind(gl);
+
+                VertexDataBuffer.Bind(gl);
+                VertexDataBuffer.SetData(gl, attributeIndexPosition, vValues, false, vStride);
+                VertexDataBuffer.Unbind(gl);
 
                 TexAtlasDataBuffer.Bind(gl);
                 TexAtlasDataBuffer.SetData(gl, attributeIndexTexBL, aValues, false, aStride);
@@ -261,10 +289,11 @@ namespace SanguineGenesis
             /// <summary>
             /// Initialize arrays with zeros with the given sizes.
             /// </summary>
-            public void InitializeArrays(int verticesSize, int textureSize, int texAtlasSize)
+            public void InitializeArrays(OpenGL gl, int verticesSize, int uvSize, int texAtlasSize)
             {
                 InitArray(ref vertices, verticesSize);
-                InitArray(ref texture, textureSize);
+                //InitArray(ref uv, uvSize);
+                InitUV(gl, ref uv, uvSize);
                 InitArray(ref texAtlas, texAtlasSize);
             }
 
@@ -277,6 +306,24 @@ namespace SanguineGenesis
                     array = new float[size];
                 else
                     Array.Clear(array, 0, array.Length);
+            }
+
+            private void InitUV(OpenGL gl, ref float[] uvArray, int uvSize)
+            {
+                if (uv.Length < uvSize)
+                {
+                    uvArray = UvFiller(uvSize);
+                    VertexBufferArray.Bind(gl);
+                    UVDataBuffer.Bind(gl);
+                    UVDataBuffer.SetData(gl, attributeIndexUVCoord, uvArray, false, 2/*uv stride*/);
+                    VertexBufferArray.Unbind(gl);
+                }
+                else
+                {
+
+                }
+
+
             }
 
             public int VertexCount => vertices == null ? 0 : vertices.Length / 3;
@@ -310,7 +357,7 @@ namespace SanguineGenesis
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateMap(OpenGL gl)
         {
-            map = new MyBufferArray(gl);
+            map = new MyBufferArray(gl, CreateSquareUVCoordinates);
         }
 
         /// <summary>
@@ -321,6 +368,7 @@ namespace SanguineGenesis
         /// <param name="mapView">Map view describing the map.</param>
         public static void UpdateMapDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
+            //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
             float viewTop = mapView.Top;
@@ -338,12 +386,12 @@ namespace SanguineGenesis
 
             int verticesPerOne = width * height * 6;
             int verticesSize = verticesPerOne * 3;
-            int textureSize = verticesPerOne * 2;
+            int uvSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
             
-            map.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
+            map.InitializeArrays(gl, verticesSize, uvSize, textureAtlasSize);
             float[] vertices = map.vertices;
-            float[] texture = map.texture;
+            float[] texture = map.uv;
             float[] texAtlas = map.texAtlas;
 
             for (int i = 0; i < width; i++)
@@ -372,12 +420,11 @@ namespace SanguineGenesis
                     float right = (current.X - viewLeft + 1) * sqW;
 
                     SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                    SetSquareTextureCoordinates(texture, texCoord);
                     SetAtlasCoordinates(texAtlas, atlasCoords, bottomLeftInd, 6);
                 }
             }
 
-            map.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
+            map.BindData(gl, 3, vertices, 4, texAtlas);
         }
 
         #endregion Map
@@ -389,7 +436,7 @@ namespace SanguineGenesis
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateNutrientsMap(OpenGL gl)
         {
-            nutrientsMap = new MyBufferArray(gl);
+            nutrientsMap = new MyBufferArray(gl, CreateSquareUVCoordinates);
         }
 
         /// <summary>
@@ -409,6 +456,7 @@ namespace SanguineGenesis
         /// <param name="mapView">Map view describing the map.</param>
         public static void UpdateNutrientsMapDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
+            //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
             float viewTop = mapView.Top;
@@ -427,12 +475,11 @@ namespace SanguineGenesis
             int numberOfChars = 6;
             int vertexCount = width * height * 6 * numberOfChars;
             int verticesSize = vertexCount * 3;
-            int textureSize = vertexCount * 2;
+            int uvSize = vertexCount * 2;
             int textureAtlasSize = vertexCount * 4;
 
-            nutrientsMap.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
+            nutrientsMap.InitializeArrays(gl, verticesSize, uvSize, textureAtlasSize);
             float[] vertices = nutrientsMap.vertices;
-            float[] texture = nutrientsMap.texture;
             float[] texAtlas = nutrientsMap.texAtlas;
 
             for (int i = 0; i < width; i++)
@@ -440,113 +487,41 @@ namespace SanguineGenesis
                 for (int j = 0; j < height; j++)
                 {
                     //buffer indices
-                    int coord = (i + j * width) * 6 * 3 * numberOfChars;
-                    int texCoord = (i + j * width) * 6 * 2 * numberOfChars;
-                    int bottomLeftInd = (i + j * width) * 6 * 4 * numberOfChars;
+                    int coord = (i + j * width) * 6 * 3;
+                    int texCoord = (i + j * width) * 6 * 2;
+                    int bottomLeftInd = (i + j * width) * 6 * 4;
 
                     Node current = visible[i, j];
                     if (current == null)
                         continue;
 
-                    //find digits and their glyphs
+                    bool isVisible = true;
+                    if (visibleVisibility != null)
+                        isVisible = visibleVisibility[i, j];
 
                     //active nutrients
-                    int nutrients100 = (int)(current.ActiveNutrients * 10);
-                    int leftDigA = nutrients100 / 10;
-                    int rightDigA = nutrients100 % 10;
+                    int activeNutrients = (int)(current.ActiveNutrients * 10);
+                    Rect atlasCoordsRight = ImageAtlas.GetImageAtlas.GetNumberedTriangle(activeNutrients);
 
                     //passive nutrients
-                    int remainingNutrients100 = (int)current.PassiveNutrients;
-                    int leftDigP = remainingNutrients100 / 10;
-                    int rightDigP = remainingNutrients100 % 10;
+                    int passiveNutrients = (int)(current.PassiveNutrients * 10);
+                    Rect atlasCoordsLeft = ImageAtlas.GetImageAtlas.GetNumberedTriangle(passiveNutrients);
 
-                    Rect[] glyphs = new Rect[3 * 2];
-                    //glyphs
-                    glyphs[0] = ImageAtlas.GetImageAtlas.GetGlyph(11);
-                    glyphs[1] = ImageAtlas.GetImageAtlas.GetGlyph(leftDigP);
-                    glyphs[2] = ImageAtlas.GetImageAtlas.GetGlyph(rightDigP);
-                    glyphs[3] = ImageAtlas.GetImageAtlas.GetGlyph(leftDigA);
-                    glyphs[4] = ImageAtlas.GetImageAtlas.GetGlyph(10);
-                    glyphs[5] = ImageAtlas.GetImageAtlas.GetGlyph(rightDigA);
+                    Rect atlasCoords = ImageAtlas.GetImageAtlas.GetTileCoords(current.Biome, current.SoilQuality, current.Terrain, isVisible);
 
-                    float[] rowScale = new float[2];
-                    rowScale[0] = 0.8f;
-                    rowScale[1] = 1f;
-
-                    //extents of one character
-                    float charWidth = 0.22f;
-                    float charHeight = 0.37f;
-
-                    float paddingX = 0f;
-                    float paddingY = 0f;
-
-                    float leftOffset = 0.15f;
-                    float bottomOffset = 0.15f;
-
-                    for (int n = 0; n < 2; n++)
-                        for (int m = 0; m < 3; m++)
-                        {
-                            //skip writing zero as first digit of number
-                            if (n == 0 && m == 1 && leftDigP == 0)
-                                continue;
-
-                            //numbers y position
-                            float bottom = (current.Y - viewBottom + bottomOffset + n*(paddingY + charHeight)) * sqH;
-                            float top = (current.Y - viewBottom + bottomOffset + n * (paddingY + charHeight) + charHeight * rowScale[n]) * sqH;
-
-                            //left digit position
-                            float left = (current.X - viewLeft + leftOffset + m * (paddingX + charWidth)) * sqW;
-                            float right = (current.X - viewLeft + leftOffset + m * (paddingX + charWidth) + charWidth * rowScale[n]) * sqW;
-
-                            SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                            SetSquareTextureCoordinates(texture, texCoord);
-                            SetAtlasCoordinates(texAtlas, glyphs[m + n * 3], bottomLeftInd, 6);
-
-                            //increase indices
-                            coord += 6 * 3;
-                            texCoord += 6 * 2;
-                            bottomLeftInd += 6 * 4;
-                        }
-                    /*
-                    //numbers y position
-                    float bottom = (current.Y - viewBottom + 0.25f) * sqH;
-                    float top = (current.Y - viewBottom + 0.75f) * sqH;
-                    
-                    //left digit position
-                    float left = (current.X - viewLeft + 0.2f) * sqW;
-                    float right = (current.X - viewLeft + 0.45f) * sqW;
+                    //tile position
+                    float bottom = (current.Y - viewBottom) * sqH;
+                    float top = (current.Y - viewBottom + 1) * sqH;
+                    float left = (current.X - viewLeft) * sqW;
+                    float right = (current.X - viewLeft + 1) * sqW;
 
                     SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                    SetSquareTextureCoordinates(texture, texCoord);
-                    SetAtlasCoordinates(texAtlas, leftDigAtlasCoordsA, bottomLeftInd, 6);
-
-                    coord += 6 * 3;
-                    texCoord +=  6 * 2;
-                    bottomLeftInd += 6 * 4;
-
-                    //float point position
-                    left = (current.X - viewLeft + 0.4f) * sqW;
-                    right = (current.X - viewLeft + 0.6f) * sqW;
-
-                    SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                    SetSquareTextureCoordinates(texture, texCoord);
-                    SetAtlasCoordinates(texAtlas, decPointAtlasCoords, bottomLeftInd, 6);
-
-                    coord += 6 * 3;
-                    texCoord += 6 * 2;
-                    bottomLeftInd += 6 * 4;
-                    
-                    //left digit position
-                    left = (current.X - viewLeft + 0.55f) * sqW;
-                    right = (current.X - viewLeft + 0.8f) * sqW;
-
-                    SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
-                    SetSquareTextureCoordinates(texture, texCoord);
-                    SetAtlasCoordinates(texAtlas, rightDigAtlasCoordsA, bottomLeftInd, 6);*/
+                    SetAtlasCoordinates(texAtlas, atlasCoordsLeft, bottomLeftInd , 3);
+                    SetAtlasCoordinates(texAtlas, atlasCoordsRight, bottomLeftInd + 4 * 3, 3);
                 }
             }
 
-            nutrientsMap.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
+            nutrientsMap.BindData(gl, 3, vertices, 4, texAtlas);
         }
 
         #endregion Nutrients map
@@ -558,7 +533,7 @@ namespace SanguineGenesis
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateUnitCircles(OpenGL gl)
         {
-            entityCircles = new MyBufferArray(gl);
+            entityCircles = new MyBufferArray(gl, CreateSquareUVCoordinates);
         }
 
         /// <summary>
@@ -569,6 +544,7 @@ namespace SanguineGenesis
         /// <param name="mapView">Map view describing the map.</param>
         public static void UpdateEntityCirclesDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
+            //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
             float viewTop = mapView.Top;
@@ -590,12 +566,11 @@ namespace SanguineGenesis
 
             int verticesPerOne = size * 6;
             int verticesSize = verticesPerOne * 3;
-            int textureSize = verticesPerOne * 2;
+            int uvSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            entityCircles.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
+            entityCircles.InitializeArrays(gl, verticesSize, uvSize, textureAtlasSize);
             float[] vertices = entityCircles.vertices;
-            float[] texture = entityCircles.texture;
             float[] texAtlas = entityCircles.texAtlas;
 
             for (int i=0;i<visEntity.Count;i++)
@@ -613,7 +588,7 @@ namespace SanguineGenesis
 
                 //entity circle
                 {
-                    //tile position
+                    //image position
                     float bottom = (current.Bottom - viewBottom) * entitySize;
                     float top = (current.Top - viewBottom) * entitySize;
                     float left = (current.Left - viewLeft) * entitySize;
@@ -644,18 +619,17 @@ namespace SanguineGenesis
                         }
                     }
                     else
+                    {
                         //fill the circle with selected entity circle color
                         atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleYellow;
-
-                    //texture coordinates
-                    SetSquareTextureCoordinates(texture, texIndex);
+                    }
 
                     //atlas coordinates
                     SetAtlasCoordinates(texAtlas, atlasCoords, atlasInd, 6);
                 }
             }
 
-            entityCircles.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
+            entityCircles.BindData(gl, 3, vertices, 4, texAtlas);
         }
         #endregion Entity circles
 
@@ -666,7 +640,7 @@ namespace SanguineGenesis
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateEntities(OpenGL gl)
         {
-            entities = new MyBufferArray(gl);
+            entities = new MyBufferArray(gl, CreateSquareUVCoordinates);
         }
 
         /// <summary>
@@ -701,9 +675,9 @@ namespace SanguineGenesis
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            entities.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
+            entities.InitializeArrays(gl, verticesSize, textureSize, textureAtlasSize);
             float[] vertices = entities.vertices;
-            float[] texture = entities.texture;
+            float[] uv = entities.uv;
             float[] texAtlas = entities.texAtlas;
 
             //visible units have to be sorted to draw them properly
@@ -731,7 +705,7 @@ namespace SanguineGenesis
                     if (current is Animal && !((Animal)current).FacingLeft)
                         imageCenter = new Vector2(anim.Width - anim.LeftBottom.X, anim.LeftBottom.Y);
 
-                    //tile position
+                    //image position
                     float bottom = (current.Center.Y - imageCenter.Y - viewBottom) * entitySize;
                     float top = (current.Center.Y - imageCenter.Y - viewBottom + anim.Height) * entitySize;
                     float left = (current.Center.X - imageCenter.X - viewLeft) * entitySize;
@@ -739,14 +713,15 @@ namespace SanguineGenesis
 
                     //depth is from [4,5]
                     float depth = 4f + current.Center.Y / game.Map.Height;
+
                     //vertices
                     SetRectangleVertices(vertices, bottom, top, left, right, -depth, index);
 
-                    //texture coordinates
+                    //uv coordinates
                     if(current is Animal && !((Animal)current).FacingLeft)
-                        SetHorizFlipSquareTextureCoordinates(texture, texIndex);
+                        SetHorizFlipSquareTextureCoordinates(uv, texIndex);
                     else
-                        SetSquareTextureCoordinates(texture, texIndex);
+                       SetSquareTextureCoordinates(uv, texIndex);
 
                     //atlas coordinates
                     Rect entityImage = current.AnimationState.CurrentImage;
@@ -754,7 +729,7 @@ namespace SanguineGenesis
                 }
             }
 
-            entities.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
+            entities.BindData(gl, 3, vertices, 2, uv, 4, texAtlas);
         }
         #endregion Entity
 
@@ -765,7 +740,7 @@ namespace SanguineGenesis
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateEntitiesIndicators(OpenGL gl)
         {
-            entityIndicators = new MyBufferArray(gl);
+            entityIndicators = new MyBufferArray(gl, CreateSquareUVCoordinates);
         }
 
         /// <summary>
@@ -776,6 +751,7 @@ namespace SanguineGenesis
         /// <param name="mapView">Map view describing the map.</param>
         public static void UpdateEntityIndicatorsDataBuffers(OpenGL gl, MapView mapView, Game game)
         {
+            //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
             float viewTop = mapView.Top;
@@ -800,9 +776,9 @@ namespace SanguineGenesis
             int textureSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            entityIndicators.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
+            entityIndicators.InitializeArrays(gl, verticesSize, textureSize, textureAtlasSize);
             float[] vertices = entityIndicators.vertices;
-            float[] texture = entityIndicators.texture;
+            float[] uv = entityIndicators.uv;
             float[] texAtlas = entityIndicators.texAtlas;
 
             //visible units have to be sorted to draw the indicators properly
@@ -813,7 +789,6 @@ namespace SanguineGenesis
                 Entity current = visUnits[i];
                 //buffer indices
                 int index = i * 24 * 3;
-                int texIndex = i * 24 * 2;
                 int atlasInd = i * 24 * 4;
 
                 if (current == null)
@@ -840,32 +815,29 @@ namespace SanguineGenesis
                     Rect greenRect = ImageAtlas.GetImageAtlas.GreenSquare;
                     //energy
                     AddRectangle(left, bottom, right, top, blackRect, depth, index, vertices,
-                         texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
+                         atlasInd, texAtlas, 0f, 0f, 0f);
                     index += 6 * 3;
-                    texIndex += 6 * 2;
                     atlasInd += 6 * 4;
                     float energyRight = Math.Max(left, left + (right - left) * (float)(current.Energy.Percentage));
                     AddRectangle(left, bottom, energyRight, top, greenRect, depth, index, vertices,
-                         texIndex, texture, atlasInd, texAtlas, 0f, 1f, 0f);
+                         atlasInd, texAtlas, 0f, 1f, 0f);
                     index += 6 * 3;
-                    texIndex += 6 * 2;
                     atlasInd += 6 * 4;
 
                     //health
                     bottom += indicatorHeight*unitSize;
                     top += indicatorHeight*unitSize;
                     AddRectangle(left, bottom, right, top, blackRect, depth, index, vertices,
-                         texIndex, texture, atlasInd, texAtlas, 0f, 0f, 0f);
+                         atlasInd, texAtlas, 0f, 0f, 0f);
                     index += 6 * 3;
-                    texIndex += 6 * 2;
                     atlasInd += 6 * 4;
                     float healthRight =Math.Max(left, left + (right - left) * (float)(current.Health.Percentage));
                     AddRectangle(left, bottom, healthRight, top, redRect, depth, index, vertices,
-                         texIndex, texture, atlasInd, texAtlas, 1f, 0f, 0f);
+                         atlasInd, texAtlas, 1f, 0f, 0f);
                 }
             }
 
-            entityIndicators.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
+            entityIndicators.BindData(gl, 3, vertices, 4, texAtlas);
         }
 
         #endregion Entity indicators
@@ -878,7 +850,7 @@ namespace SanguineGenesis
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateFlowField(OpenGL gl)
         {
-            flowField = new MyBufferArray(gl);
+            flowField = new MyBufferArray(gl, CreateSquareUVCoordinates);
         }
 
         /// <summary>
@@ -898,6 +870,7 @@ namespace SanguineGenesis
         /// <param name="mapView">Map view describing the map.</param>
         public static void UpdateFlowFieldDataBuffers(OpenGL gl, MapView mapView, FlowField flowfield)
         {
+            //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
             float viewTop = mapView.Top;
@@ -913,12 +886,11 @@ namespace SanguineGenesis
             
             int verticesPerOne = width * height * 3;
             int verticesSize = verticesPerOne * 3;
-            int textureSize = verticesPerOne * 2;
+            int uvSize = verticesPerOne * 2;
             int textureAtlasSize = verticesPerOne * 4;
 
-            flowField.InitializeArrays(verticesSize, textureSize, textureAtlasSize);
+            flowField.InitializeArrays(gl, verticesSize, uvSize, textureAtlasSize);
             float[] vertices = flowField.vertices;
-            float[] texture = flowField.texture;
             float[] texAtlas = flowField.texAtlas;
 
             //triangle
@@ -942,7 +914,6 @@ namespace SanguineGenesis
 
 
                     int offset = 0;
-                    int texOffset = 0;
                     if (flowF[i, j] == null)
                     {
                         vertices[coord + 0] = vertices[coord + 1] = vertices[coord + 2]
@@ -988,29 +959,13 @@ namespace SanguineGenesis
                         vertices[coord + offset + 1] = rotTriRM.y;
                         vertices[coord + offset + 2] = -9;
                     }
-
-                    //bottom left
-                    texture[texCoord + texOffset + 0] = 0;
-                    texture[texCoord + texOffset + 1] = 0;
-
-                    texOffset += 2;
-
-                    //top left
-                    texture[texCoord + texOffset + 0] = 0;
-                    texture[texCoord + texOffset + 1] = 1;
-
-                    texOffset += 2;
-
-                    //top right
-                    texture[texCoord + texOffset + 0] = 1;
-                    texture[texCoord + texOffset + 1] = 0.5f;
                     
                     Rect atlasCoords = ImageAtlas.GetImageAtlas.BlackSquare;//the triangles are black
                     SetAtlasCoordinates(texAtlas, atlasCoords, bottomLeftInd, 3);
                 }
             }
 
-            flowField.BindData(gl, 3, vertices, 2, texture, 4, texAtlas);
+            flowField.BindData(gl, 3, vertices, 4, texAtlas);
         }
 
         #endregion Flowfield
@@ -1022,7 +977,7 @@ namespace SanguineGenesis
         /// <param name="gl">The instance of OpenGL.</param>
         public static void CreateSelectionFrame(OpenGL gl)
         {
-            selectionFrame = new MyBufferArray(gl);
+            selectionFrame = new MyBufferArray(gl, CreateSquareUVCoordinates);
         }
 
         /// <summary>
@@ -1044,7 +999,6 @@ namespace SanguineGenesis
             float sqH = nodeSize;
 
             float[] vertices = new float[6 * 3];
-            float[] textureCoords = new float[6 * 2];
             float[] texBottomLeft = new float[6 * 4];
             
             //draw selector frame only if it exists
@@ -1056,12 +1010,11 @@ namespace SanguineGenesis
                 float right = selectorFrame.Right - viewLeft;
                 SetRectangleVertices(vertices, bottom * nodeSize, top * nodeSize,
                     left * nodeSize, right * nodeSize, -1f, 0);
-                SetSquareTextureCoordinates(textureCoords, 0);
                 Rect atlasCoords = ImageAtlas.GetImageAtlas.UnitsSelector;
                 SetAtlasCoordinates(texBottomLeft, atlasCoords, 0, 6);
             }
 
-            selectionFrame.BindData(gl, 3, vertices, 2, textureCoords, 4, texBottomLeft);
+            selectionFrame.BindData(gl, 3, vertices, 4, texBottomLeft);
         }
         #endregion Selection frame
 
@@ -1121,6 +1074,23 @@ namespace SanguineGenesis
             vertices[index + offset + 0] = right;
             vertices[index + offset + 1] = top;
             vertices[index + offset + 2] = depth;
+        }
+
+
+        /// <summary>
+        /// Write texture UV coordinates for a square made of two triangles.
+        /// </summary>
+        /// <param name="textureCoords">Writing array.</param>
+        /// <param name="index">Index of the first UV coordinate in array.</param>
+        private static float[] CreateSquareUVCoordinates(int size)
+        {
+            float[] uv = new float[size];
+            for(int i = 0; i < size/12; i++)
+            {
+                int index = i * 12;
+                SetSquareTextureCoordinates(uv, index);
+            }
+            return uv;
         }
 
         /// <summary>
@@ -1240,15 +1210,11 @@ namespace SanguineGenesis
         /// </summary>
         public static void AddRectangle(float left, float bottom, float right, float top, Rect image, float depth,
                                             int vInd, float[] vertices,
-                                            int tInd, float[] textureCoords,
                                             int aInd, float[] texAtlas,
                                             float r, float g, float b)
         {
             //vertices
             SetRectangleVertices(vertices, bottom, top, left, right, -depth, vInd);
-
-            //texture coordinates
-            SetSquareTextureCoordinates(textureCoords, tInd);
 
             //atlas coordinates
             SetAtlasCoordinates(texAtlas, image, aInd, 6);

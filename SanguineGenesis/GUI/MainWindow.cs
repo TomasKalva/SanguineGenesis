@@ -33,6 +33,12 @@ namespace SanguineGenesis.GUI
                 InitializeOpenGL();
                 InitializeUserInterface();
             };
+
+            //create and enable game update timer
+            Timer gameUpdateTimer = new Timer();
+            gameUpdateTimer.Tick += GameUpdateTimer_Tick;
+            gameUpdateTimer.Enabled = true;
+            gameUpdateTimer.Interval = 10;
         }
 
         #region Game logic
@@ -55,10 +61,13 @@ namespace SanguineGenesis.GUI
         /// the main loop.
         /// </summary>
         private double TotalTime { get; set; }
+        /// Time in since the last game update in ms.
+        /// </summary>
+        private float DeltaT { get; set; }
         /// <summary>
         /// Total number of game updates.
         /// </summary>
-        private int UpdatesDone { get; set; }
+        private long UpdatesDone { get; set; }
 
         /// <summary>
         /// One update of the game.
@@ -68,14 +77,14 @@ namespace SanguineGenesis.GUI
             if (Game.GameEnded)
                 return;
 
-            GameControls.UpdateMapView(Game.Map);
+            GameControls.MoveMapView(Game.Map, DeltaT);
             GameControls.UpdateEntitiesByInput(Game);
 
             //update the state of the game
             long totalEl = TotalStopwatch.ElapsedMilliseconds;
-            float deltaT = (totalEl - (float)TotalTime) / 1000f;
+            DeltaT = (totalEl - (float)TotalTime) / 1000f;
             TotalTime = totalEl;
-            Game.Update(deltaT);
+            Game.Update(DeltaT);
 
         }
         #endregion Game logic
@@ -100,10 +109,10 @@ namespace SanguineGenesis.GUI
         {
             //add event handlers
             MouseWheel += Window_MouseWheel;
-            Timer timer = new Timer();
-            timer.Tick += MapMovementTimer_Tick;
-            timer.Enabled = true;
-            timer.Interval = 10;
+            /*Timer gameUpdateTimer = new Timer();
+            gameUpdateTimer.Tick += GameUpdateTimer_Tick;
+            gameUpdateTimer.Enabled = true;
+            gameUpdateTimer.Interval = 10;*/
             openGLControl.PreviewKeyDown += OpenGLControl_PreviewKeyDown;
 
             InitializeBottomPanel();
@@ -295,7 +304,8 @@ namespace SanguineGenesis.GUI
             Console.WriteLine("Graphics tick length:\t" + sw.Elapsed.Milliseconds);
 
             UpdatesDone++;
-            Console.WriteLine("Updates per second: " + UpdatesDone / TotalTime * 1000);
+            //Console.WriteLine("Updates per second: " + UpdatesDone / TotalTime * 1000);
+            Console.WriteLine("Updates per second: " + 1 / DeltaT);
         }
 
         /// <summary>
@@ -490,7 +500,7 @@ namespace SanguineGenesis.GUI
             }
         }
 
-        public void MapMovementTimer_Tick(object sender, EventArgs e)
+        public void GameUpdateTimer_Tick(object sender, EventArgs e)
         {
             //move map if player is not selecting entities
             if (!(GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS))
