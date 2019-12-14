@@ -164,7 +164,8 @@ namespace SanguineGenesis.GUI
             {
                 ErrorMessage("List of maps can't be loaded.");
             }
-
+            //clear error messages
+            Message("");
         }
 
         /// <summary>

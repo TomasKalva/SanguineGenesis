@@ -11,13 +11,22 @@ using SanguineGenesis;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GUI;
+using SanguineGenesis.GUI.WinFormsComponents;
 
 namespace SanguineGenesis.GUI
 {
+    abstract class ButtonArray : TableLayoutPanel
+    {
+        /// <summary>
+        /// Icons used for the buttons.
+        /// </summary>
+        public static Icons Icons { get; set; }
+    }
+
     /// <summary>
     /// Control for drawing rectangle array of buttons.
     /// </summary>
-    abstract class ButtonArray<InfoSource> : TableLayoutPanel where InfoSource : IShowable
+    abstract class ButtonArray<InfoSource> : ButtonArray  where InfoSource : IShowable
     {
         /// <summary>
         /// InfoSources corresponding to the button indexes.
@@ -38,6 +47,7 @@ namespace SanguineGenesis.GUI
         /// Selected InfoSource.
         /// </summary>
         public InfoSource Selected { get; set; }
+
 
         protected Button[,] Buttons { get; }
 
@@ -132,13 +142,14 @@ namespace SanguineGenesis.GUI
                     int index = ButtonIndex(j, i);
                     if (index >= InfoSources.Count)
                     {
-                        b.Text = "";
+                        b.Image = null;
                         if (b.BackColor != Color.White)
                             b.BackColor = Color.White;
                     }
                     else
                     {
-                        b.Text = InfoSources[index].GetName();
+                        string name = InfoSources[index].GetName();
+                        b.Image = Icons.GetIcon(name);
                         //highlight selected
                         if (InfoSources[index].Equals(Selected))
                         {

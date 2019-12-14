@@ -1,5 +1,6 @@
 ﻿using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GUI.WinFormsComponents;
 using SanguineGenesis.GUI.WPFComponents;
 using SharpGL;
 using System;
@@ -196,6 +197,8 @@ namespace SanguineGenesis.GUI
             Controls.Add(AdditionalInfo);
             AdditionalInfo.Stats.SetStats(
                 new List<Stat>());
+
+            ButtonArray.Icons = new Icons(Game.CurrentPlayer.GameStaticData);
 
             //control groups panel
             ControlGroupButtonArray = new ControlGroupButtonArray(6, 1, EntityButtonArray.Width, 20);
