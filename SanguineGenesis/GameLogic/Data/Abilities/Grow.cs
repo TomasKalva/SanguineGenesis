@@ -21,7 +21,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new GrowCommand(caster, this);
         }
 
-        public override string GetName() => "Grow";
+        public override string GetName() => "GROW";
 
         public override string Description()
         {

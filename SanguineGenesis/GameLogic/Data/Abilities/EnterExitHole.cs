@@ -28,7 +28,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new EnterHoleCommand(caster, target, this);
         }
 
-        public override string GetName() => "Enter hole";
+        public override string GetName() => "ENTER_HOLE";
 
         public override string Description()
         {
@@ -77,7 +77,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new ExitHoleCommand(caster, target, this);
         }
 
-        public override string GetName() => "Exit hole";
+        public override string GetName() => "EXIT_HOLE";
 
         public override string Description()
         {

@@ -26,7 +26,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new AttackCommand(caster, target, this);
         }
 
-        public override string GetName() => Unbreakable?"Unbr attack":"Attack";
+        public override string GetName() => Unbreakable?"UNBR_ATTACK":"ATTACK";
 
         public override string Description()
         {

@@ -26,7 +26,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new ChargeToCommand(caster, target, this);
         }
 
-        public override string GetName() => "Charge to";
+        public override string GetName() => "CHARGE_TO";
 
         public override string Description()
         {

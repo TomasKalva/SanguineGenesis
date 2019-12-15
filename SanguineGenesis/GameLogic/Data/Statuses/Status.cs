@@ -52,11 +52,17 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Info StatusInfo { get; }
 
+        #region IShowable
+        public override string GetName() => StatusInfo.GetName();
+        #endregion IShowable
+
         public Status(Affected affected, Info statusInfo)
         {
             AffectedEntity = affected;
             StatusInfo = statusInfo;
         }
+
+
     }
 
     /// <summary>
@@ -87,8 +93,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 return true;
             return false;
         }
-
-        public override string GetName() => "Sprint";
 
         public override string Description()
         {
@@ -143,8 +147,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return false;
         }
 
-        public override string GetName() => "Consumed";
-
         public override List<Stat> Stats()
         {
             return new List<Stat>()
@@ -197,8 +199,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return ticksPerformed > StatusInfo.TotalNumberOfTicks;
         }
 
-        public override string GetName() => "Poison";
-
         public override List<Stat> Stats()
         {
             return new List<Stat>()
@@ -247,8 +247,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return false;
         }
 
-        public override string GetName() => "Shell";
-
         public override string Description()
         {
             return "Gives animal thick skin.";
@@ -286,8 +284,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 return true;
             return false;
         }
-
-        public override string GetName() => "Fast strikes";
 
         public override List<Stat> Stats()
         {
@@ -333,8 +329,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return false;
         }
 
-        public override string GetName() => "On tree";
-
         public override List<Stat> Stats()
         {
             return new List<Stat>()
@@ -365,8 +359,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return false;
         }
-
-        public override string GetName() => "Underground";
 
         public override List<Stat> Stats()
         {
@@ -409,8 +401,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 return true;
             return false;
         }
-
-        public override string GetName() => "Far sight";
 
         public override List<Stat> Stats()
         {
@@ -455,8 +445,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return moveAnimalToPoint.Step(deltaT);
         }
 
-        public override string GetName() => "Knocked away";
-
         public override List<Stat> Stats()
         {
             return new List<Stat>()
@@ -494,8 +482,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return true;
         }
 
-        public override string GetName() => "Suffocating";
-
         public override List<Stat> Stats()
         {
             return new List<Stat>()
@@ -527,8 +513,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             // remove the status if the animal can move on the terrain that is below it
             return false;
         }
-
-        public override string GetName() => "Decay";
 
         public override List<Stat> Stats()
         {

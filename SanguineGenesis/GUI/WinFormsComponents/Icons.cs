@@ -27,6 +27,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             AddIcons(data.AnimalFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Animals/");
             AddIcons(data.TreeFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Trees/");
             AddIcons(data.StructureFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Structures/");
+            AddIcons(data.Statuses.AllStatusFactories.Select(sf => sf.ToString()), "Images/Icons/Statuses/");
         }
 
         /// <summary>

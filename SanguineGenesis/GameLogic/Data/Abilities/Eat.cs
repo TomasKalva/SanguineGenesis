@@ -26,7 +26,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return base.ToString();
         }
 
-        public override string GetName() => "Eat";
+        public override string GetName() => "EAT";
 
         public override string Description()
         {
@@ -86,7 +86,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return base.ToString();
         }
 
-        public override string GetName() => "Eat";
+        public override string GetName() => "EAT";
 
         public override string Description()
         {

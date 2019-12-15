@@ -29,7 +29,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return base.ToString() + " " + BuildingFactory.EntityType;
         }
 
-        public override string GetName() => "Build "+BuildingFactory.EntityType;
+        public override string GetName() => "BUILD_"+BuildingFactory.EntityType;
 
         public override string Description()
         {

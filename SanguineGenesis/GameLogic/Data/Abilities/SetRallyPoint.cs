@@ -26,7 +26,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return base.ToString();
         }
 
-        public override string GetName() => "Rally point";
+        public override string GetName() => "RALLY_POINT";
 
         public override string Description()
         {

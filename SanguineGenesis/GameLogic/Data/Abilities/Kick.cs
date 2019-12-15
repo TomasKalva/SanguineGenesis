@@ -24,7 +24,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new KickCommand(caster, target, this);
         }
 
-        public override string GetName() => "Kick";
+        public override string GetName() => "KICK";
 
         public override string Description()
         {

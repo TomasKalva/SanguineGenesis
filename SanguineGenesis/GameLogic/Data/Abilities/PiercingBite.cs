@@ -24,7 +24,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new PiercingBiteCommand(caster, target, this);
         }
 
-        public override string GetName() => "Piercing bite";
+        public override string GetName() => "PIERCING_BITE";
 
         public override string Description()
         {

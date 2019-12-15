@@ -24,7 +24,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new ImproveStructureCommand(caster, target, this);
         }
 
-        public override string GetName() => "Improve structure";
+        public override string GetName() => "IMPROVE_STRUCTURE";
 
         public override string Description()
         {

@@ -25,7 +25,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new ConsumeAnimalCommand(caster, target, this);
         }
 
-        public override string GetName() => "Consume";
+        public override string GetName() => "CONSUME";
 
         public override string Description()
         {

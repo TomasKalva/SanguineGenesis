@@ -30,6 +30,10 @@ namespace SanguineGenesis.GUI
         /// Progress bar showing progress of the entity's first command.
         /// </summary>
         public ProgressBar FirstCommandProgress { get; }
+        /// <summary>
+        /// Show name of the entity.
+        /// </summary>
+        public Label EntityName { get; }
 
         /// <summary>
         /// Entity whose info is shown.
@@ -43,20 +47,35 @@ namespace SanguineGenesis.GUI
 
             int buttonArrayColumns = 6;
             int buttonArrayHeight = Height / buttonArrayColumns;
+            int labelHeight = 30;
             int progressBarWidth = Width / 15;
 
-
+            //status button array initialization
             StatusButtonArray = new StatusButtonArray(buttonArrayColumns, 1, Width, buttonArrayHeight);
             Controls.Add(StatusButtonArray);
-            StatusButtonArray.Location = new System.Drawing.Point(Width/2 - StatusButtonArray.Width/2, Height - StatusButtonArray.Height);
+            StatusButtonArray.Location = new System.Drawing.Point(Width / 2 - StatusButtonArray.Width / 2, Height - StatusButtonArray.Height);
 
+            //command button array initialization
             CommandButtonArray = new CommandButtonArray(buttonArrayColumns, 1, Width - progressBarWidth, buttonArrayHeight);
             Controls.Add(CommandButtonArray);
             CommandButtonArray.Location = new System.Drawing.Point(progressBarWidth, Height - (CommandButtonArray.Height + CommandButtonArray.Height));
 
-            EntityStatsTable = new StatsTable(8, 2, Width, Height - (CommandButtonArray.Height + StatusButtonArray.Height));
+            //entity stats table initialization
+            EntityStatsTable = new StatsTable(9, 2, Width, Height - (CommandButtonArray.Height + StatusButtonArray.Height + labelHeight));
             Controls.Add(EntityStatsTable);
-            EntityStatsTable.Location = new System.Drawing.Point(0, 0);
+            EntityStatsTable.Location = new System.Drawing.Point(0, labelHeight);
+
+            //entity name initialization
+            EntityName = new Label()
+            {
+                Width = Width,
+                Height = labelHeight,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font(Label.DefaultFont, System.Drawing.FontStyle.Bold),
+                BackColor = Color.LightGray
+            };
+            Controls.Add(EntityName);
+            EntityName.Location = new System.Drawing.Point(0, 0);
 
             FirstCommandProgress = new ProgressBar()
             {
@@ -86,6 +105,7 @@ namespace SanguineGenesis.GUI
                 CommandButtonArray.InfoSources = new List<Command>();
                 CommandButtonArray.UpdateControl();
                 FirstCommandProgress.Value = 0;
+                EntityName.Text = "";
             }
             else
             {
@@ -96,6 +116,7 @@ namespace SanguineGenesis.GUI
                 List<Command> commandQueue= SelectedEntity.CommandQueue.Queue;
                 CommandButtonArray.InfoSources = commandQueue;
                 CommandButtonArray.UpdateControl();
+                EntityName.Text = ((IShowable)SelectedEntity).GetName();
                 if (commandQueue.Any())
                 {
                     //the animation of progress bar is too slow, reducing progress skips animation

@@ -113,7 +113,6 @@ namespace SanguineGenesis.GameLogic
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Faction", Faction.FactionID.ToString()),
-            new Stat( "EntityType", EntityType),
             new Stat( "Health", Health.ToString("0.0")),
             new Stat("Energy", Energy.ToString("0.0")),
             new Stat( "Air", Air.ToString()),

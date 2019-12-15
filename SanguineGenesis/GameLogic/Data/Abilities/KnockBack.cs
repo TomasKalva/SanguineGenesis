@@ -25,7 +25,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new KnockBackCommand(caster, target, this);
         }
 
-        public override string GetName() => "Knock back";
+        public override string GetName() => "KNOCK_BACK";
 
         public override string Description()
         {

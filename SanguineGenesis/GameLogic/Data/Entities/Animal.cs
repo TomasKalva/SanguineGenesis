@@ -155,7 +155,6 @@ namespace SanguineGenesis.GameLogic
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Faction", Faction.FactionID.ToString()),
-            new Stat( "EntityType", EntityType),
             new Stat( "Health", Health.ToString("0.0")),
             new Stat("Energy", Energy.ToString("0.0")),
             new Stat( "Food regen", FoodEnergyRegen.ToString("0.0")),
@@ -170,9 +169,7 @@ namespace SanguineGenesis.GameLogic
             new Stat( "Movement", Movement.ToString()),
             new Stat( "Thick skin", ThickSkin.ToString()),
             new Stat( "Diet", Diet.ToString()),
-            new Stat( "Spawning time", SpawningTime.ToString()),
             new Stat( "Physical", Physical.ToString()),
-            new Stat( "Energy cost", EnergyCost.ToString("0.0")),
             new Stat( "View range", ViewRange.ToString("0.0")),
             };
             return stats;

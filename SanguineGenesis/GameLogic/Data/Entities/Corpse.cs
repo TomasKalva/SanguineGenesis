@@ -41,7 +41,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Faction", Faction.FactionID.ToString()),
-                new Stat( "EntityType", EntityType),
                 new Stat( "Health", Health.ToString("0.0")),
             };
             return stats;

@@ -72,7 +72,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             throw new NotImplementedException("This method is not necessary because the virtual method " + nameof(SetCommands) + " was overriden");
         }
 
-        public override string GetName() => AttackEnemyInstead?"Move to":"Unbr move to";
+        public override string GetName() => AttackEnemyInstead?"MOVE_TO":"UNBR_MOVE_TO";
 
         public override string Description()
         {

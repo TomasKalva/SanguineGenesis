@@ -24,7 +24,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new PullCommand(caster, target, this);
         }
 
-        public override string GetName() => "Pull";
+        public override string GetName() => "PULL";
 
         public override string Description()
         {

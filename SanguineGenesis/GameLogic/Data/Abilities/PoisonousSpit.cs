@@ -25,7 +25,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new PoisonousSpitCommand(caster, target, this);
         }
 
-        public override string GetName() => "Poisonous spit";
+        public override string GetName() => "POISONOUS_SPIT";
 
         public override string Description()
         {

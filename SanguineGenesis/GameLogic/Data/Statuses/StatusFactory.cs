@@ -21,6 +21,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public abstract bool ApplyToStatusOwner(IStatusOwner affected);
 
+        public abstract string GetName();
+
         public StatusFactory(bool onlyOnce)
         {
             OnlyOnce = onlyOnce;
@@ -56,7 +58,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return true;
         }
 
-        public override string ToString() => NewInstance(null).GetName();
+        public override string ToString() => GetName();
     }
 
     /// <summary>
@@ -103,6 +105,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
         protected override Status NewInstance(Entity affected)
             => new Poison(affected, this);
+
+        public override string GetName() => "POISON";
     }
 
     class SprintFactory : StatusFactory<Animal>
@@ -126,6 +130,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new Sprint(affected, this);
         }
+
+        public override string GetName() => "SPRINT";
     }
 
     class ConsumedAnimalFactory : StatusFactory<Animal>
@@ -148,6 +154,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new ConsumedAnimal(affected, this, AnimalConsumed);
         }
+
+        public override string GetName() => "CONSUMED";
     }
 
     class AnimalsOnTreeFactory : StatusFactory<Tree>
@@ -186,6 +194,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             }
             return true;
         }
+
+        public override string GetName() => "ON_TREE";
     }
 
 
@@ -208,6 +218,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new Underground(affected, this);
         }
+
+        public override string GetName() => "UNDERGROUND";
     }
 
     class ShellFactory : StatusFactory<Animal>
@@ -226,6 +238,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new Shell(affected, this);
         }
+
+        public override string GetName() => "SHELL";
     }
 
 
@@ -245,6 +259,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new FastStrikes(affected, this);
         }
+
+        public override string GetName() => "FAST_STRIKES";
     }
 
     class FarSightFactory : StatusFactory<Animal>
@@ -263,6 +279,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new FarSight(affected, this);
         }
+
+        public override string GetName() => "FAR_SIGHT";
     }
 
     class KnockBackFactory : StatusFactory<Animal>
@@ -291,6 +309,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new KnockAway(affected, this);
         }
+
+        public override string GetName() => "KNOCK_BACK";
     }
 
     class SuffocatingFactory : StatusFactory<Animal>
@@ -309,6 +329,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new Suffocating(affected, this);
         }
+
+        public override string GetName() => "SUFFOCATING";
     }
 
     class DecayFactory : StatusFactory<IDecayable>
@@ -327,5 +349,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             return new Decay(affected, this);
         }
+
+        public override string GetName() => "DECAY";
     }
 }

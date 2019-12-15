@@ -24,7 +24,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new JumpCommand(caster, target, this);
         }
 
-        public override string GetName() => "Jump";
+        public override string GetName() => "JUMP";
 
         public override string Description()
         {

@@ -184,8 +184,8 @@ namespace SanguineGenesis.GUI
             AbilityButtonArray = new AbilityButtonArray(4, 3, 200, 200);
             Controls.Add(AbilityButtonArray);
 
-            //unit info panel
-            EntityInfoPanel = new EntityInfoPanel(250, 200);
+            //entity info panel
+            EntityInfoPanel = new EntityInfoPanel(350, 220);
             Controls.Add(EntityInfoPanel);
 
             //additional info
