@@ -24,13 +24,23 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         {
             icons = new Dictionary<string, Bitmap>();
 
-            foreach(var kvp in data.AnimalFactories.Factorys)
+            AddIcons(data.AnimalFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Animals/");
+            AddIcons(data.TreeFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Trees/");
+            AddIcons(data.StructureFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Structures/");
+        }
+
+        /// <summary>
+        /// Adds icons for the names in the directory to icons.
+        /// </summary>
+        private void AddIcons(IEnumerable<string> names, string directoryName)
+        {
+            foreach (var name in names)
             {
                 try
                 {
-                    string fileName = "Images/Icons/" + kvp.Key.ToLower() + ".png";
-                    var bmp = new Bitmap("Images/Icons/" + kvp.Key.ToLower() + ".png");
-                    icons.Add(kvp.Key, new Bitmap("Images/Icons/"+ kvp.Key.ToLower() + ".png"));
+                    string fileName = directoryName + name.ToLower() + ".png";
+                    var bmp = new Bitmap(fileName);
+                    icons.Add(name, bmp);
                 }
                 catch (Exception)
                 {

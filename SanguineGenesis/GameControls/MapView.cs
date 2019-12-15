@@ -71,7 +71,7 @@ namespace SanguineGenesis
 
 
         public MapView(float top, float left, float nodeSize, Map map,
-            float minNodeSize = 50, float maxNodeSize = 70, float scrollSpeed = 10f, float zoomSpeed = 20)
+            float minNodeSize = 60, float maxNodeSize = 80, float scrollSpeed = 10f, float zoomSpeed = 10)
         {
             Bottom = top;
             Left = left;

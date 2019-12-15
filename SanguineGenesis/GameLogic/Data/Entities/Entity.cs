@@ -98,7 +98,7 @@ namespace SanguineGenesis
             if (this is Animal)
                 Energy = new FloatRange(maxEnergy,maxEnergy);
             else
-                Energy = new FloatRange(maxEnergy, maxEnergy);
+                Energy = new FloatRange(maxEnergy, 0);
             SetAnimation("IDLE");
             Physical = physical;
             Abilities = abilities;

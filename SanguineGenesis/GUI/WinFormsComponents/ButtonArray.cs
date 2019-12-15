@@ -317,7 +317,6 @@ namespace SanguineGenesis.GUI
         public StatusButtonArray(int columns, int rows, int preferedWidth, int preferedHeight)
             : base(columns, rows, preferedWidth, preferedHeight)
         {
-            //style = (Style)Application.Current.FindResource("StatusArrayStyle");
         }
     }
 
@@ -364,7 +363,6 @@ namespace SanguineGenesis.GUI
     /// </summary>
     class ControlGroupButtonArray : ButtonArray<Status>
     {
-        //todo: fix bugs
         delegate void ManipulateGroup();
 
         private class ControlGroup
@@ -392,13 +390,21 @@ namespace SanguineGenesis.GUI
         /// Saves currnetly selected entities to control group.
         /// </summary>
         private ManipulateGroup[] SaveGroup { get; }
+        /// <summary>
+        /// Returns text indexing the button at position index in Buttons.
+        /// </summary>
+        private string GetButtonIndexText(int index) => '(' + (index + 1).ToString() + ')';
 
-        public ControlGroupButtonArray(int columns, int rows, int preferedWidth, int preferedHeight)
-            : base(columns, rows, preferedWidth, preferedHeight)
+        public ControlGroupButtonArray(int columns, int preferedWidth, int preferedHeight)
+            : base(columns, 1, preferedWidth, preferedHeight)
         {
-            ControlGroups = new ControlGroup[columns * rows];
-            SaveGroup = new ManipulateGroup[columns * rows];
-            LoadGroup = new ManipulateGroup[columns * rows];
+            ControlGroups = new ControlGroup[columns * 1];
+            SaveGroup = new ManipulateGroup[columns * 1];
+            LoadGroup = new ManipulateGroup[columns * 1];
+            for(int i = 0; i < columns; i++)
+            {
+                Buttons[i,0].Text = GetButtonIndexText(i);
+            }
         }
 
         public void SetEventHandlers(GameControls gameControls)
@@ -417,13 +423,17 @@ namespace SanguineGenesis.GUI
                             var entities = gameControls.SelectedGroup.Entities;
                             if (entities.Any())
                             {
+                                //group contains entities
                                 ControlGroups[index] = new ControlGroup(entities);
-                                b.Text = '(' + (index+1).ToString() + ')' + entities.Count.ToString();
+                                b.Text = GetButtonIndexText(index) + entities.Count.ToString();
+                                b.BackColor = Color.Green;
                             }
                             else
                             {
+                                //gropu doesn't contain entities
                                 ControlGroups[index] = null;
-                                b.Text = '('+(index+1).ToString()+')';
+                                b.Text = GetButtonIndexText(index);
+                                b.BackColor = Color.White;
                             }
                         }
                     }

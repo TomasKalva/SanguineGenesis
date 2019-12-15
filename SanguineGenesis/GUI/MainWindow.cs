@@ -110,10 +110,6 @@ namespace SanguineGenesis.GUI
         {
             //add event handlers
             MouseWheel += Window_MouseWheel;
-            /*Timer gameUpdateTimer = new Timer();
-            gameUpdateTimer.Tick += GameUpdateTimer_Tick;
-            gameUpdateTimer.Enabled = true;
-            gameUpdateTimer.Interval = 10;*/
             openGLControl.PreviewKeyDown += OpenGLControl_PreviewKeyDown;
 
             InitializeBottomPanel();
@@ -201,7 +197,7 @@ namespace SanguineGenesis.GUI
             ButtonArray.Icons = new Icons(Game.CurrentPlayer.GameStaticData);
 
             //control groups panel
-            ControlGroupButtonArray = new ControlGroupButtonArray(6, 1, EntityButtonArray.Width, 20);
+            ControlGroupButtonArray = new ControlGroupButtonArray(6, EntityButtonArray.Width, 20);
             Controls.Add(ControlGroupButtonArray);
 
             //add listeners to the buttons
@@ -218,6 +214,7 @@ namespace SanguineGenesis.GUI
             ControlGroupButtonArray.GiveFocusTo(openGLControl);
             EntityInfoPanel.CommandButtonArray.GiveFocusTo(openGLControl);
             EntityInfoPanel.StatusButtonArray.GiveFocusTo(openGLControl);
+            ControlGroupButtonArray.GiveFocusTo(openGLControl);
 
             //set position of ui elements
             //bottom panel
@@ -327,19 +324,22 @@ namespace SanguineGenesis.GUI
                 //selected entities changed since the last update
                 GameControls.SelectedGroup.Changed = false;
                 List<Entity> selectedEntities = GameControls.SelectedGroup.Entities;
+                selectedEntities.Sort((e1, e2) => string.Compare(e1.EntityType, e2.EntityType));
+
                 //update selected entity if the old one was removed or player is currently selecting entities
-                if(GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS ||
+                if (GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS ||
                     ShouldSetSelected ||
                     !selectedEntities.Contains(EntityButtonArray.Selected))
                     EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
                 ShouldSetSelected = GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS;
+
+                //set selected entities
                 EntityButtonArray.InfoSources = selectedEntities;
             }
             EntityInfoPanel.SelectedEntity = EntityButtonArray.Selected;
 
             //set selected ability
             AbilityButtonArray.Selected = GameControls.EntityCommandsInput.SelectedAbility;
-
             if (EntityButtonArray.Selected != null)
                 AbilityButtonArray.InfoSources = EntityButtonArray.Selected.Abilities;
             else
@@ -349,6 +349,7 @@ namespace SanguineGenesis.GUI
             EntityButtonArray.UpdateControl();
             AbilityButtonArray.UpdateControl();
             EntityInfoPanel.UpdateControl();
+            ControlGroupButtonArray.UpdateControl();
 
             //update air
             PlayerPropertiesPanel.AirValue.Text = Game.CurrentPlayer.AirTaken + "/" + Game.CurrentPlayer.MaxAirTaken;
@@ -659,6 +660,7 @@ namespace SanguineGenesis.GUI
             AbilityButtonArray.Enabled = false;
             EntityInfoPanel.Enabled = false;
             AdditionalInfo.Enabled = false;
+            ControlGroupButtonArray.Enabled = false;
             GameOptionsMenu.Visible = false;
 
             //put focus to the main window
@@ -678,6 +680,7 @@ namespace SanguineGenesis.GUI
             AbilityButtonArray.Enabled = true;
             EntityInfoPanel.Enabled = true;
             AdditionalInfo.Enabled = true;
+            ControlGroupButtonArray.Enabled = true;
             GameOptionsMenu.Visible = false;
 
             //put focus to the game

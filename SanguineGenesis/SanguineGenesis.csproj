@@ -253,100 +253,200 @@
     <Resource Include="SharpGL.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\aligator.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\aligator.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\baboon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\baboon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\cheetah.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\cheetah.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\chimapanzee.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\chimpanzee.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\cobra.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\cobra.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\crocodile.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\crocodile.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\dodo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\dodo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\elephant.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\elephant.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\gazzele.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\gazzele.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\giraffe.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\giraffe.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\gorilla.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\gorilla.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\hippo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\hippo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\hyena.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\hyena.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\indian_elephant.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\indian_elephant.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\kangaroo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\kangaroo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\komodo.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\komodo_dragon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\lion.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\lion.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\meerkat.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\meerkat.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\ocelot.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\ocelot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\panda.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\panda.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\puma.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\puma.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\python.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\anaconda.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\raptor.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\raptor.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\rhino.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\rhino.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\tarantula.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\tarantula.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\tiger.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\tiger.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\triceratops.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\triceratops.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\turtle.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\turtle.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\tyrannosaur.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\tyrannosaur.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\zebra.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\zebra.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\black_widow.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Images\Icons\Animals\black_widow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons\Structures\big_rock.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Structures\hole.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Structures\majestic_rock.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Structures\rock.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons\Trees\algae.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\ashoka.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\bamboo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\bannana_tree.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\baobab.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\candelabra.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\cannonball_tree.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\coconut_tree.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\cycad.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\cycad_palm.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\elephant_grass.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\eucalyptus.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\fern.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\jackal_berry_tree.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\kapoc.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\kiwi_tree.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\miambo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\pandani.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\Pasted Layer #34.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\pitcher.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\rhode_grass.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\spike_thorn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\sword_plant.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\teak.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\tyrannosaur_tree.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\water_lettuce.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\water_lily.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Images\Icons\Trees\whistling_thorn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
