@@ -127,10 +127,9 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Update the info on the buttons, hide buttons without info, show buttons
-        /// with info.
+        /// Update the info on the buttons.
         /// </summary>
-        public void UpdateControl()
+        public virtual void UpdateControl()
         {
             if (InfoSources == null)
                 return;
@@ -142,6 +141,7 @@ namespace SanguineGenesis.GUI
                     int index = ButtonIndex(j, i);
                     if (index >= InfoSources.Count)
                     {
+                        //set default appearance of the button
                         b.Image = null;
                         if (b.BackColor != Color.White)
                             b.BackColor = Color.White;
@@ -359,29 +359,37 @@ namespace SanguineGenesis.GUI
     }
 
     /// <summary>
-    /// Used for drawing buttons with control groups.
+    /// Represent a group of entities.
     /// </summary>
-    class ControlGroupButtonArray : ButtonArray<Status>
+    class ControlGroup : IShowable
     {
-        delegate void ManipulateGroup();
+        public List<Entity> Entities { get; }
 
-        private class ControlGroup
+        public ControlGroup(List<Entity> entities)
         {
-            public List<Entity> Entities { get; }
-
-            public ControlGroup(List<Entity> entities)
-            {
-                Entities = entities;
-            }
-
-            public void RemoveDead()
-            {
-                if (Entities != null)
-                    Entities.RemoveAll(e => e.IsDead);
-            }
+            Entities = entities;
         }
 
-        private ControlGroup[] ControlGroups { get; }
+        public void RemoveDead()
+        {
+            if (Entities != null)
+                Entities.RemoveAll(e => e.IsDead);
+        }
+
+        public string GetName() => Entities.Count.ToString();
+
+        public List<Stat> Stats() => new List<Stat>();
+
+        public string Description() => "Group of entities";
+    }
+
+    /// <summary>
+    /// Used for drawing buttons with control groups.
+    /// </summary>
+    class ControlGroupButtonArray : ButtonArray<ControlGroup>
+    {
+        delegate void ManipulateGroup();
+        
         /// <summary>
         /// Loads selected group to currently selected entities.
         /// </summary>
@@ -398,7 +406,9 @@ namespace SanguineGenesis.GUI
         public ControlGroupButtonArray(int columns, int preferedWidth, int preferedHeight)
             : base(columns, 1, preferedWidth, preferedHeight)
         {
-            ControlGroups = new ControlGroup[columns * 1];
+            InfoSources = new List<ControlGroup>(columns * 1);
+            for (int i = 0; i < columns; i++)
+                InfoSources.Add(null);
             SaveGroup = new ManipulateGroup[columns * 1];
             LoadGroup = new ManipulateGroup[columns * 1];
             for(int i = 0; i < columns; i++)
@@ -418,22 +428,18 @@ namespace SanguineGenesis.GUI
                 SaveGroup[i] = () =>
                 {
                     {
-                        if(index >= 0 && index < ControlGroups.Length)
+                        if(index >= 0 && index < InfoSources.Count)
                         { 
                             var entities = gameControls.SelectedGroup.Entities;
                             if (entities.Any())
                             {
                                 //group contains entities
-                                ControlGroups[index] = new ControlGroup(entities);
-                                b.Text = GetButtonIndexText(index) + entities.Count.ToString();
-                                b.BackColor = Color.Green;
+                                InfoSources[index] = new ControlGroup(entities);
                             }
                             else
                             {
                                 //gropu doesn't contain entities
-                                ControlGroups[index] = null;
-                                b.Text = GetButtonIndexText(index);
-                                b.BackColor = Color.White;
+                                InfoSources[index] = null;
                             }
                         }
                     }
@@ -441,16 +447,16 @@ namespace SanguineGenesis.GUI
                 LoadGroup[i] = () =>
                 {
                     {
-                        if (index >= 0 && index < ControlGroups.Length)
+                        if (index >= 0 && index < InfoSources.Count)
                         {
                             SelectedGroup selectedGroup = gameControls.SelectedGroup;
                             //commit the selected entities
                             if(selectedGroup.NextOperation == Operation.ALREADY_SELECTED)
                                 selectedGroup.NextOperation = Operation.REPLACE;
 
-                            if (ControlGroups[index] != null)
+                            if (InfoSources[index] != null)
                             {
-                                selectedGroup.SetEntities(ControlGroups[index].Entities);
+                                selectedGroup.SetEntities(InfoSources[index].Entities);
                                 gameControls.EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
                             }
                             else
@@ -470,6 +476,54 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Update the info on the buttons, update control groups.
+        /// </summary>
+        public override void UpdateControl()
+        {
+            if (InfoSources == null)
+                return;
+
+            for (int i = 0; i < ColumnCount; i++)
+            {
+                Button b = Buttons[i, 0];
+                var contrGr = InfoSources[i];
+
+                //update control groups and text and color of buttons
+                if (contrGr == null)
+                {
+                    //set default appearance of the button
+                    b.Text = GetButtonIndexText(i);
+                    if(b.BackColor != Color.White)
+                        b.BackColor = Color.White;
+                }
+                else
+                {
+                    //removed dead entities from the group
+                    contrGr.RemoveDead();
+
+                    if (contrGr.Entities.Any())
+                    {
+                        //group contains entities
+                        b.Text = GetButtonIndexText(i) + contrGr.Entities.Count.ToString();
+                        if (b.BackColor != Color.Green)
+                            b.BackColor = Color.Green;
+                    }
+                    else
+                    {
+                        //gropu doesn't contain entities - remove the control group
+                        InfoSources[i] = null;
+                        b.Text = GetButtonIndexText(i);
+                        if (b.BackColor != Color.White)
+                            b.BackColor = Color.White;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns index of button corresponding to the key.
+        /// </summary>
         public int KeyToGroupIndex(Keys key)
         {
             switch (key)
@@ -485,11 +539,17 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Sets entities to the group with index i.
+        /// </summary>
         public void SaveGroupWithIndex(int i)
         {
             if (i >= 0 && i < SaveGroup.Length) SaveGroup[i]();
         }
 
+        /// <summary>
+        /// Loads entities from this group to GameControls.SelectedGroup.
+        /// </summary>
         public void LoadGroupWithIndex(int i)
         {            
             if(i>=0 && i<LoadGroup.Length) LoadGroup[i]();
