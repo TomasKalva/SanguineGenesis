@@ -43,13 +43,17 @@ namespace SanguineGenesis
         }
 
         /// <summary>
-        /// Remove all selected entities and the set them to be entities.
+        /// Remove all temporarily selected entities and the set them to be entities.
         /// </summary>
-        public void SetEntities(List<Entity> entities)
+        public void SetTemporaryEntities(List<Entity> entities)
         {
             if (NextOperation == Operation.REPLACE &&
                 TotalGroup.Any())
                 ClearTotal();
+            foreach(Entity e in TotalGroup)
+                e.Selected = true;
+
+
             ClearTemporary();
             foreach (Entity e in entities)
             {
@@ -59,6 +63,7 @@ namespace SanguineGenesis
                 else
                     e.Selected = true;
             }
+
             Changed = true;
         }
 

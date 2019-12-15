@@ -456,12 +456,12 @@ namespace SanguineGenesis.GUI
 
                             if (InfoSources[index] != null)
                             {
-                                selectedGroup.SetEntities(InfoSources[index].Entities);
+                                selectedGroup.SetTemporaryEntities(InfoSources[index].Entities);
                                 gameControls.EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
                             }
                             else
                             {
-                                selectedGroup.SetEntities(new List<Entity>());
+                                selectedGroup.SetTemporaryEntities(new List<Entity>());
                                 gameControls.EntityCommandsInput.State = EntityCommandsInputState.IDLE;
                             }
                             selectedGroup.CommitEntities();

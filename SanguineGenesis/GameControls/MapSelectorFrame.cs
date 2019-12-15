@@ -73,7 +73,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Returns all entities colliding with this MapSelectorFrame.
         /// </summary>
-        public IEnumerable<Entity> GetSelectedUnits(Game game)
+        public IEnumerable<Entity> GetSelectedEntities(Game game)
         {
             return GameQuerying.SelectRectEntities(game,((IRectangle)this).GetRect(),
                 (unit)=>unit.Faction.FactionID==game.CurrentPlayer.FactionID);

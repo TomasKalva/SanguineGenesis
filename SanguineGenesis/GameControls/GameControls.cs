@@ -70,8 +70,8 @@ namespace SanguineGenesis
                         //update selected entities
                         MapSelectorFrame.SetEndPoint(mapPoint);
                         MapSelectorFrame.Update();
-                        List<Entity> selected = MapSelectorFrame.GetSelectedUnits(game).ToList();
-                        SelectedGroup.SetEntities(selected);
+                        List<Entity> selected = MapSelectorFrame.GetSelectedEntities(game).ToList();
+                        SelectedGroup.SetTemporaryEntities(selected);
 
                         //finish selecting
                         if (EntityCommandsInput.State == EntityCommandsInputState.FINISH_SELECTING_UNITS)
