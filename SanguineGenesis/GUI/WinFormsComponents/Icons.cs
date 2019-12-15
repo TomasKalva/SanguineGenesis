@@ -27,7 +27,8 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             AddIcons(data.AnimalFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Animals/");
             AddIcons(data.TreeFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Trees/");
             AddIcons(data.StructureFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Structures/");
-            AddIcons(data.Statuses.AllStatusFactories.Select(sf => sf.ToString()), "Images/Icons/Statuses/");
+            AddIcons(data.Statuses.AllStatusFactories.Select(sf => sf.GetName()), "Images/Icons/Statuses/");
+            AddIcons(data.Abilities.AllAbilities.Select(af => af.GetName()), "Images/Icons/Abilities/");
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
                 }
                 catch (Exception)
                 {
-                    // icon couldn't be loaded
+                    // icon couldn't be loaded - problem with opening file or duplicate key
                 }
                 empty = new Bitmap(1, 1);
             }

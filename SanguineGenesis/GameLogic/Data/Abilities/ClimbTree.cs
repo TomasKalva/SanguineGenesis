@@ -25,7 +25,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new ClimbTreeCommand(caster, target, this);
         }
 
-        public override string GetName() => "CLIMB";
+        public override string GetName() => "CLIMB_UP";
 
         public override string Description()
         {

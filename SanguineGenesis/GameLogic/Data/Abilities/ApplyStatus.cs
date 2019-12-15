@@ -25,7 +25,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new ApplyStatusCommand(caster, target, this);
         }
 
-        public override string GetName() => "Apply " + StatusFactory.ToString();
+        public override string GetName() => "APPLY_" + StatusFactory.GetName();
 
         public override string Description()
         {

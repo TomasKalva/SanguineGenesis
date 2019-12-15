@@ -310,7 +310,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return new KnockAway(affected, this);
         }
 
-        public override string GetName() => "KNOCK_BACK";
+        public override string GetName() => "KNOCK_AWAY";
     }
 
     class SuffocatingFactory : StatusFactory<Animal>
