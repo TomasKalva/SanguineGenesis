@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SanguineGenesis.GUI.WinFormsComponents;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -33,6 +34,10 @@ namespace SanguineGenesis.GUI
         /// How many times bigger is the drawing of the map than the map itself.
         /// </summary>
         private int MapScale { get; }
+        /// <summary>
+        /// Icons used for the game gui.
+        /// </summary>
+        private Icons Icons { get; }
 
         public MainMenuWindow()
         {
@@ -44,6 +49,7 @@ namespace SanguineGenesis.GUI
 
             MapScale = mapPB.Width / MAX_MAP_WIDTH;
             DrawOpt = DrawOption.NO_ACTION;
+            Icons = new Icons();
             LoadNamesOfCreatedMaps();
         }
 
@@ -434,7 +440,7 @@ namespace SanguineGenesis.GUI
                     MapDescr.RepairMap();
                     DisableEditing();
 
-                    var gameWindow = new MainWinformWindow(MapDescr, PlayersBiome);
+                    var gameWindow = new MainWinformWindow(MapDescr, PlayersBiome, Icons);
                     gameWindow.ShowDialog();
                 }
                 else

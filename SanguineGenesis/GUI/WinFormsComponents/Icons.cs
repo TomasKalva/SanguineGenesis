@@ -20,36 +20,38 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         /// </summary>
         private Bitmap empty;
 
-        public Icons(GameStaticData data)
+        public Icons()
         {
             icons = new Dictionary<string, Bitmap>();
 
-            AddIcons(data.AnimalFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Animals/");
-            AddIcons(data.TreeFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Trees/");
-            AddIcons(data.StructureFactories.Factorys.Select(kvp => kvp.Key), "Images/Icons/Structures/");
-            AddIcons(data.Statuses.AllStatusFactories.Select(sf => sf.GetName()), "Images/Icons/Statuses/");
-            AddIcons(data.Abilities.AllAbilities.Select(af => af.GetName()), "Images/Icons/Abilities/");
+            AddIcons("Images/Icons/Animals/");
+            AddIcons("Images/Icons/Trees/");
+            AddIcons("Images/Icons/Structures/");
+            AddIcons("Images/Icons/Statuses/");
+            AddIcons("Images/Icons/Abilities/");
         }
 
         /// <summary>
         /// Adds icons for the names in the directory to icons.
         /// </summary>
-        private void AddIcons(IEnumerable<string> names, string directoryName)
+        private void AddIcons(string directoryName)
         {
-            foreach (var name in names)
+            foreach(var name in Directory.GetFiles(directoryName)
+                                        .Select(Path.GetFileNameWithoutExtension))
+            //foreach (var name in names)
             {
                 try
                 {
                     string fileName = directoryName + name.ToLower() + ".png";
                     var bmp = new Bitmap(fileName);
-                    icons.Add(name, bmp);
+                    icons.Add(name.ToUpper(), bmp);
                 }
                 catch (Exception)
                 {
                     // icon couldn't be loaded - problem with opening file or duplicate key
                 }
-                empty = new Bitmap(1, 1);
             }
+            empty = new Bitmap(1, 1);
         }
 
         /// <summary>

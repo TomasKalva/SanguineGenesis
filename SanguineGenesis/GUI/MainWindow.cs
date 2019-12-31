@@ -18,7 +18,7 @@ namespace SanguineGenesis.GUI
 {
     partial class MainWinformWindow : Form
     {
-        public MainWinformWindow(MapDescription mapDescription, Biome playersBiome)
+        public MainWinformWindow(MapDescription mapDescription, Biome playersBiome, Icons icons)
         {
             InitializeComponent();
 
@@ -32,7 +32,7 @@ namespace SanguineGenesis.GUI
             Shown += (s, e) =>
             {
                 InitializeOpenGL();
-                InitializeUserInterface();
+                InitializeUserInterface(icons);
             };
 
             //create and enable game update timer
@@ -106,13 +106,13 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Initializes user interface.
         /// </summary>
-        private void InitializeUserInterface()
+        private void InitializeUserInterface(Icons icons)
         {
             //add event handlers
             MouseWheel += Window_MouseWheel;
             openGLControl.PreviewKeyDown += OpenGLControl_PreviewKeyDown;
 
-            InitializeBottomPanel();
+            InitializeBottomPanel(icons);
 
             //menu button
             MenuButton = new Button()
@@ -173,7 +173,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Initialize controls of the bottom panel.
         /// </summary>
-        private void InitializeBottomPanel()
+        private void InitializeBottomPanel(Icons icons)
         {
             //initialize ui elements
             //units panel
@@ -194,7 +194,7 @@ namespace SanguineGenesis.GUI
             AdditionalInfo.Stats.SetStats(
                 new List<Stat>());
 
-            ButtonArray.Icons = new Icons(Game.CurrentPlayer.GameStaticData);
+            ButtonArray.Icons = icons;
 
             //control groups panel
             ControlGroupButtonArray = new ControlGroupButtonArray(6, EntityButtonArray.Width, 20);

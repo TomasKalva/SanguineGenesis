@@ -89,20 +89,6 @@ namespace SanguineGenesis
             visibilityGenerator = new VisibilityGenerator();
             nextVisibilityPlayer = SanguineGenesis.FactionType.PLAYER0;
             GameplayOptions = new GameplayOptions();
-            /*foreach (Animal u in CurrentPlayer.GetAll<Unit>())
-            {
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Attack);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Jump);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.Pull);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ActivateFarSight);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.KnockBack);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ConsumeAnimal);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ClimbTree);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.ChargeTo);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.HerbivoreEat);
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.BuildBuilding("KAPOC"));
-                u.Abilities.Add(CurrentPlayer.GameStaticData.Abilities.BuildBuilding("BAOBAB"));
-            }*/
         }
 
         /// <summary>
