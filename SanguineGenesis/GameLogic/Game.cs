@@ -53,10 +53,6 @@ namespace SanguineGenesis
         /// </summary>
         public Physics physics;
         /// <summary>
-        /// Generates visibility maps for players.
-        /// </summary>
-        VisibilityGenerator visibilityGenerator;
-        /// <summary>
         /// The next player to whom will be generated visibility map.
         /// </summary>
         private FactionType nextVisibilityPlayer;
@@ -86,7 +82,6 @@ namespace SanguineGenesis
                 kvp.Value.InitializeMapView(Map);
 
             physics = Physics.GetPhysics();
-            visibilityGenerator = new VisibilityGenerator();
             nextVisibilityPlayer = SanguineGenesis.FactionType.PLAYER0;
             GameplayOptions = new GameplayOptions();
         }
@@ -229,6 +224,7 @@ namespace SanguineGenesis
         /// </summary>
         private void VisibilityGeneratorInteraction(List<Building> allBuildings)
         {
+            var visibilityGenerator = VisibilityGenerator.Get;
             if (visibilityGenerator.Done)
             {
                 FactionType current = nextVisibilityPlayer;

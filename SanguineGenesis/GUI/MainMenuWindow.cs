@@ -441,7 +441,10 @@ namespace SanguineGenesis.GUI
                     DisableEditing();
 
                     var gameWindow = new MainWinformWindow(MapDescr, PlayersBiome, Icons);
+                    //var Game = new Game(MapDescr, PlayersBiome);
+                    //var GameControls = new GameControls(Game.Map);
                     gameWindow.ShowDialog();
+                    gameWindow.Dispose();
                 }
                 else
                     ErrorMessage("The map doesn't contain the main buildings of both players.");
@@ -530,26 +533,34 @@ namespace SanguineGenesis.GUI
             public MapDescription(int width, int height, string name)
             {
                 Name = name;
+                Frozen = false;
+
+                //init terrain map
                 TerrainMap = new Bitmap(width, height);
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
                     {
                         TerrainMap.SetPixel(i, j, LandColor);
                     }
+
+                //init nutrients map
                 NutrientsMap = new Bitmap(width, height);
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
                     {
                         NutrientsMap.SetPixel(i, j, NothingColor);
                     }
+
+                //init buildings map
                 BuildingsLocations = new Bitmap(width, height);
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
                     {
                         BuildingsLocations.SetPixel(i, j, NothingColor);
                     }
+
+                //init buildings
                 Buildings = new List<BuildingDescriptor>();
-                Frozen = false;
             }
 
             /// <summary>

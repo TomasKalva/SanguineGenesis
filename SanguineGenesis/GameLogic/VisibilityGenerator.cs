@@ -14,6 +14,14 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     class VisibilityGenerator
     {
+        private static VisibilityGenerator visibilityGenerator;
+
+        static VisibilityGenerator(){
+            visibilityGenerator = new VisibilityGenerator();
+        }
+
+        public static VisibilityGenerator Get => visibilityGenerator;
+
         //inputs
         /// <summary>
         /// newTask has to be false to set this.
@@ -64,7 +72,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Starts a new thread for creating visibility maps.
         /// </summary>
-        public VisibilityGenerator()
+        private VisibilityGenerator()
         {
             Done = true;
             newTask = false;
