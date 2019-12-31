@@ -148,6 +148,32 @@ namespace SanguineGenesis.GameLogic
             => typeof(Target);
 
         /// <summary>
+        /// Returns name of target type visible to the player.
+        /// </summary>
+        public string TargetName
+        {
+            get
+            {
+                // instance of target isn't present during call of this method
+                // and static methods can't be in interface, so checking manually is neccessary
+                var targetType = TargetType;
+                if (targetType == typeof( ICarnivoreFood)) return "CARN FOOD";
+                else if (targetType == typeof(IHerbivoreFood)) return "HERB FOOD";
+                else if (targetType == typeof(IMovementTarget)) return "MOVE TARG";
+                else if (targetType == typeof(Vector2)) return "POINT";
+                else if (targetType == typeof(Node)) return "NODE";
+                else if (targetType == typeof(Animal)) return "ANIMAL";
+                else if (targetType == typeof(Entity)) return "ENTITY";
+                else if (targetType == typeof(Unit)) return "UNIT";
+                else if (targetType == typeof(Building)) return "BUILDING";
+                else if (targetType == typeof(Tree)) return "TREE";
+                else if (targetType == typeof(Corpse)) return "CORPSE";
+                else if (targetType == typeof(Structure)) return "STRUCTURE";
+                else /*(targetType == typeof(Nothing))*/ return "NOTHING";
+            }
+        }
+
+        /// <summary>
         /// Sets the command for this ability to all valid casters.
         /// </summary>
         /// <param name="casters">Casters who should receive the command. Only valid casters will receive the command.</param>
@@ -219,10 +245,10 @@ namespace SanguineGenesis.GameLogic
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
-            new Stat( "Distance", Distance==null?"att dist" : Distance.ToString()),
+            new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
             new Stat( "Self castable", SelfCastable.ToString()),
             new Stat("Only one", OnlyOne.ToString()),
-            new Stat( "Target type", TargetType.Name),
+            new Stat( "Target type", TargetName),
             new Stat( "Interruptable", Interruptable.ToString()),
             };
             return stats;
