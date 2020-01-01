@@ -441,8 +441,6 @@ namespace SanguineGenesis.GUI
                     DisableEditing();
 
                     var gameWindow = new MainWinformWindow(MapDescr, PlayersBiome, Icons);
-                    //var Game = new Game(MapDescr, PlayersBiome);
-                    //var GameControls = new GameControls(Game.Map);
                     gameWindow.ShowDialog();
                     gameWindow.Dispose();
                 }

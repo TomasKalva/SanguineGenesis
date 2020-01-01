@@ -18,15 +18,17 @@ namespace SanguineGenesis.GUI
 {
     partial class MainWinformWindow : Form
     {
+        Timer GameTimer { get; }
+
         public MainWinformWindow(MapDescription mapDescription, Biome playersBiome, Icons icons)
         {
             InitializeComponent();
-
+            
             Game = new Game(mapDescription, playersBiome);
             GameControls = new GameControls(Game.Map);
             TotalStopwatch = new Stopwatch();
             TotalStopwatch.Start();
-
+            
 
             //waint until the window initializes and then initialize bottom panel and opengl
             Shown += (s, e) =>
@@ -36,10 +38,10 @@ namespace SanguineGenesis.GUI
             };
 
             //create and enable game update timer
-            Timer gameUpdateTimer = new Timer();
-            gameUpdateTimer.Tick += GameUpdateTimer_Tick;
-            gameUpdateTimer.Enabled = true;
-            gameUpdateTimer.Interval = 10;
+            GameTimer = new Timer();
+            GameTimer.Tick += GameUpdateTimer_Tick;
+            GameTimer.Enabled = true;
+            GameTimer.Interval = 10;
         }
 
         #region Game logic
@@ -692,6 +694,16 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void CloseWindow()
         {
+            // openGLControl is directly referenced by GCHandle, event handlers have to be removed
+            // to avoid memory leak
+            openGLControl.PreviewKeyDown -= OpenGLControl_PreviewKeyDown;
+            openGLControl.OpenGLDraw -= new SharpGL.RenderEventHandler(this.UpdateAndDraw);
+            openGLControl.KeyDown -= new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyDown);
+            openGLControl.KeyUp -= new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyUp);
+            openGLControl.MouseDown -= new System.Windows.Forms.MouseEventHandler(this.MouseButtonDownHandler);
+            openGLControl.MouseMove -= new System.Windows.Forms.MouseEventHandler(this.MouseMoveHandler);
+            openGLControl.MouseUp -= new System.Windows.Forms.MouseEventHandler(this.MouseButtonUpHandler);
+            GameTimer.Tick -= GameUpdateTimer_Tick;
             Close();
         }
 

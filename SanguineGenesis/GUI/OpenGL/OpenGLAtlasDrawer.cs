@@ -114,7 +114,7 @@ namespace SanguineGenesis
         /// </summary>
         /// <param name="fileName">The name of the file from which the texture will be loaded.</param>
         /// <param name="gl">The instance of OpenGL to which the texture will be loaded.</param>
-        private static void LoadTexture(String fileName, OpenGL gl, ShaderProgram shaderProgram)
+        private static void LoadTexture(string fileName, OpenGL gl, ShaderProgram shaderProgram)
         {
             //load image and flip it vertically for easier indexing
             Bitmap textureImage = new Bitmap(fileName);
@@ -128,6 +128,7 @@ namespace SanguineGenesis
                 textureImage.LockBits(new Rectangle(0, 0, textureImage.Width, textureImage.Height),
                 ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb).Scan0);
 
+            textureImage.Dispose();
             shaderProgram.Bind(gl);
 
             int atlas = shaderProgram.GetUniformLocation(gl, "atlas");
