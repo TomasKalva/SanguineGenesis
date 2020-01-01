@@ -82,6 +82,7 @@ namespace SanguineGenesis
                 kvp.Value.InitializeMapView(Map);
 
             physics = Physics.GetPhysics();
+            MovementGenerator.GetMovementGenerator().Reset();
             nextVisibilityPlayer = SanguineGenesis.FactionType.PLAYER0;
             GameplayOptions = new GameplayOptions();
         }

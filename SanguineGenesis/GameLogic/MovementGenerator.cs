@@ -26,6 +26,20 @@ namespace SanguineGenesis.GameLogic
         /// The player whose next command will be processed. Players switch after each iteration.
         /// </summary>
         private FactionType NextPlayer { get; set; }
+        /// <summary>
+        /// If set to true, all command assignments are removed during the next iteration.
+        /// </summary>
+        private bool reset;
+        /// <summary>
+        /// Sets reset to true.
+        /// </summary>
+        public void Reset()
+        {
+            lock (this)
+            {
+                reset = true;
+            }
+        }
 
         /// <summary>
         /// Calculates movement flowfields for one player.
@@ -129,6 +143,21 @@ namespace SanguineGenesis.GameLogic
 
                     if (inputs.Any())
                         CurrentWork = Work.INPUTS;
+                }
+            }
+
+            /// <summary>
+            /// Resets the command assignment queue.
+            /// </summary>
+            public void Reset()
+            {
+                lock (this)
+                {
+                    Output.Clear();
+                    inputs.Clear();
+                    repeatedInputs.Clear();
+                    commands.Clear();
+                    CurrentWork = Work.NOTHING;
                 }
             }
 
@@ -297,10 +326,12 @@ namespace SanguineGenesis.GameLogic
                 {
                     c.UpdateCommands();
                 }
+                mg0.Output.RemoveAll(ca => ca.Invalid);
                 foreach (MoveToCommandAssignment c in mg1.Output)
                 {
                     c.UpdateCommands();
                 }
+                mg1.Output.RemoveAll(ca => ca.Invalid);
             }
         } 
 
@@ -317,7 +348,11 @@ namespace SanguineGenesis.GameLogic
                 //wait until at least one of the players needs to recalculate the commands
                 lock (this)
                 {
-                    while (!StartNewCycle()) { Monitor.Wait(this); }
+                    while (!StartNewCycle()) 
+                    {
+                        TryReset();
+                        Monitor.Wait(this); 
+                    }
                 }
                 lock (this)
                 {
@@ -340,9 +375,27 @@ namespace SanguineGenesis.GameLogic
                     nMg.ProcessCommand(this);
                     
                     NextPlayer = Next(NextPlayer);
-                    
+
+                    TryReset();
                 }
             }
+        }
+
+        /// <summary>
+        /// Resets this instance, if reset is true.
+        /// </summary>
+        private void TryReset()
+        {
+            PlayerMovementGenerator mg0 = playersMovementGenerators[FactionType.PLAYER0];
+            PlayerMovementGenerator mg1 = playersMovementGenerators[FactionType.PLAYER1];
+            lock (this)
+                if (reset)
+                {
+                    //reset the command assignment queues for both players
+                    mg0.Reset();
+                    mg1.Reset();
+                    reset = false;
+                }
         }
 
         /// <summary>
