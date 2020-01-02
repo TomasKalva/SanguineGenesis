@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
@@ -10,7 +8,7 @@ using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
 using SanguineGenesis.GUI;
 
-namespace SanguineGenesis.GameControl
+namespace SanguineGenesis.GameControls
 {
     /// <summary>
     /// The class describes player's view of the map.
@@ -28,20 +26,20 @@ namespace SanguineGenesis.GameControl
         /// <summary>
         /// Speed of scrolling through the map. Relative to size of one node.
         /// </summary>
-        private float scrollSpeed;
+        private readonly float scrollSpeed;
         /// <summary>
         /// Size difference of a node before and after zoom.
         /// </summary>
-        private float zoomSpeed;
+        private readonly float zoomSpeed;
 
         /// <summary>
         /// Minimal node size.
         /// </summary>
-        private float minNodeSize;
+        private readonly float minNodeSize;
         /// <summary>
         /// Maximal node size.
         /// </summary>
-        private float maxNodeSize;
+        private readonly float maxNodeSize;
         /// <summary>
         /// Size of a node on screen.
         /// </summary>
@@ -73,7 +71,7 @@ namespace SanguineGenesis.GameControl
         public float Top => Bottom + Height;
 
 
-        public MapView(float top, float left, float nodeSize, Map map,
+        public MapView(float top, float left, float nodeSize,
             float minNodeSize = 60, float maxNodeSize = 80, float scrollSpeed = 10f, float zoomSpeed = 10)
         {
             Bottom = top;
@@ -204,8 +202,8 @@ namespace SanguineGenesis.GameControl
             NodeSize = newNodeSize;
 
             //center the view
-            Left = Left + (oldWidth - Width) / 2;
-            Bottom = Bottom + (oldHeight - Height) / 2;
+            Left += (oldWidth - Width) / 2;
+            Bottom += (oldHeight - Height) / 2;
         }
 
         /// <summary>

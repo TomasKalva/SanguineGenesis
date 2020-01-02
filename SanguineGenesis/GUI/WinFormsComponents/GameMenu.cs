@@ -37,8 +37,10 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             //create rows
             for (int i =0; i < RowCount; i++)
             {
-                RowStyle evenRow = new RowStyle(SizeType.Percent);
-                evenRow.Height = 1 / (float)RowCount;
+                RowStyle evenRow = new RowStyle(SizeType.Percent)
+                {
+                    Height = 1 / (float)RowCount
+                };
                 RowStyles.Add(evenRow);
             }
 
@@ -47,27 +49,33 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             Color buttonsColor = Color.Beige;
 
             //resume button
-            Resume = new Button();
-            Resume.Dock = DockStyle.Fill;
-            Resume.Text = "Resume";
-            Resume.BackColor = buttonsColor;
-            Resume.Font = buttonsFont;
+            Resume = new Button
+            {
+                Dock = DockStyle.Fill,
+                Text = "Resume",
+                BackColor = buttonsColor,
+                Font = buttonsFont
+            };
             Controls.Add(Resume);
 
             //options button
-            Options = new Button();
-            Options.Dock = DockStyle.Fill;
-            Options.Text = "Options";
-            Options.BackColor = buttonsColor;
-            Options.Font = buttonsFont;
+            Options = new Button
+            {
+                Dock = DockStyle.Fill,
+                Text = "Options",
+                BackColor = buttonsColor,
+                Font = buttonsFont
+            };
             Controls.Add(Options);
 
             //exit button
-            Exit = new Button();
-            Exit.Dock = DockStyle.Fill;
-            Exit.Text = "Exit";
-            Exit.BackColor = buttonsColor;
-            Exit.Font = buttonsFont;
+            Exit = new Button
+            {
+                Dock = DockStyle.Fill,
+                Text = "Exit",
+                BackColor = buttonsColor,
+                Font = buttonsFont
+            };
             Controls.Add(Exit);
         }
 

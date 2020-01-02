@@ -191,10 +191,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                  .ToList();
 
             //remove caster that is also target if the ability can't be self casted
-            Caster self= target as Caster;
-            if (!SelfCastable && self !=null)
+            if (!SelfCastable && target is Caster self)
                 validCasters.Remove(self);
-            
+
             //if there are no casters that can pay do nothing
             if (!validCasters.Any())
                 return;
@@ -230,8 +229,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 Command com = NewCommand(c, target);
 
                 //instead of MoveTo command before com set MoveTo as FollowCommand for com
-                Animal a = c as Animal;
-                if (a != null && com.FollowTarget())
+                if (c is Animal a && com.FollowTarget())
                 {
                     MoveToCommand followCommand = (MoveToCommand)a.CommandQueue.Queue.LastOrDefault();
                     a.CommandQueue.Queue.Remove(followCommand);

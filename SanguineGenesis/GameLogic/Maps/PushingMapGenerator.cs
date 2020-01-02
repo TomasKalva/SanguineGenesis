@@ -16,7 +16,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// For each possible 2x2 square arrangement of nodes where the bottom right is blocked contains
         /// angle where the animal should be pushed if its on the bottom right node.
         /// </summary>
-        private static Dictionary<Pattern2x2, float> angleForPattern;
+        private static readonly Dictionary<Pattern2x2, float> angleForPattern;
 
         static PushingMapGenerator()
         {
@@ -157,18 +157,20 @@ namespace SanguineGenesis.GameLogic.Maps
         /// </summary>
         public Pattern3x3 FlipHoriz()
         {
-            Pattern3x3 newP = new Pattern3x3();
-            newP._11 = _13;
-            newP._12 = _12;
-            newP._13 = _11;
+            Pattern3x3 newP = new Pattern3x3
+            {
+                _11 = _13,
+                _12 = _12,
+                _13 = _11,
 
-            newP._21 = _23;
-            newP._22 = _22;
-            newP._23 = _21;
+                _21 = _23,
+                _22 = _22,
+                _23 = _21,
 
-            newP._31 = _33;
-            newP._32 = _32;
-            newP._33 = _31;
+                _31 = _33,
+                _32 = _32,
+                _33 = _31
+            };
 
             return newP;
         }
@@ -178,18 +180,20 @@ namespace SanguineGenesis.GameLogic.Maps
         /// </summary>
         public Pattern3x3 RotateRight()
         {
-            Pattern3x3 newP = new Pattern3x3();
-            newP._11 = _31;
-            newP._12 = _21;
-            newP._13 = _11;
+            Pattern3x3 newP = new Pattern3x3
+            {
+                _11 = _31,
+                _12 = _21,
+                _13 = _11,
 
-            newP._21 = _32;
-            newP._22 = _22;
-            newP._23 = _12;
+                _21 = _32,
+                _22 = _22,
+                _23 = _12,
 
-            newP._31 = _33;
-            newP._32 = _23;
-            newP._33 = _13;
+                _31 = _33,
+                _32 = _23,
+                _33 = _13
+            };
 
             return newP;
         }
@@ -235,25 +239,29 @@ namespace SanguineGenesis.GameLogic.Maps
         /// </summary>
         public Pattern2x2 FlipHoriz()
         {
-            Pattern2x2 newP = new Pattern2x2();
-            newP._11 = _21;
-            newP._12 = _22;
-            newP._21 = _11;
-            newP._22 = _12;
+            Pattern2x2 newP = new Pattern2x2
+            {
+                _11 = _21,
+                _12 = _22,
+                _21 = _11,
+                _22 = _12
+            };
 
             return newP;
         }
 
         /// <summary>
-        /// Returns a pattern that is rotated by 90 degrees right.
+        /// Returns a pattern that is rotated by 90 degrees clockwise.
         /// </summary>
         public Pattern2x2 RotateRight()
         {
-            Pattern2x2 newP = new Pattern2x2();
-            newP._11 = _21;
-            newP._12 = _11;
-            newP._22 = _12;
-            newP._21 = _22;
+            Pattern2x2 newP = new Pattern2x2
+            {
+                _11 = _21,
+                _12 = _11,
+                _22 = _12,
+                _21 = _22
+            };
 
             return newP;
         }

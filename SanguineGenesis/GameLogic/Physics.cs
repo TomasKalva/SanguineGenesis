@@ -22,10 +22,12 @@ namespace SanguineGenesis.GameLogic
         public static Physics GetPhysics() => new Physics();
         private Physics()
         {
-            PushingMaps = new Dictionary<Movement, PushingMap>();
-            PushingMaps.Add(Movement.LAND, null);
-            PushingMaps.Add(Movement.WATER, null);
-            PushingMaps.Add(Movement.LAND_WATER, null);
+            PushingMaps = new Dictionary<Movement, PushingMap>
+            {
+                { Movement.LAND, null },
+                { Movement.WATER, null },
+                { Movement.LAND_WATER, null }
+            };
         }
 
         /// <summary>

@@ -93,8 +93,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     return Ability.Distance.Value;
                 else
                 {
-                    Animal a = CommandedEntity as Animal;
-                    if (a != null)
+                    if (CommandedEntity is Animal a)
                         return a.AttackDistance;
                     else
                         return 0;
@@ -181,18 +180,15 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             if (CommandedEntity.IsDead)
                 return false;
-            Entity targEnt = Target as Entity;
-            if (targEnt!=null && targEnt.IsDead)
+            if (Target is Entity targEnt && targEnt.IsDead)
                 return false;
 
-            Animal commandedA = CommandedEntity as Animal;
-            if (commandedA != null)
+            if (CommandedEntity is Animal commandedA)
             {
                 if (commandedA.StateChangeLock != null && commandedA.StateChangeLock != this)
                     return false;
             }
-            Animal targA = Target as Animal;
-            if (targA != null)
+            if (Target is Animal targA)
             {
                 if (targA.StateChangeLock != null && targA.StateChangeLock != this)
                     return false;
@@ -232,8 +228,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 }
             }
 
-            Animal a;
-            if ((a = CommandedEntity as Animal) != null)
+            if (CommandedEntity is Animal a)
                 a.CanBeMoved = false;
 
             ElapsedTime += deltaT;
@@ -250,10 +245,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         private bool TryFollowTarget(Game game, float deltaT)
         {
-            Animal animal = CommandedEntity as Animal;
             if (FollowTarget() &&
                 Target.GetType() != typeof(Nothing) &&
-                animal != null)
+                CommandedEntity is Animal animal)
             {
                 float distance = Target.DistanceTo(animal);
                 if (distance > Distance)
@@ -303,8 +297,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             base.OnRemove();
             //animal loses low priority of getting pushed by physics
-            Animal a;
-            if((a = CommandedEntity as Animal)!=null)
+            if (CommandedEntity is Animal a)
                 a.CanBeMoved = true;
         }
 

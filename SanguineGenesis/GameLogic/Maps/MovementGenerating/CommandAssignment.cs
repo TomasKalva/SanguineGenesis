@@ -45,7 +45,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         private FlowField flowField;
         private FlowField FlowField { get { lock (this) return flowField; } set { lock (this) flowField = value; } }
 
-        public MoveToCommandAssignment(FactionType player, List<Animal> units, Movement movement, IMovementTarget target, float goalDistance=0.1f, bool interruptable=true)
+        public MoveToCommandAssignment(FactionType player, List<Animal> units, Movement movement, IMovementTarget target)
         {
             Movement = movement;
             Active = false;

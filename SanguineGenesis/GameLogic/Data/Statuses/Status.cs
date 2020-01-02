@@ -425,7 +425,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     /// </summary>
     class KnockAway : Status<Animal, KnockBackFactory>, IAnimalStateManipulator
     {
-        private MoveAnimalToPoint moveAnimalToPoint;
+        private readonly MoveAnimalToPoint moveAnimalToPoint;
 
         public KnockAway(Animal affected, KnockBackFactory knockBackInfo)
             : base(affected, knockBackInfo)

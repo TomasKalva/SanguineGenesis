@@ -26,21 +26,25 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             ColumnCount = 2;
 
             //text
-            Label AirText = new Label();
-            AirText.Text = "Air taken: ";
-            AirText.Margin = Padding.Empty;
-            AirText.TextAlign = ContentAlignment.MiddleLeft;
-            AirText.ForeColor = Color.Yellow;
-            AirText.Width = width / 2;
+            Label AirText = new Label
+            {
+                Text = "Air taken: ",
+                Margin = Padding.Empty,
+                TextAlign = ContentAlignment.MiddleLeft,
+                ForeColor = Color.Yellow,
+                Width = width / 2
+            };
             Controls.Add(AirText);
 
             //value
-            AirValue = new Label();
-            AirValue.Text = "";
-            AirValue.Margin = Padding.Empty;
-            AirValue.TextAlign = ContentAlignment.MiddleRight;
-            AirValue.ForeColor = Color.Yellow;
-            AirValue.Width = width / 2;
+            AirValue = new Label
+            {
+                Text = "",
+                Margin = Padding.Empty,
+                TextAlign = ContentAlignment.MiddleRight,
+                ForeColor = Color.Yellow,
+                Width = width / 2
+            };
             Controls.Add(AirValue);
             
             BackColor = Color.Black;

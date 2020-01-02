@@ -127,10 +127,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                                 break;
                             case "eat":
                                 //eat command can only be added to an animal
-                                var animF = factory as AnimalFactory;
-                                if(animF!=null)
+                                if (factory is AnimalFactory animF)
                                 {
-                                    if(animF.Diet==Diet.HERBIVORE)
+                                    if (animF.Diet == Diet.HERBIVORE)
                                         factory.Abilities.Add(abilities.HerbivoreEat);
                                     else
                                         factory.Abilities.Add(abilities.CarnivoreEat);

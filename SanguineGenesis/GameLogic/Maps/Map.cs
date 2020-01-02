@@ -18,14 +18,14 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <summary>
         /// Data of the map.
         /// </summary>
-        private Node[,] nodes { get; set; }
+        private Node[,] Nodes { get; set; }
         public Node this[int i, int j]
         {
-            get => nodes[i + 1, j + 1];
-            set => nodes[i + 1, j + 1] = value;
+            get => Nodes[i + 1, j + 1];
+            set => Nodes[i + 1, j + 1] = value;
         }
-        public int Width => nodes.GetLength(0) - 2;
-        public int Height => nodes.GetLength(1) - 2;
+        public int Width => Nodes.GetLength(0) - 2;
+        public int Height => Nodes.GetLength(1) - 2;
         /// <summary>
         /// Set to true after building was added or removed.
         /// </summary>
@@ -37,7 +37,7 @@ namespace SanguineGenesis.GameLogic.Maps
 
         internal Map(Node[,] nodes)
         {
-            this.nodes = nodes;
+            this.Nodes = nodes;
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
             InitializeObstacleMaps();
             MovementGenerating.MovementGenerator mg = MovementGenerating.MovementGenerator.GetMovementGenerator();
@@ -52,7 +52,7 @@ namespace SanguineGenesis.GameLogic.Maps
         {
             int width = map.Width;
             int height = map.Height;
-            nodes = new Node[width + 2, height + 2];
+            Nodes = new Node[width + 2, height + 2];
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)

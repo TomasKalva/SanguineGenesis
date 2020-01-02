@@ -20,7 +20,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// Values are oriented angles in radians relative to the positive x axis.
         /// If the value is not present, the direction goes straight to the target.
         /// </summary>
-        private float?[,] directions;
+        private readonly float?[,] directions;
         /// <summary>
         /// The point to which this flow field is flowing.
         /// </summary>

@@ -139,6 +139,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
             FoodEnergyRegen = foodEnergyRegen;
             FoodEatingPeriod = foodEatingPeriod;
+            EnergyCost = energyCost;
             AttackDamage = attackDamage;
             AttackPeriod = attackPeriod;
             AttackDistance = attackDistance;

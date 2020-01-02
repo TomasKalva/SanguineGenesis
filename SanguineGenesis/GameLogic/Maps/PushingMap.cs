@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <summary>
         /// Data of the map.
         /// </summary>
-        private PushingSquare?[,] pushingSquares;
+        private readonly PushingSquare?[,] pushingSquares;
 
         public PushingSquare? this[int i, int j]
         {

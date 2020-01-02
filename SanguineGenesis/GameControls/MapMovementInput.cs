@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameControl
+namespace SanguineGenesis.GameControls
 {
     /// <summary>
     /// Represents where the movement of MapView.

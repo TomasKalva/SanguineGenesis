@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
     /// </summary>
     class RayPathfinding
     {
-        private static RayPathfinding pathfinding;
+        private static readonly RayPathfinding pathfinding;
         public static RayPathfinding GetPathfinding => pathfinding;
         static RayPathfinding()
         {
@@ -55,7 +55,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             int iterations = 0;
 
             //iterate until all unblocked squares are discovered
-            while (FindClosest(targetLocation,state,distance, out int x, out int y))
+            while (FindClosest(state,distance, out int x, out int y))
             {
                 RelaxDistances(new Vector2(x + 0.5f, y + 0.5f), obst, distance, state, flFap);
                 NextIteration(state);
@@ -70,10 +70,10 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         }
 
         /// <summary>
-        /// Finds the square that is closest to the point, was already found and
+        /// Finds the square that is closest to the point, that was already found and
         /// has a not discovered adjacent neighbour. Returns true if the square exists.
         /// </summary>
-        private bool FindClosest(Vector2 point, SquareState[,] state, float[,] distance, out int x, out int y)
+        private bool FindClosest(SquareState[,] state, float[,] distance, out int x, out int y)
         {
             //the coordinates have to be initialized even if the algorithm returns false
             x = -1;

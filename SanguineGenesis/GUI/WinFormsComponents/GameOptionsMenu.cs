@@ -19,7 +19,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         /// <summary>
         /// Checkboxes for each gameplay option.
         /// </summary>
-        private CheckBox[] optionCheckboxes;
+        private readonly CheckBox[] optionCheckboxes;
 
         public GameOptionsMenu(int width, int height, GameplayOptions gameplayOptions)
         {
@@ -32,8 +32,10 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             //create rows
             for (int i = 0; i < RowCount; i++)
             {
-                RowStyle evenRow = new RowStyle(SizeType.Percent);
-                evenRow.Height = 1 / (float)RowCount;
+                RowStyle evenRow = new RowStyle(SizeType.Percent)
+                {
+                    Height = 1 / (float)RowCount
+                };
                 RowStyles.Add(evenRow);
             }
 

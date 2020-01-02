@@ -14,7 +14,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         /// <summary>
         /// Icons for objects in the game.
         /// </summary>
-        private Dictionary<string, Bitmap> icons;
+        private readonly Dictionary<string, Bitmap> icons;
         /// <summary>
         /// Empty image returned when no icon exists for the string.
         /// </summary>

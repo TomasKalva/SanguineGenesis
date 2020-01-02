@@ -91,10 +91,6 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public static T[,] SelectPartOfMap<T>(IMap<T> map, Rect area)
         {
-            int width = Math.Min((int)(Math.Ceiling(area.Width) + 1),
-                (int)(map.Width - area.Left));
-            int height = Math.Min((int)(Math.Ceiling(area.Height) + 1),
-                (int)(map.Height - area.Bottom));
             return SelectPartOfMap(map, (int)area.Left, (int)area.Bottom, (int)area.Right+1, (int)area.Top+1);
         }
 

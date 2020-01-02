@@ -29,11 +29,13 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             for (int j = 0; j < RowCount; j++)
                 for (int i = 0; i < ColumnCount; i++)
                 {
-                    Label l = new Label();
-                    l.Width = labelWidth;
-                    l.Height = labelHeight;
-                    l.Padding = Padding.Empty;
-                    l.Margin = Padding.Empty;
+                    Label l = new Label
+                    {
+                        Width = labelWidth,
+                        Height = labelHeight,
+                        Padding = Padding.Empty,
+                        Margin = Padding.Empty
+                    };
                     Stats[i, j] = l;
                     if (i % 2 == 0)
                         l.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;

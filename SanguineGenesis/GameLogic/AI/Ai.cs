@@ -53,7 +53,7 @@ namespace SanguineGenesis.GameLogic.AI
     /// </summary>
     class DumbAI:IAI
     {
-        Random random = new Random(42);
+        readonly Random random = new Random(42);
         public Player ControlledPlayer { get; }
         private float TimeUntilDecision { get; set; }
         private float DecisionPeriod { get; }

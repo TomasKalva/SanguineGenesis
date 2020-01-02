@@ -114,7 +114,7 @@ namespace SanguineGenesis.GameLogic.Maps
             }
 
             //update Current
-            Current = Current + t * delta;
+            Current += t * delta;
 
             //return false if the next square is outside of the ray
             Vector2 Dir = delta;

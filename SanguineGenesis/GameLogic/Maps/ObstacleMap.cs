@@ -18,7 +18,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Data of the map.
         /// </summary>
-        private bool[,] isObstacle;
+        private readonly bool[,] isObstacle;
 
         public bool this[int i, int j]
         {

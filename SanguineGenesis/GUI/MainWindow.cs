@@ -1,4 +1,4 @@
-﻿using SanguineGenesis.GameControl;
+﻿using SanguineGenesis.GameControls;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
@@ -34,7 +34,7 @@ namespace SanguineGenesis.GUI
             if (testAnimals)
                 Game.SpawnTestingAnimals();
             //initialize game controls
-            GameControls = new GameControls(Game.Map);
+            GameControls = new GameControls.GameControls();
             //initialize game time
             GameTime = new GameTime(Console.Out);
             
@@ -61,7 +61,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Used for manipulating the game by player.
         /// </summary>
-        private GameControls GameControls { get; }
+        private GameControls.GameControls GameControls { get; }
         /// <summary>
         /// Measures the ingame time.
         /// </summary>
@@ -79,7 +79,7 @@ namespace SanguineGenesis.GUI
             UpdateMoveMap();
             //move map view
             GameControls.MoveMapView(Game.Map, GameTime.DeltaT);
-            
+
             //update selected entities with player's input
             GameControls.UpdateEntitiesByInput(Game);
 
@@ -237,7 +237,7 @@ namespace SanguineGenesis.GUI
             Controls.Add(ControlGroupButtonArray);
 
             //add listeners to the buttons
-            EntityButtonArray.ShowInfoOnClick(EntityInfoPanel, AbilityButtonArray, GameControls, GameControls.EntityCommandsInput);
+            EntityButtonArray.ShowInfoOnClick(GameControls, GameControls.EntityCommandsInput);
             AbilityButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
             EntityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
             EntityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
@@ -322,7 +322,7 @@ namespace SanguineGenesis.GUI
                 //flowfield
                 if (Game.GameplayOptions.ShowFlowfield)
                 {
-                    FlowField flF = null;
+                    FlowField flF;
                     if ((flF = SelectedAnimalFlowfield()) != null)
                         //update flowfield with data of the selected animal if an animal is selected
                         OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
@@ -656,14 +656,6 @@ namespace SanguineGenesis.GUI
         private void OpenOptionsMenu()
         {
             GameOptionsMenu.Visible = true;
-        }
-
-        /// <summary>
-        /// Closes options menu.
-        /// </summary>
-        private void CloseOptionsMenu()
-        {
-            GameOptionsMenu.Visible = false;
         }
 
         /// <summary>

@@ -40,7 +40,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// The unit is jumping.
         /// </summary>
         private bool jumping;
-        private MoveAnimalToPoint moveAnimalToPoint;
+        private readonly MoveAnimalToPoint moveAnimalToPoint;
 
         public JumpCommand(Animal commandedEntity, Vector2 target, Jump jump)
             : base(commandedEntity, target, jump)

@@ -13,7 +13,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
     /// </summary>
     class MovementGenerator
     {
-        private static MovementGenerator movementGenerator;
+        private static readonly MovementGenerator movementGenerator;
         public static MovementGenerator GetMovementGenerator() => movementGenerator;
         
         static MovementGenerator()
@@ -22,7 +22,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             movementGenerator.StartThread();
         }
 
-        private Dictionary<FactionType, PlayerMovementGenerator> playersMovementGenerators;
+        private readonly Dictionary<FactionType, PlayerMovementGenerator> playersMovementGenerators;
         /// <summary>
         /// The player whose next command will be processed. Players switch after each iteration.
         /// </summary>
@@ -51,11 +51,11 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             /// <summary>
             /// Commands that were not registered yet. Lock is MovementGenerator.
             /// </summary>
-            private List<MoveToCommandAssignment> newCommands;//
+            private readonly List<MoveToCommandAssignment> newCommands;
             /// <summary>
             /// Obstacle maps that were not registered yet. Lock is MovementGenerator.
             /// </summary>
-            private Dictionary<Movement, ObstacleMap> newObstMaps;
+            private readonly Dictionary<Movement, ObstacleMap> newObstMaps;
             /// <summary>
             /// Set to true after assignments are added to newCommands. Lock is MovementGenerator.
             /// </summary>
@@ -74,7 +74,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             /// <summary>
             /// All valid MoveToCommandAssignments for this player in the game.
             /// </summary>
-            private List<MoveToCommandAssignment> commands;
+            private readonly List<MoveToCommandAssignment> commands;
             /// <summary>
             /// MoveToCommandAssignments that will be recalculated in this cycle.
             /// </summary>
@@ -82,11 +82,11 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             /// <summary>
             /// MoveToCommandAssignments that will be calculated repeatedly in this cycle.
             /// </summary>
-            private List<MoveToCommandAssignment> repeatedInputs;
+            private readonly List<MoveToCommandAssignment> repeatedInputs;
             /// <summary>
             /// Obstacle maps used in this cycle.
             /// </summary>
-            private Dictionary<Movement, ObstacleMap> obstMaps;
+            private readonly Dictionary<Movement, ObstacleMap> obstMaps;
             /// <summary>
             /// What kind of command assignment is currently calculated.
             /// </summary>
@@ -100,14 +100,18 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                 CurrentWork = Work.NOTHING;
                 commands = new List<MoveToCommandAssignment>();
                 newCommands = new List<MoveToCommandAssignment>();
-                newObstMaps = new Dictionary<Movement, ObstacleMap>();
-                newObstMaps.Add(Movement.LAND, null);
-                newObstMaps.Add(Movement.WATER, null);
-                newObstMaps.Add(Movement.LAND_WATER, null);
-                obstMaps = new Dictionary<Movement, ObstacleMap>();
-                obstMaps.Add(Movement.LAND, null);
-                obstMaps.Add(Movement.WATER, null);
-                obstMaps.Add(Movement.LAND_WATER, null);
+                newObstMaps = new Dictionary<Movement, ObstacleMap>
+                {
+                    { Movement.LAND, null },
+                    { Movement.WATER, null },
+                    { Movement.LAND_WATER, null }
+                };
+                obstMaps = new Dictionary<Movement, ObstacleMap>
+                {
+                    { Movement.LAND, null },
+                    { Movement.WATER, null },
+                    { Movement.LAND_WATER, null }
+                };
             }
 
             /// <summary>
@@ -273,9 +277,11 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 
         public MovementGenerator()
         {
-            playersMovementGenerators = new Dictionary<FactionType, PlayerMovementGenerator>();
-            playersMovementGenerators.Add(FactionType.PLAYER0, new PlayerMovementGenerator());
-            playersMovementGenerators.Add(FactionType.PLAYER1, new PlayerMovementGenerator());
+            playersMovementGenerators = new Dictionary<FactionType, PlayerMovementGenerator>
+            {
+                { FactionType.PLAYER0, new PlayerMovementGenerator() },
+                { FactionType.PLAYER1, new PlayerMovementGenerator() }
+            };
         }
 
         /// <summary>
@@ -283,8 +289,10 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         private void StartThread()
         {
-            Thread t = new Thread(() => Generate());
-            t.IsBackground = true;
+            Thread t = new Thread(() => Generate())
+            {
+                IsBackground = true
+            };
             t.Start();
         }
         

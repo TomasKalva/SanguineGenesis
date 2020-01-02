@@ -9,7 +9,7 @@ using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis.GameControl
+namespace SanguineGenesis.GameControls
 {
     class EntityCommandsInput
     {

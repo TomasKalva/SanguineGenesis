@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
         /// <summary>
         /// Data of the map.
         /// </summary>
-        private bool[,] visible;
+        private readonly bool[,] visible;
 
         public bool this[int i, int j]
         {

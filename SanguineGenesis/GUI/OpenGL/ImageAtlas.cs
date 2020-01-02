@@ -82,7 +82,7 @@ namespace SanguineGenesis.GUI
         public Rect GreenSquare { get; }
 
 
-        private static ImageAtlas imageAtlas;
+        private static readonly ImageAtlas imageAtlas;
         public static ImageAtlas GetImageAtlas => imageAtlas;
         static ImageAtlas()
         {
@@ -274,7 +274,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public Rect GetTileCoords(Biome biome, SoilQuality soilQuality, Terrain terrain, bool visible)
         {
-            Rect coords=default(Rect);
+            Rect coords = default;
             if(terrain==Terrain.SHALLOW_WATER)
                 switch (biome)
                 {

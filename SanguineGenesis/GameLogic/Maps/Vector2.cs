@@ -88,7 +88,7 @@ namespace SanguineGenesis.GameLogic.Maps
             get => value;
             set
             {
-                value = Math.Max(0, Math.Min(MaxValue, value));
+                this.value = Math.Max(0, Math.Min(MaxValue, value));
             }
         }
 

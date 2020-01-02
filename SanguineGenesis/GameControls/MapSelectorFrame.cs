@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameControl
+namespace SanguineGenesis.GameControls
 {
     /// <summary>
     /// Represents rectangle for selecting units.

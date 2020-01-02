@@ -17,10 +17,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         public List<Ability> AllAbilities { get; }
 
-        private Dictionary<Ability, MoveTo> moveToCast;
-        private Dictionary<string, Spawn> unitSpawn;
-        private Dictionary<string, CreateAnimal> unitCreate;
-        private Dictionary<string, BuildBuilding> buildBuilding;
+        private readonly Dictionary<Ability, MoveTo> moveToCast;
+        private readonly Dictionary<string, Spawn> unitSpawn;
+        private readonly Dictionary<string, CreateAnimal> unitCreate;
+        private readonly Dictionary<string, BuildBuilding> buildBuilding;
 
         public MoveTo UnbreakableMoveTo { get; }
         public MoveTo MoveTo { get; }
@@ -57,10 +57,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             AllAbilities = new List<Ability>();
 
-            UnbreakableMoveTo = new MoveTo(0.1f, false, false);
+            UnbreakableMoveTo = new MoveTo(0.1f, false);
             UnbreakableMoveTo.SetAbilities(this);
 
-            MoveTo = new MoveTo(0.1f, true, false);
+            MoveTo = new MoveTo(0.1f, true);
             MoveTo.SetAbilities(this);
 
             Attack = new Attack(false);
@@ -193,16 +193,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             //move to cast has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();
 
-            MoveTo moveToAbility = new MoveTo(Attack.Distance, true, false);
+            MoveTo moveToAbility = new MoveTo(Attack.Distance, true);
             moveToCast.Add(Attack, moveToAbility);
 
-            moveToAbility = new MoveTo(UnbreakableAttack.Distance, false, false);
+            moveToAbility = new MoveTo(UnbreakableAttack.Distance, false);
             moveToCast.Add(UnbreakableAttack, moveToAbility);
 
             foreach (Ability a in AllAbilities.Where(ab=>!(ab is Attack)))
             {
                 //move to cast abilities are not in AllAbilities to avoid infinite recursion
-                moveToAbility = new MoveTo(a.Distance, false, false);
+                moveToAbility = new MoveTo(a.Distance, false);
                 moveToCast.Add(a, moveToAbility);
             }
         }

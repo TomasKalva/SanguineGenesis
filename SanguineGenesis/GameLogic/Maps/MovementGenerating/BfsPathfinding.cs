@@ -16,7 +16,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// <summary>
         /// The result of the algorithm.
         /// </summary>
-        private FlowField flowField;
+        private readonly FlowField flowField;
 
         /// <summary>
         /// Contains all discovered coordinates that weren't processed yet.
@@ -25,7 +25,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// <summary>
         /// Obstacles that need to be avoided.
         /// </summary>
-        private ObstacleMap obstacleMap;
+        private readonly ObstacleMap obstacleMap;
         /// <summary>
         /// Ending point of the flowfield.
         /// </summary>

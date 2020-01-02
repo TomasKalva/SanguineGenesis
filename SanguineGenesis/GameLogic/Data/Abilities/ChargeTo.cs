@@ -37,7 +37,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
     class ChargeToCommand : Command<Animal, Entity, ChargeTo>, IAnimalStateManipulator
     {
-        private MoveAnimalToPoint moveAnimalToPoint;
+        private readonly MoveAnimalToPoint moveAnimalToPoint;
 
         public ChargeToCommand(Animal commandedEntity, Entity target, ChargeTo chargeTo)
             : base(commandedEntity, target, chargeTo)

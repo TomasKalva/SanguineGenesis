@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
     /// </summary>
     class VisibilityGenerator
     {
-        private static VisibilityGenerator visibilityGenerator;
+        private static readonly VisibilityGenerator visibilityGenerator;
 
         static VisibilityGenerator(){
             visibilityGenerator = new VisibilityGenerator();
@@ -76,8 +76,10 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
         {
             Done = true;
             newTask = false;
-            Thread t = new Thread(() => Generate());
-            t.IsBackground = true;
+            Thread t = new Thread(() => Generate())
+            {
+                IsBackground = true
+            };
             t.Start();
         }
 

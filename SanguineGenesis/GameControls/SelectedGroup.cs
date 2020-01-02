@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 
-namespace SanguineGenesis.GameControl
+namespace SanguineGenesis.GameControls
 {
     /// <summary>
     /// Represents entities selected by player.
@@ -149,16 +149,16 @@ namespace SanguineGenesis.GameControl
         /// </summary>
         private List<Entity> ComposeGroups(Operation opearation, List<Entity> total, List<Entity> temporary)
         {
-            switch (NextOperation)
+            switch (opearation)
             {
                 case Operation.ADD:
-                    return TotalGroup.Union(TemporaryGroup).ToList();
+                    return total.Union(temporary).ToList();
                 case Operation.SUBTRACT:
-                    return TotalGroup.Where(e => !TemporaryGroup.Contains(e)).ToList();
+                    return total.Where(e => !temporary.Contains(e)).ToList();
                 case Operation.REPLACE:
-                    return TemporaryGroup.ToList();
+                    return temporary.ToList();
                 default:
-                    return TotalGroup.ToList();
+                    return total.ToList();
             }
         }
     }

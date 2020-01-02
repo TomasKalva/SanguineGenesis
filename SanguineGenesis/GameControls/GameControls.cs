@@ -8,7 +8,7 @@ using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis.GameControl
+namespace SanguineGenesis.GameControls
 {
     /// <summary>
     /// Takes player's input and performs corresponding action in the game.
@@ -22,9 +22,9 @@ namespace SanguineGenesis.GameControl
         public MapSelectorFrame MapSelectorFrame { get; set; }
         public SelectedGroup SelectedGroup { get; }
 
-        public GameControls(Map map)
+        public GameControls()
         {
-            MapView = new MapView(0, 0, 60, map);
+            MapView = new MapView(0, 0, 60);
             MapMovementInput = new MapMovementInput();
             EntityCommandsInput = new EntityCommandsInput();
             MapSelectorFrame = null;

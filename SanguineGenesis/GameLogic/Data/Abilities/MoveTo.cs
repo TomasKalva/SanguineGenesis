@@ -15,7 +15,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class MoveTo : TargetAbility<Animal, IMovementTarget>
     {
-        internal MoveTo(float? goalDistance, bool attackEnemyInstead, bool usesAttackDistance)
+        internal MoveTo(float? goalDistance, bool attackEnemyInstead)
             : base(null, 0, false, false)
         {
             GoalDistance = goalDistance;
@@ -61,8 +61,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 //give command to each caster and set the command's creator
                 foreach (Animal caster in castersMov)
                 {
-                    IComputable com = new MoveToCommand(caster, target, minStoppingDistance, this);
-                    com.Assignment = mtca;
+                    IComputable com = new MoveToCommand(caster, target, minStoppingDistance, this)
+                    {
+                        Assignment = mtca
+                    };
 
                     caster.AddCommand((Command)com);
                 }
@@ -361,7 +363,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Last 4 positions of the entity.
         /// </summary>
-        private Vector2?[] last4positions;
+        private readonly Vector2?[] last4positions;
 
         public NoMovementDetection()
         {

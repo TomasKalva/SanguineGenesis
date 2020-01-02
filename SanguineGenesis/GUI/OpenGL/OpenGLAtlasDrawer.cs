@@ -16,7 +16,7 @@ using System.Windows.Media;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
-using SanguineGenesis.GameControl;
+using SanguineGenesis.GameControls;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 
@@ -376,9 +376,7 @@ namespace SanguineGenesis.GUI
             //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
-            float viewTop = mapView.Top;
             float viewBottom = mapView.Bottom;
-            float viewRight = mapView.Right;
 
             bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.FactionID].VisibilityMap);
             Node[,] visible = mapView.GetVisibleNodes(game.Players[game.CurrentPlayer.FactionID].VisibleMap);
@@ -396,7 +394,6 @@ namespace SanguineGenesis.GUI
             
             map.InitializeArrays(gl, verticesSize, uvSize, textureAtlasSize);
             float[] vertices = map.vertices;
-            float[] texture = map.uv;
             float[] texAtlas = map.texAtlas;
 
             for (int i = 0; i < width; i++)
@@ -405,7 +402,6 @@ namespace SanguineGenesis.GUI
                 {
                     //buffer indices
                     int coord = (i + j * width) * 6 * 3;
-                    int texCoord = (i + j * width) * 6 * 2;
                     int bottomLeftInd = (i + j * width) * 6 * 4;
 
                     Node current = visible[i, j];
@@ -464,11 +460,8 @@ namespace SanguineGenesis.GUI
             //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
-            float viewTop = mapView.Top;
             float viewBottom = mapView.Bottom;
-            float viewRight = mapView.Right;
 
-            bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.FactionID].VisibilityMap);
             Node[,] visible = mapView.GetVisibleNodes(game.CurrentPlayer.VisibleMap);
             int width = visible.GetLength(0);
             int height = visible.GetLength(1);
@@ -493,26 +486,19 @@ namespace SanguineGenesis.GUI
                 {
                     //buffer indices
                     int coord = (i + j * width) * 6 * 3;
-                    int texCoord = (i + j * width) * 6 * 2;
                     int bottomLeftInd = (i + j * width) * 6 * 4;
 
                     Node current = visible[i, j];
                     if (current == null)
                         continue;
 
-                    bool isVisible = true;
-                    if (visibleVisibility != null)
-                        isVisible = visibleVisibility[i, j];
-
                     //active nutrients
                     int activeNutrients = (int)(current.ActiveNutrients * 10);
                     Rect atlasCoordsRight = ImageAtlas.GetImageAtlas.GetNumberedTriangle(activeNutrients);
 
                     //passive nutrients
-                    int passiveNutrients = (int)(current.PassiveNutrients * 10);
+                    int passiveNutrients = (int)(current.PassiveNutrients);
                     Rect atlasCoordsLeft = ImageAtlas.GetImageAtlas.GetNumberedTriangle(passiveNutrients);
-
-                    Rect atlasCoords = ImageAtlas.GetImageAtlas.GetTileCoords(current.Biome, current.SoilQuality, current.Terrain, isVisible);
 
                     //tile position
                     float bottom = (current.Y - viewBottom) * sqH;
@@ -552,9 +538,7 @@ namespace SanguineGenesis.GUI
             //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
-            float viewTop = mapView.Top;
             float viewBottom = mapView.Bottom;
-            float viewRight = mapView.Right;
 
             List<Entity> visEntity = mapView.GetVisibleEntities(game, game.CurrentPlayer);
 
@@ -583,7 +567,6 @@ namespace SanguineGenesis.GUI
                 Entity current = visEntity[i];
                 //buffer indices
                 int index = i * 6 * 3;
-                int texIndex = i * 6 * 2;
                 int atlasInd = i * 6 * 4;
 
                 if (current == null)
@@ -820,12 +803,12 @@ namespace SanguineGenesis.GUI
                     Rect greenRect = ImageAtlas.GetImageAtlas.GreenSquare;
                     //energy
                     AddRectangle(left, bottom, right, top, blackRect, depth, index, vertices,
-                         atlasInd, texAtlas, 0f, 0f, 0f);
+                         atlasInd, texAtlas);
                     index += 6 * 3;
                     atlasInd += 6 * 4;
                     float energyRight = Math.Max(left, left + (right - left) * (float)(current.Energy.Percentage));
                     AddRectangle(left, bottom, energyRight, top, greenRect, depth, index, vertices,
-                         atlasInd, texAtlas, 0f, 1f, 0f);
+                         atlasInd, texAtlas);
                     index += 6 * 3;
                     atlasInd += 6 * 4;
 
@@ -833,12 +816,12 @@ namespace SanguineGenesis.GUI
                     bottom += indicatorHeight*unitSize;
                     top += indicatorHeight*unitSize;
                     AddRectangle(left, bottom, right, top, blackRect, depth, index, vertices,
-                         atlasInd, texAtlas, 0f, 0f, 0f);
+                         atlasInd, texAtlas);
                     index += 6 * 3;
                     atlasInd += 6 * 4;
                     float healthRight =Math.Max(left, left + (right - left) * (float)(current.Health.Percentage));
                     AddRectangle(left, bottom, healthRight, top, redRect, depth, index, vertices,
-                         atlasInd, texAtlas, 1f, 0f, 0f);
+                         atlasInd, texAtlas);
                 }
             }
 
@@ -878,9 +861,7 @@ namespace SanguineGenesis.GUI
             //prepare data
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
-            float viewTop = mapView.Top;
             float viewBottom = mapView.Bottom;
-            float viewRight = mapView.Right;
             float?[,] flowF = mapView.GetVisibleFlowField(flowfield);
             int width = flowF.GetLength(0);
             int height = flowF.GetLength(1);
@@ -910,7 +891,6 @@ namespace SanguineGenesis.GUI
                 {
                     //buffer indices
                     int coord = (i + j * width) * 3 * 3;
-                    int texCoord = (i + j * width) * 3 * 2;
                     int bottomLeftInd = (i + j * width) * 3 * 4;
 
 
@@ -995,13 +975,7 @@ namespace SanguineGenesis.GUI
         {
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
-            float viewTop = mapView.Top;
             float viewBottom = mapView.Bottom;
-            float viewRight = mapView.Right;
-            
-            //extents of one rectangle
-            float sqW = nodeSize;
-            float sqH = nodeSize;
 
             float[] vertices = new float[6 * 3];
             float[] texBottomLeft = new float[6 * 4];
@@ -1215,8 +1189,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public static void AddRectangle(float left, float bottom, float right, float top, Rect image, float depth,
                                             int vInd, float[] vertices,
-                                            int aInd, float[] texAtlas,
-                                            float r, float g, float b)
+                                            int aInd, float[] texAtlas)
         {
             //vertices
             SetRectangleVertices(vertices, bottom, top, left, right, -depth, vInd);

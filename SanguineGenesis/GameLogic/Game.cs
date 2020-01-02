@@ -1,21 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.AI;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GameLogic.Maps.MovementGenerating;
-using SanguineGenesis.GUI;
+using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
 using static SanguineGenesis.GUI.MainMenuWindow;
 
 namespace SanguineGenesis.GameLogic
@@ -68,9 +57,11 @@ namespace SanguineGenesis.GameLogic
             Winner = null;
 
             //factions
-            Players = new Dictionary<FactionType, Player>();
-            Players.Add(FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null));
-            Players.Add(FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome==Biome.SAVANNA?Biome.RAINFOREST: Biome.SAVANNA, new DumbAIFactory()));
+            Players = new Dictionary<FactionType, Player>
+            {
+                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null) },
+                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, new DumbAIFactory()) }
+            };
             CurrentPlayer = Players[FactionType.PLAYER0];
             NeutralFaction = new Faction(FactionType.NEUTRAL);
 

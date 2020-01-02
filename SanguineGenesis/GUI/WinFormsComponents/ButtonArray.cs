@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using SanguineGenesis;
-using SanguineGenesis.GameControl;
+using SanguineGenesis.GameControls;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
@@ -47,7 +47,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             if (InfoSources != null && index < InfoSources.Count)
                 return InfoSources[index];
             else
-                return default(InfoSource);
+                return default;
         }
         /// <summary>
         /// Selected InfoSource.
@@ -202,7 +202,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         /// entityInfoPanel and its abilities in abilityButtonArray, and to remove
         /// the entity from selected entities on right click.
         /// </summary>
-        public void ShowInfoOnClick(EntityInfoPanel entityInfoPanel, AbilityButtonArray abilityButtonArray, GameControls gameControls,
+        public void ShowInfoOnClick(GameControls.GameControls gameControls,
                                     EntityCommandsInput entityCommandsInput)
         {
             for (int i = 0; i < ColumnCount; i++)
@@ -253,7 +253,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         /// <summary>
         /// Sets listeners to buttons click to select ability.
         /// </summary>
-        public void SelectAbilityOnClick(GameControls gameControls)
+        public void SelectAbilityOnClick(GameControls.GameControls gameControls)
         {
             for (int i = 0; i < ColumnCount; i++)
                 for (int j = 0; j < RowCount; j++)
@@ -425,7 +425,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             }
         }
 
-        public void SetEventHandlers(GameControls gameControls)
+        public void SetEventHandlers(GameControls.GameControls gameControls)
         {
             for (int i = 0; i < ColumnCount * RowCount; i++)
             {
