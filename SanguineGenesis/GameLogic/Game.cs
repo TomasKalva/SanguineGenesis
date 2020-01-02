@@ -66,7 +66,7 @@ namespace SanguineGenesis
             GameEnded = false;
             Winner = null;
 
-            //players
+            //factions
             Players = new Dictionary<FactionType, Player>();
             Players.Add(SanguineGenesis.FactionType.PLAYER0, new Player(SanguineGenesis.FactionType.PLAYER0, firstPlayersBiome, null));
             Players.Add(SanguineGenesis.FactionType.PLAYER1, new Player(SanguineGenesis.FactionType.PLAYER1, firstPlayersBiome==Biome.SAVANNA?Biome.RAINFOREST: Biome.SAVANNA, new DumbAiFactory()));
@@ -85,6 +85,14 @@ namespace SanguineGenesis
             MovementGenerator.GetMovementGenerator().Reset();
             nextVisibilityPlayer = SanguineGenesis.FactionType.PLAYER0;
             GameplayOptions = new GameplayOptions();
+        }
+
+        /// <summary>
+        /// Spawns 3 instances of each animal in the game for current player.
+        /// </summary>
+        public void SpawnTestingAnimals()
+        {
+            CurrentPlayer.SpawnTestingAnimals();
         }
 
         /// <summary>

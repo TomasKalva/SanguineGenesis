@@ -440,7 +440,7 @@ namespace SanguineGenesis.GUI
                     MapDescr.RepairMap();
                     DisableEditing();
 
-                    var gameWindow = new MainWinformWindow(MapDescr, PlayersBiome, Icons);
+                    var gameWindow = new MainWinformWindow(MapDescr, PlayersBiome, Icons, testAnimalsCB.Checked);
                     gameWindow.ShowDialog();
                     gameWindow.Dispose();
                 }

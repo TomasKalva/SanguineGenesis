@@ -138,44 +138,36 @@ namespace SanguineGenesis
         public Player(FactionType factionID, Biome biome, IAiFactory aiFactory)
             : base(factionID)
         {
-            InitUnits();
+            //SpawnTestingAnimals();
             VisibleBuildings = new List<Building>();
             Biome = biome;
             if(aiFactory!=null)
                 Ai = aiFactory.NewInstance(this);
         }
 
-        //todo: remove this things
-        public void InitUnits()
+        /// <summary>
+        /// Spawns 3 instances of each animal in the game.
+        /// </summary>
+        public void SpawnTestingAnimals()
         {
-            if (FactionID == FactionType.PLAYER1)
-                return;
-
+            //calculate extents
+            var factories = GameStaticData.AnimalFactories.Factorys;
+            int gridPoints = (int)Math.Ceiling(Math.Sqrt(factories.Count));
+            float gridSize = 29f;
+            float step = gridSize / (gridPoints + 1);
+            
+            //create animals
             AnimalFactory normalUnits = new AnimalFactory("TIGER", 200, 150, 0.3f, 0.5f, 0.4f, 5f, 0.5f, 0.1f, false, 3f, 2f, Movement.LAND, false, Diet.CARNIVORE, 5f, true, 20f, 5f, new List<StatusFactory>(), 1);
-            int id = 0;
-            foreach (AnimalFactory a in GameStaticData.AnimalFactories.Factorys.Select(kvp => kvp.Value))
+            int i = 0;
+            foreach (AnimalFactory a in factories.Select(kvp => kvp.Value))
             {
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < 3; j++)
                 {
-                    Entities.Add(a.NewInstance(this, new Vector2(2 + 5 * (id % 8), 2 + 5 * (id / 8))));
+                    Entities.Add(a.NewInstance(this, new Vector2(step * ((i % gridPoints) + 1),
+                                                                 step * ((i / gridPoints) + 1))));
                 }
-                id++;
+                i++;
             }
-            //new UnitFactory(string.TIGER, 0.5f,2f,2f,100,10,Movement.LAND,4f);
-            /*UnitFactory smallFastUnits = new UnitFactory(string.TIGER, 0.25f, 3f, 3f,50,0,Movement.WATER,4f);
-            UnitFactory bigUnits = new UnitFactory(string.BAOBAB, 1f, 2f, 4f,150,0,Movement.LAND_WATER,4f);*/
-            /*for (int i = 0; i < 20; i++)
-            {
-                for (int j = 0; j < 10; j++)
-                {
-                    Entities.Add(normalUnits.NewInstance(this, new Vector2(20 + i*.25f,10+ j*.25f)));
-                }
-            }*/
-            /*Entities.Add(bigUnits.NewInstance(this, new Vector2(5f, 6f)));
-            Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(5f, 6f)));
-            Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(7f, 6f)));
-            Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(6.5f, 6f)));
-            Entities.Add(new Unit(this, string.TIGER, 10, 10, new Vector2(4f, 9f)));*/
         }
 
         /// <summary>

@@ -20,11 +20,14 @@ namespace SanguineGenesis.GUI
     {
         Timer GameTimer { get; }
 
-        public MainWinformWindow(MapDescription mapDescription, Biome playersBiome, Icons icons)
+        public MainWinformWindow(MapDescription mapDescription, Biome playersBiome, Icons icons, bool testAnimals)
         {
             InitializeComponent();
             
             Game = new Game(mapDescription, playersBiome);
+            //spawn testing animals
+            if (testAnimals)
+                Game.SpawnTestingAnimals();
             GameControls = new GameControls(Game.Map);
             TotalStopwatch = new Stopwatch();
             TotalStopwatch.Start();
