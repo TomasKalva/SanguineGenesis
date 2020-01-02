@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis.GameLogic
+namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
 {
     /// <summary>
     /// Used for asynchronous creating of visibility maps. Lock for accessing public properties
@@ -234,6 +234,28 @@ namespace SanguineGenesis.GameLogic
             //sleep so that the updates aren't too frequent
             Thread.Sleep(10);
             return VisibilityMap;
+        }
+    }
+
+    /// <summary>
+    /// Describes view of an entity. Used as parameter for VisibilityMapGenerator, which
+    /// works in different thread than the game thread.
+    /// </summary>
+    public struct View
+    {
+        /// <summary>
+        /// Position of the entity.
+        /// </summary>
+        public Vector2 Position { get; }
+        /// <summary>
+        /// View range of the entity.
+        /// </summary>
+        public float Range { get; }
+
+        public View(Vector2 position, float range)
+        {
+            Position = position;
+            Range = range;
         }
     }
 }

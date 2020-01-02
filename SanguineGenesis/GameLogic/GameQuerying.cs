@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Used for extracting information about the game.

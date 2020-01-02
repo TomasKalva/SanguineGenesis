@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameControl
 {
     /// <summary>
     /// Takes player's input and performs corresponding action in the game.
@@ -19,7 +21,6 @@ namespace SanguineGenesis
         public EntityCommandsInput EntityCommandsInput { get; }
         public MapSelectorFrame MapSelectorFrame { get; set; }
         public SelectedGroup SelectedGroup { get; }
-
 
         public GameControls(Map map)
         {

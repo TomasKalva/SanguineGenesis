@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Maps;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -436,6 +438,50 @@ namespace SanguineGenesis.GUI
             Width = width;
             Height = height;
             ChangeTimes = animChangeTimes;
+        }
+    }
+
+    /// <summary>
+    /// Animation with current image and timer.
+    /// </summary>
+    class AnimationState
+    {
+        /// <summary>
+        /// Animation whose images are used.
+        /// </summary>
+        public Animation Animation { get; }
+        /// <summary>
+        /// Time the current image was shown for.
+        /// </summary>
+        private float progress;
+        /// <summary>
+        /// Index of the current image.
+        /// </summary>
+        private int image;
+
+        /// <summary>
+        /// Location of the current image in atlas.
+        /// </summary>
+        public Rect CurrentImage => Animation.Images[image];
+
+        public AnimationState(Animation anim)
+        {
+            Animation = anim;
+            progress = 0;
+        }
+
+        /// <summary>
+        /// Update the state.
+        /// </summary>
+        public void Step(float deltaT)
+        {
+            progress += deltaT;
+            if (progress >= Animation.ChangeTimes[image])
+            {
+                //move to the next image
+                progress -= Animation.ChangeTimes[image];
+                image = (image + 1) % Animation.Length;
+            }
         }
     }
 }

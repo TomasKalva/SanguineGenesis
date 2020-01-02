@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 
-namespace SanguineGenesis.GUI
+namespace SanguineGenesis.GUI.WinFormsComponents
 {
     /// <summary>
     /// Shows info about IShowable.

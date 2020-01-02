@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SanguineGenesis.GameLogic.Data.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameLogic.Data.Entities
+namespace SanguineGenesis.GameLogic.Data.Statuses
 {
     /// <summary>
     /// Contains statuses that are used in the game.

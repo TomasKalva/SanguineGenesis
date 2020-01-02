@@ -5,8 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameControl
 {
     class EntityCommandsInput
     {

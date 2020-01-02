@@ -1,10 +1,14 @@
-﻿using System;
+﻿using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameControl
 {
     /// <summary>
     /// Represents rectangle for selecting units.

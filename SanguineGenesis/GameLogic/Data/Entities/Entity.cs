@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Statuses;
 using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
 using SanguineGenesis.GUI;
+using SanguineGenesis.GUI.WinFormsComponents;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
     /// Represents an object on the map.

@@ -1,17 +1,17 @@
-﻿using SanguineGenesis.GameLogic;
+﻿using SanguineGenesis.GameControl;
+using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 using SanguineGenesis.GUI.WinFormsComponents;
-using SanguineGenesis.GUI.WPFComponents;
 using SharpGL;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using static SanguineGenesis.GUI.MainMenuWindow;
 

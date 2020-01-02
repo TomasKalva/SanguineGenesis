@@ -14,10 +14,11 @@ using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.AI;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 using SanguineGenesis.GUI;
 using static SanguineGenesis.GUI.MainMenuWindow;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Represents game state.
@@ -68,9 +69,9 @@ namespace SanguineGenesis
 
             //factions
             Players = new Dictionary<FactionType, Player>();
-            Players.Add(SanguineGenesis.FactionType.PLAYER0, new Player(SanguineGenesis.FactionType.PLAYER0, firstPlayersBiome, null));
-            Players.Add(SanguineGenesis.FactionType.PLAYER1, new Player(SanguineGenesis.FactionType.PLAYER1, firstPlayersBiome==Biome.SAVANNA?Biome.RAINFOREST: Biome.SAVANNA, new DumbAiFactory()));
-            CurrentPlayer = Players[SanguineGenesis.FactionType.PLAYER0];
+            Players.Add(FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null));
+            Players.Add(FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome==Biome.SAVANNA?Biome.RAINFOREST: Biome.SAVANNA, new DumbAIFactory()));
+            CurrentPlayer = Players[FactionType.PLAYER0];
             NeutralFaction = new Faction(FactionType.NEUTRAL);
 
              //map
@@ -83,7 +84,7 @@ namespace SanguineGenesis
 
             physics = Physics.GetPhysics();
             MovementGenerator.GetMovementGenerator().Reset();
-            nextVisibilityPlayer = SanguineGenesis.FactionType.PLAYER0;
+            nextVisibilityPlayer = FactionType.PLAYER0;
             GameplayOptions = new GameplayOptions();
         }
 
@@ -120,7 +121,7 @@ namespace SanguineGenesis
             //ai
             foreach (var p in Players.Values)
                 if (p.Ai != null)
-                    p.Ai.Update(deltaT, this);
+                    p.Ai.Play(deltaT, this);
 
             //map changing phase
             List<Entity> entities = GetAll<Entity>();
@@ -216,13 +217,13 @@ namespace SanguineGenesis
             //test if someone won the game
             if (Winner == null)
             {
-                if (!Players[SanguineGenesis.FactionType.PLAYER0].GetAll<Tree>().Any())
-                    Winner = SanguineGenesis.FactionType.PLAYER1;
-                else if (!Players[SanguineGenesis.FactionType.PLAYER1].GetAll<Tree>().Any())
-                    Winner = SanguineGenesis.FactionType.PLAYER0;
+                if (!Players[FactionType.PLAYER0].GetAll<Tree>().Any())
+                    Winner = FactionType.PLAYER1;
+                else if (!Players[FactionType.PLAYER1].GetAll<Tree>().Any())
+                    Winner = FactionType.PLAYER0;
             }
 
-            gameTime.PrintTime("Others");
+            gameTime.PrintTime("Others2");
         }
 
         /// <summary>
@@ -234,9 +235,9 @@ namespace SanguineGenesis
             if (visibilityGenerator.Done)
             {
                 FactionType current = nextVisibilityPlayer;
-                FactionType other = nextVisibilityPlayer == SanguineGenesis.FactionType.PLAYER0 ?
-                                        SanguineGenesis.FactionType.PLAYER1 :
-                                        SanguineGenesis.FactionType.PLAYER0;
+                FactionType other = nextVisibilityPlayer == FactionType.PLAYER0 ?
+                                        FactionType.PLAYER1 :
+                                        FactionType.PLAYER0;
 
                 //update current player's visibility map
                 var newMap = visibilityGenerator.VisibilityMap;

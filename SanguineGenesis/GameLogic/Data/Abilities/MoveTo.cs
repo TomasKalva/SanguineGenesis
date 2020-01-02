@@ -1,4 +1,7 @@
-﻿using SanguineGenesis.GUI;
+﻿using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.MovementGenerating;
+using SanguineGenesis.GUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;

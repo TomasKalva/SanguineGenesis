@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Statuses;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis.GameLogic
+namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
     /// Used for creating Entities.

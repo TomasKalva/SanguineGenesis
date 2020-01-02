@@ -8,12 +8,15 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using SanguineGenesis;
+using SanguineGenesis.GameControl;
 using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Statuses;
 using SanguineGenesis.GUI;
 using SanguineGenesis.GUI.WinFormsComponents;
 
-namespace SanguineGenesis.GUI
+namespace SanguineGenesis.GUI.WinFormsComponents
 {
     /// <summary>
     /// Parent of ButtonArray<T>, contains icons for buttons.

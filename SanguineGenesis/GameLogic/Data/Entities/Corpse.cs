@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Statuses;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
+using SanguineGenesis.GUI.WinFormsComponents;
 
 namespace SanguineGenesis.GameLogic.Data.Entities
 {

@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Forms;
 using SanguineGenesis.GameLogic;
 
-namespace SanguineGenesis.GUI
+namespace SanguineGenesis.GUI.WinFormsComponents
 {
     /// <summary>
     /// Panel for enabling and disabling game options.

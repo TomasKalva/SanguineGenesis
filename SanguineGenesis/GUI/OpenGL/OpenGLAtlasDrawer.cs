@@ -16,8 +16,11 @@ using System.Windows.Media;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
+using SanguineGenesis.GameControl;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Used for drawing objects in game to the OpenGL control.
@@ -38,6 +41,7 @@ namespace SanguineGenesis
         static private ShaderProgram shaderProgram;
 
         #region Initialization
+
         /// <summary>
         /// Initializes the instance of OpenGL.
         /// </summary>

@@ -7,7 +7,7 @@ using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Used for handling collisions.

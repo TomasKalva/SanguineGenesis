@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic.Maps
 {
     /// <summary>
     /// Generates PushingMap for Map.

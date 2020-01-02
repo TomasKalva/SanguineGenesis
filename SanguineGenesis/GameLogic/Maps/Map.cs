@@ -7,8 +7,11 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic.Maps
 {
     class Map:IMap<Node>
     {
@@ -37,9 +40,9 @@ namespace SanguineGenesis
             this.nodes = nodes;
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
             InitializeObstacleMaps();
-            MovementGenerator mg = MovementGenerator.GetMovementGenerator();
-            mg.SetMapChanged(SanguineGenesis.FactionType.PLAYER0, ObstacleMaps);
-            mg.SetMapChanged(SanguineGenesis.FactionType.PLAYER1, ObstacleMaps);
+            MovementGenerating.MovementGenerator mg = MovementGenerating.MovementGenerator.GetMovementGenerator();
+            mg.SetMapChanged(FactionType.PLAYER0, ObstacleMaps);
+            mg.SetMapChanged(FactionType.PLAYER1, ObstacleMaps);
         }
 
         /// <summary>

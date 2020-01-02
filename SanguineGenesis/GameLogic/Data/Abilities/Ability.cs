@@ -5,9 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 using SanguineGenesis.GUI;
+using SanguineGenesis.GUI.WinFormsComponents;
 
-namespace SanguineGenesis.GameLogic
+namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
     /// Used to set commands to entities.

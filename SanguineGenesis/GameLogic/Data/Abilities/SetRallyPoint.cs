@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

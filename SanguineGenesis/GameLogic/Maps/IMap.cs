@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic.Maps
 {
     /// <summary>
     /// Represents rectangle area of squares. Type of the square is Square.

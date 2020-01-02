@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Entities;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameControl
 {
     /// <summary>
     /// Represents entities selected by player.

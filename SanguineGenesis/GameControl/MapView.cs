@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.MovementGenerating;
+using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
+using SanguineGenesis.GUI;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameControl
 {
     /// <summary>
     /// The class describes player's view of the map.

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SanguineGenesis.GameLogic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GUI
 {
     /// <summary>
     /// Implemented by classes that can be considered a rectangle.

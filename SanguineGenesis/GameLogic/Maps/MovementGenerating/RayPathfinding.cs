@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SanguineGenesis.GameLogic.Maps.MovementGenerating;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 {
     /// <summary>
     /// Used for generating flowfield using raycasting algorithm.

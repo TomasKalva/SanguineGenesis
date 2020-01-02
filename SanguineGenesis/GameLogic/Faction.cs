@@ -5,10 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.AI;
+using SanguineGenesis.GameLogic.Data;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Statuses;
 using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
 
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic
 {
     class Faction
     {
@@ -27,7 +30,7 @@ namespace SanguineGenesis
         /// <summary>
         /// Entities factories, abilities and statuses used by the player.
         /// </summary>
-        public GameStaticData GameStaticData { get; }
+        public GameData GameStaticData { get; }
         /// <summary>
         /// Maximum amount of air that can be taken by animals. If reached or exceeded, 
         /// no new animals can be created.
@@ -42,7 +45,7 @@ namespace SanguineGenesis
         {
             FactionID = factionID;
             Entities = new List<Entity>();
-            GameStaticData = new GameStaticData();
+            GameStaticData = new GameData();
         }
 
         /// <summary>
@@ -133,9 +136,9 @@ namespace SanguineGenesis
         /// <summary>
         /// Aritificial intelligence that controls this player.
         /// </summary>
-        public IAi Ai { get; }
+        public IAI Ai { get; }
 
-        public Player(FactionType factionID, Biome biome, IAiFactory aiFactory)
+        public Player(FactionType factionID, Biome biome, IAIFactory aiFactory)
             : base(factionID)
         {
             //SpawnTestingAnimals();

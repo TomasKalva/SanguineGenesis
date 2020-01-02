@@ -5,9 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Statuses;
 
-namespace SanguineGenesis.GUI
+namespace SanguineGenesis.GUI.WinFormsComponents
 {
     /// <summary>
     /// Shows info about entity.

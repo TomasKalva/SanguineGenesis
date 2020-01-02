@@ -5,9 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 
-namespace SanguineGenesis.GameLogic
+namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 {
     class MoveToCommandAssignment
     {
@@ -92,24 +94,13 @@ namespace SanguineGenesis.GameLogic
                 }
                     
             }
-            /*else
-            {
-                //if there is an obstacle on the target square, cancel this assignment
-                if (obst[(int)Target.Center.X, (int)Target.Center.Y] ||
-                    !Animals.Any())
-                {
-                    Invalid = true;
-                    return;
-                }
-            }*/
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            //FlowField flF= RayPathfinding.GetPathfinding.GenerateFlowField(forPathfinding, Target.Center);
             FlowField flF = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowField();
             FlowField = flF;
             sw.Stop();
-            Console.WriteLine(sw.ElapsedMilliseconds);
+            //Console.WriteLine(sw.ElapsedMilliseconds);
         }
 
         /// <summary>

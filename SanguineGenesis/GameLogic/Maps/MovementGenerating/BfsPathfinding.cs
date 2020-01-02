@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 {
     /// <summary>
     /// Used for generating flowfield using bfs with raycasting heuristics. One instance of the class

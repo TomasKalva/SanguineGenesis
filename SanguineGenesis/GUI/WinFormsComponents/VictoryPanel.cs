@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SanguineGenesis.GUI.WPFComponents
+namespace SanguineGenesis.GUI.WinFormsComponents
 {
     /// <summary>
     /// Shows name of the player who won.

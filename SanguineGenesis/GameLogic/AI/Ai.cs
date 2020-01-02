@@ -1,4 +1,6 @@
 ﻿using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,41 +9,64 @@ using System.Threading.Tasks;
 
 namespace SanguineGenesis.GameLogic.AI
 {
-    interface IAiFactory
+    /// <summary>
+    /// Creates AIs.
+    /// </summary>
+    interface IAIFactory
     {
-        IAi NewInstance(Player controlledPlayer);
+        /// <summary>
+        /// Creates new instance that implements IAI.
+        /// </summary>
+        IAI NewInstance(Player controlledPlayer);
     }
 
-    interface IAi
+    /// <summary>
+    /// Plays the game.
+    /// </summary>
+    interface IAI
     {
-        void Update(float deltaT, Game game);
+        /// <summary>
+        /// The player this AI controls.
+        /// </summary>
+        Player ControlledPlayer { get; }
+
+        /// <summary>
+        /// AI gives command to its entities. It is called every step.
+        /// </summary>
+        void Play(float deltaT, Game game);
     }
 
-    class DumbAiFactory: IAiFactory
+    /// <summary>
+    /// Creates DumbAI.
+    /// </summary>
+    class DumbAIFactory: IAIFactory
     {
-
-
-        public DumbAiFactory()
+        public IAI NewInstance(Player controlledPlayer)
         {
-
-        }
-
-        public IAi NewInstance(Player controlledPlayer)
-        {
-            return new DumbAi(controlledPlayer, 1f);
+            return new DumbAI(controlledPlayer, 1f);
         }
     }
 
-    class DumbAi:IAi
+    /// <summary>
+    /// Sends all of its units to attack selected units of the enemy player. BuildBuildings and
+    /// CreateAnimal are used randomly.
+    /// </summary>
+    class DumbAI:IAI
     {
         Random random = new Random(42);
         public Player ControlledPlayer { get; }
         private float TimeUntilDecision { get; set; }
         private float DecisionPeriod { get; }
+        /// <summary>
+        /// Trees with corresponding ability to be used next.
+        /// </summary>
         private Dictionary<Tree, BuildBuilding> ToBuildNext { get; }
+        /// <summary>
+        /// Buildings with corresponding ability to be used next.
+        /// </summary>
         private Dictionary<Building, CreateAnimal> ToCreateAnimalNext { get; }
 
-        public DumbAi(Player controlledPlayer, float decisionPeriod)
+        public DumbAI(Player controlledPlayer, float decisionPeriod)
         {
             ControlledPlayer = controlledPlayer;
             DecisionPeriod = decisionPeriod;
@@ -50,18 +75,21 @@ namespace SanguineGenesis.GameLogic.AI
             ToCreateAnimalNext = new Dictionary<Building, CreateAnimal>();
         }
 
-        public void Update(float deltaT, Game game)
+        public void Play(float deltaT, Game game)
         {
             TimeUntilDecision -= deltaT;
             if(TimeUntilDecision <= 0)
             {
                 PlaceBuildings(game.Map);
-                SpawnAnimals();
+                CreateAnimals();
                 AttackEnemies(game);
                 TimeUntilDecision += DecisionPeriod;
             }
         }
 
+        /// <summary>
+        /// Send all idle animals to attack enemy building if it exists.
+        /// </summary>
         public void AttackEnemies(Game game)
         {
             var idleAnimals = ControlledPlayer.GetAll<Animal>()
@@ -75,18 +103,27 @@ namespace SanguineGenesis.GameLogic.AI
             }
         }
 
-        private void SpawnAnimals()
+        /// <summary>
+        /// Set CreateAnimals commands to buildings.
+        /// </summary>
+        private void CreateAnimals()
         {
             var buildings = ControlledPlayer.GetAll<Building>();
 
-            foreach (Building b in buildings.ToRandomizedList().Take(3))//only do it for 3 buildings so that the ai doesn't have too much apm
+            //only do it for 3 buildings so that the ai doesn't perform too many actions per second
+            foreach (Building b in buildings.ToRandomizedList().Take(3))
             {
-                SpawnAnimals(b);
+                CreateAnimals(b);
             }
         }
 
-        private void SpawnAnimals(Building caster)
+        /// <summary>
+        /// Set CreateAnimal command to caster.
+        /// </summary>
+        /// <param name="caster"></param>
+        private void CreateAnimals(Building caster)
         {
+            //add caster to ToCreateAnimalNext if it isn't there yet, set its next ability
             if (!ToCreateAnimalNext.ContainsKey(caster))
             {
                 var spawningAbilities = caster.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
@@ -100,8 +137,10 @@ namespace SanguineGenesis.GameLogic.AI
             CreateAnimal ability = ToCreateAnimalNext[caster];
             if (caster.Energy >= ability.EnergyCost)
             {
+                //cast the ability
                 ability.SetCommands(new List<Building>() { caster }, Nothing.Get, false);
-
+                
+                //select ability to use next by caster from all of its CreateAnimal abilities
                 var spawningAbilities = caster.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
                 if (!spawningAbilities.Any())
                     return;
@@ -109,18 +148,26 @@ namespace SanguineGenesis.GameLogic.AI
             }
         }
 
+        /// <summary>
+        /// Sets BuildBuilding abilities.
+        /// </summary>
         public void PlaceBuildings(Map map)
         {
             var trees = ControlledPlayer.GetAll<Tree>();
 
-            foreach(Tree b in trees.ToRandomizedList().Take(3))//only do it for 3 buildings so that it doesn't take too much time
+            //only do it for 3 buildings so that the ai doesn't perform too many actions per second
+            foreach (Tree b in trees.ToRandomizedList().Take(3))
             {
                 PlaceBuildings(b, map);
             }
         }
 
+        /// <summary>
+        /// Set BuildBuilding command to caster.
+        /// </summary>
         private void PlaceBuildings(Tree caster, Map map)
         {
+            //add caster to ToBuildNext if it isn't there yet, set its next ability
             if (!ToBuildNext.ContainsKey(caster))
             {
                 var buildingAbilities = caster.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();
@@ -139,8 +186,10 @@ namespace SanguineGenesis.GameLogic.AI
                 {
                     if(map.BuildingCanBePlaced(ability.BuildingFactory, n.X, n.Y))
                     {
+                        //cast ability
                         ability.SetCommands(new List<Tree>() { caster }, n, false);
 
+                        //select ability to use next by caster from all of its BuildBuilding abilities
                         var buildingAbilities = caster.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();
                         if (!buildingAbilities.Any())
                             return;
@@ -150,10 +199,16 @@ namespace SanguineGenesis.GameLogic.AI
         }
     }
 
+    /// <summary>
+    /// Extensions methods for List<T>.
+    /// </summary>
     public static class ListExtensions
     {
         private static readonly Random random = new Random(0);
 
+        /// <summary>
+        /// Returns random permutation of list.
+        /// </summary>
         public static List<T> ToRandomizedList<T>(this List<T> list)
         {
             var newL = new List<T>();

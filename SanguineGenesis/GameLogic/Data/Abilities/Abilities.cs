@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
 
-namespace SanguineGenesis.GameLogic
+namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
     /// Contains abilities that are used in the game.
@@ -53,7 +53,7 @@ namespace SanguineGenesis.GameLogic
         public ChargeTo ChargeTo { get; }
         public Kick Kick { get; }
 
-        internal Abilities(GameStaticData gameStaticData)
+        internal Abilities(GameData gameStaticData)
         {
             AllAbilities = new List<Ability>();
 

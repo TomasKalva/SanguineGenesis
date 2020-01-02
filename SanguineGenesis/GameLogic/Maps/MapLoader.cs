@@ -1,4 +1,6 @@
-﻿using SanguineGenesis.GUI;
+﻿using SanguineGenesis.GameLogic.Data;
+using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GUI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -110,13 +112,13 @@ namespace SanguineGenesis.GameLogic.Maps
             else if (type == BuildingType.ROCK)
             {
                 //neutral rock
-                GameStaticData gsd = game.NeutralFaction.GameStaticData;
+                GameData gsd = game.NeutralFaction.GameStaticData;
                 game.Map.PlaceBuilding(gsd.StructureFactories["ROCK"], game.NeutralFaction, n.X, n.Y);
             }
             else if (type == BuildingType.BIG_ROCK)
             {
                 //neutral big rock
-                GameStaticData gsd = game.NeutralFaction.GameStaticData;
+                GameData gsd = game.NeutralFaction.GameStaticData;
                 game.Map.PlaceBuilding(gsd.StructureFactories["BIG_ROCK"], game.NeutralFaction, n.X, n.Y);
 
             }

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace SanguineGenesis.GUI
 {
+    /// <summary>
+    /// Contains extension methods for System.Drawing.Color.
+    /// </summary>
     static class ColorExtensionMethods
     {
         /// <summary>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
 {
     /// <summary>
     /// Represents part of a map visible by a player.

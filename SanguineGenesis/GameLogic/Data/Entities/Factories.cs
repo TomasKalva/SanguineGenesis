@@ -5,9 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Statuses;
 
-namespace SanguineGenesis.GameLogic
+namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
     /// Loads and stores factories of the type EntityFactory.
@@ -50,7 +52,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="statuses">Statuses that can be given to factories that require them.</param>
-        public void InitFactorys(string fileName, Statuses statuses)
+        public void InitFactorys(string fileName, Statuses.Statuses statuses)
         {
             using (StreamReader fileReader = new StreamReader(fileName))
             {
@@ -68,12 +70,12 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         /// <param name="description">String that describes the factory's properties.</param>
         /// <param name="statuses">Statuses that can be given to the factory if it requires them.</param>
-        public abstract void AddNewFactory(string description, Statuses statuses);
+        public abstract void AddNewFactory(string description, Statuses.Statuses statuses);
 
         /// <summary>
         /// Returns a list of statuses represented by the string listOfStatuses.
         /// </summary>
-        public List<StatusFactory> ParseStatuses(string listOfStatuses, Statuses statuses)
+        public List<StatusFactory> ParseStatuses(string listOfStatuses, Statuses.Statuses statuses)
         {
             List<StatusFactory> statusFactories = new List<StatusFactory>();
             string[] statusesNames = listOfStatuses.Split(';');
@@ -93,7 +95,7 @@ namespace SanguineGenesis.GameLogic
         /// Uses abilitiesList to set abilities to the already created Factorys. Has to be called after
         /// InitFactorys.
         /// </summary>
-        public void InitAbilities(Abilities abilities)
+        public void InitAbilities(Abilities.Abilities abilities)
         {
             foreach(var entityAbilities in abilitiesList)
             {
@@ -212,7 +214,7 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     class TreeFactories : Factories<TreeFactory>
     {
-        public override void AddNewFactory(string description, Statuses statuses)
+        public override void AddNewFactory(string description, Statuses.Statuses statuses)
         {
             string[] fields = description.Split(',');
             string treeType = fields[0];
@@ -242,7 +244,7 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     class StructureFactories : Factories<StructureFactory>
     {
-        public override void AddNewFactory(string description, Statuses statuses)
+        public override void AddNewFactory(string description, Statuses.Statuses statuses)
         {
             string[] fields = description.Split(',');
             string structureType = fields[0];
@@ -269,7 +271,7 @@ namespace SanguineGenesis.GameLogic
     /// </summary>
     class AnimalFactories : Factories<AnimalFactory>
     {
-        public override void AddNewFactory(string description, Statuses statuses)
+        public override void AddNewFactory(string description, Statuses.Statuses statuses)
         {
             string[] fields = description.Split(',');
             string unitType = fields[0];
