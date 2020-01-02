@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -18,21 +19,25 @@ namespace SanguineGenesis.GUI
 {
     partial class MainWinformWindow : Form
     {
-        Timer GameTimer { get; }
+        /// <summary>
+        /// Runs main loop of the game.
+        /// </summary>
+        Timer GameUpdateTimer { get; }
 
         public MainWinformWindow(MapDescription mapDescription, Biome playersBiome, Icons icons, bool testAnimals)
         {
             InitializeComponent();
             
+            //initialize game
             Game = new Game(mapDescription, playersBiome);
             //spawn testing animals
             if (testAnimals)
                 Game.SpawnTestingAnimals();
+            //initialize game controls
             GameControls = new GameControls(Game.Map);
-            TotalStopwatch = new Stopwatch();
-            TotalStopwatch.Start();
+            //initialize game time
+            GameTime = new GameTime(Console.Out);
             
-
             //waint until the window initializes and then initialize bottom panel and opengl
             Shown += (s, e) =>
             {
@@ -41,70 +46,94 @@ namespace SanguineGenesis.GUI
             };
 
             //create and enable game update timer
-            GameTimer = new Timer();
-            GameTimer.Tick += GameUpdateTimer_Tick;
-            GameTimer.Enabled = true;
-            GameTimer.Interval = 10;
+            GameUpdateTimer = new Timer();
+            GameUpdateTimer.Tick += GameUpdateTimer_MainLoop;
+            GameUpdateTimer.Enabled = true;
+            GameUpdateTimer.Interval = 10;
         }
 
         #region Game logic
+
         /// <summary>
         /// The game this window is showing.
         /// </summary>
         private Game Game { get; }
         /// <summary>
-        /// Can only be used synchronously from this window. Using this variable or
-        /// its contents from other threads requires invocation.
+        /// Used for manipulating the game by player.
         /// </summary>
         private GameControls GameControls { get; }
+        /// <summary>
+        /// Measures the ingame time.
+        /// </summary>
+        private GameTime GameTime { get; }
 
-        /// <summary>
-        /// Measures time from the start of the game.
-        /// </summary>
-        private Stopwatch TotalStopwatch { get; }
-        /// <summary>
-        /// Total time elapsed since the start of the game. Is set in
-        /// the main loop.
-        /// </summary>
-        private double TotalTime { get; set; }
-        /// Time in since the last game update in ms.
-        /// </summary>
-        private float DeltaT { get; set; }
-        /// <summary>
-        /// Total number of game updates.
-        /// </summary>
-        private long UpdatesDone { get; set; }
-
-        /// <summary>
-        /// One update of the game.
-        /// </summary>
-        private void MainLoopStep()
+        public void GameUpdateTimer_MainLoop(object sender, EventArgs e)
         {
             if (Game.GameEnded)
                 return;
 
-            GameControls.MoveMapView(Game.Map, DeltaT);
+            //update time
+            GameTime.NextStep();
+
+            //update MapMovementInput
+            UpdateMoveMap();
+            //move map view
+            GameControls.MoveMapView(Game.Map, GameTime.DeltaT);
+            
+            //update selected entities with player's input
             GameControls.UpdateEntitiesByInput(Game);
 
             //update the state of the game
-            long totalEl = TotalStopwatch.ElapsedMilliseconds;
-            DeltaT = (totalEl - (float)TotalTime) / 1000f;
-            TotalTime = totalEl;
-            Game.Update(DeltaT);
+            Game.Update(GameTime);
 
+            GameTime.PrintTime("Game tick length");
+
+            openGLControl.Refresh();
         }
+
         #endregion Game logic
 
         #region User interface
+
+        /// <summary>
+        /// Shows selected entities.
+        /// </summary>
         private EntityButtonArray EntityButtonArray { get; set; }
+        /// <summary>
+        /// Shows abilities of selected entity.
+        /// </summary>
         private AbilityButtonArray AbilityButtonArray { get; set; }
+        /// <summary>
+        /// Info about selected entity.
+        /// </summary>
         private EntityInfoPanel EntityInfoPanel { get; set; }
+        /// <summary>
+        /// Info about ability or status.
+        /// </summary>
         private AdditionalInfo AdditionalInfo { get; set; }
+        /// <summary>
+        /// Shows control groups.
+        /// </summary>
         private ControlGroupButtonArray ControlGroupButtonArray { get; set; }
+        /// <summary>
+        /// Allows player to modify appearance of the game.
+        /// </summary>
         private GameOptionsMenu GameOptionsMenu { get; set; }
+        /// <summary>
+        /// Button for opening menu.
+        /// </summary>
         private Button MenuButton { get; set; }
+        /// <summary>
+        /// Contains buttons for closing the game and opening options menu.
+        /// </summary>
         private GameMenu GameMenu { get; set; }
+        /// <summary>
+        /// Shows info about current player.
+        /// </summary>
         private PlayerPropertiesPanel PlayerPropertiesPanel { get; set; }
+        /// <summary>
+        /// Shows who won the game.
+        /// </summary>
         private VictoryPanel VictoryPanel { get; set; }
 
         #region Initialization
@@ -113,11 +142,12 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void InitializeUserInterface(Icons icons)
         {
-            //add event handlers
+            //initialize bottom panel
+            InitializeBottomPanel(icons);
+
+            //add event handlers to this window and opengl control
             MouseWheel += Window_MouseWheel;
             openGLControl.PreviewKeyDown += OpenGLControl_PreviewKeyDown;
-
-            InitializeBottomPanel(icons);
 
             //menu button
             MenuButton = new Button()
@@ -180,6 +210,9 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void InitializeBottomPanel(Icons icons)
         {
+            //set icons to ButtonArray
+            ButtonArray.Icons = icons;
+
             //initialize ui elements
             //units panel
             EntityButtonArray = new EntityButtonArray(8, 5, 300, 188);
@@ -198,8 +231,6 @@ namespace SanguineGenesis.GUI
             Controls.Add(AdditionalInfo);
             AdditionalInfo.Stats.SetStats(
                 new List<Stat>());
-
-            ButtonArray.Icons = icons;
 
             //control groups panel
             ControlGroupButtonArray = new ControlGroupButtonArray(6, EntityButtonArray.Width, 20);
@@ -221,8 +252,7 @@ namespace SanguineGenesis.GUI
             EntityInfoPanel.StatusButtonArray.GiveFocusTo(openGLControl);
             ControlGroupButtonArray.GiveFocusTo(openGLControl);
 
-            //set position of ui elements
-            //bottom panel
+            //set position of ui elements on the bottom panel
             int entityInfoW = EntityInfoPanel.Width;
             int entityButtonArrayW = EntityButtonArray.Width;
             int abilityButtonArrayW = AbilityButtonArray.Width;
@@ -244,6 +274,7 @@ namespace SanguineGenesis.GUI
 
             int additionalInfoX = abilityPanelX + abilityButtonArrayW;
             AdditionalInfo.Location = new Point(additionalInfoX, windowHeight - AdditionalInfo.Height);
+            
         }
 
         /// <summary>
@@ -263,110 +294,71 @@ namespace SanguineGenesis.GUI
         }
         #endregion Initialization
 
-        #region Updates
+        #region Event handlers
 
         /// <summary>
-        /// Updates and draws the game.
+        /// Draws the game.
         /// </summary>
-        private void UpdateAndDraw(object sender, RenderEventArgs args)
+        private void Draw(object sender, RenderEventArgs args)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            MainLoopStep();
-
             OpenGL gl = openGLControl.OpenGL;
-            Console.WriteLine("Game tick length:\t" + sw.Elapsed.Milliseconds);
-            sw.Restart();
+
             //set correct extents of the window to game controls
             GameControls.MapView.SetActualExtents(openGLControl.Width, openGLControl.Height);
 
-            //data buffers
-            OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, GameControls.MapView, Game);
-            if (Game.GameplayOptions.NutrientsVisible)
-                OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
-            else
-                OpenGLAtlasDrawer.TryClearNutrientsMapDataBuffers(gl);
-            OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
-            OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
-            OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
-            //show flowfield of the selected animal if an animal is selected and player wants to show flowfield
-            if (Game.GameplayOptions.ShowFlowfield)
+            //update data buffers
+
+            //maps data
             {
-                FlowField flF = null;
-                if ((flF=SelectedAnimalFlowfield())!=null)
-                    OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
+                //map
+                OpenGLAtlasDrawer.UpdateMapDataBuffers(gl, GameControls.MapView, Game);
+
+                //nutrients map
+                if (Game.GameplayOptions.NutrientsVisible)
+                    OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
                 else
+                    OpenGLAtlasDrawer.TryClearNutrientsMapDataBuffers(gl);
+
+                //flowfield
+                if (Game.GameplayOptions.ShowFlowfield)
+                {
+                    FlowField flF = null;
+                    if ((flF = SelectedAnimalFlowfield()) != null)
+                        //update flowfield with data of the selected animal if an animal is selected
+                        OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
+                    else
+                        //clear flowfield
+                        OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+                }
+                else
+                    //clear flowfield
                     OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
             }
-            else
-                OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+
+            //set entities data
+            {
+                //entity circles
+                OpenGLAtlasDrawer.UpdateEntityCirclesDataBuffers(gl, GameControls.MapView, Game);
+                //entity images
+                OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
+                //entity health+energy indicators
+                OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
+            }
+
+            //selection frame
             OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
+
+
+            //draw the data
             OpenGLAtlasDrawer.Draw(gl, Game.GameplayOptions);
-            
+
             //update bottom panel
             UpdateBottomPanel();
-            Console.WriteLine("Graphics tick length:\t" + sw.Elapsed.Milliseconds);
 
-            UpdatesDone++;
-            //Console.WriteLine("Updates per second: " + UpdatesDone / TotalTime * 1000);
-            Console.WriteLine("Updates per second: " + 1 / DeltaT);
+            GameTime.PrintTime("Graphics tick length");
+            GameTime.PrintFPS();
+            GameTime.Delimiter();
         }
-
-        /// <summary>
-        /// True if the first entity of selected entities should be set selected entity.
-        /// </summary>
-        private bool ShouldSetSelected { get; set; }
-
-        /// <summary>
-        /// Updates information for the bottom panel and air taken.
-        /// </summary>
-        private void UpdateBottomPanel()
-        {
-            //update selected entities
-            if (GameControls.SelectedGroup.Changed)
-            {
-                //selected entities changed since the last update
-                GameControls.SelectedGroup.Changed = false;
-                List<Entity> selectedEntities = GameControls.SelectedGroup.Entities;
-                selectedEntities.Sort((e1, e2) => string.Compare(e1.EntityType, e2.EntityType));
-
-                //update selected entity if the old one was removed or player is currently selecting entities
-                if (GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS ||
-                    ShouldSetSelected ||
-                    !selectedEntities.Contains(EntityButtonArray.Selected))
-                    EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
-                ShouldSetSelected = GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS;
-
-                //set selected entities
-                EntityButtonArray.InfoSources = selectedEntities;
-            }
-            EntityInfoPanel.SelectedEntity = EntityButtonArray.Selected;
-
-            //set selected ability
-            AbilityButtonArray.Selected = GameControls.EntityCommandsInput.SelectedAbility;
-            if (EntityButtonArray.Selected != null)
-                AbilityButtonArray.InfoSources = EntityButtonArray.Selected.Abilities;
-            else
-                AbilityButtonArray.InfoSources = new List<Ability>();
-            
-            //update entities and abilities panels
-            EntityButtonArray.UpdateControl();
-            AbilityButtonArray.UpdateControl();
-            EntityInfoPanel.UpdateControl();
-            ControlGroupButtonArray.UpdateControl();
-
-            //update air
-            PlayerPropertiesPanel.AirValue.Text = Game.CurrentPlayer.AirTaken + "/" + Game.CurrentPlayer.MaxAirTaken;
-            
-            //show victory panel if a player won
-            if (Game.Winner != null)
-                ShowVictoryPanel(Game.Winner.Value);
-        }
-
-        #endregion Updates
-
-        #region Event handlers
 
         /// <summary>
         /// Ends the thread with Game when the window closes.
@@ -410,11 +402,13 @@ namespace SanguineGenesis.GUI
                 //modify control groups
                 if (e.Control)
                 {
+                    //saves selected entities to the group
                     ControlGroupButtonArray.SaveGroupWithIndex(ctrlGroupIndex);
                 }
                 else if(GameControls.EntityCommandsInput.State==EntityCommandsInputState.IDLE ||
                     GameControls.EntityCommandsInput.State == EntityCommandsInputState.UNITS_SELECTED)
                 {
+                    //loads selected entities from the group
                     if (e.Shift)
                         GameControls.SelectedGroup.NextOperation = Operation.ADD;
 
@@ -425,7 +419,7 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Updates information about pressed keys.
+        /// Updates information about shift being pressed.
         /// </summary>
         private void MainWinformWindow_KeyUp(object sender, KeyEventArgs e)
         {
@@ -446,18 +440,21 @@ namespace SanguineGenesis.GUI
             {
                 GameControls.MapView.ZoomOut(Game.Map);
             }
-
         }
         
-        
+        /// <summary>
+        /// If left button is pressed, starts selecting of selected entities. If right button
+        /// is pressed, chooses target of selected ability.
+        /// </summary>
         private void MouseButtonDownHandler(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                //update vertex of frame buffer
+                //update vertex of selector frame
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
+                
                 //set the mode of entity selection
                 switch (ModifierKeys)
                 {
@@ -472,7 +469,7 @@ namespace SanguineGenesis.GUI
                         break;
                 }
 
-
+                //choose selected entity
                 SelectEntity();
             }
             else
@@ -484,18 +481,26 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Finishes selecting entities.
+        /// </summary>
         private void MouseButtonUpHandler(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
+                //finish selecting entities
                 Vector2 mapCoordinates = GameControls.MapView
                 .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.EndSelection(mapCoordinates);
                 
+                //choose selected entity
                 SelectEntity();
             }
         }
 
+        /// <summary>
+        /// Update selected entities.
+        /// </summary>
         private void MouseMoveHandler(object sender, MouseEventArgs e)
         {
             if (GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS)
@@ -505,55 +510,65 @@ namespace SanguineGenesis.GUI
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.EntityCommandsInput.NewPoint(mapCoordinates);
                 
+                //choose selected entity
                 SelectEntity();
             }
         }
 
-        public void GameUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            //move map if player is not selecting entities
-            if (!(GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS))
-            {
-                Point mousePos = Cursor.Position;
-
-                int movingFrameSize = 2;
-                if (mousePos.X >= openGLControl.Width - movingFrameSize)
-                {
-                    GameControls.MapMovementInput.AddDirection(Direction.RIGHT);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.LEFT);
-                }
-                else if (mousePos.X <= movingFrameSize)
-                {
-                    GameControls.MapMovementInput.AddDirection(Direction.LEFT);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT);
-                }
-                else
-                {
-                    GameControls.MapMovementInput.RemoveDirection(Direction.LEFT);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT);
-                }
-
-                if (mousePos.Y >= openGLControl.Height - movingFrameSize)
-                {
-                    GameControls.MapMovementInput.AddDirection(Direction.DOWN);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.UP);
-                }
-                else if (mousePos.Y <= movingFrameSize)
-                {
-                    GameControls.MapMovementInput.AddDirection(Direction.UP);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.DOWN);
-                }
-                else
-                {
-                    GameControls.MapMovementInput.RemoveDirection(Direction.UP);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.DOWN);
-                }
-            }
-
-            openGLControl.Refresh();
-        }
-
         #endregion event handlers
+
+        #region Utility methods for manipulating controls
+
+        /// <summary>
+        /// True if EntityButtonArray.Selected should be set to the first entity of GameControls.SelectedGroup.Entities.
+        /// </summary>
+        private bool ShouldSetSelected { get; set; }
+
+        /// <summary>
+        /// Updates information for the bottom panel and air taken.
+        /// </summary>
+        private void UpdateBottomPanel()
+        {
+            //update selected entities
+            if (GameControls.SelectedGroup.Changed)
+            {
+                //selected entities changed since the last update
+                GameControls.SelectedGroup.Changed = false;
+                List<Entity> selectedEntities = GameControls.SelectedGroup.Entities;
+                selectedEntities.Sort((e1, e2) => string.Compare(e1.EntityType, e2.EntityType));
+
+                //update selected entity if the old one was removed or player is currently selecting entities
+                if (GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS ||
+                    ShouldSetSelected ||
+                    !selectedEntities.Contains(EntityButtonArray.Selected))
+                    EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
+                ShouldSetSelected = GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS;
+
+                //set selected entities
+                EntityButtonArray.InfoSources = selectedEntities;
+            }
+            EntityInfoPanel.SelectedEntity = EntityButtonArray.Selected;
+
+            //set selected ability
+            AbilityButtonArray.Selected = GameControls.EntityCommandsInput.SelectedAbility;
+            if (EntityButtonArray.Selected != null)
+                AbilityButtonArray.InfoSources = EntityButtonArray.Selected.Abilities;
+            else
+                AbilityButtonArray.InfoSources = new List<Ability>();
+
+            //update entities and abilities panels
+            EntityButtonArray.UpdateControl();
+            AbilityButtonArray.UpdateControl();
+            EntityInfoPanel.UpdateControl();
+            ControlGroupButtonArray.UpdateControl();
+
+            //update air
+            PlayerPropertiesPanel.AirValue.Text = Game.CurrentPlayer.AirTaken + "/" + Game.CurrentPlayer.MaxAirTaken;
+
+            //show victory panel if a player won
+            if (Game.Winner != null)
+                ShowVictoryPanel(Game.Winner.Value);
+        }
 
         /// <summary>
         /// Sets currently selected entity.
@@ -600,9 +615,8 @@ namespace SanguineGenesis.GUI
 
         /// <summary>
         /// Returns flowfield of first command of selected entity if it is
-        /// a MoveToCommand and the entity is animal.
+        /// a MoveToCommand and the entity is animal. Returns null otherwise.
         /// </summary>
-        /// <returns></returns>
         private FlowField SelectedAnimalFlowfield()
         {
             Animal selected;
@@ -700,13 +714,13 @@ namespace SanguineGenesis.GUI
             // openGLControl is directly referenced by GCHandle, event handlers have to be removed
             // to avoid memory leak
             openGLControl.PreviewKeyDown -= OpenGLControl_PreviewKeyDown;
-            openGLControl.OpenGLDraw -= new SharpGL.RenderEventHandler(this.UpdateAndDraw);
+            openGLControl.OpenGLDraw -= new SharpGL.RenderEventHandler(this.Draw);
             openGLControl.KeyDown -= new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyDown);
             openGLControl.KeyUp -= new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyUp);
             openGLControl.MouseDown -= new System.Windows.Forms.MouseEventHandler(this.MouseButtonDownHandler);
             openGLControl.MouseMove -= new System.Windows.Forms.MouseEventHandler(this.MouseMoveHandler);
             openGLControl.MouseUp -= new System.Windows.Forms.MouseEventHandler(this.MouseButtonUpHandler);
-            GameTimer.Tick -= GameUpdateTimer_Tick;
+            GameUpdateTimer.Tick -= GameUpdateTimer_MainLoop;
             Close();
         }
 
@@ -734,7 +748,142 @@ namespace SanguineGenesis.GUI
             EnableGameControls();
             VictoryPanel.Visible = false;
         }
-        
+
+        /// <summary>
+        /// Updates MapMovementInput with mouse input if player is not selecting entities.
+        /// </summary>
+        public void UpdateMoveMap()
+        {
+            //check if player is selecting entities
+            if (!(GameControls.EntityCommandsInput.State == EntityCommandsInputState.SELECTING_UNITS))
+            {
+                Point mousePos = Cursor.Position;
+
+                int movingFrameSize = 2;
+                if (mousePos.X >= openGLControl.Width - movingFrameSize)
+                {
+                    //move right
+                    GameControls.MapMovementInput.AddDirection(Direction.RIGHT);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.LEFT);
+                }
+                else if (mousePos.X <= movingFrameSize)
+                {
+                    //move left
+                    GameControls.MapMovementInput.AddDirection(Direction.LEFT);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT);
+                }
+                else
+                {
+                    //stop moving horizontally
+                    GameControls.MapMovementInput.RemoveDirection(Direction.LEFT);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT);
+                }
+
+                if (mousePos.Y >= openGLControl.Height - movingFrameSize)
+                {
+                    //move down
+                    GameControls.MapMovementInput.AddDirection(Direction.DOWN);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.UP);
+                }
+                else if (mousePos.Y <= movingFrameSize)
+                {
+                    //move up
+                    GameControls.MapMovementInput.AddDirection(Direction.UP);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.DOWN);
+                }
+                else
+                {
+                    //stop moving vertically
+                    GameControls.MapMovementInput.RemoveDirection(Direction.UP);
+                    GameControls.MapMovementInput.RemoveDirection(Direction.DOWN);
+                }
+            }
+        }
+
+        #endregion Utility methods for manipulating controls
+
         #endregion User interface
+    }
+}
+
+/// <summary>
+/// Represents ingame time. Can be used to measure how long certain actions of the game take.
+/// </summary>
+class GameTime
+{
+    /// <summary>
+    /// Measures time from the start of the game.
+    /// </summary>
+    private Stopwatch TotalStopwatch { get; }
+    /// <summary>
+    /// Total time elapsed since the start of the game. Is set in
+    /// the main loop.
+    /// </summary>
+    private long TotalTime { get; set; }
+    /// <summary>
+    /// Time since the last call of PrintTime or NextStep (the shortest time).
+    /// </summary>
+    private long LastElapsed { get; set; }
+    /// <summary>
+    /// Total number of game updates.
+    /// </summary>
+    private long UpdatesDone { get; set; }
+    /// <summary>
+    /// Output of messages.
+    /// </summary>
+    private TextWriter Output { get; }
+
+    /// <summary>
+    /// Time in since the last game update in ms.
+    /// </summary>
+    public float DeltaT { get; private set; }
+
+    public GameTime(TextWriter output)
+    {
+        TotalStopwatch = new Stopwatch();
+        TotalStopwatch.Start();
+        Output = output;
+        LastElapsed = 0;
+    }
+
+    /// <summary>
+    /// Starts a new step. Should be called only at the start of a step.
+    /// </summary>
+    public void NextStep()
+    {
+        LastElapsed = TotalStopwatch.ElapsedMilliseconds;
+        DeltaT = (LastElapsed - (float)TotalTime) / 1000f;
+        TotalTime = LastElapsed;
+        UpdatesDone++;
+    }
+
+    /// <summary>
+    /// Prints how long the action took = time from the last call of PrintTime or NextStep (the shortest time).
+    /// </summary>
+    public void PrintTime(string actionName)
+    {
+        long elapsed = TotalStopwatch.ElapsedMilliseconds;
+        Output.WriteLine((elapsed - LastElapsed)+"\t"+ actionName);
+        LastElapsed = elapsed;
+    }
+
+    /// <summary>
+    /// Prints average fps during the game.
+    /// </summary>
+    public void PrintFPS()
+    {
+        //prevent dividing by zero
+        if (TotalTime == 0)
+            return;
+
+        Output.WriteLine("FPS: "+(UpdatesDone/(float)TotalTime * 1000));
+    }
+
+    /// <summary>
+    /// Prints line delimiter to Output.
+    /// </summary>
+    public void Delimiter()
+    {
+        Output.WriteLine("------------------------");
     }
 }

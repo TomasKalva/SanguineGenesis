@@ -113,11 +113,10 @@ namespace SanguineGenesis
         /// <summary>
         /// Update the state of the game.
         /// </summary>
-        public void Update(float deltaT)
+        public void Update(GameTime gameTime)
         {
+            float deltaT = gameTime.DeltaT;
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
             //ai
             foreach (var p in Players.Values)
                 if (p.Ai != null)
@@ -138,8 +137,7 @@ namespace SanguineGenesis
             //generate and drain nutrients by trees
             Map.UpdateNutrientsMap(trees, deltaT);
 
-            Console.WriteLine("Others:\t" + sw.ElapsedMilliseconds);
-            sw.Restart();
+            gameTime.PrintTime("Others");
 
             //update players' visibility map
             VisibilityGeneratorInteraction(buildings);
@@ -147,8 +145,8 @@ namespace SanguineGenesis
             //update parts of map that can be seen for each player
             foreach (var p in Players)
                 p.Value.UpdateVisibleMap(Map);
-            Console.WriteLine("Visibility:\t" + sw.ElapsedMilliseconds);
-            sw.Restart();
+
+            gameTime.PrintTime("Visibility");
 
             //one step of statuses
             foreach (Entity e in entities)
@@ -179,18 +177,16 @@ namespace SanguineGenesis
             {
                 e.AnimationStep(deltaT);
             }
-            Console.WriteLine("Ingame update:\t" + sw.ElapsedMilliseconds);
-            sw.Restart();
+
+            gameTime.PrintTime("Ingame update");
 
             //physics
             List<Animal> physicalAnimals = animals.Where((a) => a.Physical).ToList();
             physics.MoveAnimals(Map, animals, deltaT);
-            //perform two steps of collision checking
-            //physics.PushAway(Map, animals, physicalEntities);
             physics.PushAway(Map, physicalAnimals);
             physics.PushOutsideOfObstacles(Map, animals);
-            Console.WriteLine("Physics:\t" + sw.ElapsedMilliseconds);
-            sw.Restart();
+
+            gameTime.PrintTime("Physics");
 
             //attack nearby enemy if idle
             foreach (Animal a in animals)
@@ -204,8 +200,8 @@ namespace SanguineGenesis
                         a.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(a, en));
                 }
             }
-            Console.WriteLine("Finding target:\t" + sw.ElapsedMilliseconds);
-            sw.Restart();
+
+            gameTime.PrintTime("Finding target");
 
             //remove dead units
             foreach (var kvp in Players)
@@ -225,7 +221,8 @@ namespace SanguineGenesis
                 else if (!Players[SanguineGenesis.FactionType.PLAYER1].GetAll<Tree>().Any())
                     Winner = SanguineGenesis.FactionType.PLAYER0;
             }
-            Console.WriteLine("Others:\t" + sw.ElapsedMilliseconds);
+
+            gameTime.PrintTime("Others");
         }
 
         /// <summary>

@@ -8,6 +8,9 @@ using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI.WPFComponents
 {
+    /// <summary>
+    /// Contains buttons for closing the game and opening options menu.
+    /// </summary>
     class GameMenu : TableLayoutPanel
     {
         /// <summary>
@@ -29,9 +32,10 @@ namespace SanguineGenesis.GUI.WPFComponents
             Height = height;
             RowCount = 3;
             ColumnCount = 1;
+            BackColor = Color.Gray;
 
             //create rows
-            for(int i =0; i < RowCount; i++)
+            for (int i =0; i < RowCount; i++)
             {
                 RowStyle evenRow = new RowStyle(SizeType.Percent);
                 evenRow.Height = 1 / (float)RowCount;
@@ -42,6 +46,7 @@ namespace SanguineGenesis.GUI.WPFComponents
             Font buttonsFont = new Font(Button.DefaultFont.FontFamily, 15, FontStyle.Bold);
             Color buttonsColor = Color.Beige;
 
+            //resume button
             Resume = new Button();
             Resume.Dock = DockStyle.Fill;
             Resume.Text = "Resume";
@@ -49,6 +54,7 @@ namespace SanguineGenesis.GUI.WPFComponents
             Resume.Font = buttonsFont;
             Controls.Add(Resume);
 
+            //options button
             Options = new Button();
             Options.Dock = DockStyle.Fill;
             Options.Text = "Options";
@@ -56,26 +62,34 @@ namespace SanguineGenesis.GUI.WPFComponents
             Options.Font = buttonsFont;
             Controls.Add(Options);
 
+            //exit button
             Exit = new Button();
             Exit.Dock = DockStyle.Fill;
             Exit.Text = "Exit";
             Exit.BackColor = buttonsColor;
             Exit.Font = buttonsFont;
             Controls.Add(Exit);
-
-            BackColor = Color.Gray;
         }
 
+        /// <summary>
+        /// Sets event handler buttonClick to resume button click event.
+        /// </summary>
         public void SetResumeButtonClickHandler(Action buttonClick)
         {
             Resume.Click += (_s, _e) => buttonClick();
         }
 
+        /// <summary>
+        /// Sets event handler buttonClick to options button click event.
+        /// </summary>
         public void SetOptionsButtonClickHandler(Action buttonClick)
         {
             Options.Click += (_s, _e) => buttonClick();
         }
 
+        /// <summary>
+        /// Sets event handler buttonClick to exit button click event.
+        /// </summary>
         public void SetExitButtonClickHandler(Action buttonClick)
         {
             Exit.Click += (_s, _e) => buttonClick();

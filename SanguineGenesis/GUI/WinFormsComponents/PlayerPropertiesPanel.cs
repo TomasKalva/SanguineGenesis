@@ -8,6 +8,9 @@ using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI.WPFComponents
 {
+    /// <summary>
+    /// Shows information about the player.
+    /// </summary>
     class PlayerPropertiesPanel:TableLayoutPanel
     {
         /// <summary>

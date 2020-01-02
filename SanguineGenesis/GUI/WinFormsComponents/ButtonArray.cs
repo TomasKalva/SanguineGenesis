@@ -15,6 +15,9 @@ using SanguineGenesis.GUI.WinFormsComponents;
 
 namespace SanguineGenesis.GUI
 {
+    /// <summary>
+    /// Parent of ButtonArray<T>, contains icons for buttons.
+    /// </summary>
     abstract class ButtonArray : TableLayoutPanel
     {
         /// <summary>
@@ -56,6 +59,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public ButtonArray(int columns, int rows, int preferedWidth, int preferedHeight)
         {
+            //initialize extents
             RowCount = rows;
             ColumnCount = columns;
             int buttonWidth = preferedWidth / ColumnCount;
@@ -63,6 +67,7 @@ namespace SanguineGenesis.GUI
             Width = buttonWidth * ColumnCount;
             Height = buttonHeight * RowCount;
 
+            //initialize Buttons
             Buttons = new Button[ColumnCount, RowCount];
             for (int i = 0; i < ColumnCount; i++)
                 for (int j = 0; j < RowCount; j++)

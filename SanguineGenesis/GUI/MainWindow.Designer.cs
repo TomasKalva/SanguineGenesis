@@ -43,7 +43,7 @@
             this.openGLControl.RenderTrigger = SharpGL.RenderTrigger.Manual;
             this.openGLControl.Size = new System.Drawing.Size(533, 292);
             this.openGLControl.TabIndex = 0;
-            this.openGLControl.OpenGLDraw += new SharpGL.RenderEventHandler(this.UpdateAndDraw);
+            this.openGLControl.OpenGLDraw += new SharpGL.RenderEventHandler(this.Draw);
             this.openGLControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyDown);
             this.openGLControl.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyUp);
             this.openGLControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseButtonDownHandler);

@@ -8,6 +8,9 @@ using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI.WPFComponents
 {
+    /// <summary>
+    /// Shows name of the player who won.
+    /// </summary>
     class VictoryPanel:Panel
     {
         /// <summary>
