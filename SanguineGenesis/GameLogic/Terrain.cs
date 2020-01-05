@@ -166,33 +166,13 @@ namespace SanguineGenesis.GameLogic
             switch (soilQuality)
             {
                 case SoilQuality.BAD:
-                    return 0.3f;//0.05f;
+                    return 0.1f;//0.05f;
                 case SoilQuality.LOW:
-                    return 0.5f;//0.01f;
+                    return 0.05f;//0.01f;
                 case SoilQuality.MEDIUM:
-                    return 0.7f;//0.02f;
+                    return 0.1f;//0.02f;
                 case SoilQuality.HIGH:
-                    return 1f;//0.03f;
-                default:
-                    return 0f;
-            }
-        }
-
-        /// <summary>
-        /// Returns amount of nutrients that can be transfered by a Node with soilQuality.
-        /// </summary>
-        public static float TransferCapacity(this SoilQuality soilQuality)
-        {
-            switch (soilQuality)
-            {
-                case SoilQuality.BAD:
-                    return 0f;
-                case SoilQuality.LOW:
-                    return 0.05f;
-                case SoilQuality.MEDIUM:
-                    return 0.005f;
-                case SoilQuality.HIGH:
-                    return 0f;
+                    return 0.25f;//0.03f;
                 default:
                     return 0f;
             }

@@ -256,63 +256,6 @@ namespace SanguineGenesis.GameLogic.Maps
         }
 
         /// <summary>
-        /// One step of nodes producing and sharing nutrients.
-        /// </summary>
-        public void UpdateNutrients()
-        {
-            //generate nutrients
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                    this[i, j].GenerateNutrients();
-
-            //transfer nutrients
-            int width = Width + 2;
-            int height = Height + 2;
-            float[,] newNutrients = new float[width, height];
-            Node[] neighbours = new Node[4];
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                {
-                    Node current = this[i, j];
-                    //initialize neighbours
-                    neighbours[0] = this[i + 1, j];
-                    neighbours[1] = this[i - 1, j];
-                    neighbours[2] = this[i, j + 1];
-                    neighbours[3] = this[i, j - 1];
-
-                    //find the neighbour with the least amount of nutrients
-                    Node lowestNutr = neighbours[0];
-                    foreach(Node n in neighbours)
-                    {
-                        if (n.ActiveNutrients < lowestNutr.ActiveNutrients)
-                            lowestNutr = n;
-                    }
-
-                    //transfer only if the neighbour has less nutrients
-                    float dif = current.ActiveNutrients - lowestNutr.ActiveNutrients;
-                    if (dif > 0)
-                    {
-                        //diffuse nutrients, limited by soil transfer capacity
-
-                        //maximum amount of transported nutrients supported by the soil
-                        float suppTrans = Math.Min(dif / 2f, current.SoilQuality.TransferCapacity());
-                        //maximum amount of transported nutrients so the soil doesn't downgrade
-                        float noDownTrans = Math.Min(suppTrans, current.ActiveNutrients - current.Terrain.Nutrients(current.Biome,current.SoilQuality));
-                        newNutrients[i + 1, j + 1] += current.ActiveNutrients - noDownTrans;
-                        newNutrients[lowestNutr.X + 1, lowestNutr.Y + 1] += noDownTrans;
-                    }
-                    else
-                    {
-                        newNutrients[i + 1, j + 1] += current.ActiveNutrients;
-                    }
-                }
-
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                    this[i, j].ActiveNutrients=newNutrients[i + 1, j + 1];
-        }
-
-        /// <summary>
         /// Nodes with roots of producers produce nutrients trients. Nutrients can't be produced under
         /// structures.
         /// </summary>
