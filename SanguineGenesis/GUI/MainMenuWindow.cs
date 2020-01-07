@@ -52,6 +52,10 @@ namespace SanguineGenesis.GUI
             DrawOpt = DrawOption.NO_ACTION;
             Icons = new Icons();
             LoadNamesOfCreatedMaps();
+            try { this.Icon = new Icon("Images/Icons/giraffe.ico"); } catch (IOException)
+            {
+                Console.WriteLine("Icon can't be loaded.");
+            }
         }
 
         /// <summary>
