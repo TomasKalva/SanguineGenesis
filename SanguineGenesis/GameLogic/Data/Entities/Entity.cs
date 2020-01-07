@@ -98,10 +98,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             CommandQueue = new CommandQueue();
             EntityType = entityType;
             Health = new FloatRange(maxHealth, maxHealth);
-            if (this is Animal)
-                Energy = new FloatRange(maxEnergy,maxEnergy);
-            else
-                Energy = new FloatRange(maxEnergy, 0);
+            Energy = new FloatRange(maxEnergy, 0);
             SetAnimation("IDLE");
             Physical = physical;
             Abilities = abilities;

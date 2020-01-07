@@ -1,6 +1,6 @@
 name,max health,max energy,energy regen,physical,size,roots distance,energy cost,biome,terrain,soil quality,abilities,statuses,producer,air
 BAOBAB,250,100,0.02,yes,2,3,50,SAVANNA,LAND,LOW,build:RHODE_GRASS;build:PANDANI;build:MIAMBO;rallyPoint,,yes,8
-RHODE_GRASS,50,60,0.02,no,2,4,30,SAVANNA,LAND,LOW,create:ZEBRA;create:GAZZELE;build:KIWI_TREE;build:CANDELABRA;rallyPoint,,yes,3
+RHODE_GRASS,50,60,0.02,no,2,4,30,SAVANNA,LAND,LOW,create:ZEBRA;create:GAZZELE;build:KIWI_TREE;build:CANDELABRA;build:RHODE_GRASS;rallyPoint,,yes,3
 CANDELABRA,130,75,0.04,yes,2,2,30,SAVANNA,LAND,MEDIUM,create:RHINO;build:ACACIA;rallyPoint,,no,4
 ACACIA,220,120,0.03,yes,3,2,30,SAVANNA,LAND,MEDIUM,create:GIRAFFE;rallyPoint,,no,5
 KIWI_TREE,110,65,0.04,yes,2,2,30,SAVANNA,LAND,MEDIUM,create:HIPPO;build:WATER_LETTUCE;rallyPoint,,no,4
@@ -16,7 +16,7 @@ KAPOC,250,100,0.02,yes,2,3,30,RAINFOREST,LAND,LOW,build:BANNANA_TREE;build:BAMBO
 BANNANA_TREE,80,60,0.10,yes,2,1,30,RAINFOREST,LAND,MEDIUM,create:CHIMPANZEE;build:COCONUT_TREE;rallyPoint,,no,3
 COCONUT_TREE,80,60,0.18,yes,1,1,30,RAINFOREST,LAND,MEDIUM,create:BABOON;build:CANNONBALL_TREE;rallyPoint,,no,4
 CANNONBALL_TREE,110,80,0.04,yes,2,2,30,RAINFOREST,LAND,HIGH,create:GORILLA;rallyPoint,,no,5
-BAMBOO,50,30,0.03,no,1,3,30,RAINFOREST,LAND,MEDIUM,build:TEAK;build:WALKING_PALM,,yes,2
+BAMBOO,50,30,0.03,no,1,3,30,RAINFOREST,LAND,MEDIUM,build:TEAK;build:WALKING_PALM;build:BAMBOO,,yes,2
 TEAK,120,75,0.04,yes,2,2,30,RAINFOREST,LAND,MEDIUM,create:PANDA;build:ASHOKA;rallyPoint,,no,3
 ASHOKA,150,90,0.04,yes,2,2,30,RAINFOREST,LAND,MEDIUM,create:TIGER;rallyPoint,,no,5
 WALKING_PALM,80,60,0.18,yes,1,1,30,RAINFOREST,LAND,LOW,create:PUMA;rallyPoint,,no,3

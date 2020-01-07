@@ -233,7 +233,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             {
                 case Movement.LAND:
                     // land animal can only move on land
-                    if (terrain == Terrain.LAND)
+                    if (terrain == Terrain.LAND || terrain == Terrain.SHALLOW_WATER)
                         return true;
                     else
                         return false;

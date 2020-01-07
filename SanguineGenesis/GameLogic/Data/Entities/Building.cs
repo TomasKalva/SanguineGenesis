@@ -39,10 +39,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Node[,] Nodes { get; }
         /// <summary>
-        /// Type of the building.
-        /// </summary>
-        public string BuildingType { get; }
-        /// <summary>
         /// How many nodes horizontally and also vertically it takes.
         /// </summary>
         public int Size { get; }

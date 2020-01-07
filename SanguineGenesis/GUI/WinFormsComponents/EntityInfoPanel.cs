@@ -61,7 +61,9 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             //command button array initialization
             CommandButtonArray = new CommandButtonArray(buttonArrayColumns, 1, Width - progressBarWidth, buttonArrayHeight);
             Controls.Add(CommandButtonArray);
-            CommandButtonArray.Location = new System.Drawing.Point(progressBarWidth, Height - (CommandButtonArray.Height + CommandButtonArray.Height));
+            CommandButtonArray.Location = new System.Drawing.Point(
+                progressBarWidth + (Width - progressBarWidth - CommandButtonArray.Width),
+                Height - (CommandButtonArray.Height + CommandButtonArray.Height));
 
             //entity stats table initialization
             EntityStatsTable = new StatsTable(9, 2, Width, Height - (CommandButtonArray.Height + StatusButtonArray.Height + labelHeight));
@@ -83,11 +85,10 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             FirstCommandProgress = new ProgressBar()
             {
                 Width = progressBarWidth,
-                Height = CommandButtonArray.Height
+                Height =  CommandButtonArray.Height
             };
             Controls.Add(FirstCommandProgress);
             FirstCommandProgress.Maximum = 100;
-            //todo: FirstCommandProgress.Orientation = Orientation.Vertical;
             FirstCommandProgress.Location = new System.Drawing.Point(0, Height - (CommandButtonArray.Height + StatusButtonArray.Height));
             FirstCommandProgress.Value = 70;
 

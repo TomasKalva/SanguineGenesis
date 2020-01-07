@@ -146,7 +146,13 @@ namespace SanguineGenesis.GameLogic.Maps
                     buildNodes[i, j].ActiveNutrients = minNutr;
                 }
 
+            //place the building on the map
             game.Map.PlaceBuilding(buildingFactory, player, n.X, n.Y);
+
+            //set it to max energy
+            var mainBuilding = player.GetAll<Tree>().Where(t => t.EntityType == buildingFactory.EntityType).FirstOrDefault();
+            if(mainBuilding!=null)
+                mainBuilding.Energy = buildingFactory.MaxEnergy;
         }
     }
 }

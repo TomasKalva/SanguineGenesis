@@ -267,7 +267,9 @@ namespace SanguineGenesis.GUI
             int entityButtonArrayX = entityInfoX + entityInfoW;
             EntityButtonArray.Location = new Point(entityButtonArrayX, windowHeight - EntityButtonArray.Height);
 
-            ControlGroupButtonArray.Location = new Point(entityButtonArrayX, windowHeight - EntityButtonArray.Height - ControlGroupButtonArray.Height);
+            ControlGroupButtonArray.Location = new Point(
+                entityButtonArrayX + (entityButtonArrayW - ControlGroupButtonArray.Width)/2,
+                windowHeight - EntityButtonArray.Height - ControlGroupButtonArray.Height);
 
             int abilityPanelX = entityButtonArrayX + entityButtonArrayW;
             AbilityButtonArray.Location = new Point(abilityPanelX, windowHeight - AbilityButtonArray.Height);
