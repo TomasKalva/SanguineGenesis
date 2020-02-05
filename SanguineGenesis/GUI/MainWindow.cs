@@ -86,8 +86,6 @@ namespace SanguineGenesis.GUI
             //update the state of the game
             Game.Update(GameTime);
 
-            GameTime.PrintTime("Game tick length");
-
             openGLControl.Refresh();
         }
 

@@ -200,6 +200,17 @@
       <Image X="26" Y="11"  Width="2" Height="1" Duration="0.3"/>
     </Animation>
   </Entity>
+  <Entity EntityType="OCELOT">
+    <Animation Action="IDLE" CenterX="0.5" CenterY="0.2">
+      <Image X="28" Y="4"  Width="1" Height="1"/>
+    </Animation>
+    <Animation Action="RUNNING" CenterX="0.5" CenterY="0.2">
+      <Image X="28" Y="4"  Width="1" Height="1"/>
+    </Animation>
+    <Animation Action="ATTACKING" CenterX="0.5" CenterY="0.2">
+      <Image X="28" Y="4"  Width="1" Height="1"/>
+    </Animation>
+  </Entity>
   <Entity EntityType="ZEBRA">
     <Animation Action="IDLE" CenterX="1" CenterY="0.1">
       <Image X="25" Y="0"  Width="2" Height="1"/>
