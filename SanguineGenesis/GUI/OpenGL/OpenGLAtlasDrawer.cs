@@ -746,7 +746,8 @@ namespace SanguineGenesis.GUI
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Entity> visUnits = mapView.GetVisibleEntities(game, game.CurrentPlayer);
+            List<Entity> visUnits = mapView.GetVisibleEntities(game, game.CurrentPlayer)
+                .Where(e=>e.Health!=e.Health.MaxValue || e.Energy !=e.Energy.MaxValue).ToList();
 
             int size = visUnits.Count;
             if (size == 0)
