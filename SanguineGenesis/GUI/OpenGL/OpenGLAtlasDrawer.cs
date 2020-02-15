@@ -19,6 +19,7 @@ using SanguineGenesis.GUI;
 using SanguineGenesis.GameControls;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps.MovementGenerating;
+using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
 
 namespace SanguineGenesis.GUI
 {
@@ -172,7 +173,7 @@ namespace SanguineGenesis.GUI
                 flowField.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, flowField.VertexCount);
             }
-            
+
             //draw entities
             if (!entitiesEmpty)
             {
@@ -181,7 +182,9 @@ namespace SanguineGenesis.GUI
 
                 entities.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entities.VertexCount);
-
+            }
+            if (!entityIndicatorsEmpty) 
+            { 
                 entityIndicators.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entityIndicators.VertexCount);
             }
@@ -352,8 +355,10 @@ namespace SanguineGenesis.GUI
         private static MyBufferArray entityIndicators;
         private static MyBufferArray selectionFrame;
 
-        //true if there are no units to draw
+        //true if there are no entities to draw
         private static bool entitiesEmpty;
+        //true if there are no entity indicators to draw
+        private static bool entityIndicatorsEmpty;
 
         #region Map
         /// <summary>
@@ -737,7 +742,8 @@ namespace SanguineGenesis.GUI
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateEntityIndicatorsDataBuffers(OpenGL gl, MapView mapView, Game game)
+        public static void UpdateEntityIndicatorsDataBuffers(OpenGL gl, MapView mapView,
+                                                            Player observer, Game game)
         {
             //prepare data
             float nodeSize = mapView.NodeSize;
@@ -746,18 +752,19 @@ namespace SanguineGenesis.GUI
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            List<Entity> visUnits = mapView.GetVisibleEntities(game, game.CurrentPlayer)
+            //only show indicators for entities that player can directly see = are in visible area of map
+            List<Entity> visEntities = game.GetAll<Entity>().Where((e) => observer.CanSee(e))
                 .Where(e=>e.Health!=e.Health.MaxValue || e.Energy !=e.Energy.MaxValue).ToList();
 
-            int size = visUnits.Count;
+            int size = visEntities.Count;
             if (size == 0)
             {
-                entitiesEmpty = true;
+                entityIndicatorsEmpty = true;
                 return;
             }
             else
             {
-                entitiesEmpty = false;
+                entityIndicatorsEmpty = false;
             }
             
             int verticesPerOne = size * 24;
@@ -771,11 +778,11 @@ namespace SanguineGenesis.GUI
             float[] texAtlas = entityIndicators.texAtlas;
 
             //visible units have to be sorted to draw the indicators properly
-            visUnits.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
+            visEntities.Sort((u, v) => Math.Sign(v.Center.Y - u.Center.Y));
 
-            for (int i = 0; i < visUnits.Count; i++)
+            for (int i = 0; i < visEntities.Count; i++)
             {
-                Entity current = visUnits[i];
+                Entity current = visEntities[i];
                 //buffer indices
                 int index = i * 24 * 3;
                 int atlasInd = i * 24 * 4;

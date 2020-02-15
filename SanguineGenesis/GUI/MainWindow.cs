@@ -342,7 +342,7 @@ namespace SanguineGenesis.GUI
                 //entity images
                 OpenGLAtlasDrawer.UpdateEntitiesDataBuffers(gl, GameControls.MapView, Game);
                 //entity health+energy indicators
-                OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game);
+                OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game.CurrentPlayer, Game);
             }
 
             //selection frame
