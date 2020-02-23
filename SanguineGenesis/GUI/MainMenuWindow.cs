@@ -689,7 +689,6 @@ namespace SanguineGenesis.GUI
             /// </summary>
             public bool ValidCoordinates(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
 
-
             /// <summary>
             /// Returns true iff building of width and height can be placed to coordinates x,y.
             /// </summary>

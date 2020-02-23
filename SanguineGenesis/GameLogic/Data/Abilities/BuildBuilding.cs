@@ -1,4 +1,5 @@
 ﻿using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GUI.WinFormsComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             return "The building is built at the target node. Requires at least "+BuildingFactory.SoilQuality+" soil qulity in " +
                 BuildingFactory.Biome+" to be built";
+        }
+        public override List<Stat> Stats()
+        {
+            List<Stat> stats = new List<Stat>()
+            {
+                new Stat( "Energy cost", EnergyCost.ToString()),
+            new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
+            new Stat( "Self castable", SelfCastable.ToString()),
+            new Stat("Only one", OnlyOne.ToString()),
+            new Stat( "Target type", TargetName),
+            new Stat( "Building size", BuildingFactory.Size.ToString()),
+            };
+            return stats;
         }
     }
 

@@ -240,7 +240,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             }
         }
 
-
         public override List<Stat> Stats()
         {
             List<Stat> stats = new List<Stat>()

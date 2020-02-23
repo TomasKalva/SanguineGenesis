@@ -11,9 +11,9 @@ using SanguineGenesis.GameLogic.Maps;
 
 namespace SanguineGenesis.GameControls
 {
-    class EntityCommandsInput
+    class SelectionInput
     {
-        public EntityCommandsInputState State { get; set; }
+        public SelectionInputState State { get; set; }
         public Vector2 SelectingCoordinates { get; private set; }
         public Vector2 TargetCoordinates { get; private set; }
         public Entity TargetedEntity { get; private set; }
@@ -24,9 +24,9 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public bool ResetCommandsQueue { get; set; }
 
-        internal EntityCommandsInput()
+        internal SelectionInput()
         {
-            State = EntityCommandsInputState.IDLE;
+            State = SelectionInputState.IDLE;
             SelectingCoordinates = new Vector2();
             ResetCommandsQueue = true;
         }
@@ -36,7 +36,7 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public void NewPoint(Vector2 mousePos)
         {
-            State = EntityCommandsInputState.SELECTING_UNITS;
+            State = SelectionInputState.SELECTING_UNITS;
             SelectingCoordinates = mousePos;
         }
 
@@ -45,7 +45,7 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public void EndSelection(Vector2 mousePos)
         {
-            State = EntityCommandsInputState.FINISH_SELECTING_UNITS;
+            State = SelectionInputState.FINISH_SELECTING_UNITS;
             SelectingCoordinates = mousePos;
         }
 
@@ -54,10 +54,10 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public void SetTarget(Vector2 mousePos)
         {
-            if (State == EntityCommandsInputState.UNITS_SELECTED)
+            if (State == SelectionInputState.UNITS_SELECTED)
             {
                 TargetCoordinates = mousePos;
-                State = EntityCommandsInputState.ABILITY_TARGET_SELECTED;
+                State = SelectionInputState.ABILITY_TARGET_SELECTED;
             }
         }
     }
@@ -65,7 +65,7 @@ namespace SanguineGenesis.GameControls
     /// <summary>
     /// States of EntityCommandsInput.
     /// </summary>
-    public enum EntityCommandsInputState
+    public enum SelectionInputState
     {
         IDLE,
         SELECTING_UNITS,

@@ -203,7 +203,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         /// the entity from selected entities on right click.
         /// </summary>
         public void ShowInfoOnClick(GameControls.GameControls gameControls,
-                                    EntityCommandsInput entityCommandsInput)
+                                    SelectionInput entityCommandsInput)
         {
             for (int i = 0; i < ColumnCount; i++)
                 for (int j = 0; j < RowCount; j++)
@@ -265,7 +265,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
                         {
                             Ability selectedAbility;
                             if ((selectedAbility = GetInfoSource(buttonInd)) != null)
-                                gameControls.EntityCommandsInput.SelectedAbility = selectedAbility;
+                                gameControls.SelectionInput.SelectedAbility = selectedAbility;
 
                         };
                     b.Click += (sender, ev) => SelectAbilityArray[buttonInd]();
@@ -465,12 +465,12 @@ namespace SanguineGenesis.GUI.WinFormsComponents
                             if (InfoSources[index] != null)
                             {
                                 selectedGroup.SetTemporaryEntities(InfoSources[index].Entities);
-                                gameControls.EntityCommandsInput.State = EntityCommandsInputState.UNITS_SELECTED;
+                                gameControls.SelectionInput.State = SelectionInputState.UNITS_SELECTED;
                             }
                             else
                             {
                                 selectedGroup.SetTemporaryEntities(new List<Entity>());
-                                gameControls.EntityCommandsInput.State = EntityCommandsInputState.IDLE;
+                                gameControls.SelectionInput.State = SelectionInputState.IDLE;
                             }
                             selectedGroup.CommitEntities();
 

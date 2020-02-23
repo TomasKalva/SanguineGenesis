@@ -300,7 +300,6 @@ namespace SanguineGenesis.GUI
             public void InitializeArrays(OpenGL gl, int verticesSize, int uvSize, int texAtlasSize)
             {
                 InitArray(ref vertices, verticesSize);
-                //InitArray(ref uv, uvSize);
                 InitUV(gl, ref uv, uvSize);
                 InitArray(ref texAtlas, texAtlasSize);
             }
@@ -316,9 +315,12 @@ namespace SanguineGenesis.GUI
                     Array.Clear(array, 0, array.Length);
             }
 
+            /// <summary>
+            /// Sets uv coordinates by UvFiller if UVDataBuffer is too small or it was Cleared.
+            /// </summary>
             private void InitUV(OpenGL gl, ref float[] uvArray, int uvSize)
             {
-                if (uv.Length < uvSize)
+                if (uv.Length < uvSize || Clear)
                 {
                     uvArray = UvFiller(uvSize);
                     VertexBufferArray.Bind(gl);
@@ -326,12 +328,6 @@ namespace SanguineGenesis.GUI
                     UVDataBuffer.SetData(gl, attributeIndexUVCoord, uvArray, false, 2/*uv stride*/);
                     VertexBufferArray.Unbind(gl);
                 }
-                else
-                {
-
-                }
-
-
             }
 
             public int VertexCount => vertices == null ? 0 : vertices.Length / 3;

@@ -157,7 +157,7 @@
     <Compile Include="GameLogic\Faction.cs" />
     <Compile Include="GameLogic\Maps\PushingMapGenerator.cs" />
     <Compile Include="GameLogic\Rect.cs" />
-    <Compile Include="GameControls\EntityCommandsInput.cs" />
+    <Compile Include="GameControls\SelectionInput.cs" />
     <Compile Include="GameLogic\Terrain.cs" />
     <Compile Include="GameLogic\Data\Entities\Entity.cs" />
     <Compile Include="GUI\WinFormsComponents\GameMenu.cs">
