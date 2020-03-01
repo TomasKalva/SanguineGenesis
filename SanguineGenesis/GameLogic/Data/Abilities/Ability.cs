@@ -215,8 +215,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     c.ResetCommands();
 
             //move units to the target until the required distance is reached
-            if(typeof(Animal).IsAssignableFrom(typeof(Caster)) &&
-                !typeof(Nothing).IsAssignableFrom(typeof(Target)))
+            if(validCasters.Where(caster => caster.GetType() == typeof(Animal)).Any() &&
+                typeof(Target) != typeof(Nothing))
                 abilities.MoveToCast(this)
                     .SetCommands(validCasters
                     .Where(caster=>caster.GetType()==typeof(Animal))

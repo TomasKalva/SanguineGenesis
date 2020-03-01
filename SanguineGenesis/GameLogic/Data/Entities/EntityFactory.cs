@@ -58,9 +58,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public Terrain Terrain { get; }
         public SoilQuality SoilQuality { get; }
         public bool Producer { get; }
+        public float BuildingDistance { get; }
 
         public BuildingFactory(string buildingType, float maxHealth, float maxEnergy, int size,
-            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<StatusFactory> statusFactories)
+            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, List<StatusFactory> statusFactories)
             : base(buildingType, maxHealth, maxEnergy, physical, energyCost, viewRange, statusFactories)
         {
             Size = size;
@@ -68,6 +69,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Terrain = terrain;
             SoilQuality = soilQuality;
             Producer = producer;
+            BuildingDistance = buildingDistance;
         }
 
         /// <summary>
@@ -96,12 +98,12 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public Tree NewInstance(Faction faction, Node[,] nodesUnder, Node[,] roots)
         {
             return (Tree)SetStatuses(new Tree(faction, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake,
-                Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Air, Abilities.ToList()));
+                Size, Physical, Biome, Terrain, SoilQuality, Producer, BuildingDistance, ViewRange, Air, Abilities.ToList()));
         }
 
         public TreeFactory(string buildingType, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
-            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int rootsDistance, int air, List<StatusFactory> statusFactories)
-            : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange, statusFactories)
+            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, int rootsDistance, int air, List<StatusFactory> statusFactories)
+            : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, buildingDistance, viewRange, statusFactories)
 
         {
             MaxEnergyIntake = maxEnergyIntake;
@@ -121,12 +123,12 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public Structure NewInstance(Faction faction, Node[,] nodesUnder)
         {
             return (Structure)SetStatuses(new Structure(faction, EntityType, nodesUnder, MaxHealth, MaxEnergy,
-                Size, Physical, Biome, Terrain, SoilQuality, Producer, ViewRange, Abilities.ToList()));
+                Size, Physical, Biome, Terrain, SoilQuality, Producer, BuildingDistance, ViewRange, Abilities.ToList()));
         }
 
         public StructureFactory(string buildingType, float maxHealth, float maxEnergy, int size,
-            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<StatusFactory> statusFactories)
-            : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, viewRange, statusFactories)
+            bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, List<StatusFactory> statusFactories)
+            : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, buildingDistance, viewRange, statusFactories)
 
         {
         }

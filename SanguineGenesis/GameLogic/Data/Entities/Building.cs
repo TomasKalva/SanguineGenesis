@@ -60,6 +60,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public bool Producer { get; }
         /// <summary>
+        /// Distance at which this building can be built.
+        /// </summary>
+        public float BuildingDistance { get; }
+        /// <summary>
         /// Point to which created units go after they spawn.
         /// </summary>
         public Vector2? RallyPoint { get; set; }
@@ -72,7 +76,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public new int Height => Top - Bottom;
 
         public Building(Faction faction, string buildingType, Node[,] nodes, float maxHealth, float maxEnergy, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, List<Ability> abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, List<Ability> abilities)
             : base(faction, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Nodes = nodes;
@@ -81,6 +85,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Terrain = terrain;
             SoilQuality = soilQuality;
             Producer = producer;
+            BuildingDistance = buildingDistance;
 
             NodeLeft = nodes[0, 0].X;
             NodeBottom = nodes[0, 0].Y;

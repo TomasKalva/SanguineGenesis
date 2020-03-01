@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     sealed class BuildBuilding : TargetAbility<Entity, Node>
     {
         internal BuildBuilding(BuildingFactory buildingFactory)
-            : base(10f, buildingFactory.EnergyCost, true, false)
+            : base(buildingFactory.BuildingDistance, buildingFactory.EnergyCost, true, false)
         {
             BuildingFactory = buildingFactory;
         }
@@ -63,7 +63,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            if (!CanBeUsed() || (Target.Center - CommandedEntity.Center).Length > Ability.Distance)
+            if (!CanBeUsed() || CommandedEntity.DistanceTo(Target) > Ability.Distance)
                 //finish if the command can't be used
                 return true;
 

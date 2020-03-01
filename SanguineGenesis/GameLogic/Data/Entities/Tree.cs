@@ -24,8 +24,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
 
         public Tree(Faction faction, string treeType, Node[,] nodes, Node[,] rootNodes, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, int air, List<Ability> abilities)
-            : base(faction, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, viewRange, abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, int air, List<Ability> abilities)
+            : base(faction, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, abilities)
         {
             MaxEnergyIntake = maxEnergyIntake;
             RootNodes = rootNodes;
@@ -60,7 +60,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             if(Physical && Energy > 0)
             {
                 Structure deadTree = new Structure(game.NeutralFaction, "DEAD_TREE", Nodes, Energy, Energy, Size,
-                    Physical, Biome, Terrain, SoilQuality.BAD, false, 0, new List<Ability>());
+                    Physical, Biome, Terrain, SoilQuality.BAD, false, 0, 0, new List<Ability>());
                 Faction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(deadTree);
                 Faction.Entities.Add(deadTree);
                 game.Map.AddBuilding(deadTree);
