@@ -26,11 +26,23 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new ConsumeAnimalCommand(caster, target, this);
         }
 
+        /// <summary>
+        /// Animal can only eat twice as small animals.
+        /// </summary>
+        public override bool ValidArguments(Animal caster, Animal target)
+        {
+            if (target.Range * 2 > caster.Range)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public override string GetName() => "CONSUME";
 
         public override string Description()
         {
-            return "The target animal is tepmorarily removed from the map and then put back on the map.";
+            return "The target animal is tepmorarily removed from the map and then put back on the map. Animal can only eat twice as small animals.";
         }
     }
 

@@ -178,11 +178,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         protected bool CanBeUsed()
         {
+            //check validity of target and caster
             if (CommandedEntity.IsDead)
                 return false;
             if (Target is Entity targEnt && targEnt.IsDead)
                 return false;
 
+            //check if both target and caster are not locked by other ability/status...
             if (CommandedEntity is Animal commandedA)
             {
                 if (commandedA.StateChangeLock != null && commandedA.StateChangeLock != this)
@@ -193,6 +195,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 if (targA.StateChangeLock != null && targA.StateChangeLock != this)
                     return false;
             }
+
+            //check if target satisfies additional conditions required by the ability
+            if (!Ability.ValidArguments(CommandedEntity, Target))
+                return false;
+
             return true;
         }
 
@@ -223,7 +230,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 {
                     // target is too far away and CommandedEntity can't follow it
                     // => finish ability
-                    if (Target.DistanceTo(CommandedEntity) > Distance*1.2f)
+                    if (Target.DistanceTo(CommandedEntity) > Distance + .2f)
                         return true;
                 }
             }

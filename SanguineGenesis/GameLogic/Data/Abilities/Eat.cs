@@ -22,6 +22,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new HerbivoreEatCommand(caster, target, this);
         }
 
+        /// <summary>
+        /// Make sure that animals don't eat dirt.
+        /// </summary>
+        public override bool ValidArguments(Animal caster, IHerbivoreFood target)
+        {
+            if (target is Node tNode)
+            {
+                if (tNode.Biome == Biome.DEFAULT)
+                    return false;
+            }
+            return true;
+        }
+
         public override string ToString()
         {
             return base.ToString();
