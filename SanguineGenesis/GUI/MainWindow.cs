@@ -37,19 +37,19 @@ namespace SanguineGenesis.GUI
             GameControls = new GameControls.GameControls();
             //initialize game time
             GameTime = new GameTime(Console.Out);
-            
+
+            //create and enable game update timer
+            GameUpdateTimer = new Timer();
+            GameUpdateTimer.Tick += GameUpdateTimer_MainLoop;
+            GameUpdateTimer.Interval = 10;
+
             //waint until the window initializes and then initialize bottom panel and opengl
             Shown += (s, e) =>
             {
                 InitializeOpenGL();
                 InitializeUserInterface(icons);
+                GameUpdateTimer.Enabled = true;
             };
-
-            //create and enable game update timer
-            GameUpdateTimer = new Timer();
-            GameUpdateTimer.Tick += GameUpdateTimer_MainLoop;
-            GameUpdateTimer.Enabled = true;
-            GameUpdateTimer.Interval = 10;
         }
 
         #region Game logic
@@ -282,15 +282,22 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void InitializeOpenGL()
         {
-            OpenGL gl = openGLControl.OpenGL;
-            OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl.Width, (float)openGLControl.Height);
-            OpenGLAtlasDrawer.CreateMap(gl);
-            OpenGLAtlasDrawer.CreateNutrientsMap(gl);
-            OpenGLAtlasDrawer.CreateUnitCircles(gl);
-            OpenGLAtlasDrawer.CreateEntities(gl);
-            OpenGLAtlasDrawer.CreateEntitiesIndicators(gl);
-            OpenGLAtlasDrawer.CreateFlowField(gl);
-            OpenGLAtlasDrawer.CreateSelectionFrame(gl);
+            try
+            {
+                OpenGL gl = openGLControl.OpenGL;
+                OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl.Width, (float)openGLControl.Height);
+                OpenGLAtlasDrawer.CreateMap(gl);
+                OpenGLAtlasDrawer.CreateNutrientsMap(gl);
+                OpenGLAtlasDrawer.CreateUnitCircles(gl);
+                OpenGLAtlasDrawer.CreateEntities(gl);
+                OpenGLAtlasDrawer.CreateEntitiesIndicators(gl);
+                OpenGLAtlasDrawer.CreateFlowField(gl);
+                OpenGLAtlasDrawer.CreateSelectionFrame(gl);
+            }catch(Exception e)
+            {
+                MessageBox.Show("Failed to initialize window: "+e.Message);
+                CloseWindow();
+            }
         }
         #endregion Initialization
 
