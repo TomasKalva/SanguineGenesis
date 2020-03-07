@@ -375,7 +375,8 @@ namespace SanguineGenesis.GUI
 
         /// <summary>
         /// Returns triangle with number between 0 and 99. Returns triangle with 
-        /// number 0 if number is out of range.
+        /// number 0 if number is out of 
+        /// .
         /// </summary>
         public Rect GetNumberedTriangle(int number)
         {

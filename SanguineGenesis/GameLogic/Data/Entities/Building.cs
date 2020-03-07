@@ -19,9 +19,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public override Vector2 Center { get; }
         /// <summary>
-        /// Range of the circle collider.
+        /// Radius of the circle collider.
         /// </summary>
-        public override float Range => Size / 2f;
+        public override float Radius => Size / 2f;
         /// <summary>
         /// True iff the building was built.
         /// </summary>
@@ -89,7 +89,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
             NodeLeft = nodes[0, 0].X;
             NodeBottom = nodes[0, 0].Y;
-            Center = new Vector2(nodes[0, 0].X + Range, nodes[0, 0].Y + Range);
+            Center = new Vector2(nodes[0, 0].X + Radius, nodes[0, 0].Y + Radius);
         }
 
         /// <summary>

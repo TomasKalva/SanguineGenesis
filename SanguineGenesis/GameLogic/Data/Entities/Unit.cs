@@ -22,15 +22,15 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public override Vector2 Center => Position;
         /// <summary>
-        /// Range of the circle collider.
+        /// Radius of the circle collider.
         /// </summary>
-        public override float Range { get; }
+        public override float Radius { get; }
 
-        public Unit(Faction faction, string unitType, float maxHealth, float viewRange, float maxEnergy, List<Ability> abilities, Vector2 position, float range, bool physical)
+        public Unit(Faction faction, string unitType, float maxHealth, float viewRange, float maxEnergy, List<Ability> abilities, Vector2 position, float radius, bool physical)
             :base(faction, unitType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Position = position;
-            Range = range;
+            Radius = radius;
         }
     }
 }

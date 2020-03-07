@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     sealed class CreateAnimal : TargetAbility<Building, Nothing>
     {
         internal CreateAnimal(AnimalFactory spawningUnitFactory)
-            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false, duration: spawningUnitFactory.SpawningTime)
+            : base(2 * spawningUnitFactory.Radius, spawningUnitFactory.EnergyCost, true, false, duration: spawningUnitFactory.SpawningTime)
         {
             SpawningAnimalFactory = spawningUnitFactory;
 

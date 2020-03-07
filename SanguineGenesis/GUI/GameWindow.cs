@@ -78,7 +78,7 @@ namespace SanguineGenesis.GUI
             //update MapMovementInput
             UpdateMoveMap();
             //move map view
-            GameControls.MoveMapView(Game.Map, GameTime.DeltaT);
+            GameControls.MoveMapView(Game.Map);
 
             //update selected entities with player's input
             GameControls.UpdateEntitiesByInput(Game);

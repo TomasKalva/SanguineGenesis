@@ -31,7 +31,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         public override bool ValidArguments(Animal caster, Animal target)
         {
-            if (target.Range * 2 > caster.Range)
+            if (target.Radius * 2 > caster.Radius)
             {
                 return false;
             }

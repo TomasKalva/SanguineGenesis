@@ -25,9 +25,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public virtual Vector2 Center { get; }
         /// <summary>
-        /// Range of the circle collider.
+        /// Radius of the circle collider.
         /// </summary>
-        public abstract float Range { get; }
+        public abstract float Radius { get; }
         /// <summary>
         /// How far the unit sees.
         /// </summary>
@@ -83,10 +83,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public List<Status> Statuses { get; }
 
         //map extents
-        public float Left => Center.X - Range;
-        public float Right => Center.X + Range;
-        public float Bottom => Center.Y - Range;
-        public float Top => Center.Y + Range;
+        public float Left => Center.X - Radius;
+        public float Right => Center.X + Radius;
+        public float Bottom => Center.Y - Radius;
+        public float Top => Center.Y + Radius;
         public float Width => Right - Left;
         public float Height => Top - Bottom;
 
@@ -107,21 +107,21 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         
         #region Animation
         public float GetActualBottom(float imageBottom)
-            => Math.Min(Center.Y - Range, Center.Y - imageBottom);
+            => Math.Min(Center.Y - Radius, Center.Y - imageBottom);
         public float GetActualTop(float imageHeight, float imageBottom)
-            => Math.Max(Center.Y + Range, Center.Y - imageBottom + imageHeight);
+            => Math.Max(Center.Y + Radius, Center.Y - imageBottom + imageHeight);
         public float GetActualLeft(float imageLeft)
-            => Math.Min(Center.X - Range, Center.X - imageLeft);
+            => Math.Min(Center.X - Radius, Center.X - imageLeft);
         public float GetActualRight(float imageWidth, float imageLeft)
-            => Math.Max(Center.X + Range, Center.X - imageLeft + imageWidth);
+            => Math.Max(Center.X + Radius, Center.X - imageLeft + imageWidth);
         public Rect GetActualRect()
         {
             Animation anim = AnimationState.Animation;
             return new Rect(
-                Math.Min(Center.X - Range, Center.X - anim.LeftBottom.X),
-                Math.Min(Center.Y - Range, Center.Y - anim.LeftBottom.Y),
-                Math.Max(Center.X + Range, Center.X - anim.LeftBottom.X + anim.Width),
-                Math.Max(Center.Y + Range, Center.Y - anim.LeftBottom.Y + anim.Height));
+                Math.Min(Center.X - Radius, Center.X - anim.LeftBottom.X),
+                Math.Min(Center.Y - Radius, Center.Y - anim.LeftBottom.Y),
+                Math.Max(Center.X + Radius, Center.X - anim.LeftBottom.X + anim.Width),
+                Math.Max(Center.Y + Radius, Center.Y - anim.LeftBottom.Y + anim.Height));
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public float DistanceTo(Entity e)
         {
-            return (this.Center - e.Center).Length - this.Range - e.Range;
+            return (this.Center - e.Center).Length - this.Radius - e.Radius;
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public float DistanceTo(Node n)
         {
-            return (this.Center - n.Center).Length - this.Range - 0.5f;
+            return (this.Center - n.Center).Length - this.Radius - 0.5f;
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
         float ITargetable.DistanceTo(Entity entity)
         {
-            return (entity.Center - Center).Length - entity.Range - Range;
+            return (entity.Center - Center).Length - entity.Radius - Radius;
         }
 
         #region IShowable

@@ -107,7 +107,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     if (animalInHole != null)
                     {
                         animalInHole.Faction.Entities.Add(animalInHole);
-                        animalInHole.Position = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - animalInHole.Range);
+                        animalInHole.Position = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - animalInHole.Radius);
                         underground.AnimalsUnderGround.Remove(animalInHole);
                         animalInHole.StateChangeLock = null;
                         return false;

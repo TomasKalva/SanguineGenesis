@@ -61,6 +61,14 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 {
                     jumping = true;
                     ElapsedTime -= Ability.Duration;
+
+                    //don't jump if the endpoint collides with building
+                    if (game.physics.CollidesWithBuilding(game, Target, CommandedEntity.Radius))
+                    {
+                        CommandedEntity.StateChangeLock = null;
+                        Refund();
+                        return true;
+                    }
                 }
             }
 

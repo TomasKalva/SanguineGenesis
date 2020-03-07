@@ -34,12 +34,12 @@ namespace SanguineGenesis.GameControls
         /// <summary>
         /// Moves MapView using MapMovementInput.
         /// </summary>
-        public void MoveMapView(Map map, float deltaT)
+        public void MoveMapView(Map map)
         {
             //move map view only if player isn't currently selecting units
             if (SelectionInput.State != SelectionInputState.SELECTING_UNITS)
                 foreach (Direction d in MapMovementInput.MapDirection)
-                    MapView.Move(d, map, deltaT);
+                    MapView.Move(d, map);
         }
 
         /// <summary>

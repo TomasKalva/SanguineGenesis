@@ -137,7 +137,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             //add the consumed unit back to the list of entities
             //it spawns in front of the affected animal
-            AnimalConsumed.Position = AffectedEntity.Position + (AffectedEntity.Range + AnimalConsumed.Range) * AffectedEntity.Direction;
+            AnimalConsumed.Position = AffectedEntity.Position + (AffectedEntity.Radius + AnimalConsumed.Radius) * AffectedEntity.Direction;
             AnimalConsumed.Faction.Entities.Add(AnimalConsumed);
             AnimalConsumed.StateChangeLock = null;
         }

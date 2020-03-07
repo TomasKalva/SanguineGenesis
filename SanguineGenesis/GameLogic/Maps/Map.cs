@@ -148,13 +148,15 @@ namespace SanguineGenesis.GameLogic.Maps
                         if (ijN.Blocked || !(buildingFactory.CanBeOn(ijN)))
                             return false;
                     }
+
+
+                return true;
             }
             else
             {
                 //the whole building has to be on the map
                 return false;
             }
-            return true;
         }
 
         /// <summary>

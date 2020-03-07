@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     sealed class Spawn : TargetAbility<Entity, Vector2>
     {
         internal Spawn(AnimalFactory spawningUnitFactory)
-            : base(2 * spawningUnitFactory.Range, spawningUnitFactory.EnergyCost, true, false, duration:spawningUnitFactory.SpawningTime)
+            : base(2 * spawningUnitFactory.Radius, spawningUnitFactory.EnergyCost, true, false, duration:spawningUnitFactory.SpawningTime)
         {
             SpawningUnitFactory = spawningUnitFactory;
         }
