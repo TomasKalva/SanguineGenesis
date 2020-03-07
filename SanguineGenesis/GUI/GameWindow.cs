@@ -17,14 +17,14 @@ using static SanguineGenesis.GUI.MainMenuWindow;
 
 namespace SanguineGenesis.GUI
 {
-    partial class MainWinformWindow : Form
+    partial class GameWindow : Form
     {
         /// <summary>
         /// Runs main loop of the game.
         /// </summary>
         Timer GameUpdateTimer { get; }
 
-        public MainWinformWindow(MapDescription mapDescription, Biome playersBiome, Icons icons, bool testAnimals)
+        public GameWindow(MapDescription mapDescription, Biome playersBiome, Icons icons, bool testAnimals)
         {
             InitializeComponent();
             

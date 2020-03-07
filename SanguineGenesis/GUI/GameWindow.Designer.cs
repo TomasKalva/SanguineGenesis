@@ -1,6 +1,6 @@
 ﻿namespace SanguineGenesis.GUI
 {
-    partial class MainWinformWindow
+    partial class GameWindow
     {
         /// <summary>
         /// Required designer variable.
