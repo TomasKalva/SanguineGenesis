@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Create a new animal at the target location.
     /// </summary>
-    sealed class Spawn : TargetAbility<Entity, Vector2>
+    sealed class Spawn : Ability<Entity, Vector2>
     {
         internal Spawn(AnimalFactory spawningUnitFactory)
             : base(2 * spawningUnitFactory.Radius, spawningUnitFactory.EnergyCost, true, false, duration:spawningUnitFactory.SpawningTime)

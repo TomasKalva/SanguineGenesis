@@ -125,6 +125,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             new Stat( "Energy intake", MaxEnergyIntake.ToString("0.0")),
             new Stat( "Physical", Physical.ToString()),
             new Stat( "View range", ViewRange.ToString("0.0")),
+            new Stat( "Producer", Producer.ToString())
             };
             return stats;
         }

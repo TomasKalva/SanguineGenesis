@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Eat a node or tree to regenerate energy.
     /// </summary>
-    sealed class HerbivoreEat : TargetAbility<Animal, IHerbivoreFood>
+    sealed class HerbivoreEat : Ability<Animal, IHerbivoreFood>
     {
         internal HerbivoreEat()
             : base(0.1f, 0, false, false)
@@ -83,7 +83,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Eat a corpse to regenerate energy.
     /// </summary>
-    sealed class CarnivoreEat : TargetAbility<Animal, ICarnivoreFood>
+    sealed class CarnivoreEat : Ability<Animal, ICarnivoreFood>
     {
         internal CarnivoreEat()
             : base(0.1f, 0, false, false)

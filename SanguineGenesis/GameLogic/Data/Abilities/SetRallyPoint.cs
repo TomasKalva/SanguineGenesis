@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Set rally point of the building.
     /// </summary>
-    sealed class SetRallyPoint : TargetAbility<Building, Vector2>
+    sealed class SetRallyPoint : Ability<Building, Vector2>
     {
         internal SetRallyPoint()
             : base(0, 0, false, false)

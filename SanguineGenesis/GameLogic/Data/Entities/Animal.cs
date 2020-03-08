@@ -29,11 +29,11 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public bool CanBeMoved { get; set; }
         /// <summary>
-        /// Set to true to set WantsToMove to false in Move.
+        /// Set to true to set WantsToMove to false in Move method.
         /// </summary>
         public bool StopMoving { get; set; }
         /// <summary>
-        /// True if the unit is performing a MoveToCommand.
+        /// True if the animal is performing a MoveToCommand.
         /// </summary>
         public bool WantsToMove { get; set; }
         /// <summary>

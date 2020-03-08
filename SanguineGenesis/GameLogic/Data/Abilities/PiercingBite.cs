@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Deal huge amount of damage to animal.
     /// </summary>
-    sealed class PiercingBite : TargetAbility<Animal, Animal>
+    sealed class PiercingBite : Ability<Animal, Animal>
     {
         public float Damage { get; }
 

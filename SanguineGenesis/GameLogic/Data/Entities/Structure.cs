@@ -39,6 +39,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 new Stat( "Soil quality", SoilQuality.ToString()),
                 new Stat( "Physical", Physical.ToString()),
                 new Stat( "View range", ViewRange.ToString("0.0")),
+                new Stat( "Producer", Producer.ToString())
             };
             return stats;
         }

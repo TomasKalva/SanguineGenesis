@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Applies status to the CommandedEntity.
     /// </summary>
-    sealed class ApplyStatus : TargetAbility<Animal, Nothing>
+    sealed class ApplyStatus : Ability<Animal, Nothing>
     {
         public StatusFactory StatusFactory { get; }
 

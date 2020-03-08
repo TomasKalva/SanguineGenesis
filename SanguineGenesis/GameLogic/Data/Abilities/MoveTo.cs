@@ -13,7 +13,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The animal moves to the target.
     /// </summary>
-    sealed class MoveTo : TargetAbility<Animal, IMovementTarget>
+    sealed class MoveTo : Ability<Animal, IMovementTarget>
     {
         internal MoveTo(float? goalDistance, bool attackEnemyInstead)
             : base(null, 0, false, false)

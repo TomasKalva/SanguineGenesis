@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Apply poison to the animal.
     /// </summary>
-    sealed class PoisonousSpit : TargetAbility<Animal, Animal>
+    sealed class PoisonousSpit : Ability<Animal, Animal>
     {
         public PoisonFactory PoisonFactory { get; }
 

@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The target is consumed for a short time by the caster.
     /// </summary>
-    sealed class ConsumeAnimal : TargetAbility<Animal, Animal>
+    sealed class ConsumeAnimal : Ability<Animal, Animal>
     {
         public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
 

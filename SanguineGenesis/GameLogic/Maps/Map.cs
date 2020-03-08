@@ -304,18 +304,26 @@ namespace SanguineGenesis.GameLogic.Maps
                         else if (n.Biome == Biome.SAVANNA)
                             rainMsav--;
 
+                    //building standing on this node
+                    var building = this[i, j].Building;
+                    /*Player builPl = null;
+                    if(building != null)
+                        builPl = building.Faction as Player;
+                        */
                     if (this[i, j].ActiveNutrients >= this[i,j].Terrain.Nutrients(Biome.SAVANNA, SoilQuality.LOW))
                     {
                         //node has enough nutrients to become savanna
-                        if (rainMsav < 0)
-                            //majority of nondefault neighbour biomes is savanna
+                        if (rainMsav < 0 || //majority of nondefault neighbour biomes is savanna
+                            (building != null &&
+                            building.Biome == Biome.SAVANNA)) //or savanna building is standing on it
                             newBiomes[i, j] = Biome.SAVANNA;
                     }
                     if (this[i, j].ActiveNutrients >= this[i, j].Terrain.Nutrients(Biome.RAINFOREST, SoilQuality.LOW))
                     {
                         //node has enough nutrients to become rainforest
-                        if (rainMsav > 0)
-                            //majority of nondefault neighbour biomes is rainforest
+                        if (rainMsav > 0 || //majority of nondefault neighbour biomes is rainforest
+                            (building != null &&
+                            building.Biome == Biome.RAINFOREST))//or rainforest building is standing on it
                             newBiomes[i, j] = Biome.RAINFOREST;
                     }
                 }

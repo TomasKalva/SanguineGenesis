@@ -77,6 +77,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public bool CanBeOn(Node node)
         {
+            //any node has at least BAD terrain
+            if (SoilQuality == SoilQuality.BAD)
+                return true;
+
             return node.Terrain == Terrain &&
                 node.Biome == Biome &&
                 node.ActiveNutrients >= Terrain.Nutrients(Biome, SoilQuality);

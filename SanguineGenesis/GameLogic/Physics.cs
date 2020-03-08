@@ -243,9 +243,9 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public void MoveAnimals(Map map, List<Animal> animals, float deltaT)
         {
-            foreach(Animal u in animals)
+            foreach(Animal a in animals)
             {
-                u.Move(map,deltaT);
+                a.Move(map,deltaT);
             }
         }
 
