@@ -1,4 +1,5 @@
 ﻿using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GUI.WinFormsComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +30,24 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string GetName() => "CHARGE_TO";
 
+        public override List<Stat> Stats()
+        {
+            List<Stat> stats = new List<Stat>()
+            {
+                new Stat( "Energy cost", EnergyCost.ToString()),
+            new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
+            new Stat( "Self castable", SelfCastable.ToString()),
+            new Stat("Only one", OnlyOne.ToString()),
+            new Stat( "Target type", TargetName),
+            new Stat( "Dmg mult", AttackDamageMultiplier.ToString("0.0")),
+            };
+            return stats;
+        }
+
         public override string Description()
         {
-            return "The animal charges to the entity and deals it damage.";
+            return "The animal charges to the entity and deals it "+ AttackDamageMultiplier.ToString("0.0")
+                + " times of its attack damage.";
         }
     }
 

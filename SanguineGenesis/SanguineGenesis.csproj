@@ -84,7 +84,7 @@
     <Compile Include="GameLogic\Data\Abilities\ImproveStructure.cs" />
     <Compile Include="GameLogic\Data\Abilities\Jump.cs" />
     <Compile Include="GameLogic\Data\Abilities\Kick.cs" />
-    <Compile Include="GameLogic\Data\Abilities\KnockBack.cs" />
+    <Compile Include="GameLogic\Data\Abilities\KnockAway.cs" />
     <Compile Include="GameLogic\Data\Abilities\MoveTo.cs" />
     <Compile Include="GameLogic\Data\Abilities\PiercingBite.cs" />
     <Compile Include="GameLogic\Data\Abilities\PoisonousSpit.cs" />

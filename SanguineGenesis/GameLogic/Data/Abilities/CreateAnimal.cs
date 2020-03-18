@@ -24,7 +24,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override Command NewCommand(Building caster, Nothing target)
         {
-            return new CreateUnitCommand(caster, target, this);
+            return new CreateAnimalCommand(caster, target, this);
         }
 
         public override string ToString()
@@ -36,13 +36,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The entity spawns a new unit at the target point.";
+            return "The entity spawns a new animal at the target point.";
         }
     }
 
-    class CreateUnitCommand : Command<Building, Nothing, CreateAnimal>
+    class CreateAnimalCommand : Command<Building, Nothing, CreateAnimal>
     {
-        public CreateUnitCommand(Building commandedEntity, Nothing target, CreateAnimal spawn)
+        public CreateAnimalCommand(Building commandedEntity, Nothing target, CreateAnimal spawn)
             : base(commandedEntity, target, spawn)
         {
         }

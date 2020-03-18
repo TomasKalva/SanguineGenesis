@@ -11,11 +11,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Knock the target back.
     /// </summary>
-    sealed class KnockBack : Ability<Animal, Animal>
+    sealed class KnockAway : Ability<Animal, Animal>
     {
-        public KnockBackFactory KnockBackFactory { get; }
+        public KnockAwayFactory KnockBackFactory { get; }
 
-        internal KnockBack(float energyCost, float distance, float preparationTime, KnockBackFactory knockBackFactory)
+        internal KnockAway(float energyCost, float distance, float preparationTime, KnockAwayFactory knockBackFactory)
             : base(distance, energyCost, true, false, duration:preparationTime)
         {
             KnockBackFactory = knockBackFactory;
@@ -26,17 +26,17 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new KnockBackCommand(caster, target, this);
         }
 
-        public override string GetName() => "KNOCK_BACK";
+        public override string GetName() => "KNOCK_AWAY";
 
         public override string Description()
         {
-            return "The animal pulls the other animal to itself.";
+            return "The animal knocks other animal away.";
         }
     }
 
-    class KnockBackCommand : Command<Animal, Animal, KnockBack>
+    class KnockBackCommand : Command<Animal, Animal, KnockAway>
     {
-        public KnockBackCommand(Animal commandedEntity, Animal target, KnockBack knockBack)
+        public KnockBackCommand(Animal commandedEntity, Animal target, KnockAway knockBack)
             : base(commandedEntity, target, knockBack)
         {
         }

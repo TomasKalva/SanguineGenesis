@@ -22,7 +22,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public ShellFactory ShellFactory { get; }
         public FastStrikesFactory FastStrikesFactory { get; }
         public FarSightFactory FarSightFactory { get; }
-        public KnockBackFactory KnockAwayFactory { get; }
+        public KnockAwayFactory KnockAwayFactory { get; }
         public SuffocatingFactory SuffocatingFactory { get; }
         public DecayFactory DecayFactory { get; }
 
@@ -64,7 +64,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             AllStatusFactories.Add(FarSightFactory);
 
             //knock away
-            KnockAwayFactory = new KnockBackFactory(distance: 2f, speed: 6f);
+            KnockAwayFactory = new KnockAwayFactory(distance: 2f, speed: 6f);
             AllStatusFactories.Add(KnockAwayFactory);
 
             //suffocating

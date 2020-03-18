@@ -81,8 +81,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The unit moves to the target. If the target is on a terrain " +
-                "this unit can't move to, the unit won't do anything. If unit meets an enemy it attacks it instead.";
+            return "The animal moves to the target. If the target is on a terrain " +
+                "this animal can't move to, the animal won't do anything." + 
+                (AttackEnemyInstead ? " If animal meets an enemy it attacks it instead." : "");
         }
     }
 
@@ -185,9 +186,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             //command is finished if unit reached the goal distance or if it was standing at one
             //place near the target position for a long time
             if (Finished() //unit is close to the target point
-                || (NoMovementDetection.NotMovingMuch(CommandedEntity.MaxSpeedLand * deltaT / 2) && CanStop())//unit is stuck
-                /*|| game.Players[unit.Player.PlayerID].MapView
-                    .GetObstacleMap(unit.Movement)[(int)TargetPoint.Center.X,(int)TargetPoint.Center.Y]*/)//target point is blocked
+                || (NoMovementDetection.NotMovingMuch(CommandedEntity.MaxSpeedLand * deltaT / 2) && CanStop()))//unit is stuck
             {
                 return true;
             }

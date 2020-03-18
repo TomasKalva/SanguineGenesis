@@ -286,7 +286,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public override string GetName() => "FAR_SIGHT";
     }
 
-    class KnockBackFactory : StatusFactory<Animal>
+    class KnockAwayFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// How far the animal is knocked away.
@@ -302,7 +302,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         /// </summary>
         public Vector2 Direction { get; set; }
 
-        public KnockBackFactory(float distance, float speed)
+        public KnockAwayFactory(float distance, float speed)
             : base(true)
         {
             Distance=distance;

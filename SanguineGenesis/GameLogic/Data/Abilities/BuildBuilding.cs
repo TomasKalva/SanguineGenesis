@@ -70,7 +70,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
             int nX = Target.X;
             int nY = Target.Y;
-            float buildingRadius = Ability.BuildingFactory.Size / 2;
+            float buildingRadius = Ability.BuildingFactory.Size / 2f;
             var targetCenter = new Vector2(Target.X + buildingRadius,
                                            Target.Y + buildingRadius);
 

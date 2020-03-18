@@ -244,16 +244,16 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override bool Step(Game game, float deltaT)
         {
-            //remove the staus if the duration is over
+            //remove the staus if the duration is over or animal moves
             timer += deltaT;
-            if (timer > StatusInfo.Duration)
+            if (timer > StatusInfo.Duration || AffectedEntity.WantsToMove)
                 return true;
             return false;
         }
 
         public override string Description()
         {
-            return "Gives animal thick skin.";
+            return "Gives animal thick skin. Removed if animal moves.";
         }
     }
 
@@ -299,7 +299,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "Increases attack speed of animal by " + 0.1f + ".";
+            return "Increases attack speed of animal by " + 0.1f + " for "+StatusInfo.Duration+" seconds.";
         }
     }
 
@@ -374,7 +374,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "There are " + AnimalsUnderGround.Count() + " underground.";
+            return (AnimalsUnderGround.Count()<=1? "There is ":"There are ") + AnimalsUnderGround.Count() + " animals underground.";
         }
     }
 
@@ -400,7 +400,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override bool Step(Game game, float deltaT)
         {
-            //remove the staus if the unit moves
+            //remove the staus if the animal moves
             if (AffectedEntity.WantsToMove)
                 return true;
             return false;
@@ -416,19 +416,19 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "Increases view range by " + StatusInfo.RangeExtension + ".";
+            return "Increases view range by " + StatusInfo.RangeExtension + ". Removed if the animal moves.";
         }
     }
 
     /// <summary>
     /// Animal is being knocked away.
     /// </summary>
-    class KnockAway : Status<Animal, KnockBackFactory>, IAnimalStateManipulator
+    class KnockAway : Status<Animal, KnockAwayFactory>, IAnimalStateManipulator
     {
         private readonly MoveAnimalToPoint moveAnimalToPoint;
 
-        public KnockAway(Animal affected, KnockBackFactory knockBackInfo)
-            : base(affected, knockBackInfo)
+        public KnockAway(Animal affected, KnockAwayFactory knockAwayInfo)
+            : base(affected, knockAwayInfo)
         {
             Vector2 targetPoint = affected.Position + StatusInfo.Distance * StatusInfo.Direction;
             moveAnimalToPoint = new MoveAnimalToPoint(affected, targetPoint, StatusInfo.Speed, StatusInfo.Distance / StatusInfo.Speed);
@@ -496,7 +496,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "This animal is out of its natural terrain and is therefore suffocating.";
+            return "This animal is out of its natural environment and is therefore suffocating.";
         }
     }
 

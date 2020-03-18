@@ -31,7 +31,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The unit deals repeatedly its attack damage to the target.";
+            return "The animal moves to the target and then deals repeatedly its attack damage to the target." +
+                (!Unbreakable ? " If animal meets an enemy it attacks it instead." : "");
         }
     }
 

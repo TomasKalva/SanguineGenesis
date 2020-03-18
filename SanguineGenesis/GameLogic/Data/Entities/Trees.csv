@@ -1,4 +1,4 @@
-name,max health,max energy,energy regen,physical,size,roots distance,energy cost,biome,terrain,soil quality,abilities,statuses,producer,air,5,10
+name,max health,max energy,energy regen,physical,size,roots distance,energy cost,biome,terrain,soil quality,abilities,statuses,producer,air,building distance, view range
 BAOBAB,250,100,0.02,yes,2,3,50,SAVANNA,LAND,LOW,build:RHODE_GRASS;build:PANDANI;build:MIAMBO;rallyPoint,,yes,8,5,10
 RHODE_GRASS,50,60,0.02,no,2,4,30,SAVANNA,LAND,LOW,create:ZEBRA;create:GAZZELE;build:KIWI_TREE;build:CANDELABRA;build:RHODE_GRASS;rallyPoint,,yes,3,5,10
 CANDELABRA,130,75,0.04,yes,2,2,30,SAVANNA,LAND,MEDIUM,create:RHINO;build:ACACIA;rallyPoint,,no,4,5,10
@@ -24,7 +24,7 @@ PITCHER,50,30,1.60,no,1,0,30,RAINFOREST,LAND,LOW,,,no,1,5,10
 CYCAD,120,65,0.10,yes,2,1,30,RAINFOREST,LAND,HIGH,create:RAPTOR;create:DODO;build:CYCAD_PALM;rallyPoint,,no,2,5,10
 CYCAD_PALM,160,85,0.03,yes,3,2,30,RAINFOREST,LAND,HIGH,create:TRICERATOPS;build:TYRANNOSAUR_TREE;rallyPoint,,no,4,5,10
 TYRANNOSAUR_TREE,220,120,0.02,yes,3,3,30,RAINFOREST,LAND,HIGH,create:TYRANNOSAUR;rallyPoint,,no,4,5,10
-FERN,30,10,0.06,no,1,2,30,RAINFOREST,LAND,BAD,,SOIL_IMPROVING,yes,2,5,10
+FERN,30,10,0.06,no,1,2,30,RAINFOREST,LAND,BAD,,SOIL_IMPROVING,yes,2,1,4
 MANGROVE,80,50,0.10,yes,2,1,30,RAINFOREST,SHALLOW_WATER,LOW,create:ANACONDA;build:WATER_LILY;build:ALGAE;rallyPoint,,no,3,5,10
 WATER_LILY,50,40,0.06,no,1,2,30,RAINFOREST,DEEP_WATER,LOW,create:COBRA;rallyPoint,,yes,2,5,10
 ALGAE,40,25,0.03,no,1,3,30,RAINFOREST,DEEP_WATER,LOW,create:ALIGATOR;build:SWORD_PLANT;rallyPoint,,yes,1,5,10
