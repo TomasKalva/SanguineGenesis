@@ -145,6 +145,17 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
+        /// Commit entities and keep only the ones with the given type.
+        /// </summary>
+        public void KeepSelected(string entityType)
+        {
+            CommitEntities();
+            foreach(var e in TotalGroup.Where(e => e.EntityType != entityType))
+                e.Selected = false;
+            TotalGroup = TotalGroup.Where(e => e.EntityType == entityType).ToList();
+        }
+
+        /// <summary>
         /// Composes the two groups using the operation and returns the result.
         /// </summary>
         private List<Entity> ComposeGroups(Operation opearation, List<Entity> total, List<Entity> temporary)

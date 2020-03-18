@@ -393,17 +393,24 @@ namespace SanguineGenesis.GUI
         {
             int abilityIndex;
             int ctrlGroupIndex;
-            if ((abilityIndex = AbilityButtonArray.KeyToAbilityIndex(e.KeyCode))!=-1)
+            if ((abilityIndex = AbilityButtonArray.KeyToAbilityIndex(e.KeyCode)) != -1)
             {
                 //select the ability
                 AbilityButtonArray.SelectAbilityWithIndex(abilityIndex);
             }
-            else if(e.KeyCode == Keys.ShiftKey)
+            else if (e.KeyCode == Keys.ShiftKey)
                 //abilities will be appended to the queue
                 GameControls.SelectionInput.ResetCommandsQueue = false;
             else if (e.KeyCode == Keys.Tab)
                 //jump to next entity type
                 SelectEntityOfNextType();
+            else if (e.KeyCode == Keys.Space)
+            {
+                //select only entities of current type
+                if(EntityButtonArray.Selected!=null &&
+                    GameControls.SelectionInput.State==SelectionInputState.UNITS_SELECTED)
+                    GameControls.SelectedGroup.KeepSelected(EntityButtonArray.Selected.EntityType);
+            }
             else if ((ctrlGroupIndex = ControlGroupButtonArray.KeyToGroupIndex(e.KeyCode)) != -1)
             {
                 //modify control groups
@@ -412,7 +419,7 @@ namespace SanguineGenesis.GUI
                     //saves selected entities to the group
                     ControlGroupButtonArray.SaveGroupWithIndex(ctrlGroupIndex);
                 }
-                else if(GameControls.SelectionInput.State==SelectionInputState.IDLE ||
+                else if (GameControls.SelectionInput.State == SelectionInputState.IDLE ||
                     GameControls.SelectionInput.State == SelectionInputState.UNITS_SELECTED)
                 {
                     //loads selected entities from the group
@@ -597,6 +604,9 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void SelectEntityOfNextType()
         {
+            //iterate through all entities starting at selectedEntity,
+            //select the first one with different type, keep the original
+            //entity selected if there is no entity with different type
             List<Entity> selectedEntities = EntityButtonArray.InfoSources;
             Entity selectedEntity = EntityButtonArray.Selected;
             if (selectedEntities != null &&
