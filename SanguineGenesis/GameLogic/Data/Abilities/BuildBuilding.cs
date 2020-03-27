@@ -75,7 +75,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                                            Target.Y + buildingRadius);
 
             if (game.Map.BuildingCanBePlaced(Ability.BuildingFactory, nX, nY) &&
-                !game.physics.CollidesWithUnits(game, targetCenter, buildingRadius))
+                !game.collisions.CollidesWithUnits(game, targetCenter, buildingRadius))
             {
                 if (!TryPay())
                     //entity doesn't have enough energy
