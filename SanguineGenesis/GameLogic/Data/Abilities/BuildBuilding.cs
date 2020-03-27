@@ -1,4 +1,5 @@
 ﻿using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI.WinFormsComponents;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Build a building at the target node.
     /// </summary>
-    sealed class BuildBuilding : TargetAbility<Entity, Node>
+    sealed class BuildBuilding : Ability<Entity, Node>
     {
         internal BuildBuilding(BuildingFactory buildingFactory)
             : base(buildingFactory.BuildingDistance, buildingFactory.EnergyCost, true, false)
@@ -69,8 +70,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
             int nX = Target.X;
             int nY = Target.Y;
+            float buildingRadius = Ability.BuildingFactory.Size / 2;
+            var targetCenter = new Vector2(Target.X + buildingRadius,
+                                           Target.Y + buildingRadius);
 
-            if (game.Map.BuildingCanBePlaced(Ability.BuildingFactory, nX, nY))
+            if (game.Map.BuildingCanBePlaced(Ability.BuildingFactory, nX, nY) &&
+                !game.physics.CollidesWithUnits(game, targetCenter, buildingRadius))
             {
                 if (!TryPay())
                     //entity doesn't have enough energy

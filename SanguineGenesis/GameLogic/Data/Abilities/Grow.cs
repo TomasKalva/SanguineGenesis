@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The tree grows until it has full energy.
     /// </summary>
-    sealed class Grow : TargetAbility<Tree, Nothing>
+    sealed class Grow : Ability<Tree, Nothing>
     {
         internal Grow()
             : base(0, 0, true, false, false)

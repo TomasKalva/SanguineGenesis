@@ -282,7 +282,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture);
             float foodEnergyRegen = float.Parse(fields[3], CultureInfo.InvariantCulture);
             float foodEatingPeriod = float.Parse(fields[4], CultureInfo.InvariantCulture);
-            float range = float.Parse(fields[5], CultureInfo.InvariantCulture);
+            float radius = float.Parse(fields[5], CultureInfo.InvariantCulture);
             float energyCost = float.Parse(fields[6], CultureInfo.InvariantCulture);
             float attackDamage = float.Parse(fields[7], CultureInfo.InvariantCulture);
             float attackDistance = float.Parse(fields[8], CultureInfo.InvariantCulture);
@@ -305,7 +305,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                     maxEnergy: maxEnergy,
                     foodEnergyRegen: foodEnergyRegen,
                     foodEatingPeriod: foodEatingPeriod,
-                    range: range,
+                    radius: radius,
                     attackDamage: attackDamage,
                     attackPeriod: attackPeriod,
                     attackDistance: attackDistance,

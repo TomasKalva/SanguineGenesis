@@ -57,9 +57,24 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Select the rectangle of Nodes given by the coordinates.
+        /// Select buildings in area on map.
         /// </summary>
-        public static Node[,] SelectNodes(Map map, int left, int bottom, int right, int top)
+        public static IEnumerable<Building> SelectBuildingInArea(Map map, Rect area)
+        {
+            var nearbyNodes = SelectNodes(
+                       map, (int)area.Left - 1, (int)area.Bottom - 1, (int)area.Right + 1, (int)area.Top + 1);
+            foreach (Node n in nearbyNodes)
+            {
+                Building b;
+                if ((b = n.Building) != null)
+                    yield return b;
+            }
+        }
+
+    /// <summary>
+    /// Select the rectangle of Nodes given by the coordinates.
+    /// </summary>
+    public static Node[,] SelectNodes(Map map, int left, int bottom, int right, int top)
         {
             return SelectPartOfMap(map,left,bottom,right,top);
         }

@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Pull the target to the caster.
     /// </summary>
-    sealed class Pull : TargetAbility<Animal, Animal>
+    sealed class Pull : Ability<Animal, Animal>
     {
         public float PullSpeed { get; }
 
@@ -75,7 +75,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     //clear the command queue of Targ, so that it can't move away
                     Target.CommandQueue.Clear();
                     //create instance of MoveAnimalToPoint that will be moving Targ to CommandedEntity
-                    Vector2 frontOfAnimal = CommandedEntity.Position + (CommandedEntity.Range + Target.Range) * CommandedEntity.Direction;
+                    Vector2 frontOfAnimal = CommandedEntity.Position + (CommandedEntity.Radius + Target.Radius) * CommandedEntity.Direction;
                     float dist = (Target.Center - frontOfAnimal).Length;
                     moveAnimalToPoint = new MoveAnimalToPoint(Target, frontOfAnimal, Ability.PullSpeed, dist / Ability.PullSpeed);
 

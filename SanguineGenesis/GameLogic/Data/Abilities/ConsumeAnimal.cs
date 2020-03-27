@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The target is consumed for a short time by the caster.
     /// </summary>
-    sealed class ConsumeAnimal : TargetAbility<Animal, Animal>
+    sealed class ConsumeAnimal : Ability<Animal, Animal>
     {
         public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
 
@@ -31,7 +31,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         public override bool ValidArguments(Animal caster, Animal target)
         {
-            if (target.Range * 2 > caster.Range)
+            if (target.Radius * 2 > caster.Radius)
             {
                 return false;
             }

@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Jump to the target location.
     /// </summary>
-    sealed class Jump : TargetAbility<Animal, Vector2>
+    sealed class Jump : Ability<Animal, Vector2>
     {
         public float JumpSpeed { get; }
 
@@ -61,6 +61,14 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 {
                     jumping = true;
                     ElapsedTime -= Ability.Duration;
+
+                    //don't jump if the endpoint collides with building
+                    if (game.physics.CollidesWithBuilding(game, Target, CommandedEntity.Radius))
+                    {
+                        CommandedEntity.StateChangeLock = null;
+                        Refund();
+                        return true;
+                    }
                 }
             }
 

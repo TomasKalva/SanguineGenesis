@@ -29,11 +29,11 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public bool CanBeMoved { get; set; }
         /// <summary>
-        /// Set to true to set WantsToMove to false in Move.
+        /// Set to true to set WantsToMove to false in Move method.
         /// </summary>
         public bool StopMoving { get; set; }
         /// <summary>
-        /// True if the unit is performing a MoveToCommand.
+        /// True if the animal is performing a MoveToCommand.
         /// </summary>
         public bool WantsToMove { get; set; }
         /// <summary>
@@ -115,7 +115,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             float maxEnergy,
             float foodEnergyRegen,
             float foodEatingPeriod,
-            float range,
+            float radius,
             float attackDamage,
             float attackPeriod,
             float attackDistance,
@@ -131,7 +131,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             float viewRange,
             List<Ability> abilities,
             int air)
-            : base(faction, unitType, maxHealth, viewRange, maxEnergy, abilities, position, range, physical)
+            : base(faction, unitType, maxHealth, viewRange, maxEnergy, abilities, position, radius, physical)
         {
             Velocity = new Vector2(0f, 0f);
             CanBeMoved = true;
@@ -162,7 +162,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             new Stat("Energy", Energy.ToString("0.0")),
             new Stat( "Food regen", FoodEnergyRegen.ToString("0.0")),
             new Stat( "Eating period", FoodEatingPeriod.ToString("0.0")),
-            new Stat( "Size", (2 * Range).ToString("0.0")),
+            new Stat( "Size", (2 * Radius).ToString("0.0")),
             new Stat( "Att damage", AttackDamage.ToString("0.0")),
             new Stat( "Att period", AttackPeriod.ToString("0.0")),
             new Stat( "Att Distance", AttackDistance.ToString("0.0")),
@@ -301,8 +301,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public void PushBackToMap(Map map)
         {
             Position = new Vector2(
-                Math.Max(Range, Math.Min(Position.X, map.Width - Range)),
-                Math.Max(Range, Math.Min(Position.Y, map.Height - Range)));
+                Math.Max(Radius, Math.Min(Position.X, map.Width - Radius)),
+                Math.Max(Radius, Math.Min(Position.Y, map.Height - Radius)));
         }
     }
 

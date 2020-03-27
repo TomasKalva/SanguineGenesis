@@ -75,7 +75,8 @@ namespace SanguineGenesis.GUI
             //create projection matrix that maps points directly to screen coordinates
             projectionMatrix = glm.ortho(0f, width, 0f, height, 0f, 100f);
 
-            //create view matrix that translates graphical objects to visible range
+            //create view matrix that translates graphical objects to visible 
+
             viewMatrix = glm.translate(new mat4(1.0f), new vec3(0.0f, 0.0f, -1.0f));
 
             //create identity matrix as model matrix
@@ -788,7 +789,7 @@ namespace SanguineGenesis.GUI
 
                 float unitSize = nodeSize;
 
-                float indicatorWidth = current.Range * 1.5f;
+                float indicatorWidth = current.Radius * 1.5f;
                 float indicatorHeight = 0.15f;
                 {
                     Animation anim = current.AnimationState.Animation;

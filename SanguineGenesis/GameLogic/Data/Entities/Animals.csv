@@ -1,4 +1,4 @@
-name,max health,max energy,food energy regen,food eating period,range,energy cost,attack damage,attack distance,attack period,mechanical damage,dps,speed land,speed water,movement,thick skin,diet,spawning time,statuses,abilities,air
+name,max health,max energy,food energy regen,food eating period,radius,energy cost,attack damage,attack distance,attack period,mechanical damage,dps,speed land,speed water,movement,thick skin,diet,spawning time,statuses,abilities,air
 ZEBRA,60,50,3,1.5,0.4,50,2,0.1,1,no,2,3,1.4,LAND,no,HERBIVORE,20,,unbreakableMoveTo;moveTo;unbreakableAttack;attack;eat;kick,2
 GAZZELE,45,50,3,1.5,0.2,30,1.5,0.1,0.8,no,1.9,2.5,1.4,LAND,no,HERBIVORE,15,,unbreakableMoveTo;moveTo;unbreakableAttack;attack;eat;activateSprint,1
 RHINO,130,50,3,1.5,0.5,80,13,0.1,1.2,yes,10.8,2,1.4,LAND,yes,HERBIVORE,35,,unbreakableMoveTo;moveTo;unbreakableAttack;attack;eat;knockBack,3

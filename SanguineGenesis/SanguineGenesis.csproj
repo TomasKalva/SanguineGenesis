@@ -113,7 +113,7 @@
     <Compile Include="GameLogic\Data\Entities\Animal.cs" />
     <Compile Include="GameLogic\Maps\Vector2.cs" />
     <Compile Include="GameLogic\Maps\VisibilityGenerating\VisibilityGenerator.cs" />
-    <Compile Include="GameLogic\Maps\Ray.cs" />
+    <Compile Include="GameLogic\Maps\VisibilityGenerating\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityGenerating\VisibilityMap.cs" />
     <Compile Include="GUI\ColorExtensionMethods.cs" />
     <Compile Include="GUI\MainMenuWindow.cs">
@@ -163,7 +163,7 @@
     <Compile Include="GUI\WinFormsComponents\GameMenu.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GUI\WinFormsComponents\Icons.cs" />
+    <Compile Include="GUI\Icons.cs" />
     <Compile Include="GUI\WinFormsComponents\PlayerPropertiesPanel.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -68,7 +68,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
     abstract class Command<Caster, TargetT, AbilityT> : Command where Caster : Entity
                                                                     where TargetT : ITargetable
-                                                                    where AbilityT : TargetAbility<Caster, TargetT>
+                                                                    where AbilityT : Ability<Caster, TargetT>
     {
         /// <summary>
         /// The ability this command is performing.

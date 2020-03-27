@@ -72,7 +72,7 @@ namespace SanguineGenesis.GameControls
 
 
         public MapView(float top, float left, float nodeSize,
-            float minNodeSize = 60, float maxNodeSize = 80, float scrollSpeed = 10f, float zoomSpeed = 10)
+            float minNodeSize = 60, float maxNodeSize = 80, float scrollSpeed = 0.5f, float zoomSpeed = 10)
         {
             Bottom = top;
             Left = left;
@@ -148,15 +148,15 @@ namespace SanguineGenesis.GameControls
         /// Moves the view in given direction so that it doesn't leave the map.
         /// </summary>
         /// <param name="dir">The direction.</param>
-        public void Move(Direction dir, Map map, float deltaT)
+        public void Move(Direction dir, Map map)
         {
             switch (dir)
             {
 
-                case Direction.DOWN: Bottom -= scrollSpeed * deltaT; break;
-                case Direction.UP: Bottom += scrollSpeed * deltaT; break;
-                case Direction.LEFT: Left -= scrollSpeed * deltaT; break;
-                case Direction.RIGHT: Left += scrollSpeed * deltaT; break;
+                case Direction.DOWN: Bottom -= scrollSpeed; break;
+                case Direction.UP: Bottom += scrollSpeed; break;
+                case Direction.LEFT: Left -= scrollSpeed; break;
+                case Direction.RIGHT: Left += scrollSpeed; break;
             }
             CorrectPosition(map);
         }

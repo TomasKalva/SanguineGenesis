@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Attack the target.
     /// </summary>
-    sealed class Attack : TargetAbility<Animal, Entity>
+    sealed class Attack : Ability<Animal, Entity>
     {
         /// <summary>
         /// Used just to return correct name.

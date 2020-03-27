@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Enter hole.
     /// </summary>
-    sealed class EnterHole : TargetAbility<Animal, Structure>
+    sealed class EnterHole : Ability<Animal, Structure>
     {
         internal EnterHole(float energyCost, float enteringTime)
             : base(0.1f, energyCost, false, false, duration:enteringTime)
@@ -67,7 +67,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Exit hole.
     /// </summary>
-    sealed class ExitHole : TargetAbility<Structure, Nothing>
+    sealed class ExitHole : Ability<Structure, Nothing>
     {
         internal ExitHole(float energyCost, float exitingTime)
             : base(0.1f, energyCost, false, false, duration:exitingTime)
@@ -107,7 +107,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     if (animalInHole != null)
                     {
                         animalInHole.Faction.Entities.Add(animalInHole);
-                        animalInHole.Position = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - animalInHole.Range);
+                        animalInHole.Position = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - animalInHole.Radius);
                         underground.AnimalsUnderGround.Remove(animalInHole);
                         animalInHole.StateChangeLock = null;
                         return false;

@@ -77,6 +77,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public bool CanBeOn(Node node)
         {
+            //any node has at least BAD terrain
+            if (SoilQuality == SoilQuality.BAD)
+                return true;
+
             return node.Terrain == Terrain &&
                 node.Biome == Biome &&
                 node.ActiveNutrients >= Terrain.Nutrients(Biome, SoilQuality);
@@ -139,13 +143,13 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     /// </summary>
     class UnitFactory : EntityFactory
     {
-        public float Range { get; }//range of the circle collider
+        public float Radius { get; }//randius of the circle collider
 
-        public UnitFactory(string unitType, float maxHealth, float maxEnergy, float range, bool physical, float energyCost,
+        public UnitFactory(string unitType, float maxHealth, float maxEnergy, float radius, bool physical, float energyCost,
             float viewRange, List<StatusFactory> statusFactories)
             : base(unitType, maxHealth, maxEnergy, physical, energyCost, viewRange, statusFactories)
         {
-            Range = range;
+            Radius = radius;
         }
     }
 
@@ -181,7 +185,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 maxEnergy:MaxEnergy,
                 foodEnergyRegen:FoodEnergyRegen,
                 foodEatingPeriod:FoodEatingPeriod,
-                range:Range,
+                radius:Radius,
                 attackDamage:AttackDamage,
                 attackPeriod:AttackPeriod,
                 attackDistance:AttackDistance,
@@ -205,7 +209,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             float maxEnergy,
             float foodEnergyRegen,
             float foodEatingPeriod,
-            float range,
+            float radius,
             float attackDamage,
             float attackPeriod,
             float attackDistance,
@@ -221,7 +225,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             float viewRange,
             List<StatusFactory> statusFactories,
             int air)
-            : base(unitType, maxHealth, maxEnergy, range, physical, energyCost, viewRange, statusFactories)
+            : base(unitType, maxHealth, maxEnergy, radius, physical, energyCost, viewRange, statusFactories)
         {
             FoodEnergyRegen = foodEnergyRegen;
             FoodEatingPeriod = foodEatingPeriod;

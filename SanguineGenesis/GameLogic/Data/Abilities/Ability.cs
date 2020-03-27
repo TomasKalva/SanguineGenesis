@@ -98,10 +98,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    abstract class TargetAbility<Caster, Target> : Ability where Caster:Entity 
+    abstract class Ability<Caster, Target> : Ability where Caster:Entity 
                                                                     where Target: ITargetable
     {
-        public TargetAbility(float? distance, float energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
+        public Ability(float? distance, float energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
             :base(distance, energyCost, onlyOne, selfCastable, interruptable, duration)
         {
         }

@@ -13,7 +13,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The animal moves to the target.
     /// </summary>
-    sealed class MoveTo : TargetAbility<Animal, IMovementTarget>
+    sealed class MoveTo : Ability<Animal, IMovementTarget>
     {
         internal MoveTo(float? goalDistance, bool attackEnemyInstead)
             : base(null, 0, false, false)
@@ -46,7 +46,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             var castersGroups = casters.ToLookup((unit) => unit.Movement);
 
             //volume of all animals' circles /pi
-            float volume = casters.Select((e) => e.Range * e.Range).Sum();
+            float volume = casters.Select((e) => e.Radius * e.Radius).Sum();
             //distance from the target when animal can stop if it gets stuck
             float minStoppingDistance = (float)Math.Sqrt(volume) * 1.3f;
 

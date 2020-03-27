@@ -64,21 +64,20 @@ namespace SanguineGenesis.GameLogic
                     continue;
 
                 //resolve collisions with other animals
-                foreach (Entity e in physicalAnimals)
+                foreach (Animal e in physicalAnimals)
                 {
-                    Push(a, e, map);
+                    //calculate collisions for each pair of animals only once
+                    if (a.GetHashCode() < e.GetHashCode())
+                        Push(a, e, map);
                 }
                 //resolve collisions with nearby buildings
                 int animalX = (int)a.Position.X;
                 int animalY = (int)a.Position.Y;
-                var nearbyNodes = GameQuerying.SelectNodes(map, animalX - 1, animalY - 1, animalX + 1, animalY + 1);
-                foreach(Node n in nearbyNodes)
+                foreach(Building b in GameQuerying
+                                        .SelectBuildingInArea(map, new Rect(
+                                            animalX - 1, animalY - 1, animalX + 1, animalY + 1)))
                 {
-                    Building b;
-                    if ((b = n.Building) != null)
-                    {
-                        Push(a, b, map);
-                    }
+                    Push(a, b, map);
                 }
             }
         }
@@ -89,83 +88,78 @@ namespace SanguineGenesis.GameLogic
             if (!e.Physical)
                 return;
 
-            //calculate collisions for each pair of unit and entity only once
-            if (a.GetHashCode() < e.GetHashCode() || e is Building)
+            float dist = (a.Center - e.Center).Length;
+            //if two units get stuck on top of each other, move them apart
+            if (dist == 0)
             {
-
-                float dist = (a.Center - e.Center).Length;
-                //if two units get stuck on top of each other, move them apart
-                if (dist == 0)
+                Vector2 epsilon = new Vector2(0.1f, 0.1f);
+                a.Position = a.Center + epsilon;
+                dist = epsilon.Length;
+            }
+            float totalR = a.Radius + e.Radius;
+            //check if u and e are in collision
+            if (dist < totalR && dist != 0)
+            {
+                //push centres of the units from each other
+                Vector2 dirAtoE = a.Center.UnitDirectionTo(e.Center);
+                Vector2 pushVec = (totalR - dist) / 2 * dirAtoE;
+                if (e is Building)
                 {
-                    Vector2 epsilon = new Vector2(0.1f, 0.1f);
-                    a.Position = a.Center + epsilon;
-                    dist = epsilon.Length;
+                    //buildings can't be pushed
+                    a.Push(-2 * pushVec, map);
                 }
-                float totalR = a.Range + e.Range;
-                //check if u and e are in collision
-                if (dist < totalR && dist != 0)
+                else if (e is Corpse)
                 {
-                    //push centres of the units from each other
-                    Vector2 dirAtoE = a.Center.UnitDirectionTo(e.Center);
-                    Vector2 pushVec = (totalR - dist) / 2 * dirAtoE;
-                    if (e is Building)
+                    //corpse isn't pushed
+                    a.Push(pushVec, map);
+                }
+                else
+                {
+                    Animal a1 = (Animal)e;
+                    if (a.Faction != a1.Faction)
                     {
-                        //buildings can't be pushed
-                        a.Push(-2 * pushVec, map);
-                    }
-                    else if (e is Corpse)
-                    {
-                        //corpse isn't pushed
-                        a.Push(pushVec, map);
-                    }
-                    else
-                    {
-                        Animal a1 = (Animal)e;
-                        if (a.Faction != a1.Faction)
+                        //if the players are different, push the animal that wants to move
+                        //if both or none want to move, push both of them
+                        if (a.WantsToMove && !a1.WantsToMove)
                         {
-                            //if the players are different, push the animal that wants to move
-                            //if both or none want to move, push both of them
-                            if (a.WantsToMove && !a1.WantsToMove)
-                            {
-                                a.Push(-2 * pushVec, map);
+                            a.Push(-2 * pushVec, map);
 
-                            }
-                            else if (a1.WantsToMove && !a.WantsToMove)
-                            {
-                                a1.Push(2 * pushVec, map);
+                        }
+                        else if (a1.WantsToMove && !a.WantsToMove)
+                        {
+                            a1.Push(2 * pushVec, map);
 
-                            }
-                            else
-                            {
-                                a.Push(-1 * pushVec, map);
-                                a1.Push(pushVec, map);
-
-                            }
                         }
                         else
                         {
-                            //if the players are different, push the animal that wants to move
-                            //if both or none want to move, push both of them
-                            if (a.CanBeMoved && !a1.CanBeMoved)
-                            {
-                                a.Push(-2 * pushVec, map);
+                            a.Push(-1 * pushVec, map);
+                            a1.Push(pushVec, map);
 
-                            }
-                            else if (a1.CanBeMoved && !a.CanBeMoved)
-                            {
-                                a1.Push(2 * pushVec, map);
-                            }
-                            else
-                            {
-                                a.Push(-1 * pushVec, map);
-                                a1.Push(pushVec, map);
-                            }
                         }
-                        //push animal with a pushing map if it gets into 
-                        //collision with blocked node
-                        PushOutsideOfObstacles(a);
-                        PushOutsideOfObstacles(a1);
                     }
+                    else
+                    {
+                        //if the players are different, push the animal that wants to move
+                        //if both or none want to move, push both of them
+                        if (a.CanBeMoved && !a1.CanBeMoved)
+                        {
+                            a.Push(-2 * pushVec, map);
+
+                        }
+                        else if (a1.CanBeMoved && !a.CanBeMoved)
+                        {
+                            a1.Push(2 * pushVec, map);
+                        }
+                        else
+                        {
+                            a.Push(-1 * pushVec, map);
+                            a1.Push(pushVec, map);
+                        }
+                    }
+                    //push animal with a pushing map if it gets into 
+                    //collision with blocked node
+                    PushOutsideOfObstacles(a);
+                    PushOutsideOfObstacles(a1);
                 }
             }
         }
@@ -249,10 +243,44 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public void MoveAnimals(Map map, List<Animal> animals, float deltaT)
         {
-            foreach(Animal u in animals)
+            foreach(Animal a in animals)
             {
-                u.Move(map,deltaT);
+                a.Move(map,deltaT);
             }
+        }
+
+        /// <summary>
+        /// True if physical entity with given location and radius collides with other
+        /// buildings in the game.
+        /// </summary>
+        public bool CollidesWithBuilding(Game game, Vector2 location, float r)
+        {
+            //check collisions with buildings
+            foreach (Building b in 
+                                GameQuerying.SelectBuildingInArea(game.Map, new Rect((int)location.X - 1, 
+                                    (int)location.Y - 1, (int)location.X + 1, (int)location.Y + 1)))
+            {
+                if (b.Physical &&
+                    (b.Center - location).Length < b.Radius + r)
+                        return true;
+            }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// True if physical entity with given location and radius collides with other
+        /// physical units in the game.
+        /// </summary>
+        public bool CollidesWithUnits(Game game, Vector2 location, float r)
+        {
+            //check collisions with units
+            var physicalUnits = game.GetAll<Unit>().Where(u => u.Physical);
+            foreach (var u in physicalUnits)
+                if ((u.Center - location).Length < u.Radius + r)
+                    return true;
+
+            return false;
         }
     }
 }
