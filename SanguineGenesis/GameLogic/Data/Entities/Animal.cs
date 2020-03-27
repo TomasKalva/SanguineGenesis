@@ -25,7 +25,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         private float MaxDistToMove { get; set; }
         /// <summary>
-        /// False if the unit shouldn't be pushed by physics.
+        /// False if the unit shouldn't be pushed by collisions.
         /// </summary>
         public bool CanBeMoved { get; set; }
         /// <summary>

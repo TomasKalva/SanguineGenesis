@@ -12,15 +12,15 @@ namespace SanguineGenesis.GameLogic
     /// <summary>
     /// Used for handling collisions.
     /// </summary>
-    class Physics
+    class Collisions
     {
         /// <summary>
         /// Pushing maps for the current map. If the map changes they are updated by the method UpdatePushingMaps.
         /// </summary>
         public Dictionary<Movement, PushingMap> PushingMaps { get; }
 
-        public static Physics GetPhysics() => new Physics();
-        private Physics()
+        public static Collisions GetCollisions() => new Collisions();
+        private Collisions()
         {
             PushingMaps = new Dictionary<Movement, PushingMap>
             {
