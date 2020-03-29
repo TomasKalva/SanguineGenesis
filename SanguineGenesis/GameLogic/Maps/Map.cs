@@ -266,9 +266,14 @@ namespace SanguineGenesis.GameLogic.Maps
             //generate nutrients
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
-                    if (this[i, j].Roots.Where((t) => t.Producer).Any() &&
-                        !(this[i,j].Building is Structure))
+                {
+                    //produce nutrients only in the same biome or in default biome
+                    Biome biome = this[i, j].Biome;
+                    if (this[i, j].Roots.Where(
+                        (t) => t.Producer && (t.Biome == biome || biome==Biome.DEFAULT)).Any() &&
+                        !(this[i, j].Building is Structure))
                         this[i, j].GenerateNutrients();
+                }
         }
 
         /// <summary>

@@ -96,17 +96,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 }
             }
         }
-
-        /// <summary>
-        /// Puts nutrients to the soil at its roots.
-        /// </summary>
-        public void ProduceNutrients()
-        {
-            foreach (Node n in RootNodes)
-            {
-                n.ActiveNutrients += MaxEnergyIntake * 2;
-            }
-        }
         #endregion Energy manipulation
 
         #region IShowable
