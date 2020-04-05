@@ -123,15 +123,15 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             PoisonousSpit.SetAbilities(this);
 
             //sprint
-            ActivateSprint = new ApplyStatus(10, gameStaticData.Statuses.SprintFactory);
+            ActivateSprint = new ApplyStatus(20, gameStaticData.Statuses.SprintFactory);
             ActivateSprint.SetAbilities(this);
 
             //piercing bite
-            PiercingBite = new PiercingBite(25, 100f, 0.5f);
+            PiercingBite = new PiercingBite(30, 100f, 0.5f);
             PiercingBite.SetAbilities(this);
 
             //consume animal
-            ConsumeAnimal = new ConsumeAnimal(25, 0.5f, gameStaticData.Statuses.ConsumedAnimalFactory);
+            ConsumeAnimal = new ConsumeAnimal(35, 0.5f, gameStaticData.Statuses.ConsumedAnimalFactory);
             ConsumeAnimal.SetAbilities(this);
             
             //shell
@@ -139,11 +139,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             ActivateShell.SetAbilities(this);
 
             //jump
-            Jump = new Jump(25, 4f, 0.1f, 10f );
+            Jump = new Jump(15, 4f, 0.1f, 10f );
             Jump.SetAbilities(this);
 
             //pull
-            Pull = new Pull(25, 4f, 1f, 8f);
+            Pull = new Pull(35, 4f, 1f, 8f);
             Pull.SetAbilities(this);
 
             //big pull
@@ -183,7 +183,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             ImproveStructure.SetAbilities(this);
 
             //charge to
-            ChargeTo = new ChargeTo(20f, 3f, 2.5f, 10f);
+            ChargeTo = new ChargeTo(40f, 3f, 2.5f, 10f);
             ChargeTo.SetAbilities(this);
 
             //kick

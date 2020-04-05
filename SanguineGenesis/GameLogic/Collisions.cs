@@ -97,7 +97,7 @@ namespace SanguineGenesis.GameLogic
                 dist = epsilon.Length;
             }
             float totalR = a.Radius + e.Radius;
-            //check if u and e are in collision
+            //check if a and e are in collision
             if (dist < totalR && dist != 0)
             {
                 //push centres of the units from each other

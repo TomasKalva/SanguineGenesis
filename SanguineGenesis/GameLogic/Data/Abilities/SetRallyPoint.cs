@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     sealed class SetRallyPoint : Ability<Building, Vector2>
     {
         internal SetRallyPoint()
-            : base(0, 0, false, false)
+            : base(1000/*big number so that rally point can be set anywhere on the map*/, 0, false, false)
         {
         }
 

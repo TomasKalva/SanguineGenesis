@@ -23,7 +23,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Maximal number of passive nutrients a node can have.
         /// </summary>
-        public const int MAX_PASSIVE_NUTRIENTS = 99;
+        public const int MAX_PASSIVE_NUTRIENTS = 30;
 
         /// <summary>
         /// X coordinate on the map.

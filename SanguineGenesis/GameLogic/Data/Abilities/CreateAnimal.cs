@@ -71,6 +71,31 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return false;
         }
 
+
+        /// <summary>
+        /// Helper class for generating pseudorandom vectors of small length.
+        /// </summary>
+        class SmallPseudoRandomVector
+        {
+            private static readonly Vector2[] vectors = {
+                    new Vector2(-0.1f,0.1f),
+                    new Vector2(0f,-0.1f),
+                    new Vector2(0.1f,-0.1f),
+                    new Vector2(0f,0.1f),
+                    new Vector2(-0.1f,-0.1f),
+                    new Vector2(0.1f,0f),
+                    new Vector2(0.1f,0.1f),
+                    new Vector2(-0.1f,-0f),
+                };
+            private static int i = 0;
+
+            public static Vector2 Next()
+            {
+                i = (i + 1) % vectors.Length;
+                return vectors[i];
+            }
+        }
+
         /// <summary>
         /// Returns position where the animal should spawn, if no such position exists,
         /// returns null.
@@ -94,8 +119,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 foreach(Node n in frame)
                 {
                     //return coordinate of square where the animal can spawn
+                    //randomize the coordinate so that new animal doesn't spawn
+                    //on the same spot as the last one
                     if (!obstMap[n.X, n.Y] && !n.MovementBlocked)
-                        return new Vector2(n.X + 0.5f, n.Y + 0.5f);
+                        return new Vector2(n.X + 0.5f, n.Y + 0.5f) + SmallPseudoRandomVector.Next();
                 }
                 //no square where the animal can spawn was found
                 return null;
