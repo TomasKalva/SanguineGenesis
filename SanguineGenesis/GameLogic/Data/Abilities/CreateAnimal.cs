@@ -36,7 +36,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The entity spawns a new animal at the target point.";
+            return $"The entity creates a new {SpawningAnimalFactory.EntityType}. It will move to this entity's rally point.";
         }
     }
 

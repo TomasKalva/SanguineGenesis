@@ -102,7 +102,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Tree NewInstance(Faction faction, Node[,] nodesUnder, Node[,] roots)
         {
-            return (Tree)SetStatuses(new Tree(faction, EntityType, nodesUnder, roots, MaxHealth, MaxEnergy, MaxEnergyIntake,
+            return (Tree)SetStatuses(new Tree(faction, EntityType, nodesUnder, roots, RootsDistance, MaxHealth, MaxEnergy, MaxEnergyIntake,
                 Size, Physical, Biome, Terrain, SoilQuality, Producer, BuildingDistance, ViewRange, Air, Abilities.ToList()));
         }
 

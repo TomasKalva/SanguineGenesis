@@ -72,7 +72,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             AllStatusFactories.Add(SuffocatingFactory);
 
             //decay
-            DecayFactory = new DecayFactory(5);
+            DecayFactory = new DecayFactory(1);
             AllStatusFactories.Add(DecayFactory);
         }
 

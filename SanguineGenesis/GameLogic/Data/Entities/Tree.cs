@@ -20,15 +20,20 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// Sources from which the building takes energy.
         /// </summary>
         public Node[,] RootNodes { get; }
+        /// <summary>
+        /// Maximal distance of roots.
+        /// </summary>
+        public int RootDistance { get; }
         public int Air { get; }
 
 
-        public Tree(Faction faction, string treeType, Node[,] nodes, Node[,] rootNodes, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
+        public Tree(Faction faction, string treeType, Node[,] nodes, Node[,] rootNodes, int rootDistance, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, int air, List<Ability> abilities)
             : base(faction, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, abilities)
         {
             MaxEnergyIntake = maxEnergyIntake;
             RootNodes = rootNodes;
+            RootDistance = rootDistance;
             Air = air;
             foreach(Node n in rootNodes)
                 n.Roots.Add(this);
@@ -108,10 +113,11 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             new Stat("Energy", Energy.ToString("0.0")),
             new Stat( "Air", Air.ToString()),
             new Stat( "Size", Size.ToString()),
+            new Stat( "Root distance", RootDistance.ToString()),
             new Stat( "Biome", Biome.ToString()),
             new Stat( "Terrain", Terrain.ToString()),
             new Stat( "Soil quality", SoilQuality.ToString()),
-            new Stat( "Energy intake", MaxEnergyIntake.ToString("0.0")),
+            new Stat( "Energy/node", MaxEnergyIntake.ToString("0.00")),
             new Stat( "Physical", Physical.ToString()),
             new Stat( "View range", ViewRange.ToString("0.0")),
             new Stat( "Producer", Producer.ToString())

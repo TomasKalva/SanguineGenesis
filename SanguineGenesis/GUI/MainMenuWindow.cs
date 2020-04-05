@@ -933,6 +933,17 @@ namespace SanguineGenesis.GUI
                             }
                         }
                 }
+
+                //put land under buildings
+                for (int i = 0; i < Width - 1; i++)
+                    for (int j = 0; j < Height - 1; j++)
+                    {
+                        if (Color.Black.SameRGB(BuildingsLocations.GetPixel(i, j)) &&
+                            !LandColor.SameRGB(TerrainMap.GetPixel(i,j)))
+                        {
+                            TerrainMap.SetPixel(i, j, LandColor);
+                        }
+                    }
             }
 
             /// <summary>

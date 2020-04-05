@@ -149,10 +149,20 @@ namespace SanguineGenesis.GameLogic.Maps
             //place the building on the map
             game.Map.PlaceBuilding(buildingFactory, player, n.X, n.Y);
 
-            //set it to max energy
+            //set it to max energy and set its root nodes to be in the same biome
             var mainBuilding = player.GetAll<Tree>().Where(t => t.EntityType == buildingFactory.EntityType).FirstOrDefault();
-            if(mainBuilding!=null)
+            if (mainBuilding != null)
+            {
                 mainBuilding.Energy = buildingFactory.MaxEnergy;
+                float minBiomeNutrients = mainBuilding.Terrain.Nutrients(mainBuilding.Biome, SoilQuality.LOW);
+                foreach(var rootNode in mainBuilding.RootNodes)
+                {
+                    //set biome
+                    rootNode.Biome = player.Biome;
+                    //set minimum nutrients for the biome
+                    rootNode.ActiveNutrients = minBiomeNutrients;
+                }
+            }
         }
     }
 }
