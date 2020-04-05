@@ -32,7 +32,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "Sets rally point of this building.";
+            return "Sets rally point of this building. Spawned animals will move to the rally point.";
         }
     }
 

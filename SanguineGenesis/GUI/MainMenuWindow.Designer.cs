@@ -59,12 +59,12 @@
             this.mapNameL = new System.Windows.Forms.Label();
             this.testAnimalsCB = new System.Windows.Forms.CheckBox();
             this.newMapGB = new System.Windows.Forms.GroupBox();
-            this.heightL = new System.Windows.Forms.Label();
-            this.newMapB = new System.Windows.Forms.Button();
-            this.widthL = new System.Windows.Forms.Label();
-            this.widthNUD = new System.Windows.Forms.NumericUpDown();
-            this.newNameTB = new System.Windows.Forms.TextBox();
             this.heightNUD = new System.Windows.Forms.NumericUpDown();
+            this.newNameTB = new System.Windows.Forms.TextBox();
+            this.widthNUD = new System.Windows.Forms.NumericUpDown();
+            this.widthL = new System.Windows.Forms.Label();
+            this.newMapB = new System.Windows.Forms.Button();
+            this.heightL = new System.Windows.Forms.Label();
             this.loadMapGB = new System.Windows.Forms.GroupBox();
             this.playGB = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).BeginInit();
@@ -74,8 +74,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.brushSizeNUD)).BeginInit();
             this.buildingSelectionGB.SuspendLayout();
             this.newMapGB.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.widthNUD)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.heightNUD)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.widthNUD)).BeginInit();
             this.loadMapGB.SuspendLayout();
             this.playGB.SuspendLayout();
             this.SuspendLayout();
@@ -476,36 +476,36 @@
             this.newMapGB.TabStop = false;
             this.newMapGB.Text = "New map";
             // 
-            // heightL
+            // heightNUD
             // 
-            this.heightL.AutoSize = true;
-            this.heightL.Location = new System.Drawing.Point(29, 107);
-            this.heightL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.heightL.Name = "heightL";
-            this.heightL.Size = new System.Drawing.Size(56, 20);
-            this.heightL.TabIndex = 11;
-            this.heightL.Text = "Height";
+            this.heightNUD.Location = new System.Drawing.Point(166, 104);
+            this.heightNUD.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.heightNUD.Maximum = new decimal(new int[] {
+            150,
+            0,
+            0,
+            0});
+            this.heightNUD.Minimum = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+            this.heightNUD.Name = "heightNUD";
+            this.heightNUD.Size = new System.Drawing.Size(69, 26);
+            this.heightNUD.TabIndex = 15;
+            this.heightNUD.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
             // 
-            // newMapB
+            // newNameTB
             // 
-            this.newMapB.Location = new System.Drawing.Point(290, 92);
-            this.newMapB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.newMapB.Name = "newMapB";
-            this.newMapB.Size = new System.Drawing.Size(108, 46);
-            this.newMapB.TabIndex = 3;
-            this.newMapB.Text = "New";
-            this.newMapB.UseVisualStyleBackColor = true;
-            this.newMapB.Click += new System.EventHandler(this.NewMapB_Click);
-            // 
-            // widthL
-            // 
-            this.widthL.AutoSize = true;
-            this.widthL.Location = new System.Drawing.Point(29, 67);
-            this.widthL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.widthL.Name = "widthL";
-            this.widthL.Size = new System.Drawing.Size(50, 20);
-            this.widthL.TabIndex = 10;
-            this.widthL.Text = "Width";
+            this.newNameTB.Location = new System.Drawing.Point(23, 27);
+            this.newNameTB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.newNameTB.Name = "newNameTB";
+            this.newNameTB.Size = new System.Drawing.Size(210, 26);
+            this.newNameTB.TabIndex = 7;
             // 
             // widthNUD
             // 
@@ -530,36 +530,36 @@
             0,
             0});
             // 
-            // newNameTB
+            // widthL
             // 
-            this.newNameTB.Location = new System.Drawing.Point(23, 27);
-            this.newNameTB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.newNameTB.Name = "newNameTB";
-            this.newNameTB.Size = new System.Drawing.Size(210, 26);
-            this.newNameTB.TabIndex = 7;
+            this.widthL.AutoSize = true;
+            this.widthL.Location = new System.Drawing.Point(29, 67);
+            this.widthL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.widthL.Name = "widthL";
+            this.widthL.Size = new System.Drawing.Size(50, 20);
+            this.widthL.TabIndex = 10;
+            this.widthL.Text = "Width";
             // 
-            // heightNUD
+            // newMapB
             // 
-            this.heightNUD.Location = new System.Drawing.Point(166, 104);
-            this.heightNUD.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.heightNUD.Maximum = new decimal(new int[] {
-            150,
-            0,
-            0,
-            0});
-            this.heightNUD.Minimum = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-            this.heightNUD.Name = "heightNUD";
-            this.heightNUD.Size = new System.Drawing.Size(69, 26);
-            this.heightNUD.TabIndex = 15;
-            this.heightNUD.Value = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
+            this.newMapB.Location = new System.Drawing.Point(290, 92);
+            this.newMapB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.newMapB.Name = "newMapB";
+            this.newMapB.Size = new System.Drawing.Size(108, 46);
+            this.newMapB.TabIndex = 3;
+            this.newMapB.Text = "New";
+            this.newMapB.UseVisualStyleBackColor = true;
+            this.newMapB.Click += new System.EventHandler(this.NewMapB_Click);
+            // 
+            // heightL
+            // 
+            this.heightL.AutoSize = true;
+            this.heightL.Location = new System.Drawing.Point(29, 107);
+            this.heightL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.heightL.Name = "heightL";
+            this.heightL.Size = new System.Drawing.Size(56, 20);
+            this.heightL.TabIndex = 11;
+            this.heightL.Text = "Height";
             // 
             // loadMapGB
             // 
@@ -603,7 +603,7 @@
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.Name = "MainMenuWindow";
-            this.Text = "MainMenu";
+            this.Text = "Sanguine Genesis";
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -615,8 +615,8 @@
             this.buildingSelectionGB.PerformLayout();
             this.newMapGB.ResumeLayout(false);
             this.newMapGB.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.widthNUD)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.heightNUD)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.widthNUD)).EndInit();
             this.loadMapGB.ResumeLayout(false);
             this.playGB.ResumeLayout(false);
             this.playGB.PerformLayout();

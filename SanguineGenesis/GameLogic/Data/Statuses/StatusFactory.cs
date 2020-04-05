@@ -252,11 +252,16 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         /// Length of the time interval this staus will be active for in s.
         /// </summary>
         public float Duration { get; }
+        /// <summary>
+        /// Increase of attack speed.
+        /// </summary>
+        public float AttSpeedIncr { get; }
 
         public FastStrikesFactory(float duration)
             : base(true)
         {
             Duration = duration;
+            AttSpeedIncr = 0.1f;
         }
         protected override Status NewInstance(Animal affected)
         {

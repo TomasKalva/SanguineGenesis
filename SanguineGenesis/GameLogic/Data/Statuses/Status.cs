@@ -100,7 +100,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "Increases speed of animal by " + StatusInfo.SpeedBonus + ".";
+            return $"Increases speed of animal by {StatusInfo.SpeedBonus}.";
         }
     }
 
@@ -161,7 +161,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "Consumed another animal for " + StatusInfo.Duration + " seconds.";
+            return $"Consumed another animal for {StatusInfo.Duration} seconds.";
         }
     }
 
@@ -215,7 +215,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "Deals " + StatusInfo.TickDamage + " damage every "+StatusInfo.TickTime+" seconds.";
+            return $"Deals {StatusInfo.TickDamage} damage every {StatusInfo.TickTime} seconds.";
         }
     }
 
@@ -253,7 +253,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "Gives animal thick skin. Removed if animal moves.";
+            return $"Gives animal thick skin. Lasts {StatusInfo.Duration} seconds. Removed if animal moves.";
         }
     }
 
@@ -272,12 +272,12 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override void Added()
         {
-            AffectedEntity.AttackPeriod -= 0.1f;
+            AffectedEntity.AttackPeriod -= StatusInfo.AttSpeedIncr;
         }
 
         public override void Removed()
         {
-            AffectedEntity.AttackPeriod += 0.1f;
+            AffectedEntity.AttackPeriod += StatusInfo.AttSpeedIncr;
         }
 
         public override bool Step(Game game, float deltaT)
@@ -299,7 +299,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "Increases attack speed of animal by " + 0.1f + " for "+StatusInfo.Duration+" seconds.";
+            return $"Increases attack speed of animal by {StatusInfo.AttSpeedIncr} for {StatusInfo.Duration} seconds.";
         }
     }
 
@@ -343,7 +343,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "There are " + Animals.Count() + " animals on this tree.";
+            return $"There are {Animals.Count()} animals on this tree.";
         }
     }
 
@@ -374,7 +374,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return (AnimalsUnderGround.Count()<=1? "There is ":"There are ") + AnimalsUnderGround.Count() + " animals underground.";
+            return $"{(AnimalsUnderGround.Count()<=1? "There is ":"There are ")} {AnimalsUnderGround.Count()} animals underground.";
         }
     }
 
@@ -416,7 +416,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return "Increases view range by " + StatusInfo.RangeExtension + ". Removed if the animal moves.";
+            return $"Increases view range by {StatusInfo.RangeExtension}. Removed if the animal moves.";
         }
     }
 
@@ -522,13 +522,13 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Eng loss ", StatusInfo.EnergyLossPerS.ToString())
+                new Stat( "Enrg loss ", StatusInfo.EnergyLossPerS.ToString())
             };
         }
 
         public override string Description()
         {
-            return "This entity is decaying. Once its energy reaches 0 it disappears.";
+            return "This entity is losing energy. Once its energy reaches 0 it disappears.";
         }
     }
 }

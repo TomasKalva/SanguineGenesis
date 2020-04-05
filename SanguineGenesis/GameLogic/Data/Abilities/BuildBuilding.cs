@@ -36,8 +36,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The building is built at the target node. Requires at least "+BuildingFactory.SoilQuality+" soil qulity in " +
-                BuildingFactory.Biome+" to be built";
+            return $"The building is built at the target node. Requires at least {BuildingFactory.SoilQuality} soil qulity in " +
+                $"{BuildingFactory.Biome} to be built";
         }
         public override List<Stat> Stats()
         {
