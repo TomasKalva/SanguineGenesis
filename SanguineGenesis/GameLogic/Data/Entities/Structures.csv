@@ -1,5 +1,5 @@
-name,max health,max energy,physical,size,energy cost,biome,terrain,soil quality,abilities,statuses,producer,building distance, view range
-HOLE,50,0,yes,1,40,SAVANNA,LAND,LOW,exitHole,underground,no,0.5,10
+name,max health,max energy,physical,size,energy cost,biome,terrain,soil quality,abilities,statuses,producer,building distance,view range
+HOLE,25,0,yes,1,15,SAVANNA,LAND,LOW,exitHole,underground,no,0.5,10
 ROCK,50,0,yes,1,30,DEFAULT,LAND,LOW,,,no,5,10
-MAJESTIC_ROCK,130,75,yes,1,30,SAVANNA,LAND,MEDIUM,create:LION;create:KOMODO_DRAGON;rallyPoint,,no,1,10
+MAJESTIC_ROCK,190,120,yes,1,90,SAVANNA,LAND,MEDIUM,create:LION;create:KOMODO_DRAGON;rallyPoint,,no,1,10
 BIG_ROCK,50,0,yes,2,30,DEFAULT,LAND,LOW,,,no,5,10

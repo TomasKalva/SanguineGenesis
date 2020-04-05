@@ -76,7 +76,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         public void Update(IShowable showable)
         {
             Shown = showable;
-            Caption.Text = showable.GetName();
+            Caption.Text = showable.GetName().Replace("_"," ");
             Stats.SetStats(showable.Stats());
             Description.Text = showable.Description();
         }

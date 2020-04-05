@@ -120,7 +120,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
                 List<Command> commandQueue= SelectedEntity.CommandQueue.Queue;
                 CommandButtonArray.InfoSources = commandQueue;
                 CommandButtonArray.UpdateControl();
-                EntityName.Text = ((IShowable)SelectedEntity).GetName();
+                EntityName.Text = ((IShowable)SelectedEntity).GetName().Replace("_"," ");
                 if (commandQueue.Any())
                 {
                     //the animation of progress bar is too slow, reducing progress skips animation

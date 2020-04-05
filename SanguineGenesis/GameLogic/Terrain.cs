@@ -168,11 +168,11 @@ namespace SanguineGenesis.GameLogic
                 case SoilQuality.BAD:
                     return 0.1f;
                 case SoilQuality.LOW:
-                    return 0.05f;
-                case SoilQuality.MEDIUM:
                     return 0.1f;
+                case SoilQuality.MEDIUM:
+                    return 0.15f;
                 case SoilQuality.HIGH:
-                    return 0.25f;
+                    return 0.2f;
                 default:
                     return 0f;
             }
