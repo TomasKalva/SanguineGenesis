@@ -41,7 +41,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Used for handling collisions.
         /// </summary>
-        public Physics physics;
+        public Collisions collisions;
         /// <summary>
         /// The next player to whom will be generated visibility map.
         /// </summary>
@@ -73,7 +73,7 @@ namespace SanguineGenesis.GameLogic
             foreach(var kvp in Players)
                 kvp.Value.InitializeMapView(Map);
 
-            physics = Physics.GetPhysics();
+            collisions = Collisions.GetCollisions();
             MovementGenerator.GetMovementGenerator().Reset();
             nextVisibilityPlayer = FactionType.PLAYER0;
             GameplayOptions = new GameplayOptions();
@@ -172,13 +172,13 @@ namespace SanguineGenesis.GameLogic
 
             gameTime.PrintTime("Ingame update");
 
-            //physics
+            //collisions
             List<Animal> physicalAnimals = animals.Where((a) => a.Physical).ToList();
-            physics.MoveAnimals(Map, animals, deltaT);
-            physics.PushAway(Map, physicalAnimals);
-            physics.PushOutsideOfObstacles(Map, animals);
+            collisions.MoveAnimals(Map, animals, deltaT);
+            collisions.PushAway(Map, physicalAnimals);
+            collisions.PushOutsideOfObstacles(Map, animals);
 
-            gameTime.PrintTime("Physics");
+            gameTime.PrintTime("Collisions");
 
             //attack nearby enemy if idle
             foreach (Animal a in animals)

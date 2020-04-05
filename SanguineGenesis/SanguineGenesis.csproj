@@ -153,7 +153,7 @@
     <Compile Include="GameLogic\Maps\ObstacleMap.cs" />
     <Compile Include="GUI\OpenGL\ImageAtlas.cs" />
     <Compile Include="GUI\OpenGL\OpenGLAtlasDrawer.cs" />
-    <Compile Include="GameLogic\Physics.cs" />
+    <Compile Include="GameLogic\Collisions.cs" />
     <Compile Include="GameLogic\Faction.cs" />
     <Compile Include="GameLogic\Maps\PushingMapGenerator.cs" />
     <Compile Include="GameLogic\Rect.cs" />
