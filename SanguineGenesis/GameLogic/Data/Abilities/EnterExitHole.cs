@@ -19,10 +19,15 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override bool ValidArguments(Animal caster, Structure target)
+        public override bool ValidArguments(Animal caster, Structure target, ActionLog actionLog)
         {
             //target has to have underground status
-            return target.Statuses.Where((s) => s is Underground).Any();
+            if(!target.Statuses.Where((s) => s is Underground).Any())
+            {
+                actionLog.LogError(caster, this, $"target doesn't have status {nameof(Underground)}");
+                return false;
+            }
+            return true;
         }
 
         public override Command NewCommand(Animal caster, Structure target)

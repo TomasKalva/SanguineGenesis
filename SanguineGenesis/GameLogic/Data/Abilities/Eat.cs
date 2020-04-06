@@ -25,12 +25,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Make sure that animals don't eat dirt.
         /// </summary>
-        public override bool ValidArguments(Animal caster, IHerbivoreFood target)
+        public override bool ValidArguments(Animal caster, IHerbivoreFood target, ActionLog actionLog)
         {
-            if (target is Node tNode)
+            if (target is Node tNode &&
+                tNode.Biome == Biome.DEFAULT)
             {
-                if (tNode.Biome == Biome.DEFAULT)
-                    return false;
+                actionLog.LogError(caster, this, "animal can't eat dirt");
+                return false;
             }
             return true;
         }

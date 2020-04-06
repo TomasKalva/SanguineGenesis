@@ -57,6 +57,7 @@ namespace SanguineGenesis.GameLogic.AI
         public Player ControlledPlayer { get; }
         private float TimeUntilDecision { get; set; }
         private float DecisionPeriod { get; }
+        public ActionLog ActionLog { get; }
         /// <summary>
         /// Trees with corresponding ability to be used next.
         /// </summary>
@@ -71,6 +72,7 @@ namespace SanguineGenesis.GameLogic.AI
             ControlledPlayer = controlledPlayer;
             DecisionPeriod = decisionPeriod;
             TimeUntilDecision = DecisionPeriod;
+            ActionLog = new ActionLog(20);
             ToBuildNext = new Dictionary<Tree, BuildBuilding>();
             ToCreateAnimalNext = new Dictionary<Building, CreateAnimal>();
         }
@@ -99,7 +101,7 @@ namespace SanguineGenesis.GameLogic.AI
             if (idleAnimals.Any()
                 && target != null)
             {
-                ControlledPlayer.GameStaticData.Abilities.Attack.SetCommands(idleAnimals, target, false);
+                ControlledPlayer.GameStaticData.Abilities.Attack.SetCommands(idleAnimals, target, false, ActionLog);
             }
         }
 
@@ -138,7 +140,7 @@ namespace SanguineGenesis.GameLogic.AI
             if (caster.Energy >= ability.EnergyCost)
             {
                 //cast the ability
-                ability.SetCommands(new List<Building>() { caster }, Nothing.Get, false);
+                ability.SetCommands(new List<Building>() { caster }, Nothing.Get, false, ActionLog);
                 
                 //select ability to use next by caster from all of its CreateAnimal abilities
                 var spawningAbilities = caster.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
@@ -187,7 +189,7 @@ namespace SanguineGenesis.GameLogic.AI
                     if(map.BuildingCanBePlaced(ability.BuildingFactory, n.X, n.Y))
                     {
                         //cast ability
-                        ability.SetCommands(new List<Tree>() { caster }, n, false);
+                        ability.SetCommands(new List<Tree>() { caster }, n, false, ActionLog);
 
                         //select ability to use next by caster from all of its BuildBuilding abilities
                         var buildingAbilities = caster.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();

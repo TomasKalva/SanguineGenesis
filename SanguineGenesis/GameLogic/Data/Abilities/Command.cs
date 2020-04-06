@@ -30,6 +30,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// Performs one step of the command. Returns true if command is finished.
         /// </summary>
         public abstract bool PerformCommand(Game game, float deltaT);
+        /// <summary>
+        /// Used for logging errors.
+        /// </summary>
+        public ActionLog ActionLog { get; set; }
 
         #region IShowable
         public abstract string GetName();
@@ -124,6 +128,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             CommandedEntity = commandedEntity;
             Target = target;
             ElapsedTime = 0;
+            ActionLog = ActionLog.ThrowAway;
         }
 
         public override string ToString()
@@ -180,24 +185,35 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             //check validity of target and caster
             if (CommandedEntity.IsDead)
+            {
+                ActionLog.LogError(CommandedEntity, Ability, "the caster is dead");
                 return false;
+            }
             if (Target is Entity targEnt && targEnt.IsDead)
+            {
                 return false;
+            }
 
             //check if both target and caster are not locked by other ability/status...
             if (CommandedEntity is Animal commandedA)
             {
                 if (commandedA.StateChangeLock != null && commandedA.StateChangeLock != this)
+                {
+                    ActionLog.LogError(CommandedEntity, Ability, "the caster is locked by other command/status");
                     return false;
+                }
             }
             if (Target is Animal targA)
             {
                 if (targA.StateChangeLock != null && targA.StateChangeLock != this)
+                {
+                    ActionLog.LogError(CommandedEntity, Ability, "the target is locked by other command/status");
                     return false;
+                }
             }
 
             //check if target satisfies additional conditions required by the ability
-            if (!Ability.ValidArguments(CommandedEntity, Target))
+            if (!Ability.ValidArguments(CommandedEntity, Target, ActionLog))
                 return false;
 
             return true;
@@ -231,7 +247,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     // target is too far away and CommandedEntity can't follow it
                     // => finish ability
                     if (Target.DistanceTo(CommandedEntity) > Distance + .2f)
+                    {
+                        ActionLog.LogError(CommandedEntity, Ability, "the target is too far away");
                         return true;
+                    }
                 }
             }
 

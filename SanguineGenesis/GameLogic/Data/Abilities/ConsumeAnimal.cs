@@ -29,10 +29,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Animal can only eat twice as small animals.
         /// </summary>
-        public override bool ValidArguments(Animal caster, Animal target)
+        public override bool ValidArguments(Animal caster, Animal target, ActionLog actionLog)
         {
             if (target.Radius * 2 > caster.Radius)
             {
+                actionLog.LogError(caster, this, "target is too big");
                 return false;
             }
             return true;

@@ -22,6 +22,8 @@ namespace SanguineGenesis.GameControls
         public MapSelectorFrame MapSelectorFrame { get; set; }
         public SelectedGroup SelectedGroup { get; }
 
+        public ActionLog ActionLog { get; }
+
         public GameControls()
         {
             MapView = new MapView(0, 0, 60);
@@ -29,6 +31,7 @@ namespace SanguineGenesis.GameControls
             SelectionInput = new SelectionInput();
             MapSelectorFrame = null;
             SelectedGroup = new SelectedGroup();
+            ActionLog = new ActionLog(4);
         }
 
         /// <summary>
@@ -100,7 +103,7 @@ namespace SanguineGenesis.GameControls
                             IEnumerable<Entity> entitiesWithAbil = SelectedGroup.Entities.Where((e) => e.Abilities.Contains(selectedAbility));
                             if (entitiesWithAbil != null)
                             {
-                                selectedAbility.SetCommands(entitiesWithAbil, Nothing.Get, SelectionInput.ResetCommandsQueue);
+                                selectedAbility.SetCommands(entitiesWithAbil, Nothing.Get, SelectionInput.ResetCommandsQueue, ActionLog);
                             }
                             //reset ability selection
                             SelectionInput.SelectedAbility = null;
@@ -123,7 +126,11 @@ namespace SanguineGenesis.GameControls
                             {
                                 //use the ability if a valid target was selected
                                 IEnumerable<Entity> entitiesWithAbil = SelectedGroup.Entities.Where((e) => e.Abilities.Contains(ability));
-                                ability.SetCommands(entitiesWithAbil, target, SelectionInput.ResetCommandsQueue);
+                                ability.SetCommands(entitiesWithAbil, target, SelectionInput.ResetCommandsQueue, ActionLog);
+                            }
+                            else
+                            {
+                                ActionLog.LogError(null, ability, "target is not valid");
                             }
                         }
 
@@ -150,12 +157,12 @@ namespace SanguineGenesis.GameControls
             {
                 //no enemy selected, move to the clicked coordiantes
                 game.CurrentPlayer.GameStaticData.Abilities.UnbreakableMoveTo.SetCommands(SelectedGroup.Entities
-                    .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), targetCoords, resetQueue);
+                    .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), targetCoords, resetQueue, ActionLog);
             }
             else
             {
                 //enemy selected => attack it
-                game.CurrentPlayer.GameStaticData.Abilities.UnbreakableAttack.SetCommands(SelectedGroup.Entities, enemy, resetQueue);
+                game.CurrentPlayer.GameStaticData.Abilities.UnbreakableAttack.SetCommands(SelectedGroup.Entities, enemy, resetQueue, ActionLog);
             }
         }
 

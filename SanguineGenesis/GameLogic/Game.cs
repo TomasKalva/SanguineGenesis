@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using SanguineGenesis.GameLogic.AI;
+using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GameLogic.Maps.MovementGenerating;
@@ -161,6 +164,12 @@ namespace SanguineGenesis.GameLogic
             //one step of commands
             foreach (Entity e in entities)
             {
+                //remove commands of animals who are on wrong terrain
+                if(e is Animal a)
+                    if (!a.CanMoveOn(Map[(int)a.Position.X, (int)a.Position.Y].Terrain))
+                        a.CommandQueue.Clear();
+
+                //one step of command
                 e.PerformCommand(this, deltaT);
             }
 
@@ -272,6 +281,82 @@ namespace SanguineGenesis.GameLogic
 
             //update move to commands
             mg.UseProcessedCommands();
+        }
+    }
+
+    /// <summary>
+    /// Logs last few errors by user. Used in ability-command pipeline. 
+    /// </summary>
+    class ActionLog
+    {
+        public static ActionLog ThrowAway = new ActionLog(1);
+
+        public int Size { get; }
+        private readonly Message[] messages;
+
+        /// <summary>
+        /// Logged message.
+        /// </summary>
+        class Message
+        {
+            public Entity Entity { get; }
+            public Ability Ability { get; }
+            public string Text { get; }
+            public Message(Entity entity, Ability ability, string text)
+            {
+                Entity = entity;
+                Ability = ability;
+                Text = text;
+            }
+
+            public override string ToString()
+            {
+                return $"{(Entity != null ? (Entity.EntityType + ", ") : "")}{(Ability != null ? (Ability.GetName() + ": ") : "")}{Text}";
+            }
+        }
+
+        public ActionLog(int size)
+        {
+            this.Size = size >= 1 ? size : 1;
+            messages = new Message[this.Size];
+        }
+
+        /// <summary>
+        /// Adds message to the log and moves other messages by one. Can
+        /// erase the last message in the log.
+        /// </summary>
+        private void PushMessage(Message message)
+        {
+            //move messages by one
+            for(int i = Size - 2; i >= 0; i--)
+            {
+                messages[i + 1] = messages[i];
+            }
+            messages[0] = message;
+        }
+
+        /// <summary>
+        /// Log a new message. entity and ability should correspond to the message.
+        /// If no corresponding entity or ability exist, use null instead.
+        /// </summary>
+        public void LogError(Entity entity, Ability ability, string message)
+        {
+            PushMessage(new Message(entity, ability, message));
+        }
+
+        /// <summary>
+        /// Returns error messages from oldest to newest separated by \n.
+        /// </summary>
+        /// <returns></returns>
+        public string GetMessages()
+        {
+            StringBuilder messagesText = new StringBuilder();
+            for (int i = Size - 1; i >= 0; i--)
+            {
+                messagesText.Append(messages[i]);
+                messagesText.Append(i!=0?"\n":"");
+            }
+            return messagesText.ToString();
         }
     }
 }

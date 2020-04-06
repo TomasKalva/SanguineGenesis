@@ -64,9 +64,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            if (!CanBeUsed() || CommandedEntity.DistanceTo(Target) > Ability.Distance)
-                //finish if the command can't be used
+            if (!CanBeUsed())
+                //CanBeUsed handles ActionLog
                 return true;
+            
+            if(CommandedEntity.DistanceTo(Target) > Ability.Distance)
+            {
+                //finish if the command can't be used
+                ActionLog.LogError(CommandedEntity, Ability, "target is too far away");
+                return true;
+            }
 
             int nX = Target.X;
             int nY = Target.Y;
@@ -74,15 +81,29 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             var targetCenter = new Vector2(Target.X + buildingRadius,
                                            Target.Y + buildingRadius);
 
-            if (game.Map.BuildingCanBePlaced(Ability.BuildingFactory, nX, nY) &&
-                !game.collisions.CollidesWithUnits(game, targetCenter, buildingRadius))
+            if (!game.Map.BuildingCanBePlaced(Ability.BuildingFactory, nX, nY))
+            {
+                ActionLog.LogError(CommandedEntity, Ability, "wrong terrain or nodes blocked by buildings");
+                return true;
+            }
+
+            if (game.collisions.CollidesWithUnits(game, targetCenter, buildingRadius))
+            {
+                ActionLog.LogError(CommandedEntity, Ability, "units collide with the new building");
+                return true;
+            }
+
             {
                 if (!TryPay())
+                {
                     //entity doesn't have enough energy
+                    ActionLog.LogError(CommandedEntity, Ability, "entity doesn't have enough energy");
                     return true;
+                }
 
                 game.Map.PlaceBuilding(Ability.BuildingFactory, CommandedEntity.Faction, nX, nY);
             }
+
             //the command always immediately finishes regardless of the success of placing the building
             return true;
         }

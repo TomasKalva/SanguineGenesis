@@ -146,6 +146,7 @@ namespace SanguineGenesis.GameLogic
             Biome = biome;
             if(aiFactory!=null)
                 Ai = aiFactory.NewInstance(this);
+
         }
 
         /// <summary>
@@ -160,18 +161,17 @@ namespace SanguineGenesis.GameLogic
             float step = gridSize / (gridPoints + 1);
             
             //create animals
-            AnimalFactory normalUnits = new AnimalFactory("TIGER", 200, 150, 0.3f, 0.5f, 0.4f, 5f, 0.5f, 0.1f, false, 3f, 2f, Movement.LAND, false, Diet.CARNIVORE, 5f, true, 20f, 5f, new List<StatusFactory>(), 1);
-            int i = 0;
+            int pos = 0;
             foreach (AnimalFactory a in factories.Select(kvp => kvp.Value))
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    var animal = a.NewInstance(this, new Vector2(step * ((i % gridPoints) + 1),
-                                                                 step * ((i / gridPoints) + 1)));
+                    var animal = a.NewInstance(this, new Vector2(step * ((pos % gridPoints) + 1),
+                                                                 step * ((pos / gridPoints) + 1)));
                     animal.Energy = animal.Energy.MaxValue;
                     Entities.Add(animal);
                 }
-                i++;
+                pos++;
             }
         }
 

@@ -183,6 +183,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             AnimalsOnTree alreadyApplied = (AnimalsOnTree)affected.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
             if(alreadyApplied!=null)
             {
+                //use existing instance of the status
                 if (PutOnTree != null)
                 {
                     alreadyApplied.Animals.Add(PutOnTree);
@@ -192,6 +193,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             }
             else
             {
+                //create new instance of the status
                 AnimalsOnTree newStatus = (AnimalsOnTree)NewInstance(affected);
                 affected.AddStatus(newStatus);
             }

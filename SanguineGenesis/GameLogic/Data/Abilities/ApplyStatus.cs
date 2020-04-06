@@ -46,7 +46,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             //try to apply the status to the caster, if
             //the application fails, caster gets refunded
             if (!Ability.StatusFactory.ApplyToStatusOwner(CommandedEntity))
+            {
+                ActionLog.LogError(CommandedEntity, Ability, "status can't be added to the target");
                 Refund();
+            }
 
             return true;
         }

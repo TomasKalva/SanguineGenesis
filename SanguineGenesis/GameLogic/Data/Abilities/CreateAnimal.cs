@@ -65,7 +65,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 game.Players[newUnitOwner.FactionID].Entities.Add(newUnit);
                 //make unit go towards the rally point
                 if(CommandedEntity.RallyPoint!=null)
-                    newUnitOwner.GameStaticData.Abilities.MoveTo.SetCommands(new List<Unit>(1) { newUnit }, CommandedEntity.RallyPoint.Value, true);
+                    newUnitOwner.GameStaticData.Abilities.MoveTo.SetCommands(new List<Unit>(1) { newUnit }, CommandedEntity.RallyPoint.Value, true, ActionLog.ThrowAway);
                 return true;
             }
             return false;

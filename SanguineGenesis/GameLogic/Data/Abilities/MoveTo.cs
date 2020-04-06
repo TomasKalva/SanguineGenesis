@@ -28,7 +28,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public float? GoalDistance { get; }
         public bool AttackEnemyInstead { get; }
 
-        public override void SetCommands(IEnumerable<Animal> casters, IMovementTarget target, bool resetCommandQueue)
+        public override void SetCommands(IEnumerable<Animal> casters, IMovementTarget target, bool resetCommandQueue, ActionLog actionLog)
         {
             //if there are no casters do nothing
             if (!casters.Any())
@@ -53,7 +53,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             foreach (Movement m in Enum.GetValues(typeof(Movement)))
             {
                 IEnumerable<Animal> castersMov = castersGroups[m];
-                //set commands only if any unit can receive it
+                //set commands only if some unit can receive it
                 if (!castersMov.Any())
                     continue;
 

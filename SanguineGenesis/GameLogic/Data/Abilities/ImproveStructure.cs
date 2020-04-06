@@ -67,7 +67,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Target.Energy += transferedEn;
 
             //if the commanded entity doesn't have energy anymore, it can't give energy to the structure
-            if (CommandedEntity.Energy == 0f)
+            if (!(CommandedEntity.Energy > 0f))
                 return true;
 
             return false;

@@ -180,7 +180,7 @@ namespace SanguineGenesis.GameLogic.Maps
                 rootNodes = GameQuerying.SelectNodes(this, x - rDist, y - rDist, x + (size + rDist - 1), y + (size + rDist - 1));
                 newBuilding = trF.NewInstance(owner, buildNodes, rootNodes);
                 //make the tree grow
-                owner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get, true);
+                owner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get, true, ActionLog.ThrowAway);
             }
             else
             {

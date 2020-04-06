@@ -133,6 +133,10 @@ namespace SanguineGenesis.GUI
         /// Shows who won the game.
         /// </summary>
         private VictoryPanel VictoryPanel { get; set; }
+        /// <summary>
+        /// Shows error messages.
+        /// </summary>
+        private Label ErrorList { get; set; }
 
         #region Initialization
         /// <summary>
@@ -193,6 +197,21 @@ namespace SanguineGenesis.GUI
             //players properties
             PlayerPropertiesPanel = new PlayerPropertiesPanel(120, 20);
             Controls.Add(PlayerPropertiesPanel);
+
+            //error list
+            int errListWidth = 500;
+            ErrorList = new Label()
+            {
+                Width = errListWidth,
+                Left = (ClientSize.Width - errListWidth) / 2,
+                Top = 0,
+                ForeColor = Color.Red,
+                BackColor = Color.White,
+                TextAlign = ContentAlignment.BottomCenter
+            };
+            ErrorList.Height = GameControls.ActionLog.Size * ErrorList.Font.Height + 2;
+            ErrorList.Text = "Error: 4\nError: 3\nError: 2\nError: 1\n ";
+            openGLControl.Controls.Add(ErrorList);
 
             //put openGLFocus to the background and set focus to it
             Controls.SetChildIndex(openGLControl, 100);
@@ -578,6 +597,9 @@ namespace SanguineGenesis.GUI
 
             //update air
             PlayerPropertiesPanel.AirValue.Text = Game.CurrentPlayer.AirTaken + "/" + Game.CurrentPlayer.MaxAirTaken;
+
+            //update error list
+            ErrorList.Text = GameControls.ActionLog.GetMessages();
 
             //show victory panel if a player won
             if (Game.Winner != null)

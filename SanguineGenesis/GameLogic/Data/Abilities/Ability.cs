@@ -61,7 +61,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
         /// <exception cref="NullReferenceException">If some casters are null.</exception>
-        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue);
+        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue, ActionLog actionLog);
         /// <summary>
         /// Returns true if the target type is valid for this ability.
         /// </summary>
@@ -124,16 +124,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Returns false if command with caster and target can't be created.
         /// </summary>
-        public virtual bool ValidArguments(Caster caster, Target target) => true;
+        public virtual bool ValidArguments(Caster caster, Target target, ActionLog actionLog) => true;
 
         /// <summary>
         /// Set commands to the units. Does nothing if target has wrong type. Calls the generic version of this method.
         /// </summary>
         /// <exception cref="NullReferenceException">If some casters are null.</exception>
-        public sealed override void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue)
+        public sealed override void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue, ActionLog actionLog)
         {
             if(target is Target t)
-                SetCommands(casters.Where(c=>c is Caster).Cast<Caster>(), t, resetCommandQueue);
+                SetCommands(casters.Where(c=>c is Caster).Cast<Caster>(), t, resetCommandQueue, actionLog);
         }
         
         /// <summary>
@@ -182,21 +182,52 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <param name="casters">Casters who should receive the command. Only valid casters will receive the command.</param>
         /// <param name="target">Target of the new commands.</param>
         /// <param name="resetCommandQueue">If true, the casters CommandQueue will be reset.</param>
-        public virtual void SetCommands(IEnumerable<Caster> casters, Target target, bool resetCommandQueue)
+        public virtual void SetCommands(IEnumerable<Caster> casters, Target target, bool resetCommandQueue, ActionLog actionLog)
         {
             //casters are put to a list so that they can be enumerated multiple times
-            List<Caster> validCasters = casters
-                .Where((caster) =>caster.Energy >= EnergyCost)//select only the casters who can pay
-                .Where((caster) => ValidArguments(caster, target))//select only casters who are valid for this target
-                 .ToList();
+            List<Caster> castersWithThisAbility = casters
+                .Where(c => c.Abilities.Where(a => a == this).Any()).ToList();
+
+            if (!castersWithThisAbility.Any())
+            {
+                actionLog.LogError(null, this, $"no caster with this ability");
+                return;
+            }
+
+            //select only casters who are valid for this target
+            List<Caster> castersWithValidArguments = castersWithThisAbility
+                .Where((caster) => ValidArguments(caster, target, (!OnlyOne)? actionLog : ActionLog.ThrowAway))
+                .ToList();
+
+            //if there are no valid casters
+            if (!castersWithValidArguments.Any())
+            {
+                actionLog.LogError(null, this, "no caster with valid target");
+                return;
+            }
+
+            //select only the casters who can pay
+            List<Caster> validCasters = castersWithValidArguments
+                .Where((caster) =>caster.Energy >= EnergyCost)
+                .ToList();
 
             //remove caster that is also target if the ability can't be self casted
             if (!SelfCastable && target is Caster self)
+            {
+                if(validCasters.Contains(self) && validCasters.Count==1)
+                {
+                    actionLog.LogError(null, this, "caster can't use this ability on itself");
+                    return;
+                }
                 validCasters.Remove(self);
+            }
 
             //if there are no casters that can pay do nothing
-            if (!validCasters.Any())
-                return;
+            if (!validCasters.Any()) 
+            {
+                actionLog.LogError(null, this, "no valid caster has enough energy");
+                return; 
+            }
 
             //if the ability should be cast only by one caster,
             //find the most suitable caster to cast this ability
@@ -209,10 +240,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     .ToList();
             }
 
-            if(resetCommandQueue)
+            if (resetCommandQueue)
+            {
                 //reset all commands
                 foreach (Caster c in validCasters)
+                {
                     c.ResetCommands();
+                    if (c.CommandQueue.Any())
+                        actionLog.LogError(c, this, $"{c} has unremovable commands");
+                }
+            }
 
             //move units to the target until the required distance is reached
             if(validCasters.Where(caster => caster.GetType() == typeof(Animal)).Any() &&
@@ -220,7 +257,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 abilities.MoveToCast(this)
                     .SetCommands(validCasters
                     .Where(caster=>caster.GetType()==typeof(Animal))
-                    .Cast<Animal>(), target, resetCommandQueue);
+                    .Cast<Animal>(), target, resetCommandQueue, actionLog);
 
             //give command to each caster
             foreach (Caster c in validCasters)
@@ -235,6 +272,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     a.CommandQueue.Queue.Remove(followCommand);
                     com.FollowCommand = followCommand;
                 }
+                //set action log to the command to report errors
+                com.ActionLog = actionLog;
 
                 c.AddCommand(com);
             }

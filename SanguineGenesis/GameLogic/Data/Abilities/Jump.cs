@@ -67,6 +67,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     {
                         CommandedEntity.StateChangeLock = null;
                         Refund();
+                        ActionLog.LogError(CommandedEntity, Ability, "target is colliding with a building");
                         return true;
                     }
                 }
