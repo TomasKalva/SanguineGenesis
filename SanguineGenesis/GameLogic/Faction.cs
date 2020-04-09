@@ -20,9 +20,21 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public const int MAX_AIR_TAKEN = 100;
         /// <summary>
-        /// Entities owned by the faction.
+        /// Animals owned by the faction.
         /// </summary>
-        public List<Entity> Entities { get; private set; }
+        public List<Animal> Animals { get; private set; }
+        /// <summary>
+        /// Trees owned by the faction.
+        /// </summary>
+        public List<Tree> Trees { get; private set; }
+        /// <summary>
+        /// Structures owned by the faction.
+        /// </summary>
+        public List<Structure> Structures { get; private set; }
+        /// <summary>
+        /// Corpses owned by the faction.
+        /// </summary>
+        public List<Corpse> Corpses { get; private set; }
         /// <summary>
         /// Type of faction.
         /// </summary>
@@ -44,29 +56,67 @@ namespace SanguineGenesis.GameLogic
         public Faction(FactionType factionID)
         {
             FactionID = factionID;
-            Entities = new List<Entity>();
+            Animals = new List<Animal>();
+            Trees = new List<Tree>();
+            Structures = new List<Structure>();
+            Corpses = new List<Corpse>();
             GameStaticData = new GameData();
+        }
+
+        /// <summary>
+        /// Adds the entity to the list of its real type.
+        /// </summary>
+        public void AddEntity(Entity e)
+        {
+            if (e.GetType() == typeof(Animal))
+                Animals.Add((Animal)e);
+            if (e.GetType() == typeof(Tree))
+                Trees.Add((Tree)e);
+            if (e.GetType() == typeof(Structure))
+                Structures.Add((Structure)e);
+            if (e.GetType() == typeof(Corpse))
+                Corpses.Add((Corpse)e);
+        }
+
+        /// <summary>
+        /// Removes the entity from the list of its real type.
+        /// </summary>
+        public void RemoveEntity(Entity e)
+        {
+            if (e.GetType() == typeof(Animal))
+                Animals.Remove((Animal)e);
+            if (e.GetType() == typeof(Tree))
+                Trees.Remove((Tree)e);
+            if (e.GetType() == typeof(Structure))
+                Structures.Remove((Structure)e);
+            if (e.GetType() == typeof(Corpse))
+                Corpses.Remove((Corpse)e);
         }
 
         /// <summary>
         /// Returns all entities of type T owned by the faction.
         /// </summary>
-        public List<T> GetAll<T>() where T : Entity
+        public IEnumerable<T> GetAll<T>() where T : Entity
         {
             if (typeof(T) == typeof(Entity))
-                return Entities.Cast<T>().ToList();
+                return Animals.Cast<T>().Concat(
+                        Trees.Cast<T>().Concat(
+                         Structures.Cast<T>().Concat(
+                          Corpses.Cast<T>())));
             else if (typeof(T) == typeof(Unit))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
+                return Animals.Cast<T>().Concat(
+                          Corpses.Cast<T>());
             else if (typeof(T) == typeof(Animal))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
+                return Animals.Cast<T>();
             else if (typeof(T) == typeof(Corpse))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
+                return Corpses.Cast<T>();
             else if (typeof(T) == typeof(Building))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
+                return Trees.Cast<T>().Concat(
+                         Structures.Cast<T>());
             else if (typeof(T) == typeof(Tree))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
+                return Trees.Cast<T>();
             else if (typeof(T) == typeof(Structure))
-                return Entities.Where((e) => e is T).Cast<T>().ToList();
+                return Structures.Cast<T>();
 
             throw new NotImplementedException("The case when entity is " + typeof(T) + " is not covered!");
         }
@@ -88,17 +138,18 @@ namespace SanguineGenesis.GameLogic
         {
             //remove player's dead entities
             List<Entity> deadEntities = new List<Entity>();
-            foreach (Entity e in Entities)
+            foreach (Entity e in GetAll<Entity>())
             {
                 if (e.IsDead)
                 {
-                    deadEntities.Add(e);
+                    e.Die(game);
                 }
             }
-            foreach (Entity e in deadEntities)
-                e.Die(game);
 
-            Entities.RemoveAll((entity) => entity.IsDead);
+            Animals.RemoveAll((a) => a.IsDead);
+            Trees.RemoveAll((t) => t.IsDead);
+            Structures.RemoveAll((s) => s.IsDead);
+            Corpses.RemoveAll((c) => c.IsDead);
         }
 
         /// <summary>
@@ -169,7 +220,7 @@ namespace SanguineGenesis.GameLogic
                     var animal = a.NewInstance(this, new Vector2(step * ((pos % gridPoints) + 1),
                                                                  step * ((pos / gridPoints) + 1)));
                     animal.Energy = animal.Energy.MaxValue;
-                    Entities.Add(animal);
+                    AddEntity(animal);
                 }
                 pos++;
             }
@@ -180,7 +231,7 @@ namespace SanguineGenesis.GameLogic
         /// buildings that were visible but now can be seen that they no longer exist.
         /// </summary>
         /// <param name="buildings"></param>
-        public void UpdateBuildingsView(List<Building> buildings)
+        public void UpdateBuildingsView(IEnumerable<Building> buildings)
         {
             if (VisibilityMap == null)
                 return;
@@ -206,8 +257,7 @@ namespace SanguineGenesis.GameLogic
             }
 
             //remove visible buildings for which it can be seen that they no longer exist
-            VisibleBuildings.RemoveAll((b) => CanSee(b) &&
-                                                !buildings.Contains(b));
+            VisibleBuildings.RemoveAll((b) => CanSee(b) && b.IsDead);
         }
 
         /// <summary>
@@ -256,7 +306,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Sets VisibilityMap and updates visible buildings.
         /// </summary>
-        public void SetVisibilityMap(VisibilityMap visMap, List<Building> buildings)
+        public void SetVisibilityMap(VisibilityMap visMap, IEnumerable<Building> buildings)
         {
             //add vision under this player's buildings
             foreach (Building b in GetAll<Building>())

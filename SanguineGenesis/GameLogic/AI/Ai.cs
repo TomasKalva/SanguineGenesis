@@ -113,7 +113,7 @@ namespace SanguineGenesis.GameLogic.AI
             var buildings = ControlledPlayer.GetAll<Building>();
 
             //only do it for 3 buildings so that the ai doesn't perform too many actions per second
-            foreach (Building b in buildings.ToRandomizedList().Take(3))
+            foreach (Building b in buildings.ToList().ToRandomizedList().Take(3))
             {
                 CreateAnimals(b);
             }
@@ -158,7 +158,7 @@ namespace SanguineGenesis.GameLogic.AI
             var trees = ControlledPlayer.GetAll<Tree>();
 
             //only do it for 3 buildings so that the ai doesn't perform too many actions per second
-            foreach (Tree b in trees.ToRandomizedList().Take(3))
+            foreach (Tree b in trees.ToList().ToRandomizedList().Take(3))
             {
                 PlaceBuildings(b, map);
             }

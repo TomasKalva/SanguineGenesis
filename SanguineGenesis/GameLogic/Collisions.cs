@@ -52,19 +52,20 @@ namespace SanguineGenesis.GameLogic
         /// Handles collisions between animals and entities. If animal gets pushed to blocked node,
         /// use corresponding PushingMap to push it back.
         /// </summary>
-        public void PushAway(Map map, List<Animal> physicalAnimals)
+        public void PushAway(Game game)
         {
+            Map map = game.Map;
             //set push maps so that colliding animals can be correctly pushed to not blocked squares
             SetPushMaps(map);
             
-            foreach (Animal a in physicalAnimals)
+            foreach (Animal a in game.GetAll<Animal>())
             {
                 //animals that aren't physical don't need to check for collisions
                 if (!a.Physical)
                     continue;
 
                 //resolve collisions with other animals
-                foreach (Animal e in physicalAnimals)
+                foreach (Animal e in game.GetAll<Animal>())
                 {
                     //calculate collisions for each pair of animals only once
                     if (a.GetHashCode() < e.GetHashCode())
@@ -167,7 +168,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Uses pushing maps to push animals that are on blocked squares.
         /// </summary>
-        public void PushOutsideOfObstacles(Map map, List<Animal> animals)
+        public void PushOutsideOfObstacles(Map map, IEnumerable<Animal> animals)
         {
             //set pushing maps or reset them if map was changed
             if (map.MapWasChanged
@@ -241,7 +242,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Move each animal.
         /// </summary>
-        public void MoveAnimals(Map map, List<Animal> animals, float deltaT)
+        public void MoveAnimals(Map map, IEnumerable<Animal> animals, float deltaT)
         {
             foreach(Animal a in animals)
             {

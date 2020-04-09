@@ -53,7 +53,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 var newUnitOwner = CommandedEntity.Faction;
                 Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Target);
-                newUnitOwner.Entities.Add(newUnit);
+                newUnitOwner.AddEntity(newUnit);
                 return true;
             }
             return false;

@@ -93,15 +93,14 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Returns all entities of the type T that are in the game.
         /// </summary>
-        public List<T> GetAll<T>() where T:Entity
+        public IEnumerable<T> GetAll<T>() where T:Entity
         {
-            var Ts = new List<T>();
+            var Ts = NeutralFaction.GetAll<T>();
             foreach (var kvpPlayer in Players)
             {
-                Ts = Ts.Concat(kvpPlayer.Value.GetAll<T>()).ToList();
+                Ts = Ts.Concat(kvpPlayer.Value.GetAll<T>());
             }
 
-            Ts = Ts.Concat(NeutralFaction.GetAll<T>()).ToList();
             return Ts;
         }
 
@@ -118,24 +117,18 @@ namespace SanguineGenesis.GameLogic
                     p.Ai.Play(deltaT, this);
 
             //map changing phase
-            List<Entity> entities = GetAll<Entity>();
-            List<Unit> units = GetAll<Unit>();
-            List<Animal> animals = GetAll<Animal>();
-            List<Building> buildings = GetAll<Building>();
-            List<Tree> trees = GetAll<Tree>();
-
 
             //update air values
             foreach (var kvp in Players)
                 kvp.Value.CalulateAir();
 
             //generate and drain nutrients by trees
-            Map.UpdateNutrientsMap(trees, deltaT);
+            Map.UpdateNutrientsMap(GetAll<Tree>(), deltaT);
 
             gameTime.PrintTime("Others");
 
             //update players' visibility map
-            VisibilityGeneratorInteraction(buildings);
+            VisibilityGeneratorInteraction(GetAll<Building>());
 
             //update parts of map that can be seen for each player
             foreach (var p in Players)
@@ -144,13 +137,14 @@ namespace SanguineGenesis.GameLogic
             gameTime.PrintTime("Visibility");
 
             //one step of statuses
-            foreach (Entity e in entities)
+            //statuses can't modify any collection of entities of any player
+            foreach (Entity e in GetAll<Entity>())
             {
                 e.StepStatuses(this, deltaT);
             }
             
             // add suffocating status to animals on wrong terrain
-            foreach(Animal a in animals)
+            foreach(Animal a in GetAll<Animal>())
             {
                 int x = (int)a.Position.X;
                 int y = (int)a.Position.Y;
@@ -162,7 +156,8 @@ namespace SanguineGenesis.GameLogic
             }
 
             //one step of commands
-            foreach (Entity e in entities)
+            foreach (Entity e in GetAll<Entity>()
+                .ToList())//new list has to be constructed because the original collections can change
             {
                 //remove commands of animals who are on wrong terrain
                 if(e is Animal a)
@@ -174,7 +169,7 @@ namespace SanguineGenesis.GameLogic
             }
 
             //one step of animations
-            foreach (Entity e in entities)
+            foreach (Entity e in GetAll<Entity>())
             {
                 e.AnimationStep(deltaT);
             }
@@ -182,21 +177,20 @@ namespace SanguineGenesis.GameLogic
             gameTime.PrintTime("Ingame update");
 
             //collisions
-            List<Animal> physicalAnimals = animals.Where((a) => a.Physical).ToList();
-            collisions.MoveAnimals(Map, animals, deltaT);
-            collisions.PushAway(Map, physicalAnimals);
-            collisions.PushOutsideOfObstacles(Map, animals);
+            collisions.MoveAnimals(Map, GetAll<Animal>(), deltaT);
+            collisions.PushAway(this);
+            collisions.PushOutsideOfObstacles(Map, GetAll<Animal>());
 
             gameTime.PrintTime("Collisions");
 
             //attack nearby enemy if idle
-            foreach (Animal a in animals)
+            foreach (Animal a in GetAll<Animal>())
             {
                 if(!a.CommandQueue.Any())
                 {
                     //animal isn't doing anything
                     var opposite = a.Faction.FactionID.Opposite();
-                    Entity en = units.Where((v) => v.Faction.FactionID==opposite && a.DistanceTo(v) < a.AttackDistance && a.Faction.CanSee(v)).FirstOrDefault();
+                    Entity en = GetAll<Animal>().Where((v) => v.Faction.FactionID==opposite && a.DistanceTo(v) < a.AttackDistance && a.Faction.CanSee(v)).FirstOrDefault();
                     if(en!=null)
                         a.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(a, en));
                 }
@@ -217,9 +211,9 @@ namespace SanguineGenesis.GameLogic
             //test if someone won the game
             if (Winner == null)
             {
-                if (!Players[FactionType.PLAYER0].GetAll<Tree>().Any())
+                if (!Players[FactionType.PLAYER0].GetAll<Building>().Any())
                     Winner = FactionType.PLAYER1;
-                else if (!Players[FactionType.PLAYER1].GetAll<Tree>().Any())
+                else if (!Players[FactionType.PLAYER1].GetAll<Building>().Any())
                     Winner = FactionType.PLAYER0;
             }
 
@@ -229,7 +223,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Sets tasks to visibilityGenerator and updates visibility maps.
         /// </summary>
-        private void VisibilityGeneratorInteraction(List<Building> allBuildings)
+        private void VisibilityGeneratorInteraction(IEnumerable<Building> allBuildings)
         {
             var visibilityGenerator = VisibilityGenerator.Get;
             if (visibilityGenerator.Done)
@@ -253,7 +247,7 @@ namespace SanguineGenesis.GameLogic
                     visGenTask = new UnlimitedVisibilityGeneratingTask(Map.Width, Map.Height);
                 else
                     visGenTask = new RayVisibilityGeneratingTask(Map.GetViewObstaclesMap(nextVisibilityPlayer),
-                    Players[nextVisibilityPlayer].Entities.Select((entity) => entity.View).ToList());
+                    Players[nextVisibilityPlayer].GetAll<Entity>().Select((entity) => entity.View).ToList());
 
                 visibilityGenerator.SetNewTask(visGenTask);
             }

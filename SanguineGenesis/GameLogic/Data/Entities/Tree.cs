@@ -67,7 +67,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 Structure deadTree = new Structure(game.NeutralFaction, "DEAD_TREE", Nodes, Energy, Energy, Size,
                     Physical, Biome, Terrain, SoilQuality.BAD, false, 0, 0, new List<Ability>());
                 Faction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(deadTree);
-                Faction.Entities.Add(deadTree);
+                Faction.AddEntity(deadTree);
                 game.Map.AddBuilding(deadTree);
             }
         }

@@ -129,7 +129,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public override void Added()
         {
             //temporarily remove the animal from list of entities
-            AnimalConsumed.Faction.Entities.Remove(AnimalConsumed);
+            AnimalConsumed.Faction.RemoveEntity(AnimalConsumed);
             AnimalConsumed.StateChangeLock = this;
         }
 
@@ -138,7 +138,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             //add the consumed unit back to the list of entities
             //it spawns in front of the affected animal
             AnimalConsumed.Position = AffectedEntity.Position + (AffectedEntity.Radius + AnimalConsumed.Radius) * AffectedEntity.Direction;
-            AnimalConsumed.Faction.Entities.Add(AnimalConsumed);
+            AnimalConsumed.Faction.AddEntity(AnimalConsumed);
             AnimalConsumed.StateChangeLock = null;
         }
 

@@ -188,7 +188,7 @@ namespace SanguineGenesis.GameLogic.Maps
                 newBuilding = stF.NewInstance(owner, buildNodes);
             }
             //put the new building on the main map
-            owner.Entities.Add(newBuilding);
+            owner.AddEntity(newBuilding);
             AddBuilding(newBuilding);
             MapWasChanged = true;
         }
@@ -235,7 +235,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <summary>
         /// Trees draing nutrients from nodes and nodes with roots generate nutrients.
         /// </summary>
-        public void UpdateNutrientsMap(List<Tree> trees, float deltaT)
+        public void UpdateNutrientsMap(IEnumerable<Tree> trees, float deltaT)
         {
             nutrientUpdateTimer -= deltaT;
             if (nutrientUpdateTimer <= 0)

@@ -264,7 +264,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             {
                 var corpse = new Corpse(game.NeutralFaction, "CORPSE", Energy, Energy, Position, 0.2f);
                 Faction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(corpse);
-                game.NeutralFaction.Entities.Add(corpse);
+                game.NeutralFaction.AddEntity(corpse);
 
             }
         }

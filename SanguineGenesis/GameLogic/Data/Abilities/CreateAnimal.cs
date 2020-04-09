@@ -62,7 +62,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
                 var newUnitOwner = CommandedEntity.Faction;
                 Animal newUnit = Ability.SpawningAnimalFactory.NewInstance(newUnitOwner, newUnitPosition.Value);
-                game.Players[newUnitOwner.FactionID].Entities.Add(newUnit);
+                game.Players[newUnitOwner.FactionID].AddEntity(newUnit);
                 //make unit go towards the rally point
                 if(CommandedEntity.RallyPoint!=null)
                     newUnitOwner.GameStaticData.Abilities.MoveTo.SetCommands(new List<Unit>(1) { newUnit }, CommandedEntity.RallyPoint.Value, true, ActionLog.ThrowAway);
