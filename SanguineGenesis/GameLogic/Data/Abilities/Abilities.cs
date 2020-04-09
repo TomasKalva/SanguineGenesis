@@ -143,11 +143,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Jump.SetAbilities(this);
 
             //pull
-            Pull = new Pull(35, 4f, 1f, 8f);
+            Pull = new Pull(75, 4f, 1f, 8f);
             Pull.SetAbilities(this);
 
             //big pull
-            BigPull = new Pull(40, 6f, 1.2f, 8f);
+            BigPull = new Pull(90, 6f, 1.2f, 8f);
             BigPull.SetAbilities(this);
 
             //activate far sight
