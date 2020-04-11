@@ -232,9 +232,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             int air = int.Parse(fields[14], CultureInfo.InvariantCulture);
             float buildingDistance = float.Parse(fields[15], CultureInfo.InvariantCulture);
             float viewRange = float.Parse(fields[16], CultureInfo.InvariantCulture);
+            bool blocksVision = fields[17] == "yes";
 
             TreeFactory newFactory = new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
-                biome, terrain, soilQuality, producer, buildingDistance, viewRange, rootsDistance, air, statusFactories);
+                biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, rootsDistance, air, statusFactories);
             Factorys.Add(treeType, newFactory);
             abilitiesList.Add(treeType, fields[11]);
         }
@@ -261,9 +262,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             bool producer = fields[11] == "yes";
             float buildingDistance = float.Parse(fields[12], CultureInfo.InvariantCulture);
             float viewRange = float.Parse(fields[13], CultureInfo.InvariantCulture);
+            bool blocksVision = fields[14] == "yes";
 
             StructureFactory newFactory = new StructureFactory(structureType, maxHealth, maxEnergy, size, physical, energyCost,
-                biome, terrain, soilQuality,  producer, buildingDistance, viewRange, statusFactories);
+                biome, terrain, soilQuality,  producer, buildingDistance, viewRange, blocksVision, statusFactories);
             Factorys.Add(structureType, newFactory);
             abilitiesList.Add(structureType, fields[9]);
         }

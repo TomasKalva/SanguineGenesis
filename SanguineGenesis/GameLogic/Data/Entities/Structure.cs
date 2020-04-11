@@ -19,8 +19,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public override bool IsDead => base.IsDead || Decayed;
 
         public Structure(Faction faction, string buildingType, Node[,] nodes, float maxHealth, float maxEnergy, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, List<Ability> abilities)
-            : base(faction, buildingType, nodes, maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, bool blocksVision, List<Ability> abilities)
+            : base(faction, buildingType, nodes, maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, abilities)
         {
             Decayed = false;
         }

@@ -123,8 +123,8 @@ namespace SanguineGenesis.GameLogic.Maps
             ObstacleMap om = new ObstacleMap(Width, Height);
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
-                    //player can't see through blocked squares that he doesn't own
-                    om[i, j] = this[i, j].Blocked && this[i, j].Building.Faction.FactionID != player;
+                    //player can't see through buildings that block vision
+                    om[i, j] = this[i, j].Building!=null && this[i, j].Building.BlocksVision;
             return om;
         }
 

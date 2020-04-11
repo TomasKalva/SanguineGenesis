@@ -28,8 +28,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
 
         public Tree(Faction faction, string treeType, Node[,] nodes, Node[,] rootNodes, int rootDistance, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, int air, List<Ability> abilities)
-            : base(faction, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, bool blocksVision, int air, List<Ability> abilities)
+            : base(faction, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, abilities)
         {
             MaxEnergyIntake = maxEnergyIntake;
             RootNodes = rootNodes;
@@ -64,10 +64,12 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             //after physical tree dies and has energy left, spawn a dead tree
             if(Physical && Energy > 0)
             {
-                Structure deadTree = new Structure(game.NeutralFaction, "DEAD_TREE", Nodes, Energy, Energy, Size,
-                    Physical, Biome, Terrain, SoilQuality.BAD, false, 0, 0, new List<Ability>());
-                Faction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(deadTree);
-                Faction.AddEntity(deadTree);
+                var neutralFaction = game.NeutralFaction;
+                Structure deadTree = new Structure(neutralFaction, "DEAD_TREE", Nodes, Energy, Energy, Size,
+                    Physical, Biome, Terrain, SoilQuality.BAD, false, 0, 0, true, new List<Ability>());
+                deadTree.Energy = Energy;
+                neutralFaction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(deadTree);
+                neutralFaction.AddEntity(deadTree);
                 game.Map.AddBuilding(deadTree);
             }
         }

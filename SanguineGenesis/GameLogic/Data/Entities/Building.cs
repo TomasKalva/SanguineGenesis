@@ -67,6 +67,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// Point to which created units go after they spawn.
         /// </summary>
         public Vector2? RallyPoint { get; set; }
+        /// <summary>
+        /// True iff the building blocks vision.
+        /// </summary>
+        public bool BlocksVision { get; set; }
         // Map extents
         public new int Left => NodeLeft;
         public new int Right => Left + Nodes.GetLength(0);
@@ -76,7 +80,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public new int Height => Top - Bottom;
 
         public Building(Faction faction, string buildingType, Node[,] nodes, float maxHealth, float maxEnergy, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, List<Ability> abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, bool blocksVision, List<Ability> abilities)
             : base(faction, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Nodes = nodes;
@@ -86,6 +90,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             SoilQuality = soilQuality;
             Producer = producer;
             BuildingDistance = buildingDistance;
+            BlocksVision = blocksVision;
 
             NodeLeft = nodes[0, 0].X;
             NodeBottom = nodes[0, 0].Y;
