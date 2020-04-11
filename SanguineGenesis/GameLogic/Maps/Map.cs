@@ -118,7 +118,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <summary>
         /// Returns obstacles map where the obstacles block vision.
         /// </summary>
-        public ObstacleMap GetViewObstaclesMap(FactionType player)
+        public ObstacleMap GetViewObstaclesMap()
         {
             ObstacleMap om = new ObstacleMap(Width, Height);
             for (int i = 0; i < Width; i++)

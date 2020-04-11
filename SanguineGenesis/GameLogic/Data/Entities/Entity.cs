@@ -278,7 +278,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Called after this entity dies.
+        /// Called after this entity dies. Can add a new Structure to neutral faction but only from
+        /// not neutral faction.
         /// </summary>
         public virtual void Die(Game game)
         {

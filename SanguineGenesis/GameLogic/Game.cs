@@ -246,7 +246,7 @@ namespace SanguineGenesis.GameLogic
                 if (GameplayOptions.WholeMapVisible)
                     visGenTask = new UnlimitedVisibilityGeneratingTask(Map.Width, Map.Height);
                 else
-                    visGenTask = new RayVisibilityGeneratingTask(Map.GetViewObstaclesMap(nextVisibilityPlayer),
+                    visGenTask = new RayVisibilityGeneratingTask(Map.GetViewObstaclesMap(),
                     Players[nextVisibilityPlayer].GetAll<Entity>().Select((entity) => entity.View).ToList());
 
                 visibilityGenerator.SetNewTask(visGenTask);
