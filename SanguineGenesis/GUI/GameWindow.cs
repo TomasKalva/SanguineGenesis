@@ -172,7 +172,7 @@ namespace SanguineGenesis.GUI
             GameMenu.Top = (ClientSize.Height - GameMenu.Height) / 2;
             GameMenu.SetResumeButtonClickHandler(CloseMenu);
             GameMenu.SetOptionsButtonClickHandler(OpenOptionsMenu);
-            GameMenu.SetExitButtonClickHandler(CloseWindow);
+            GameMenu.SetExitButtonClickHandler(Close);
             Controls.Add(GameMenu);
             Controls.SetChildIndex(GameMenu, 10);
 
@@ -315,7 +315,7 @@ namespace SanguineGenesis.GUI
             }catch(Exception e)
             {
                 MessageBox.Show("Failed to initialize window: "+e.Message);
-                CloseWindow();
+                Close();
             }
         }
         #endregion Initialization
@@ -737,10 +737,7 @@ namespace SanguineGenesis.GUI
             openGLControl.Focus();
         }
 
-        /// <summary>
-        /// Closes the game.
-        /// </summary>
-        private void CloseWindow()
+        private void GameWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             // openGLControl is directly referenced by GCHandle, event handlers have to be removed
             // to avoid memory leak
@@ -752,7 +749,14 @@ namespace SanguineGenesis.GUI
             openGLControl.MouseMove -= new System.Windows.Forms.MouseEventHandler(this.MouseMoveHandler);
             openGLControl.MouseUp -= new System.Windows.Forms.MouseEventHandler(this.MouseButtonUpHandler);
             GameUpdateTimer.Tick -= GameUpdateTimer_MainLoop;
-            Close();
+            try
+            {
+                OpenGLAtlasDrawer.Destruct(openGLControl.OpenGL);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Failed to destroy OpenGL context: " + ex.Message);
+            }
         }
 
         /// <summary>

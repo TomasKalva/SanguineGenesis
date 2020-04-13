@@ -37,11 +37,12 @@
             this.openGLControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.openGLControl.DrawFPS = false;
             this.openGLControl.Location = new System.Drawing.Point(0, 0);
+            this.openGLControl.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
             this.openGLControl.Name = "openGLControl";
             this.openGLControl.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
             this.openGLControl.RenderContextType = SharpGL.RenderContextType.FBO;
             this.openGLControl.RenderTrigger = SharpGL.RenderTrigger.Manual;
-            this.openGLControl.Size = new System.Drawing.Size(533, 292);
+            this.openGLControl.Size = new System.Drawing.Size(800, 449);
             this.openGLControl.TabIndex = 0;
             this.openGLControl.OpenGLDraw += new SharpGL.RenderEventHandler(this.Draw);
             this.openGLControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyDown);
@@ -50,17 +51,17 @@
             this.openGLControl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MouseMoveHandler);
             this.openGLControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MouseButtonUpHandler);
             // 
-            // MainWinformWindow
+            // GameWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(533, 292);
+            this.ClientSize = new System.Drawing.Size(800, 449);
             this.Controls.Add(this.openGLControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.Name = "MainWinformWindow";
+            this.Name = "GameWindow";
             this.Text = "MainWindow";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GameWindow_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.openGLControl)).EndInit();
             this.ResumeLayout(false);
 

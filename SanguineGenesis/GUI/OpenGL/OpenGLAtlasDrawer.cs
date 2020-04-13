@@ -30,8 +30,6 @@ namespace SanguineGenesis.GUI
     {
         //the projection, view and model matrices.
         static mat4 projectionMatrix;
-        static mat4 viewMatrix;
-        static mat4 modelMatrix;
 
         //vertex shader attribute indices
         const uint attributeIndexPosition = 0;
@@ -75,21 +73,12 @@ namespace SanguineGenesis.GUI
             //create projection matrix that maps points directly to screen coordinates
             projectionMatrix = glm.ortho(0f, width, 0f, height, 0f, 100f);
 
-            //create view matrix that translates graphical objects to visible 
-
-            viewMatrix = glm.translate(new mat4(1.0f), new vec3(0.0f, 0.0f, -1.0f));
-
-            //create identity matrix as model matrix
-            modelMatrix = new mat4(1.0f);
-
             //load image used as atlas and pass it to the shader program
             InitializeAtlas(gl, shaderProgram);
             
             //bind the shader program and set its parameters
             shaderProgram.Bind(gl);
             shaderProgram.SetUniformMatrix4(gl, "projectionMatrix", projectionMatrix.to_array());
-            shaderProgram.SetUniformMatrix4(gl, "viewMatrix", viewMatrix.to_array());
-            shaderProgram.SetUniformMatrix4(gl, "modelMatrix", modelMatrix.to_array());
         }
 
         /// <summary>
@@ -145,6 +134,21 @@ namespace SanguineGenesis.GUI
         }
 
         #endregion Initialization
+
+        /// <summary>
+        /// Destructs all buffers and programs created in gl.
+        /// </summary>
+        public static void Destruct(OpenGL gl) 
+        {
+            shaderProgram.Delete(gl);
+            map.Dispose(gl);
+            flowField.Dispose(gl);
+            nutrientsMap.Dispose(gl);
+            entityCircles.Dispose(gl);
+            entities.Dispose(gl);
+            entityIndicators.Dispose(gl);
+            selectionFrame.Dispose(gl);
+        }
 
         /// <summary>
         /// Draws the scene.
@@ -339,6 +343,22 @@ namespace SanguineGenesis.GUI
                             1, new float[1],
                             1, new float[1]);
                 Clear = true;
+            }
+
+            /// <summary>
+            /// Removes all buffers in this object from the state of gl. This object can't be receive data
+            /// after the buffers are removed.
+            /// </summary>
+            public void Dispose(OpenGL gl)
+            {
+                ClearBuffers(gl);
+                gl.DeleteBuffers(3, new uint[]
+                {
+                    VertexDataBuffer.VertexBufferObject,
+                    UVDataBuffer.VertexBufferObject,
+                    TexAtlasDataBuffer.VertexBufferObject
+                });
+                VertexBufferArray.Delete(gl);
             }
         }
 
