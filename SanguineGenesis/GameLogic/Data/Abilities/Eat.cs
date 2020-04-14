@@ -41,7 +41,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return base.ToString();
         }
 
-        public override string GetName() => "EAT";
+        public override string GetName() => "HERBIVORE_EAT";
 
         public override string Description()
         {
@@ -101,11 +101,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return base.ToString();
         }
 
-        public override string GetName() => "EAT";
+        public override string GetName() => "CARNIVORE_EAT";
 
         public override string Description()
         {
-            return "The commanded herbivore eats tree or node.";
+            return "The commanded carnivore eats tree or node.";
         }
     }
 

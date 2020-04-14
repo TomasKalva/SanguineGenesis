@@ -147,7 +147,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Pull.SetAbilities(this);
 
             //big pull
-            BigPull = new Pull(90, 6f, 1.2f, 8f);
+            BigPull = new Pull(40, 6f, 1.2f, 8f);
             BigPull.SetAbilities(this);
 
             //activate far sight

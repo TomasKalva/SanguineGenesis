@@ -39,6 +39,10 @@ namespace SanguineGenesis.GUI
         /// Icons used for the game gui.
         /// </summary>
         private Icons Icons { get; }
+        /// <summary>
+        /// If set to false, new game can't be created. 
+        /// </summary>
+        public bool CanCreateGame { get; set; }
 
         public MainMenuWindow()
         {
@@ -51,7 +55,9 @@ namespace SanguineGenesis.GUI
             MapScale = mapPB.Width / MAX_MAP_WIDTH;
             DrawOpt = DrawOption.NO_ACTION;
             Icons = new Icons();
+            CanCreateGame = true;
             LoadNamesOfCreatedMaps();
+            //load icon
             try { this.Icon = new Icon("Images/Icons/giraffe.ico"); } catch (IOException)
             {
                 Console.WriteLine("Icon can't be loaded.");
@@ -436,24 +442,41 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Window where the game is played.
+        /// </summary>
+        private GameWindow gameWindow;
+
         private void PlayB_Click(object sender, EventArgs e)
         {
-            if (MapDescr != null)
+            if (CanCreateGame)
             {
-                if (MapDescr.MainBuildingsPresent())
+                if (MapDescr != null)
                 {
-                    MapDescr.RepairMap();
-                    DisableEditing();
+                    if (MapDescr.MainBuildingsPresent())
+                    {
+                        MapDescr.RepairMap();
+                        DisableEditing();
 
-                    var gameWindow = new GameWindow(MapDescr, PlayersBiome, Icons, testAnimalsCB.Checked);
-                    gameWindow.ShowDialog();
-                    gameWindow.Dispose();
+                        //create new window only if it wasn't created already
+                        if (gameWindow == null)
+                            gameWindow = new GameWindow(Icons, this);
+                        gameWindow.Enabled = true;
+                        gameWindow.StartNewGame(MapDescr, PlayersBiome, testAnimalsCB.Checked);
+                        //hide this window
+                        Enabled = false;
+                        Visible = false;
+                        //show game window
+                        gameWindow.Show();
+                    }
+                    else
+                        ErrorMessage("The map doesn't contain the main buildings of both players.");
                 }
                 else
-                    ErrorMessage("The map doesn't contain the main buildings of both players.");
+                    ErrorMessage("Load or create a map before starting the game.");
             }
             else
-                ErrorMessage("Load or create a map before starting the game.");
+                ErrorMessage("There was a problem with game window initialization.");
         }
 
         private void EditB_Click(object sender, EventArgs e)

@@ -519,7 +519,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
                     }
                     else
                     {
-                        //gropu doesn't contain entities - remove the control group
+                        //group doesn't contain entities - remove the control group
                         InfoSources[i] = null;
                         b.Text = GetButtonIndexText(i);
                         if (b.BackColor != Color.White)
@@ -561,7 +561,18 @@ namespace SanguineGenesis.GUI.WinFormsComponents
         public void LoadGroupWithIndex(int i)
         {            
             if(i>=0 && i<LoadGroup.Length) LoadGroup[i]();
-        }    
+        }
+
+        /// <summary>
+        /// Resets all control groups.
+        /// </summary>
+        public void Reset()
+        {
+            for(int i = 0; i < InfoSources.Count; i++)
+            {
+                InfoSources[i] = null;
+            }
+        }
     }
 
 

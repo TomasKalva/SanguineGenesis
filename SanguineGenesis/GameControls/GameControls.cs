@@ -15,16 +15,30 @@ namespace SanguineGenesis.GameControls
     /// </summary>
     class GameControls
     {
-        public MapMovementInput MapMovementInput { get; }
-        public MapView MapView { get; }
+        public MapMovementInput MapMovementInput { get; private set; }
+        public MapView MapView { get; private set; }
 
-        public SelectionInput SelectionInput { get; }
-        public MapSelectorFrame MapSelectorFrame { get; set; }
-        public SelectedGroup SelectedGroup { get; }
+        public SelectionInput SelectionInput { get; private set; }
+        public MapSelectorFrame MapSelectorFrame { get; private set; }
+        public SelectedGroup SelectedGroup { get; private set; }
 
-        public ActionLog ActionLog { get; }
+        public ActionLog ActionLog { get; private set; }
 
         public GameControls()
+        {
+            /*MapView = new MapView(0, 0, 60);
+            MapMovementInput = new MapMovementInput();
+            SelectionInput = new SelectionInput();
+            MapSelectorFrame = null;
+            SelectedGroup = new SelectedGroup();
+            ActionLog = new ActionLog(4);*/
+            Reset();
+        }
+
+        /// <summary>
+        /// Resets this instance.
+        /// </summary>
+        public void Reset()
         {
             MapView = new MapView(0, 0, 60);
             MapMovementInput = new MapMovementInput();

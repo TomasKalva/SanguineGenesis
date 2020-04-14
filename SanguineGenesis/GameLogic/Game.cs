@@ -54,7 +54,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
 
-        public Game(MapDescription mapDescription, Biome firstPlayersBiome)
+        public Game(MapDescription mapDescription, Biome firstPlayersBiome, GameplayOptions gameplayOptions)
         {
             GameEnded = false;
             Winner = null;
@@ -79,7 +79,7 @@ namespace SanguineGenesis.GameLogic
             collisions = Collisions.GetCollisions();
             MovementGenerator.GetMovementGenerator().Reset();
             nextVisibilityPlayer = FactionType.PLAYER0;
-            GameplayOptions = new GameplayOptions();
+            GameplayOptions = gameplayOptions;
         }
 
         /// <summary>

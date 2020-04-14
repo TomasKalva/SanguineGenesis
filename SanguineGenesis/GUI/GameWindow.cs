@@ -22,21 +22,28 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Runs main loop of the game.
         /// </summary>
-        Timer GameUpdateTimer { get; }
+        private Timer GameUpdateTimer { get; }
+        /// <summary>
+        /// Window that created this window.
+        /// </summary>
+        private MainMenuWindow MainMenuWindow { get; }
+        /// <summary>
+        /// Describes customizable parts of the game.
+        /// </summary>
+        public GameplayOptions GameplayOptions { get; }
 
-        public GameWindow(MapDescription mapDescription, Biome playersBiome, Icons icons, bool testAnimals)
+        public GameWindow(Icons icons, MainMenuWindow mainMenuWindow)
         {
             InitializeComponent();
-            
-            //initialize game
-            Game = new Game(mapDescription, playersBiome);
-            //spawn testing animals
-            if (testAnimals)
-                Game.SpawnTestingAnimals();
+
+            //initialize MainMenuWindow
+            MainMenuWindow = mainMenuWindow;
+
             //initialize game controls
             GameControls = new GameControls.GameControls();
-            //initialize game time
-            GameTime = new GameTime(Console.Out);
+
+            //initialize GameplayOptions
+            GameplayOptions = new GameplayOptions();
 
             //create and enable game update timer
             GameUpdateTimer = new Timer();
@@ -57,15 +64,28 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// The game this window is showing.
         /// </summary>
-        private Game Game { get; }
+        private Game Game { get; set; }
         /// <summary>
         /// Used for manipulating the game by player.
         /// </summary>
-        private GameControls.GameControls GameControls { get; }
+        private GameControls.GameControls GameControls { get; set; }
         /// <summary>
         /// Measures the ingame time.
         /// </summary>
-        private GameTime GameTime { get; }
+        private GameTime GameTime { get; set; }
+
+        public void StartNewGame(MapDescription mapDescription, Biome playersBiome, bool testAnimals)
+        {
+            //initialize game
+            Game = new Game(mapDescription, playersBiome, GameplayOptions);
+            //reset game controls
+            GameControls.Reset();
+            //spawn testing animals
+            if (testAnimals)
+                Game.SpawnTestingAnimals();
+            //initialize game time
+            GameTime = new GameTime(Console.Out);
+        }
 
         public void GameUpdateTimer_MainLoop(object sender, EventArgs e)
         {
@@ -315,6 +335,7 @@ namespace SanguineGenesis.GUI
             }catch(Exception e)
             {
                 MessageBox.Show("Failed to initialize window: "+e.Message);
+                MainMenuWindow.CanCreateGame = false;
                 Close();
             }
         }
@@ -384,14 +405,6 @@ namespace SanguineGenesis.GUI
             GameTime.PrintTime("Graphics tick length");
             GameTime.PrintFPS();
             GameTime.Delimiter();
-        }
-
-        /// <summary>
-        /// Ends the thread with Game when the window closes.
-        /// </summary>
-        private void MainWinformWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            Game.GameEnded = true;
         }
 
         /// <summary>
@@ -548,6 +561,28 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Disables this window and enables main menu window.
+        /// </summary>
+        private void MainWinformWindow_Closing(object sender, FormClosingEventArgs e)
+        {
+            //reset this window
+            Game.GameEnded = true;
+            HideVictoryPanel();
+            Game.Winner = null;
+            VictoryPanel.AlreadyShown = false;
+            ControlGroupButtonArray.Reset();
+            CloseMenu();
+            //don't close this window
+            e.Cancel = true;
+            //hide this window
+            Enabled = false;
+            Visible = false;
+            //show main menu window
+            MainMenuWindow.Enabled = true;
+            MainMenuWindow.Visible = true;
+        }
+
         #endregion event handlers
 
         #region Utility methods for manipulating controls
@@ -686,6 +721,7 @@ namespace SanguineGenesis.GUI
             EnableGameControls();
 
             //hide menu
+            GameOptionsMenu.Visible = false;
             GameMenu.Visible = false;
         }
         
@@ -739,16 +775,6 @@ namespace SanguineGenesis.GUI
 
         private void GameWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
-            // openGLControl is directly referenced by GCHandle, event handlers have to be removed
-            // to avoid memory leak
-            openGLControl.PreviewKeyDown -= OpenGLControl_PreviewKeyDown;
-            openGLControl.OpenGLDraw -= new SharpGL.RenderEventHandler(this.Draw);
-            openGLControl.KeyDown -= new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyDown);
-            openGLControl.KeyUp -= new System.Windows.Forms.KeyEventHandler(this.MainWinformWindow_KeyUp);
-            openGLControl.MouseDown -= new System.Windows.Forms.MouseEventHandler(this.MouseButtonDownHandler);
-            openGLControl.MouseMove -= new System.Windows.Forms.MouseEventHandler(this.MouseMoveHandler);
-            openGLControl.MouseUp -= new System.Windows.Forms.MouseEventHandler(this.MouseButtonUpHandler);
-            GameUpdateTimer.Tick -= GameUpdateTimer_MainLoop;
             try
             {
                 OpenGLAtlasDrawer.Destruct(openGLControl.OpenGL);
