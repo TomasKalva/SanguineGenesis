@@ -31,10 +31,15 @@ namespace SanguineGenesis.GUI
         /// Describes customizable parts of the game.
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
+        /// <summary>
+        /// True if the window was initialized.
+        /// </summary>
+        public bool Initialized { get; set; }
 
         public GameWindow(Icons icons, MainMenuWindow mainMenuWindow)
         {
             InitializeComponent();
+            Initialized = false;
 
             //initialize MainMenuWindow
             MainMenuWindow = mainMenuWindow;
@@ -76,6 +81,15 @@ namespace SanguineGenesis.GUI
 
         public void StartNewGame(MapDescription mapDescription, Biome playersBiome, bool testAnimals)
         {
+            if (Initialized)
+            {
+                //reset window state
+                Game.Winner = null;
+                VictoryPanel.AlreadyShown = false;
+                ControlGroupButtonArray.Reset();
+                CloseMenu();
+                GameUpdateTimer.Enabled = false;
+            }
             //initialize game
             Game = new Game(mapDescription, playersBiome, GameplayOptions);
             //reset game controls
@@ -85,6 +99,7 @@ namespace SanguineGenesis.GUI
                 Game.SpawnTestingAnimals();
             //initialize game time
             GameTime = new GameTime(Console.Out);
+            GameUpdateTimer.Enabled = true;
         }
 
         public void GameUpdateTimer_MainLoop(object sender, EventArgs e)
@@ -240,6 +255,8 @@ namespace SanguineGenesis.GUI
             VictoryPanel.Visible = false;
             GameOptionsMenu.Visible = false;
             GameMenu.Visible = false;
+
+            Initialized = true;
         }
 
         /// <summary>
@@ -348,6 +365,9 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void Draw(object sender, RenderEventArgs args)
         {
+            if (!Enabled)
+                return;
+
             OpenGL gl = openGLControl.OpenGL;
 
             //set correct extents of the window to game controls
@@ -566,13 +586,8 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void MainWinformWindow_Closing(object sender, FormClosingEventArgs e)
         {
-            //reset this window
             Game.GameEnded = true;
-            HideVictoryPanel();
-            Game.Winner = null;
-            VictoryPanel.AlreadyShown = false;
-            ControlGroupButtonArray.Reset();
-            CloseMenu();
+            GameUpdateTimer.Enabled = false;
             //don't close this window
             e.Cancel = true;
             //hide this window
