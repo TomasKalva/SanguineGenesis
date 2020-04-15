@@ -60,6 +60,10 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public Rect UnitCircleYellow { get; }
         /// <summary>
+        /// Position of white unit circle in the atlas.
+        /// </summary>
+        public Rect UnitCircleWhite { get; }
+        /// <summary>
         /// Position of transparent square in the atlas.
         /// </summary>
         public Rect UnitsSelector { get; }
@@ -100,6 +104,7 @@ namespace SanguineGenesis.GUI
             UnitCircleRed = ToRelative(GridToCoordinates(2, 19, 2, 2));
             UnitCircleBlue = ToRelative(GridToCoordinates(4, 19, 2, 2));
             UnitCircleYellow = ToRelative(GridToCoordinates(6, 19, 2, 2));
+            UnitCircleWhite = ToRelative(GridToCoordinates(8, 19, 2, 2));
 
             UnitsSelector = ToRelative(GridToCoordinates(3, 0, 1, 1));
 

@@ -59,7 +59,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Select buildings in area on map.
         /// </summary>
-        public static IEnumerable<Building> SelectBuildingInArea(Map map, Rect area)
+        public static IEnumerable<Building> SelectBuildingsInArea(Map map, Rect area)
         {
             var nearbyNodes = SelectNodes(
                        map, (int)area.Left - 1, (int)area.Bottom - 1, (int)area.Right + 1, (int)area.Top + 1);
@@ -80,7 +80,7 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Select the rectangle of squares T given by the coordinates.
+        /// Select the rectangle of squares T given by the coordinates. Coordinates can be out of range of the map.
         /// </summary>
         public static T[,] SelectPartOfMap<T>(IMap<T> map, int left, int bottom, int right, int top)
         {

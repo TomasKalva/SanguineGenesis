@@ -635,6 +635,12 @@ namespace SanguineGenesis.GUI
                                 atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleGray;
                                 break;
                         }
+                        //fill animals that are state change locked with white color
+                        if (current is Animal a &&
+                            a.StateChangeLock != null)
+                        {
+                            atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleWhite;
+                        }
                     }
                     else
                     {
