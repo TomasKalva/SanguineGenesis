@@ -22,7 +22,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Maximum width of the map.
         /// </summary>
-        private const int MAX_MAP_WIDTH = 100;
+        private const int MAX_MAP_WIDTH = 80;
         /// <summary>
         /// Minimum height of the map.
         /// </summary>
@@ -30,7 +30,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Maximum height of the map.
         /// </summary>
-        private const int MAX_MAP_HEIGHT = 100;
+        private const int MAX_MAP_HEIGHT = 80;
         /// <summary>
         /// How many times bigger is the drawing of the map than the map itself.
         /// </summary>

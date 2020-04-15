@@ -36,7 +36,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Dictionary of all players.
         /// </summary>
-        public Dictionary<FactionType,Player> Players { get; }
+        public Dictionary<FactionType, Player> Players { get; }
         /// <summary>
         /// Player controlled by the user.
         /// </summary>
@@ -53,6 +53,10 @@ namespace SanguineGenesis.GameLogic
         /// Describes customizable parts of the game.
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
+        /// <summary>
+        /// True if the first visibility map was taken from visibility generator this game.
+        /// </summary>
+        private bool FirstVisibilityTaken { get; set; }
 
         public Game(MapDescription mapDescription, Biome firstPlayersBiome, GameplayOptions gameplayOptions)
         {
@@ -76,10 +80,11 @@ namespace SanguineGenesis.GameLogic
             foreach(var kvp in Players)
                 kvp.Value.InitializeMapView(Map);
 
-            collisions = Collisions.GetCollisions();
+            collisions = new Collisions();
             MovementGenerator.GetMovementGenerator().Reset();
             nextVisibilityPlayer = FactionType.PLAYER0;
             GameplayOptions = gameplayOptions;
+            FirstVisibilityTaken = false;
         }
 
         /// <summary>
@@ -235,8 +240,12 @@ namespace SanguineGenesis.GameLogic
 
                 //update current player's visibility map
                 var newMap = visibilityGenerator.VisibilityMap;
-                if (newMap != null)
+                if (newMap != null && FirstVisibilityTaken)
                     Players[current].SetVisibilityMap(newMap, allBuildings);
+
+                //visibility map was taken
+                if (!FirstVisibilityTaken)
+                    FirstVisibilityTaken = true;
 
                 //generated visibility map for the other player
                 nextVisibilityPlayer = other;

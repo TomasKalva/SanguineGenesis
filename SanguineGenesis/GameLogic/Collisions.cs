@@ -19,8 +19,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public Dictionary<Movement, PushingMap> PushingMaps { get; }
 
-        public static Collisions GetCollisions() => new Collisions();
-        private Collisions()
+        public Collisions()
         {
             PushingMaps = new Dictionary<Movement, PushingMap>
             {
