@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SanguineGenesis.GameLogic.Maps
 {
     /// <summary>
-    /// Used for pushing animals out of terrain they can't walk on.
+    /// Used for pushing animals out of terrain they can't move in.
     /// </summary>
     class PushingMap : IMap<PushingSquare?>
     {
@@ -53,11 +53,16 @@ namespace SanguineGenesis.GameLogic.Maps
                 return new Vector2(0f, 0f);
 
             
-            float angle = pushingSquares[i, j].Value.GetDirection(position.X % 1, position.Y % 1);
-            return new Vector2(
-                (float)Math.Cos(angle) * speed,
-                (float)Math.Sin(angle) * speed
-                );
+            float? angle = pushingSquares[i, j].Value.GetDirection(position.X % 1, position.Y % 1);
+            if (angle != null)
+                //map pushes in the angle direction
+                return new Vector2(
+                    (float)Math.Cos(angle.Value) * speed,
+                    (float)Math.Sin(angle.Value) * speed
+                    );
+            else
+                //map doesn't push
+                return new Vector2(0, 0);
         }
     }
 
@@ -67,11 +72,11 @@ namespace SanguineGenesis.GameLogic.Maps
     /// </summary>
     public struct PushingSquare
     {
-        public float Dir_11 { get; }/*top left*/    public float Dir_12 { get; }/*top right*/
-        public float Dir_21 { get; }/*bottom left*/ public float Dir_22 { get; }/*bottom right*/
+        public float? Dir_11 { get; }/*top left*/    public float? Dir_12 { get; }/*top right*/
+        public float? Dir_21 { get; }/*bottom left*/ public float? Dir_22 { get; }/*bottom right*/
 
-        public PushingSquare(float dir_11, float dir_12,
-                            float dir_21, float dir_22)
+        public PushingSquare(float? dir_11, float? dir_12,
+                            float? dir_21, float? dir_22)
         {
             this.Dir_11 = dir_11;
             this.Dir_12 = dir_12;
@@ -83,7 +88,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// Returns direction, in which the animal should move. x and y represent position in square.
         /// They have to be from interval [0,1].
         /// </summary>
-        public float GetDirection(float x, float y)
+        public float? GetDirection(float x, float y)
         {
             if (x < 0.5f)
                 if (y > 0.5f)

@@ -16,24 +16,23 @@ namespace SanguineGenesis.GameLogic.Maps
         /// For each possible 2x2 square arrangement of nodes where the bottom right is blocked contains
         /// angle where the animal should be pushed if its on the bottom right node.
         /// </summary>
-        private static readonly Dictionary<Pattern2x2, float> angleForPattern;
+        private static readonly Dictionary<Pattern2x2, float?> angleForPattern;
 
         static PushingMapGenerator()
         {
             //initialize the pattern dictionary with angles
-            angleForPattern = new Dictionary<Pattern2x2, float>();
+            angleForPattern = new Dictionary<Pattern2x2, float?>();
             float left= (float)(Math.PI);
             float leftUp = (float)(Math.PI) * 3 / 4f;
             float up = (float)(Math.PI) / 2f;
-            float rightDown = (float)(Math.PI) * 7 / 4f;
             
             Pattern2x2[] patterns = new Pattern2x2[8];
-            float[] angles = new float[8];
+            var angles = new float?[8];
 
             patterns[0] = new Pattern2x2(
                 true, true, 
                 true, true);
-            angles[0] = rightDown;
+            angles[0] = null;
 
             patterns[1] = new Pattern2x2(
                 true, true,
@@ -105,11 +104,13 @@ namespace SanguineGenesis.GameLogic.Maps
                             //the angle back left
                             //repeat for all 4 directions
                             float rotation = 0f;
-                            float[] directions = new float[4];
+                            var directions = new float?[4];
                             for (int k = 0; k < 4; k++)
                             {
                                 Pattern2x2 sub = pat.LeftUpSubpattern();
-                                directions[k] = angleForPattern[sub] - rotation;
+                                directions[k] = angleForPattern[sub];
+                                if(directions[k].HasValue)
+                                    directions[k] = angleForPattern[sub].Value - rotation;
                                 pat = pat.RotateRight();
                                 rotation += (float)((Math.PI) * 3 / 2f);
                             }

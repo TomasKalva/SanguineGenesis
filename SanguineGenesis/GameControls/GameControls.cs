@@ -169,9 +169,12 @@ namespace SanguineGenesis.GameControls
 
             if (enemy == null)
             {
-                //no enemy selected => move to the movement target that is at clicked coordinates
+                //no enemy selected => move to the movement target building that is at clicked coordinates
                 var moveToAbility = game.CurrentPlayer.GameStaticData.Abilities.UnbreakableMoveTo;
                 ITargetable movementTarget = FindAbilityTarget(game, moveToAbility, SelectionInput.TargetCoordinates);
+                //if there is no building at clicked coordinates, move to the coordinates
+                if (!(movementTarget is Building))
+                    movementTarget = targetCoords;
                 moveToAbility.SetCommands(SelectedGroup.Entities
                     .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), movementTarget, resetQueue, ActionLog);
             }
