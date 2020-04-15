@@ -19,7 +19,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public Dictionary<Movement, PushingMap> PushingMaps { get; }
 
-        public Collisions()
+        public Collisions(Map map)
         {
             PushingMaps = new Dictionary<Movement, PushingMap>
             {
@@ -27,6 +27,7 @@ namespace SanguineGenesis.GameLogic
                 { Movement.WATER, null },
                 { Movement.LAND_WATER, null }
             };
+            HashAnimals = new HashedAnimals(map.Width, map.Height);
         }
 
         /// <summary>
@@ -35,7 +36,7 @@ namespace SanguineGenesis.GameLogic
         /// <param name="map"></param>
         public void UpdatePushingMaps(Map map)
         {
-            
+
             ObstacleMap groundObst = map.ObstacleMaps[Movement.LAND];
             ObstacleMap waterObst = map.ObstacleMaps[Movement.WATER];
             ObstacleMap bothObst = map.ObstacleMaps[Movement.LAND_WATER];
@@ -44,8 +45,13 @@ namespace SanguineGenesis.GameLogic
             PushingMap gwPMap = PushingMapGenerator.GeneratePushingMap(bothObst);
             PushingMaps[Movement.LAND] = gPMap;
             PushingMaps[Movement.WATER] = wPMap;
-            PushingMaps[Movement.LAND_WATER]= gwPMap;
+            PushingMaps[Movement.LAND_WATER] = gwPMap;
         }
+
+        /// <summary>
+        /// Data structure used in the method PushAway.
+        /// </summary>
+        private HashedAnimals HashAnimals { get; }
 
         /// <summary>
         /// Handles collisions between animals and entities. If animal gets pushed to blocked node,
@@ -55,10 +61,10 @@ namespace SanguineGenesis.GameLogic
         {
             Map map = game.Map;
             //create structure that hashes animals by their position
-            var hashedAnimals = HashAnimals(game.GetAll<Animal>(), game.Map.Width, game.Map.Height);
+            HashAnimals.Init(game.GetAll<Animal>());
             //set push maps so that colliding animals can be correctly pushed to not blocked squares
             SetPushMaps(map);
-            
+
             foreach (Animal a in game.GetAll<Animal>())
             {
                 //animals that aren't physical don't need to check for collisions
@@ -66,7 +72,7 @@ namespace SanguineGenesis.GameLogic
                     continue;
 
                 //resolve collisions with other animals
-                foreach (Animal e in hashedAnimals.CloseAnimals(a.Position.X, a.Position.Y))
+                foreach (Animal e in HashAnimals.CloseAnimals(a.Position.X, a.Position.Y))
                 {
                     //calculate collisions for each pair of animals only once
                     if (a.GetHashCode() < e.GetHashCode())
@@ -75,13 +81,14 @@ namespace SanguineGenesis.GameLogic
                 //resolve collisions with nearby buildings
                 int animalX = (int)a.Position.X;
                 int animalY = (int)a.Position.Y;
-                foreach(Building b in GameQuerying
+                foreach (Building b in GameQuerying
                                         .SelectBuildingsInArea(map, new Rect(
                                             animalX - 1, animalY - 1, animalX + 1, animalY + 1)))
                 {
                     Push(a, b, map);
                 }
             }
+            HashAnimals.Reset();
         }
 
         /// <summary>
@@ -89,14 +96,32 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         private class HashedAnimals : IMap<List<Animal>>
         {
-            public List<Animal> this[int i, int j] => hashedAnimals[i,j];
+            public List<Animal> this[int i, int j] => hashedAnimals[i, j];
             private readonly List<Animal>[,] hashedAnimals;
+            //list of indexes in hashedAnimals that are initialized
+            private readonly List<Index> initialized;
             public int Width => hashedAnimals.GetLength(0);
             public int Height => hashedAnimals.GetLength(1);
+
+            /// <summary>
+            /// Index to hashedAnimals.
+            /// </summary>
+            private struct Index
+            {
+                public int I { get; }
+                public int J { get; }
+
+                public Index(int i, int j)
+                {
+                    this.I = i;
+                    this.J = j;
+                }
+            }
 
             public HashedAnimals(int width, int height)
             {
                 hashedAnimals = new List<Animal>[width, height];
+                initialized = new List<Index>();
             }
 
             /// <summary>
@@ -113,6 +138,30 @@ namespace SanguineGenesis.GameLogic
                 }
                 //hash the animal
                 hashedAnimals[ax, ay].Add(animal);
+                initialized.Add(new Index(ax, ay));
+            }
+
+            /// <summary>
+            /// Initializes map with animals hashed to their position.
+            /// </summary>
+            public void Init(IEnumerable<Animal> animals)
+            {
+                foreach (var a in animals)
+                {
+                    Add(a);
+                }
+            }
+
+            /// <summary>
+            /// Removes all animals from this map.
+            /// </summary>
+            public void Reset()
+            {
+                foreach (var index in initialized)
+                {
+                    hashedAnimals[index.I, index.J]?.Clear();
+                }
+                initialized.Clear();
             }
 
             /// <summary>
@@ -129,7 +178,7 @@ namespace SanguineGenesis.GameLogic
                 IEnumerable<Animal> closeAnimals = new List<Animal>().AsEnumerable();
                 foreach (var list in GameQuerying.SelectPartOfMap(this, left, bottom, right, top))
                 {
-                    //lists are null iff they contain no animals
+                    //if lists are null, they contain no animals
                     if (list != null)
                     {
                         closeAnimals = closeAnimals.Concat(list);
@@ -137,19 +186,6 @@ namespace SanguineGenesis.GameLogic
                 }
                 return closeAnimals;
             }
-        }
-
-        /// <summary>
-        /// Returns map with animals hashed to their position.
-        /// </summary>
-        private HashedAnimals HashAnimals(IEnumerable<Animal> animals, int width, int height)
-        {
-            var hashedAnimals = new HashedAnimals(width, height);
-            foreach (var a in animals)
-            {
-                hashedAnimals.Add(a);
-            }
-            return hashedAnimals;
         }
 
         private void Push(Animal a, Entity e, Map map)
@@ -313,9 +349,9 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public void MoveAnimals(Map map, IEnumerable<Animal> animals, float deltaT)
         {
-            foreach(Animal a in animals)
+            foreach (Animal a in animals)
             {
-                a.Move(map,deltaT);
+                a.Move(map, deltaT);
             }
         }
 
@@ -326,18 +362,18 @@ namespace SanguineGenesis.GameLogic
         public bool CollidesWithBuilding(Game game, Vector2 location, float r)
         {
             //check collisions with buildings
-            foreach (Building b in 
-                                GameQuerying.SelectBuildingsInArea(game.Map, new Rect((int)location.X - 1, 
+            foreach (Building b in
+                                GameQuerying.SelectBuildingsInArea(game.Map, new Rect((int)location.X - 1,
                                     (int)location.Y - 1, (int)location.X + 1, (int)location.Y + 1)))
             {
                 if (b.Physical &&
                     (b.Center - location).Length < b.Radius + r)
-                        return true;
+                    return true;
             }
 
             return false;
         }
-        
+
         /// <summary>
         /// True if physical entity with given location and radius collides with other
         /// physical units in the game.

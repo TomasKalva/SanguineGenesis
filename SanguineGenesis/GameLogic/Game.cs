@@ -80,7 +80,7 @@ namespace SanguineGenesis.GameLogic
             foreach(var kvp in Players)
                 kvp.Value.InitializeMapView(Map);
 
-            collisions = new Collisions();
+            collisions = new Collisions(Map);
             MovementGenerator.GetMovementGenerator().Reset();
             nextVisibilityPlayer = FactionType.PLAYER0;
             GameplayOptions = gameplayOptions;
