@@ -36,7 +36,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             AllStatusFactories.Add(PoisonFactory);
 
             //sprint
-            SprintFactory = new SprintFactory(speedBonus: 1f, energyPerS: 10f);
+            SprintFactory = new SprintFactory(speedBonus: 0.4f, energyPerS: 10f);
             AllStatusFactories.Add(SprintFactory);
 
             //consumed animal
