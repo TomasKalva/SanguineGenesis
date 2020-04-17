@@ -355,7 +355,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Returns true if the unit reached its destination or the MaxWaitingTime was reached.
+        /// Returns true if the animal reached its destination or the MaxWaitingTime was reached.
         /// </summary>
         public bool Step(float deltaT)
         {

@@ -463,6 +463,7 @@ namespace SanguineGenesis.GUI
                             gameWindow = new GameWindow(Icons, this);
                         gameWindow.Enabled = true;
                         gameWindow.StartNewGame(MapDescr, PlayersBiome, testAnimalsCB.Checked);
+                        gameWindow.BringToFront();
                         //hide this window
                         Enabled = false;
                         Visible = false;
@@ -1054,6 +1055,16 @@ namespace SanguineGenesis.GUI
             PLAYER_1_MAIN,
             ROCK,
             BIG_ROCK
+        }
+
+        private void MainMenuWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            //close the game window if it exists
+            if (gameWindow != null)
+            {
+                gameWindow.CloseWindow = true;
+                gameWindow.Close();
+            }
         }
     }
 }

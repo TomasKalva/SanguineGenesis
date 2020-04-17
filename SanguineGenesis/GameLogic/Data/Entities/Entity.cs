@@ -208,6 +208,18 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             CommandQueue.Clear();
         }
 
+        /// <summary>
+        /// Removes all statuses from this entity.
+        /// </summary>
+        public void ResetStatuses()
+        {
+            foreach(var s in Statuses)
+            {
+                s.Removed();
+            }
+            Statuses.Clear();
+        }
+
         #endregion Commands
 
         #region Statuses
@@ -285,6 +297,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             //reset commands - some commands might require entity to be unregistered (e.g. MoveTo)
             ResetCommands();
+            //reset statuses
+            ResetStatuses();
         }
 
         float ITargetable.DistanceTo(Entity entity)

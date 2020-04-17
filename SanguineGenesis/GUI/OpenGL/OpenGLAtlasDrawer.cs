@@ -29,15 +29,17 @@ namespace SanguineGenesis.GUI
     static class OpenGLAtlasDrawer
     {
         //the projection, view and model matrices.
-        static mat4 projectionMatrix;
+        private static mat4 projectionMatrix;
 
         //vertex shader attribute indices
-        const uint attributeIndexPosition = 0;
-        const uint attributeIndexUVCoord = 1;
-        const uint attributeIndexTexBL = 2;
+        private const uint attributeIndexPosition = 0;
+        private const uint attributeIndexUVCoord = 1;
+        private const uint attributeIndexTexBL = 2;
         
         //the shader program for the vertex and fragment shader
         static private ShaderProgram shaderProgram;
+
+        static private uint[] textureIds;
 
         #region Initialization
 
@@ -116,7 +118,8 @@ namespace SanguineGenesis.GUI
             textureImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
             //generate id for the texture and then bind the image with this id
-            uint[] textureIds = new uint[1];
+            //uint[] textureIds = new uint[1];
+            textureIds = new uint[1];
             gl.GenTextures(1, textureIds);
             gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[0]);
             gl.TexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, textureImage.Width, textureImage.Height, 0, OpenGL.GL_BGRA, OpenGL.GL_UNSIGNED_BYTE,
@@ -140,7 +143,9 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public static void Destruct(OpenGL gl) 
         {
+            //delete shader program
             shaderProgram.Delete(gl);
+            //delete VAOs
             map.Dispose(gl);
             flowField.Dispose(gl);
             nutrientsMap.Dispose(gl);
@@ -148,6 +153,9 @@ namespace SanguineGenesis.GUI
             entities.Dispose(gl);
             entityIndicators.Dispose(gl);
             selectionFrame.Dispose(gl);
+            //delete textures
+            if(textureIds!=null)
+                gl.DeleteTextures(textureIds.Length, textureIds);
         }
 
         /// <summary>

@@ -138,7 +138,8 @@ namespace SanguineGenesis.GameLogic
         {
             //remove player's dead entities
             List<Entity> deadEntities = new List<Entity>();
-            foreach (Entity e in GetAll<Entity>())
+            foreach (Entity e in GetAll<Entity>()
+                .ToList())//new entities can be added to the list
             {
                 if (e.IsDead)
                 {
@@ -215,7 +216,7 @@ namespace SanguineGenesis.GameLogic
             int pos = 0;
             foreach (AnimalFactory a in factories.Select(kvp => kvp.Value))
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < 7; j++)
                 {
                     var animal = a.NewInstance(this, new Vector2(step * ((pos % gridPoints) + 1),
                                                                  step * ((pos / gridPoints) + 1)));

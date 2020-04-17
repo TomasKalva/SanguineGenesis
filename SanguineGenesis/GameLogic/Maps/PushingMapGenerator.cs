@@ -67,7 +67,7 @@ namespace SanguineGenesis.GameLogic.Maps
             patterns[7] = new Pattern2x2(
                 true, false,
                 false, true);
-            angles[7] = leftUp;
+            angles[7] = left;
 
             for(int i=0;i<8;i++)
                 angleForPattern.Add(patterns[i], angles[i]);

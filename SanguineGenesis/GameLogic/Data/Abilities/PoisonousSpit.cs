@@ -30,7 +30,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The unit applies poison to the target after short period of time.";
+            return $"The unit applies poison to the target after short period of time. Poison deals {PoisonFactory.TickDamage} each {PoisonFactory.TickTime}s {PoisonFactory.TotalNumberOfTicks} times.";
         }
     }
 
@@ -48,7 +48,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 //apply poison to the target and finish the command
-                Ability.PoisonFactory.ApplyToAffected(Target);
+                if (!Ability.PoisonFactory.ApplyToStatusOwner(Target))
+                {
+                    Refund();
+                }
                 return true;
             }
 

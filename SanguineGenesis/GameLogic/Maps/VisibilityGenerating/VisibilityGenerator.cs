@@ -87,13 +87,11 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
         /// Set parameters for creating the visibility map. Does nothing if the current
         /// task is not done yet.
         /// </summary>
-        public void SetNewTask(/*ObstacleMap obstMap, List<View> unitViews*/IVisibilityGeneratingTask task)
+        public void SetNewTask(IVisibilityGeneratingTask task)
         {
             lock(this)
                 if (newTask) return;
 
-            //this.obstMap = obstMap;
-            //this.views = unitViews;
             this.task = task;
             lock (this)
             {

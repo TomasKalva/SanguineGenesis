@@ -10,6 +10,7 @@ using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 
 namespace SanguineGenesis.GameLogic.Maps
 {
@@ -76,14 +77,17 @@ namespace SanguineGenesis.GameLogic.Maps
         }
 
         /// <summary>
-        /// Updates ObstacleMaps. Should be called only when the map chaneges.
+        /// Updates ObstacleMaps. Should be called only when the map chaneges. Locks movement generator.
         /// </summary>
         public void UpdateObstacleMaps()
         {
-            ObstacleMaps[Movement.LAND] = GetObstacleMap(Movement.LAND);
-            ObstacleMaps[Movement.WATER] = GetObstacleMap(Movement.WATER);
-            ObstacleMaps[Movement.LAND_WATER] = GetObstacleMap(Movement.LAND_WATER);
-            MapWasChanged = false;
+            lock (MovementGenerator.GetMovementGenerator())
+            {
+                ObstacleMaps[Movement.LAND] = GetObstacleMap(Movement.LAND);
+                ObstacleMaps[Movement.WATER] = GetObstacleMap(Movement.WATER);
+                ObstacleMaps[Movement.LAND_WATER] = GetObstacleMap(Movement.LAND_WATER);
+                MapWasChanged = false;
+            }
         }
 
         /// <summary>

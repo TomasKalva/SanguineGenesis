@@ -604,6 +604,7 @@
             this.MaximizeBox = false;
             this.Name = "MainMenuWindow";
             this.Text = "Sanguine Genesis";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainMenuWindow_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

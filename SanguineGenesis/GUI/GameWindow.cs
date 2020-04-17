@@ -35,11 +35,16 @@ namespace SanguineGenesis.GUI
         /// True if the window was initialized.
         /// </summary>
         public bool Initialized { get; set; }
+        /// <summary>
+        /// True if the window should be closed.
+        /// </summary>
+        public bool CloseWindow { get; set; }
 
         public GameWindow(Icons icons, MainMenuWindow mainMenuWindow)
         {
             InitializeComponent();
             Initialized = false;
+            CloseWindow = false;
 
             //initialize MainMenuWindow
             MainMenuWindow = mainMenuWindow;
@@ -588,14 +593,18 @@ namespace SanguineGenesis.GUI
         {
             Game.GameEnded = true;
             GameUpdateTimer.Enabled = false;
-            //don't close this window
-            e.Cancel = true;
-            //hide this window
-            Enabled = false;
-            Visible = false;
-            //show main menu window
-            MainMenuWindow.Enabled = true;
-            MainMenuWindow.Visible = true;
+            if (!CloseWindow)
+            {
+                //don't close this window
+                e.Cancel = true;
+                //hide this window
+                Enabled = false;
+                Visible = false;
+                //show main menu window
+                MainMenuWindow.Enabled = true;
+                MainMenuWindow.Visible = true;
+                MainMenuWindow.BringToFront();
+            }
         }
 
         #endregion event handlers

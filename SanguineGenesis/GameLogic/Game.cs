@@ -272,13 +272,18 @@ namespace SanguineGenesis.GameLogic
             foreach (var kvp in Players)
             {
                 Player p = kvp.Value;
-                //if map changed, set new obstacle maps to mg and make it re-generate all
+                //if map changed, set new obstacle maps to mg and make it regenerate all
                 //movement maps
                 if (p.MapChanged)
                 {
-                    p.VisibleMap.UpdateObstacleMaps();
-                    mg.SetMapChanged(kvp.Key, p.VisibleMap.ObstacleMaps);
-                    p.VisibleMap.MapWasChanged = false;
+                    lock (mg) 
+                    { 
+                        //update visible obstacle maps
+                        p.VisibleMap.UpdateObstacleMaps();
+                        //tell movement generator that obstacle maps changed
+                        mg.SetMapChanged(kvp.Key, p.VisibleMap.ObstacleMaps);
+                        p.VisibleMap.MapWasChanged = false;
+                    }
                 }
             }
 
