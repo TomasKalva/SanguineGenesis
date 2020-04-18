@@ -35,6 +35,10 @@ namespace SanguineGenesis.GameLogic.Maps
         /// Obstacle maps for the current map. Is updated by the UpdateObstacleMaps.
         /// </summary>
         public Dictionary<Movement, ObstacleMap> ObstacleMaps { get; }
+        /// <summary>
+        /// Visibility obstacles for the current map. Is updated by UpdateVisibilityObstacleMap.
+        /// </summary>
+        public ObstacleMap VisibilityObstacles { get; }
 
         internal Map(Node[,] nodes)
         {
@@ -44,6 +48,7 @@ namespace SanguineGenesis.GameLogic.Maps
             MovementGenerating.MovementGenerator mg = MovementGenerating.MovementGenerator.GetMovementGenerator();
             mg.SetMapChanged(FactionType.PLAYER0, ObstacleMaps);
             mg.SetMapChanged(FactionType.PLAYER1, ObstacleMaps);
+            VisibilityObstacles = new ObstacleMap(Width, Height);
         }
 
         /// <summary>
@@ -64,16 +69,19 @@ namespace SanguineGenesis.GameLogic.Maps
             }
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
             InitializeObstacleMaps();
+            VisibilityObstacles = new ObstacleMap(Width, Height);
         }
-        
+
+        #region Obstacle maps
+
         /// <summary>
         /// Initializes obstacle maps with values based on the map terrain.
         /// </summary>
         private void InitializeObstacleMaps()
         {
-            ObstacleMaps.Add(Movement.LAND, GetObstacleMap(Movement.LAND));
-            ObstacleMaps.Add(Movement.WATER, GetObstacleMap(Movement.WATER));
-            ObstacleMaps.Add(Movement.LAND_WATER, GetObstacleMap(Movement.LAND_WATER));
+            ObstacleMaps.Add(Movement.LAND, new ObstacleMap(Width, Height));
+            ObstacleMaps.Add(Movement.WATER, new ObstacleMap(Width, Height));
+            ObstacleMaps.Add(Movement.LAND_WATER, new ObstacleMap(Width, Height));
         }
 
         /// <summary>
@@ -83,19 +91,39 @@ namespace SanguineGenesis.GameLogic.Maps
         {
             lock (MovementGenerator.GetMovementGenerator())
             {
-                ObstacleMaps[Movement.LAND] = GetObstacleMap(Movement.LAND);
-                ObstacleMaps[Movement.WATER] = GetObstacleMap(Movement.WATER);
-                ObstacleMaps[Movement.LAND_WATER] = GetObstacleMap(Movement.LAND_WATER);
+                UpdateObstacleMap(Movement.LAND);
+                UpdateObstacleMap(Movement.WATER);
+                UpdateObstacleMap(Movement.LAND_WATER);
                 MapWasChanged = false;
             }
         }
 
         /// <summary>
-        /// Creates a new obstacle map from this Map for movement.
+        /// Updates VisibilityObstacles.
         /// </summary>
-        public ObstacleMap GetObstacleMap(Movement movement)
+        public void UpdateVisibilityObstacleMap()
         {
-            ObstacleMap om = new ObstacleMap(Width,Height);
+            for (int i = 0; i < Width; i++)
+                for (int j = 0; j < Height; j++)
+                    //player can't see through buildings that block vision
+                    VisibilityObstacles[i, j] = this[i, j].Building != null && this[i, j].Building.BlocksVision;
+        }
+
+        /// <summary>
+        /// Updates the obstacle map from this Map for movement.
+        /// </summary>
+        public void UpdateObstacleMap(Movement movement)
+        {
+            ObstacleMaps.TryGetValue(movement, out ObstacleMap obstMap);
+            //check if the map exists, if it doesn't exist, create a new one
+            if (obstMap==null ||
+                obstMap.Width != Width ||
+                obstMap.Height != Height)
+            {
+                ObstacleMaps[movement] = new ObstacleMap(Width, Height);
+                obstMap = ObstacleMaps[movement];
+            }
+
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
                 {
@@ -103,35 +131,24 @@ namespace SanguineGenesis.GameLogic.Maps
                     switch (movement)
                     {
                         case Movement.LAND:
-                            om[i, j] = ter == Terrain.DEEP_WATER ||
+                            obstMap[i, j] = ter == Terrain.DEEP_WATER ||
                                         this[i,j].MovementBlocked;
                             break;
                         case Movement.WATER:
-                            om[i, j] = (ter != Terrain.DEEP_WATER &&
+                            obstMap[i, j] = (ter != Terrain.DEEP_WATER &&
                                         ter != Terrain.SHALLOW_WATER) ||
                                         this[i,j].MovementBlocked;
                             break;
                         case Movement.LAND_WATER:
-                            om[i, j] = this[i,j].MovementBlocked;
+                            obstMap[i, j] = this[i,j].MovementBlocked;
                             break;
                     }
                 }
-            return om;
         }
 
-        /// <summary>
-        /// Returns obstacles map where the obstacles block vision.
-        /// </summary>
-        public ObstacleMap GetViewObstaclesMap()
-        {
-            ObstacleMap om = new ObstacleMap(Width, Height);
-            for (int i = 0; i < Width; i++)
-                for (int j = 0; j < Height; j++)
-                    //player can't see through buildings that block vision
-                    om[i, j] = this[i, j].Building!=null && this[i, j].Building.BlocksVision;
-            return om;
-        }
+        #endregion Obstacle maps
 
+        #region Buildings
         /// <summary>
         /// Returns true if the building can be placed on the coordinates of this map.
         /// </summary>
@@ -227,6 +244,10 @@ namespace SanguineGenesis.GameLogic.Maps
             MapWasChanged = true;
         }
 
+        #endregion Buildings
+
+        #region Nutrients and biomes
+
         /// <summary>
         /// Time between two updates of nutrients.
         /// </summary>
@@ -281,11 +302,11 @@ namespace SanguineGenesis.GameLogic.Maps
         }
 
         /// <summary>
-        /// Spread biomes to neighbour nodes.
+        /// Spread biomes to neighbor nodes.
         /// </summary>
         public void SpreadBiomes()
         {
-            //spread biome to neighbours
+            //spread biome to neighbors
             Biome[,] newBiomes = new Biome[Width, Height];
             Node[] neighbours = new Node[4];
             for (int i = 0; i < Width; i++)
@@ -299,7 +320,7 @@ namespace SanguineGenesis.GameLogic.Maps
                         continue;
                     }
 
-                    //initialize neighbours
+                    //initialize neighbors
                     neighbours[0] = this[i + 1, j];
                     neighbours[1] = this[i - 1, j];
                     neighbours[2] = this[i, j + 1];
@@ -315,10 +336,6 @@ namespace SanguineGenesis.GameLogic.Maps
 
                     //building standing on this node
                     var building = this[i, j].Building;
-                    /*Player builPl = null;
-                    if(building != null)
-                        builPl = building.Faction as Player;
-                        */
                     if (this[i, j].ActiveNutrients >= this[i,j].Terrain.Nutrients(Biome.SAVANNA, SoilQuality.LOW))
                     {
                         //node has enough nutrients to become savanna
@@ -358,5 +375,6 @@ namespace SanguineGenesis.GameLogic.Maps
                 }
 
         }
+        #endregion Nutrients and biomes
     }
 }
