@@ -82,6 +82,9 @@ namespace SanguineGenesis.GameLogic.Maps
             ObstacleMaps.Add(Movement.LAND, new ObstacleMap(Width, Height));
             ObstacleMaps.Add(Movement.WATER, new ObstacleMap(Width, Height));
             ObstacleMaps.Add(Movement.LAND_WATER, new ObstacleMap(Width, Height));
+            UpdateObstacleMap(Movement.LAND);
+            UpdateObstacleMap(Movement.WATER);
+            UpdateObstacleMap(Movement.LAND_WATER);
         }
 
         /// <summary>
