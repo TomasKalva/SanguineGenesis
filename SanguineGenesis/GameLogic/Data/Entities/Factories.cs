@@ -165,8 +165,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                             case "knockBack":
                                 factory.Abilities.Add(abilities.KnockBack);
                                 break;
-                            case "climbTree":
-                                factory.Abilities.Add(abilities.ClimbTree);
+                            case "climbPlant":
+                                factory.Abilities.Add(abilities.ClimbPlant);
                                 break;
                             case "enterHole":
                                 factory.Abilities.Add(abilities.EnterHole);
@@ -209,14 +209,14 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     }
 
     /// <summary>
-    /// Loads and stores factories of the type TreeFactory.
+    /// Loads and stores factories of the type PlantFactory.
     /// </summary>
-    class TreeFactories : Factories<TreeFactory>
+    class PlantFactories : Factories<PlantFactory>
     {
         public override void AddNewFactory(string description, Statuses.Statuses statuses)
         {
             string[] fields = description.Split(',');
-            string treeType = fields[0];
+            string plantType = fields[0];
             float maxHealth=float.Parse(fields[1], CultureInfo.InvariantCulture);
             float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture);
             float energyRegen = float.Parse(fields[3], CultureInfo.InvariantCulture);
@@ -234,10 +234,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             float viewRange = float.Parse(fields[16], CultureInfo.InvariantCulture);
             bool blocksVision = fields[17] == "yes";
 
-            TreeFactory newFactory = new TreeFactory(treeType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
+            PlantFactory newFactory = new PlantFactory(plantType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
                 biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, rootsDistance, air, statusFactories);
-            Factorys.Add(treeType, newFactory);
-            abilitiesList.Add(treeType, fields[11]);
+            Factorys.Add(plantType, newFactory);
+            abilitiesList.Add(plantType, fields[11]);
         }
     }
 

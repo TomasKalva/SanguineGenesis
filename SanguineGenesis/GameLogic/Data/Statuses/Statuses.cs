@@ -17,7 +17,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public PoisonFactory PoisonFactory { get; }
         public SprintFactory SprintFactory { get; }
         public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
-        public AnimalsOnTreeFactory AnimalsOnTreeFactory { get; }
+        public AnimalsOnTreeFactory AnimalsOnPlantFactory { get; }
         public UndergroundFactory UndergroundFactory { get; }
         public ShellFactory ShellFactory { get; }
         public FastStrikesFactory FastStrikesFactory { get; }
@@ -43,9 +43,9 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             ConsumedAnimalFactory = new ConsumedAnimalFactory(3f);
             AllStatusFactories.Add(ConsumedAnimalFactory);
 
-            //animals on tree
-            AnimalsOnTreeFactory = new AnimalsOnTreeFactory();
-            AllStatusFactories.Add(AnimalsOnTreeFactory);
+            //animals on plant
+            AnimalsOnPlantFactory = new AnimalsOnTreeFactory();
+            AllStatusFactories.Add(AnimalsOnPlantFactory);
 
             //underground
             UndergroundFactory = new UndergroundFactory();

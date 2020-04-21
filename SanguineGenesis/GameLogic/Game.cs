@@ -127,8 +127,8 @@ namespace SanguineGenesis.GameLogic
             foreach (var kvp in Players)
                 kvp.Value.CalulateAir();
 
-            //generate and drain nutrients by trees
-            Map.UpdateNutrientsMap(GetAll<Tree>(), deltaT);
+            //generate and drain nutrients by plants
+            Map.UpdateNutrientsMap(GetAll<Plant>(), deltaT);
 
             gameTime.PrintTime("Others");
 

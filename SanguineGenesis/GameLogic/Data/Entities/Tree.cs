@@ -10,7 +10,7 @@ using SanguineGenesis.GUI.WinFormsComponents;
 
 namespace SanguineGenesis.GameLogic.Data.Entities
 {
-    class Tree:Building, IHerbivoreFood
+    class Plant:Building, IHerbivoreFood
     {
         /// <summary>
         /// Maximum energy taken from one source per second.
@@ -27,9 +27,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public int Air { get; }
 
 
-        public Tree(Faction faction, string treeType, Node[,] nodes, Node[,] rootNodes, int rootDistance, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
+        public Plant(Faction faction, string plantType, Node[,] nodes, Node[,] rootNodes, int rootDistance, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
             bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, bool blocksVision, int air, List<Ability> abilities)
-            : base(faction, treeType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, abilities)
+            : base(faction, plantType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, abilities)
         {
             MaxEnergyIntake = maxEnergyIntake;
             RootNodes = rootNodes;
@@ -49,7 +49,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         #endregion IFood
 
         /// <summary>
-        /// Called after this entity dies. Creates a structure representing dead tree.
+        /// Called after this entity dies. Creates a structure representing dead plant.
         /// </summary>
         public override void Die(Game game)
         {
@@ -61,19 +61,19 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 n.Roots.Remove(this);
             }
 
-            //after physical tree dies and has energy left, spawn a dead tree
-            //don't spawn structures for dead trees from neutral faction
+            //after physical plant dies and has energy left, spawn a dead plant
+            //don't spawn structures for dead plants from neutral faction
             if(Physical && Energy > 0 && Faction.FactionID!=game.NeutralFaction.FactionID)
             {
                 var neutralFaction = game.NeutralFaction;
-                Structure deadTree = new Structure(neutralFaction, "DEAD_TREE", Nodes, Energy, Energy, Size,
+                Structure deadPlant = new Structure(neutralFaction, "DEAD_TREE", Nodes, Energy, Energy, Size,
                     Physical, Biome, Terrain, SoilQuality.BAD, false, 0, 0, true, new List<Ability>())
                 {
                     Energy = Energy
                 };
-                neutralFaction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(deadTree);
-                neutralFaction.AddEntity(deadTree);
-                game.Map.AddBuilding(deadTree);
+                neutralFaction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(deadPlant);
+                neutralFaction.AddEntity(deadPlant);
+                game.Map.AddBuilding(deadPlant);
             }
         }
 

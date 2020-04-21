@@ -304,16 +304,16 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     }
 
     /// <summary>
-    /// Represents animal on tree.
+    /// Represents animal on plant.
     /// </summary>
-    class AnimalsOnTree : Status<Tree, AnimalsOnTreeFactory>, IAnimalStateManipulator
+    class AnimalsOnTree : Status<Plant, AnimalsOnTreeFactory>, IAnimalStateManipulator
     {
         public List<Animal> Animals { get; }
 
-        public AnimalsOnTree(Tree affected, AnimalsOnTreeFactory animalsOnTreenfo, Animal putOnTree)
-            : base(affected, animalsOnTreenfo)
+        public AnimalsOnTree(Plant affected, AnimalsOnTreeFactory animalsOnTreeInfo, Animal putOnPlant)
+            : base(affected, animalsOnTreeInfo)
         {
-            Animals = new List<Animal>(1) { putOnTree };
+            Animals = new List<Animal>(1) { putOnPlant };
         }
 
         public override void Added()

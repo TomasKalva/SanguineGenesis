@@ -59,9 +59,9 @@ namespace SanguineGenesis.GameLogic.AI
         private float DecisionPeriod { get; }
         public ActionLog ActionLog { get; }
         /// <summary>
-        /// Trees with corresponding ability to be used next.
+        /// Plants with corresponding ability to be used next.
         /// </summary>
-        private Dictionary<Tree, BuildBuilding> ToBuildNext { get; }
+        private Dictionary<Plant, BuildBuilding> ToBuildNext { get; }
         /// <summary>
         /// Buildings with corresponding ability to be used next.
         /// </summary>
@@ -73,7 +73,7 @@ namespace SanguineGenesis.GameLogic.AI
             DecisionPeriod = decisionPeriod;
             TimeUntilDecision = DecisionPeriod;
             ActionLog = new ActionLog(20);
-            ToBuildNext = new Dictionary<Tree, BuildBuilding>();
+            ToBuildNext = new Dictionary<Plant, BuildBuilding>();
             ToCreateAnimalNext = new Dictionary<Building, CreateAnimal>();
         }
 
@@ -155,10 +155,10 @@ namespace SanguineGenesis.GameLogic.AI
         /// </summary>
         public void PlaceBuildings(Map map)
         {
-            var trees = ControlledPlayer.GetAll<Tree>();
+            var plants = ControlledPlayer.GetAll<Plant>();
 
             //only do it for 3 buildings so that the ai doesn't perform too many actions per second
-            foreach (Tree b in trees.ToList().ToRandomizedList().Take(3))
+            foreach (Plant b in plants.ToList().ToRandomizedList().Take(3))
             {
                 PlaceBuildings(b, map);
             }
@@ -167,7 +167,7 @@ namespace SanguineGenesis.GameLogic.AI
         /// <summary>
         /// Set BuildBuilding command to caster.
         /// </summary>
-        private void PlaceBuildings(Tree caster, Map map)
+        private void PlaceBuildings(Plant caster, Map map)
         {
             //add caster to ToBuildNext if it isn't there yet, set its next ability
             if (!ToBuildNext.ContainsKey(caster))
@@ -189,7 +189,7 @@ namespace SanguineGenesis.GameLogic.AI
                     if(map.BuildingCanBePlaced(ability.BuildingFactory, n.X, n.Y))
                     {
                         //cast ability
-                        ability.SetCommands(new List<Tree>() { caster }, n, false, ActionLog);
+                        ability.SetCommands(new List<Plant>() { caster }, n, false, ActionLog);
 
                         //select ability to use next by caster from all of its BuildBuilding abilities
                         var buildingAbilities = caster.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();

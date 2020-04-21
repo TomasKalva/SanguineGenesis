@@ -169,7 +169,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 else if (targetType == typeof(Entity)) return "ENTITY";
                 else if (targetType == typeof(Unit)) return "UNIT";
                 else if (targetType == typeof(Building)) return "BUILDING";
-                else if (targetType == typeof(Tree)) return "TREE";
+                else if (targetType == typeof(Plant)) return "PLANT";
                 else if (targetType == typeof(Corpse)) return "CORPSE";
                 else if (targetType == typeof(Structure)) return "STRUCTURE";
                 else /*(targetType == typeof(Nothing))*/ return "NOTHING";

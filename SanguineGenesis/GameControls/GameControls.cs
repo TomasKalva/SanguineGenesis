@@ -208,15 +208,15 @@ namespace SanguineGenesis.GameControls
             }
             else if (targetType == typeof(IHerbivoreFood))
             {
-                //target is a tree or node
-                target = SelectClickedTarget(game, targetCoords.X, targetCoords.Y, game.CurrentPlayer, (e) => true, typeof(Tree));
-                //there is no tree clicked, so use node
+                //target is a plant or node
+                target = SelectClickedTarget(game, targetCoords.X, targetCoords.Y, game.CurrentPlayer, (e) => true, typeof(Plant));
+                //there is no plant clicked, so use node
                 if (target == null)
                     target = game.Map[(int)targetCoords.X, (int)targetCoords.Y];
             }
             else if (targetType == typeof(ICarnivoreFood))
             {
-                //target is a tree or node
+                //target is a plant or node
                 target = SelectClickedTarget(game, targetCoords.X, targetCoords.Y, game.CurrentPlayer, (e) => true, typeof(ICarnivoreFood));
             }
             else if (targetType == typeof(Node))

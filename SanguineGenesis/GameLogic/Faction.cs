@@ -24,9 +24,9 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public List<Animal> Animals { get; private set; }
         /// <summary>
-        /// Trees owned by the faction.
+        /// Plants owned by the faction.
         /// </summary>
-        public List<Tree> Trees { get; private set; }
+        public List<Plant> Plants { get; private set; }
         /// <summary>
         /// Structures owned by the faction.
         /// </summary>
@@ -57,7 +57,7 @@ namespace SanguineGenesis.GameLogic
         {
             FactionID = factionID;
             Animals = new List<Animal>();
-            Trees = new List<Tree>();
+            Plants = new List<Plant>();
             Structures = new List<Structure>();
             Corpses = new List<Corpse>();
             GameStaticData = new GameData();
@@ -70,8 +70,8 @@ namespace SanguineGenesis.GameLogic
         {
             if (e.GetType() == typeof(Animal))
                 Animals.Add((Animal)e);
-            if (e.GetType() == typeof(Tree))
-                Trees.Add((Tree)e);
+            if (e.GetType() == typeof(Plant))
+                Plants.Add((Plant)e);
             if (e.GetType() == typeof(Structure))
                 Structures.Add((Structure)e);
             if (e.GetType() == typeof(Corpse))
@@ -85,8 +85,8 @@ namespace SanguineGenesis.GameLogic
         {
             if (e.GetType() == typeof(Animal))
                 Animals.Remove((Animal)e);
-            if (e.GetType() == typeof(Tree))
-                Trees.Remove((Tree)e);
+            if (e.GetType() == typeof(Plant))
+                Plants.Remove((Plant)e);
             if (e.GetType() == typeof(Structure))
                 Structures.Remove((Structure)e);
             if (e.GetType() == typeof(Corpse))
@@ -100,7 +100,7 @@ namespace SanguineGenesis.GameLogic
         {
             if (typeof(T) == typeof(Entity))
                 return Animals.Cast<T>().Concat(
-                        Trees.Cast<T>().Concat(
+                        Plants.Cast<T>().Concat(
                          Structures.Cast<T>().Concat(
                           Corpses.Cast<T>())));
             else if (typeof(T) == typeof(Unit))
@@ -111,10 +111,10 @@ namespace SanguineGenesis.GameLogic
             else if (typeof(T) == typeof(Corpse))
                 return Corpses.Cast<T>();
             else if (typeof(T) == typeof(Building))
-                return Trees.Cast<T>().Concat(
+                return Plants.Cast<T>().Concat(
                          Structures.Cast<T>());
-            else if (typeof(T) == typeof(Tree))
-                return Trees.Cast<T>();
+            else if (typeof(T) == typeof(Plant))
+                return Plants.Cast<T>();
             else if (typeof(T) == typeof(Structure))
                 return Structures.Cast<T>();
 
@@ -126,7 +126,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public void CalulateAir()
         {
-            MaxAirTaken = Math.Min(MAX_AIR_TAKEN, GetAll<Tree>().Sum((t) => t.Air));
+            MaxAirTaken = Math.Min(MAX_AIR_TAKEN, GetAll<Plant>().Sum((t) => t.Air));
             AirTaken = GetAll<Animal>().Sum((a) => a.Air);
         }
 
@@ -148,7 +148,7 @@ namespace SanguineGenesis.GameLogic
             }
 
             Animals.RemoveAll((a) => a.IsDead);
-            Trees.RemoveAll((t) => t.IsDead);
+            Plants.RemoveAll((t) => t.IsDead);
             Structures.RemoveAll((s) => s.IsDead);
             Corpses.RemoveAll((c) => c.IsDead);
         }
@@ -345,8 +345,8 @@ namespace SanguineGenesis.GameLogic
         {
             switch (Biome)
             {
-                case Biome.SAVANNA: return GameStaticData.TreeFactories["BAOBAB"];
-                case Biome.RAINFOREST: return GameStaticData.TreeFactories["KAPOC"];
+                case Biome.SAVANNA: return GameStaticData.PlantFactories["BAOBAB"];
+                case Biome.RAINFOREST: return GameStaticData.PlantFactories["KAPOC"];
                 default: return GameStaticData.StructureFactories["ROCK"];
             }
         }

@@ -150,7 +150,7 @@ namespace SanguineGenesis.GameLogic.Maps
             game.Map.PlaceBuilding(buildingFactory, player, n.X, n.Y);
 
             //set it to max energy and set its root nodes to be in the same biome
-            var mainBuilding = player.GetAll<Tree>().Where(t => t.EntityType == buildingFactory.EntityType).FirstOrDefault();
+            var mainBuilding = player.GetAll<Plant>().Where(t => t.EntityType == buildingFactory.EntityType).FirstOrDefault();
             if (mainBuilding != null)
             {
                 mainBuilding.Energy = buildingFactory.MaxEnergy;

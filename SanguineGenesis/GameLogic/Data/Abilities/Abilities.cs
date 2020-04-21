@@ -44,8 +44,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public Pull BigPull { get; }
         public ApplyStatus ActivateFarSight { get; }
         public KnockAway KnockBack { get; }
-        public ClimbTree ClimbTree { get; }
-        public ClimbDownTree ClimbDownTree { get; }
+        public ClimbPlant ClimbPlant { get; }
+        public ClimbDownPlant ClimbDownTree { get; }
         public EnterHole EnterHole { get; }
         public ExitHole ExitHole { get; }
         public ApplyStatus ActivateFastStrikes { get; }
@@ -89,11 +89,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
             //build buiding
             buildBuilding = new Dictionary<string, BuildBuilding>();
-            foreach (var treeFac in gameStaticData.TreeFactories.Factorys)
+            foreach (var plantFac in gameStaticData.PlantFactories.Factorys)
             {
-                BuildBuilding plant = new BuildBuilding(treeFac.Value);
+                BuildBuilding plant = new BuildBuilding(plantFac.Value);
                 plant.SetAbilities(this);
-                buildBuilding.Add(treeFac.Value.EntityType, plant);
+                buildBuilding.Add(plantFac.Value.EntityType, plant);
             }
             foreach (var structureFac in gameStaticData.StructureFactories.Factorys)
             {
@@ -158,12 +158,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             KnockBack = new KnockAway(20, 0.1f, 0.3f, gameStaticData.Statuses.KnockAwayFactory);
             KnockBack.SetAbilities(this);
 
-            //climb tree
-            ClimbTree = new ClimbTree(20, 0.3f);
-            ClimbTree.SetAbilities(this);
+            //climb plant
+            ClimbPlant = new ClimbPlant(20, 0.3f);
+            ClimbPlant.SetAbilities(this);
 
-            //climb down tree
-            ClimbDownTree = new ClimbDownTree(0, 0.3f);
+            //climb down plant
+            ClimbDownTree = new ClimbDownPlant(0, 0.3f);
             ClimbDownTree.SetAbilities(this);
 
             //enter hole

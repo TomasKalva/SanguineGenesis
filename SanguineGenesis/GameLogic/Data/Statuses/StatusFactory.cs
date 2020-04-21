@@ -161,7 +161,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public override string GetName() => "CONSUMED";
     }
 
-    class AnimalsOnTreeFactory : StatusFactory<Tree>
+    class AnimalsOnTreeFactory : StatusFactory<Plant>
     {
         /// <summary>
         /// Animal that will be put on the tree. Should be set right before using this factory to apply status.
@@ -172,13 +172,13 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             : base(true)
         {
         }
-        protected override Status NewInstance(Tree affected)
+        protected override Status NewInstance(Plant affected)
         {
             return new AnimalsOnTree(affected, this, PutOnTree);
         }
 
 
-        public override bool ApplyToAffected(Tree affected)
+        public override bool ApplyToAffected(Plant affected)
         {
             AnimalsOnTree alreadyApplied = (AnimalsOnTree)affected.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
             if(alreadyApplied!=null)
@@ -346,7 +346,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     class DecayFactory : StatusFactory<IDecayable>
     {
         /// <summary>
-        /// How much energy the corpse/dead tree loses per second.
+        /// How much energy the corpse/dead plant loses per second.
         /// </summary>
         public float EnergyLossPerS { get; }
 

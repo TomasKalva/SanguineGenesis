@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
-    /// Eat a node or tree to regenerate energy.
+    /// Eat a node or plant to regenerate energy.
     /// </summary>
     sealed class HerbivoreEat : Ability<Animal, IHerbivoreFood>
     {
@@ -45,7 +45,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The commanded herbivore eats tree or node.";
+            return "The commanded herbivore eats plant or node.";
         }
     }
 
@@ -105,7 +105,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The commanded carnivore eats tree or node.";
+            return "The commanded carnivore eats plant or node.";
         }
     }
 

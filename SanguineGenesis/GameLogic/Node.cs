@@ -96,9 +96,9 @@ namespace SanguineGenesis.GameLogic
             set { building = value; Blocked = building != null; }
         }
         /// <summary>
-        /// List of trees whose roots are on this node.
+        /// List of plants whose roots are on this node.
         /// </summary>
-        public List<Tree> Roots { get; }
+        public List<Plant> Roots { get; }
         /// <summary>
         /// Center of this node on the map.
         /// </summary>
@@ -113,7 +113,7 @@ namespace SanguineGenesis.GameLogic
             X = x;
             Y = y;
             Blocked = false;
-            Roots = new List<Tree>();
+            Roots = new List<Plant>();
         }
 
         /// <summary>

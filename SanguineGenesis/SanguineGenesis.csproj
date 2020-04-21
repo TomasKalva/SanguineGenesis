@@ -205,7 +205,7 @@
     <None Include="GameLogic\Data\Entities\Structures.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="GameLogic\Data\Entities\Trees.csv">
+    <None Include="GameLogic\Data\Entities\Plants.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="GameLogic\Data\Entities\Animals.csv">
@@ -362,88 +362,88 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\Trees\algae.png">
+    <None Include="Images\Icons\Plants\algae.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\ashoka.png">
+    <None Include="Images\Icons\Plants\ashoka.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\bamboo.png">
+    <None Include="Images\Icons\Plants\bamboo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\bannana_tree.png">
+    <None Include="Images\Icons\Plants\bannana_tree.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\baobab.png">
+    <None Include="Images\Icons\Plants\baobab.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\candelabra.png">
+    <None Include="Images\Icons\Plants\candelabra.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\cannonball_tree.png">
+    <None Include="Images\Icons\Plants\cannonball_tree.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\coconut_tree.png">
+    <None Include="Images\Icons\Plants\coconut_tree.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\cycad.png">
+    <None Include="Images\Icons\Plants\cycad.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\cycad_palm.png">
+    <None Include="Images\Icons\Plants\cycad_palm.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\elephant_grass.png">
+    <None Include="Images\Icons\Plants\elephant_grass.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\eucalyptus.png">
+    <None Include="Images\Icons\Plants\eucalyptus.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\fern.png">
+    <None Include="Images\Icons\Plants\fern.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\jackal_berry_tree.png">
+    <None Include="Images\Icons\Plants\jackal_berry_tree.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\kapoc.png">
+    <None Include="Images\Icons\Plants\kapoc.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\kiwi_tree.png">
+    <None Include="Images\Icons\Plants\kiwi_tree.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\miambo.png">
+    <None Include="Images\Icons\Plants\miambo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\pandani.png">
+    <None Include="Images\Icons\Plants\pandani.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\Pasted Layer #34.png">
+    <None Include="Images\Icons\Plants\Pasted Layer #34.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\pitcher.png">
+    <None Include="Images\Icons\Plants\pitcher.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\rhode_grass.png">
+    <None Include="Images\Icons\Plants\rhode_grass.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\spike_thorn.png">
+    <None Include="Images\Icons\Plants\spike_thorn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\sword_plant.png">
+    <None Include="Images\Icons\Plants\sword_plant.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\teak.png">
+    <None Include="Images\Icons\Plants\teak.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\tyrannosaur_tree.png">
+    <None Include="Images\Icons\Plants\tyrannosaur_tree.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\water_lettuce.png">
+    <None Include="Images\Icons\Plants\water_lettuce.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\water_lily.png">
+    <None Include="Images\Icons\Plants\water_lily.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\whistling_thorn.png">
+    <None Include="Images\Icons\Plants\whistling_thorn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -867,7 +867,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\Trees\acacia.png">
+    <None Include="Images\Icons\Plants\acacia.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Images\Icons\Abilities\build_acacia.png">
@@ -879,10 +879,10 @@
     <None Include="Images\Icons\Abilities\build_walking_palm.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\mangrove.png">
+    <None Include="Images\Icons\Plants\mangrove.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Trees\walking_palm.png">
+    <None Include="Images\Icons\Plants\walking_palm.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

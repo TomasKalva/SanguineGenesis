@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic.Data
     /// </summary>
     class GameData
     {
-        public TreeFactories TreeFactories { get; }
+        public PlantFactories PlantFactories { get; }
         public StructureFactories StructureFactories { get; }
         public AnimalFactories AnimalFactories { get; }
         public Abilities.Abilities Abilities { get; }
@@ -24,15 +24,15 @@ namespace SanguineGenesis.GameLogic.Data
 
             StructureFactories = new StructureFactories();
             StructureFactories.InitFactorys("GameLogic/Data/Entities/Structures.csv", Statuses);
-            TreeFactories = new TreeFactories();
-            TreeFactories.InitFactorys("GameLogic/Data/Entities/Trees.csv", Statuses);
+            PlantFactories = new PlantFactories();
+            PlantFactories.InitFactorys("GameLogic/Data/Entities/Plants.csv", Statuses);
             AnimalFactories = new AnimalFactories();
             AnimalFactories.InitFactorys("GameLogic/Data/Entities/Animals.csv", Statuses);
 
             Abilities = new Abilities.Abilities(this);
 
             StructureFactories.InitAbilities(Abilities);
-            TreeFactories.InitAbilities(Abilities);
+            PlantFactories.InitAbilities(Abilities);
             AnimalFactories.InitAbilities(Abilities);
         }
     }

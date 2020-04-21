@@ -91,24 +91,24 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     }
 
     /// <summary>
-    /// Used for creating Trees.
+    /// Used for creating Plants.
     /// </summary>
-    class TreeFactory : BuildingFactory
+    class PlantFactory : BuildingFactory
     {
         public float MaxEnergyIntake { get; }
         public int RootsDistance { get; }
         public int Air { get; }
 
         /// <summary>
-        /// Creates a new Tree for the player.
+        /// Creates a new Plant for the player.
         /// </summary>
-        public Tree NewInstance(Faction faction, Node[,] nodesUnder, Node[,] roots)
+        public Plant NewInstance(Faction faction, Node[,] nodesUnder, Node[,] roots)
         {
-            return (Tree)SetStatuses(new Tree(faction, EntityType, nodesUnder, roots, RootsDistance, MaxHealth, MaxEnergy, MaxEnergyIntake,
+            return (Plant)SetStatuses(new Plant(faction, EntityType, nodesUnder, roots, RootsDistance, MaxHealth, MaxEnergy, MaxEnergyIntake,
                 Size, Physical, Biome, Terrain, SoilQuality, Producer, BuildingDistance, ViewRange, BlocksVision, Air, Abilities.ToList()));
         }
 
-        public TreeFactory(string buildingType, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
+        public PlantFactory(string buildingType, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
             bool physical, float energyCost, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, bool blocksVision, int rootsDistance, int air, List<StatusFactory> statusFactories)
             : base(buildingType, maxHealth, maxEnergy, size, physical, energyCost, biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, statusFactories)
 

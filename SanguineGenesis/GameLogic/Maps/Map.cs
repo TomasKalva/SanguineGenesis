@@ -196,15 +196,15 @@ namespace SanguineGenesis.GameLogic.Maps
             int size = buildingFactory.Size;
             Node[,] buildNodes = GameQuerying.SelectNodes(this, x, y, x + (size - 1), y + (size - 1));
             Building newBuilding;
-            if (buildingFactory is TreeFactory trF)
+            if (buildingFactory is PlantFactory trF)
             {
                 //find energy source nodes
                 Node[,] rootNodes;
                 int rDist = trF.RootsDistance;
                 rootNodes = GameQuerying.SelectNodes(this, x - rDist, y - rDist, x + (size + rDist - 1), y + (size + rDist - 1));
                 newBuilding = trF.NewInstance(owner, buildNodes, rootNodes);
-                //make the tree grow
-                owner.GameStaticData.Abilities.Grow.SetCommands(new List<Tree>(1) { (Tree)newBuilding }, Nothing.Get, true, ActionLog.ThrowAway);
+                //make the plant grow
+                owner.GameStaticData.Abilities.Grow.SetCommands(new List<Plant>(1) { (Plant)newBuilding }, Nothing.Get, true, ActionLog.ThrowAway);
             }
             else
             {
@@ -261,9 +261,9 @@ namespace SanguineGenesis.GameLogic.Maps
         private float nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
 
         /// <summary>
-        /// Trees draing nutrients from nodes and nodes with roots generate nutrients.
+        /// Plants draing nutrients from nodes and nodes with roots generate nutrients.
         /// </summary>
-        public void UpdateNutrientsMap(IEnumerable<Tree> trees, float deltaT)
+        public void UpdateNutrientsMap(IEnumerable<Plant> plants, float deltaT)
         {
             nutrientUpdateTimer -= deltaT;
             if (nutrientUpdateTimer <= 0)
@@ -273,8 +273,8 @@ namespace SanguineGenesis.GameLogic.Maps
                 ProduceNutrients();
                 SpreadBiomes();
 
-                //trees drain energy from nodes
-                foreach (Tree t in trees)
+                //plants drain energy from nodes
+                foreach (Plant t in plants)
                 {
                     t.DrainEnergy();
                 }

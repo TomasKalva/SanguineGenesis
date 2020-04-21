@@ -9,31 +9,31 @@ using SanguineGenesis.GameLogic.Data.Statuses;
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
-    /// Climb on a tree.
+    /// Climb on a plant.
     /// </summary>
-    sealed class ClimbTree : Ability<Animal, Tree>
+    sealed class ClimbPlant : Ability<Animal, Plant>
     {
-        public AnimalsOnTreeFactory AnimalsOnTreeFactory { get; }
+        public AnimalsOnTreeFactory AnimalsOnPlantFactory { get; }
 
-        internal ClimbTree(float energyCost, float climbingTime)
+        internal ClimbPlant(float energyCost, float climbingTime)
             : base(0.1f, energyCost, false, false, duration:climbingTime)
         {
-            AnimalsOnTreeFactory = new AnimalsOnTreeFactory();
+            AnimalsOnPlantFactory = new AnimalsOnTreeFactory();
         }
 
-        public override Command NewCommand(Animal caster, Tree target)
+        public override Command NewCommand(Animal caster, Plant target)
         {
-            return new ClimbTreeCommand(caster, target, this);
+            return new ClimbPlantCommand(caster, target, this);
         }
 
         public override string GetName() => "CLIMB_UP";
 
         public override string Description()
         {
-            return "The animal climbs on the tree.";
+            return "The animal climbs on the plant.";
         }
 
-        public override bool ValidArguments(Animal caster, Tree target, ActionLog actionLog)
+        public override bool ValidArguments(Animal caster, Plant target, ActionLog actionLog)
         {
             if(caster.Faction.FactionID != target.Faction.FactionID)
             {
@@ -44,10 +44,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    class ClimbTreeCommand : Command<Animal, Tree, ClimbTree>, IAnimalStateManipulator
+    class ClimbPlantCommand : Command<Animal, Plant, ClimbPlant>, IAnimalStateManipulator
     {
-        public ClimbTreeCommand(Animal commandedEntity, Tree target, ClimbTree climbTree)
-            : base(commandedEntity, target, climbTree)
+        public ClimbPlantCommand(Animal commandedEntity, Plant target, ClimbPlant climbPlant)
+            : base(commandedEntity, target, climbPlant)
         {
         }
 
@@ -55,12 +55,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             if (ElapsedTime >= Ability.Duration)
             {
-                //put the animal on the target tree
+                //put the animal on the target plant
                 CommandedEntity.Faction.RemoveEntity(CommandedEntity);
 
-                AnimalsOnTreeFactory anOnTreeFact = Ability.AnimalsOnTreeFactory;
-                anOnTreeFact.PutOnTree = CommandedEntity;
-                anOnTreeFact.ApplyToAffected(Target);
+                AnimalsOnTreeFactory anOnPlantFact = Ability.AnimalsOnPlantFactory;
+                anOnPlantFact.PutOnTree = CommandedEntity;
+                anOnPlantFact.ApplyToAffected(Target);
                 return true;
             }
 
@@ -69,55 +69,55 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     }
 
     /// <summary>
-    /// Climb down a tree.
+    /// Climb down a plant.
     /// </summary>
-    sealed class ClimbDownTree : Ability<Tree, Nothing>
+    sealed class ClimbDownPlant : Ability<Plant, Nothing>
     {
-        internal ClimbDownTree(float energyCost, float climbingTime)
+        internal ClimbDownPlant(float energyCost, float climbingTime)
             : base(0.1f, energyCost, false, false, duration:climbingTime)
         {
         }
 
-        public override Command NewCommand(Tree caster, Nothing target)
+        public override Command NewCommand(Plant caster, Nothing target)
         {
-            return new ClimbDownTreeCommand(caster, target, this);
+            return new ClimbDownPlantCommand(caster, target, this);
         }
 
         public override string GetName() => "CLIMB_DOWN";
 
         public override string Description()
         {
-            return "The animal climbs down the tree.";
+            return "The animal climbs down the plant.";
         }
     }
 
-    class ClimbDownTreeCommand : Command<Tree, Nothing, ClimbDownTree>, IAnimalStateManipulator
+    class ClimbDownPlantCommand : Command<Plant, Nothing, ClimbDownPlant>, IAnimalStateManipulator
     {
-        public ClimbDownTreeCommand(Tree commandedEntity, Nothing target, ClimbDownTree climbDownTree)
-            : base(commandedEntity, target, climbDownTree)
+        public ClimbDownPlantCommand(Plant commandedEntity, Nothing target, ClimbDownPlant climbDownPlant)
+            : base(commandedEntity, target, climbDownPlant)
         {
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             var status = (AnimalsOnTree)CommandedEntity.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
-            //finish command if the status isn't on the tree anymore
+            //finish command if the status isn't on the plant anymore
             if (status == null)
                 return true;
             
             if (ElapsedTime >= Ability.Duration)
             {
                 ElapsedTime -= Ability.Duration;
-                //put the animals from the tree back to the ground
-                Animal anOnTree = status.Animals.FirstOrDefault();
-                if (anOnTree == null)
+                //put the animals from the plant back to the ground
+                Animal anOnPlant = status.Animals.FirstOrDefault();
+                if (anOnPlant == null)
                     //all animals already climbed down
                     return true;
                 else
                 {
-                    anOnTree.StateChangeLock = null;
-                    CommandedEntity.Faction.AddEntity(anOnTree);
-                    status.Animals.Remove(anOnTree);
+                    anOnPlant.StateChangeLock = null;
+                    CommandedEntity.Faction.AddEntity(anOnPlant);
+                    status.Animals.Remove(anOnPlant);
 
                     //if there are no animals left, remove the status
                     if (!status.Animals.Any())

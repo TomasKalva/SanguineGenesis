@@ -25,7 +25,7 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             icons = new Dictionary<string, Bitmap>();
 
             AddIcons("Images/Icons/Animals/");
-            AddIcons("Images/Icons/Trees/");
+            AddIcons("Images/Icons/Plants/");
             AddIcons("Images/Icons/Structures/");
             AddIcons("Images/Icons/Statuses/");
             AddIcons("Images/Icons/Abilities/");

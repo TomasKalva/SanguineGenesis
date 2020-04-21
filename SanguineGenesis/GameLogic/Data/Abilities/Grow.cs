@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
-    /// The tree grows until it has full energy.
+    /// The plant grows until it has full energy.
     /// </summary>
-    sealed class Grow : Ability<Tree, Nothing>
+    sealed class Grow : Ability<Plant, Nothing>
     {
         internal Grow()
             : base(0, 0, true, false, false)
         {
         }
 
-        public override Command NewCommand(Tree caster, Nothing target)
+        public override Command NewCommand(Plant caster, Nothing target)
         {
             return new GrowCommand(caster, this);
         }
@@ -26,20 +26,20 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The tree grows until it is at max energy. The tree can't perform other commands while growing.";
+            return "The plant grows until it is at max energy. The plant can't perform other commands while growing.";
         }
     }
 
-    class GrowCommand : Command<Tree, Nothing, Grow>
+    class GrowCommand : Command<Plant, Nothing, Grow>
     {
-        public GrowCommand(Tree commandedEntity, Grow plantBuilding)
+        public GrowCommand(Plant commandedEntity, Grow plantBuilding)
             : base(commandedEntity, Nothing.Get, plantBuilding)
         {
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            //finish if the tree is at full energy
+            //finish if the plant is at full energy
             if (CommandedEntity.Energy.Full)
             {
                 CommandedEntity.Built = true;
