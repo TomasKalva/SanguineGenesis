@@ -62,7 +62,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             }
 
             //after physical plant dies and has energy left, spawn a dead plant
-            //don't spawn structures for dead plants from neutral faction
+            //don't spawn structures for dead trees from neutral faction
             if(Physical && Energy > 0 && Faction.FactionID!=game.NeutralFaction.FactionID)
             {
                 var neutralFaction = game.NeutralFaction;

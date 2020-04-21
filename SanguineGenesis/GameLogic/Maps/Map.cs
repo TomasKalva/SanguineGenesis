@@ -311,7 +311,7 @@ namespace SanguineGenesis.GameLogic.Maps
         {
             //spread biome to neighbors
             Biome[,] newBiomes = new Biome[Width, Height];
-            Node[] neighbours = new Node[4];
+            Node[] neighbors = new Node[4];
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
                 {
@@ -324,14 +324,14 @@ namespace SanguineGenesis.GameLogic.Maps
                     }
 
                     //initialize neighbors
-                    neighbours[0] = this[i + 1, j];
-                    neighbours[1] = this[i - 1, j];
-                    neighbours[2] = this[i, j + 1];
-                    neighbours[3] = this[i, j - 1];
+                    neighbors[0] = this[i + 1, j];
+                    neighbors[1] = this[i - 1, j];
+                    neighbors[2] = this[i, j + 1];
+                    neighbors[3] = this[i, j - 1];
 
-                    //rainMsav = #rainforest neighbours - #savanna neighbours
+                    //rainMsav = #rainforest neighbors - #savanna neighbors
                     int rainMsav = 0;
-                    foreach (Node n in neighbours)
+                    foreach (Node n in neighbors)
                         if (n.Biome == Biome.RAINFOREST)
                             rainMsav++;
                         else if (n.Biome == Biome.SAVANNA)
@@ -342,7 +342,7 @@ namespace SanguineGenesis.GameLogic.Maps
                     if (this[i, j].ActiveNutrients >= this[i,j].Terrain.Nutrients(Biome.SAVANNA, SoilQuality.LOW))
                     {
                         //node has enough nutrients to become savanna
-                        if (rainMsav < 0 || //majority of nondefault neighbour biomes is savanna
+                        if (rainMsav < 0 || //majority of nondefault neighbor biomes is savanna
                             (building != null &&
                             building.Biome == Biome.SAVANNA)) //or savanna building is standing on it
                             newBiomes[i, j] = Biome.SAVANNA;
@@ -350,7 +350,7 @@ namespace SanguineGenesis.GameLogic.Maps
                     if (this[i, j].ActiveNutrients >= this[i, j].Terrain.Nutrients(Biome.RAINFOREST, SoilQuality.LOW))
                     {
                         //node has enough nutrients to become rainforest
-                        if (rainMsav > 0 || //majority of nondefault neighbour biomes is rainforest
+                        if (rainMsav > 0 || //majority of nondefault neighbor biomes is rainforest
                             (building != null &&
                             building.Biome == Biome.RAINFOREST))//or rainforest building is standing on it
                             newBiomes[i, j] = Biome.RAINFOREST;
