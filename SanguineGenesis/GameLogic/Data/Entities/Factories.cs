@@ -126,7 +126,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                                 factory.AddAbility(abilities.SetRallyPoint);
                                 break;
                             case "eat":
-                                //eat command can only be added to an animal
+                                //check if animal is herbivore or carnivore
                                 if (factory is AnimalFactory animF)
                                 {
                                     if (animF.Diet == Diet.HERBIVORE)

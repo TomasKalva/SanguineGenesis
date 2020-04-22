@@ -74,6 +74,7 @@ namespace SanguineGenesis.GUI
             DRAW_SHALLOW_WATER,
             DRAW_DEEP_WATER,
             DRAW_NUTRIENTS,
+            ERASE_NUTRIENTS,
             ADD_BUILDING,
             REMOVE_BUILDING,
             NO_ACTION
@@ -90,20 +91,34 @@ namespace SanguineGenesis.GUI
             get => drawOpt;
             set
             {
-                if (value == DrawOption.ADD_BUILDING)
-                {
-                    buildingSelectionGB.Enabled = true;
-                    brushSizeNUD.Enabled = false;
-                    nutrientsRateNUD.Enabled = false;
-                }
-                else
-                {
-                    buildingSelectionGB.Enabled = false;
-                    brushSizeNUD.Enabled = true;
-                    if (value == DrawOption.DRAW_NUTRIENTS)
-                        nutrientsRateNUD.Enabled = true;
-                }
                 drawOpt = value;
+                //enable and disable parts of gui
+                switch (value)
+                {
+                    case DrawOption.DRAW_DEEP_WATER:
+                    case DrawOption.DRAW_SHALLOW_WATER:
+                    case DrawOption.DRAW_LAND:
+                        buildingSelectionGB.Enabled = false;
+                        brushSizeNUD.Enabled = true;
+                        nutrientsRateNUD.Enabled = false;
+                        break;
+                    case DrawOption.DRAW_NUTRIENTS:
+                    case DrawOption.ERASE_NUTRIENTS:
+                        buildingSelectionGB.Enabled = false;
+                        brushSizeNUD.Enabled = true;
+                        nutrientsRateNUD.Enabled = true;
+                        break;
+                    case DrawOption.ADD_BUILDING:
+                        buildingSelectionGB.Enabled = true;
+                        brushSizeNUD.Enabled = false;
+                        nutrientsRateNUD.Enabled = false;
+                        break;
+                    case DrawOption.REMOVE_BUILDING:
+                        buildingSelectionGB.Enabled = false;
+                        brushSizeNUD.Enabled = false;
+                        nutrientsRateNUD.Enabled = false;
+                        break;
+                }
             }
         }
 
@@ -229,6 +244,8 @@ namespace SanguineGenesis.GUI
                 DrawOpt = DrawOption.DRAW_LAND;
             else if (nutrientsRB.Checked)
                 DrawOpt = DrawOption.DRAW_NUTRIENTS;
+            else if (eraseNutrientsRB.Checked)
+                DrawOpt = DrawOption.ERASE_NUTRIENTS;
             else if (addBuildingRB.Checked)
                 DrawOpt = DrawOption.ADD_BUILDING;
             else if (removeBuildingRB.Checked)
@@ -292,6 +309,9 @@ namespace SanguineGenesis.GUI
                     break;
                 case "nutrientsRB":
                     DrawOpt = DrawOption.DRAW_NUTRIENTS;
+                    break;
+                case "eraseNutrientsRB":
+                    DrawOpt = DrawOption.ERASE_NUTRIENTS;
                     break;
                 case "addBuildingRB":
                     DrawOpt = DrawOption.ADD_BUILDING;
@@ -362,6 +382,9 @@ namespace SanguineGenesis.GUI
                             break;
                         case DrawOption.DRAW_NUTRIENTS:
                             MapDescr.AddNutrients(x, y, size, size, (int)nutrientsRateNUD.Value);
+                            break;
+                        case DrawOption.ERASE_NUTRIENTS:
+                            MapDescr.AddNutrients(x, y, size, size, -(int)nutrientsRateNUD.Value);
                             break;
                         case DrawOption.ADD_BUILDING:
                             string error = MapDescr.AddBuilding(BuildingToPlace, mapPoint.X, mapPoint.Y);
@@ -591,6 +614,16 @@ namespace SanguineGenesis.GUI
             }
 
             /// <summary>
+            /// Returns true if the color is valid color for terrain map.
+            /// </summary>
+            private bool IsTerrainColor(Color c)
+            {
+                return LandColor.SameRGB(c) ||
+                        ShallowWaterColor.SameRGB(c) ||
+                        DeepWaterColor.SameRGB(c);
+            }
+
+            /// <summary>
             /// Loads map from the directory.
             /// </summary>
             /// <param name="mapDirectoryName">Name of the directory.</param>
@@ -607,12 +640,36 @@ namespace SanguineGenesis.GUI
                 using (var sr = new StreamReader(dirName + "/buildings.txt"))
                 {
                     TerrainMap = new Bitmap(terrainReader);
+                    int tWidth = TerrainMap.Width;
+                    int tHeight = TerrainMap.Height;
                     NutrientsMap = new Bitmap(nutrientsReader);
-                    BuildingsLocations = new Bitmap(TerrainMap.Width, TerrainMap.Height);
-                    for (int i = 0; i < BuildingsLocations.Width; i++)
-                        for (int j = 0; j < BuildingsLocations.Height; j++)
+                    int nWidth = NutrientsMap.Width;
+                    int nHeight = NutrientsMap.Height;
+
+                    int width = tWidth;
+                    int height = tHeight;
+                    //check extents of loaded maps
+                    if (tWidth > MAX_MAP_WIDTH || tWidth < MIN_MAP_HEIGHT || tHeight > MAX_MAP_HEIGHT || tHeight < MIN_MAP_HEIGHT ||
+                        nWidth > MAX_MAP_WIDTH || nWidth < MIN_MAP_HEIGHT || nHeight > MAX_MAP_HEIGHT || nHeight < MIN_MAP_HEIGHT)
+                    {
+                        width = Math.Min(MAX_MAP_WIDTH, Math.Max(MIN_MAP_WIDTH, tWidth));
+                        height = Math.Min(MAX_MAP_HEIGHT, Math.Max(MIN_MAP_HEIGHT, tWidth));
+                        TerrainMap = new Bitmap(width, height);
+                        NutrientsMap = new Bitmap(width, height);
+                        for (int i = 0; i < width; i++)
+                            for (int j = 0; j < height; j++)
+                            {
+                                NutrientsMap.SetPixel(i, j, NothingColor);
+                            }
+                    }
+                    BuildingsLocations = new Bitmap(width, height);
+                    for (int i = 0; i < width; i++)
+                        for (int j = 0; j < height; j++)
                         {
                             BuildingsLocations.SetPixel(i, j, NothingColor);
+                            //set correct to terrain map if the original is incorrect
+                            if (!IsTerrainColor(TerrainMap.GetPixel(i, j)))
+                                TerrainMap.SetPixel(i, j, LandColor);
                         }
 
                     Buildings = new List<BuildingDescriptor>();
@@ -873,9 +930,9 @@ namespace SanguineGenesis.GUI
                             Color color = bitmap.GetPixel(xx, yy);
                             bitmap.SetPixel(xx, yy,
                                 Color.FromArgb(
-                                    Math.Max(color.R + intensity, 0),
-                                    Math.Max(color.G + intensity, 0),
-                                    Math.Max(color.B + intensity, 0)));
+                                    Math.Min(255, Math.Max(color.R + intensity, 0)),
+                                    Math.Min(255, Math.Max(color.G + intensity, 0)),
+                                    Math.Min(255, Math.Max(color.B + intensity, 0))));
                         }
                     }
             }

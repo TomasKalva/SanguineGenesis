@@ -67,6 +67,7 @@
             this.heightL = new System.Windows.Forms.Label();
             this.loadMapGB = new System.Windows.Forms.GroupBox();
             this.playGB = new System.Windows.Forms.GroupBox();
+            this.eraseNutrientsRB = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.drawOptionsGB.SuspendLayout();
@@ -210,6 +211,7 @@
             // 
             // drawOptionsGB
             // 
+            this.drawOptionsGB.Controls.Add(this.eraseNutrientsRB);
             this.drawOptionsGB.Controls.Add(this.removeBuildingRB);
             this.drawOptionsGB.Controls.Add(this.nutrientsRateL);
             this.drawOptionsGB.Controls.Add(this.nutrientsRateNUD);
@@ -235,7 +237,7 @@
             // removeBuildingRB
             // 
             this.removeBuildingRB.AutoSize = true;
-            this.removeBuildingRB.Location = new System.Drawing.Point(10, 206);
+            this.removeBuildingRB.Location = new System.Drawing.Point(8, 237);
             this.removeBuildingRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.removeBuildingRB.Name = "removeBuildingRB";
             this.removeBuildingRB.Size = new System.Drawing.Size(151, 24);
@@ -308,7 +310,7 @@
             // coordinatesL
             // 
             this.coordinatesL.AutoSize = true;
-            this.coordinatesL.Location = new System.Drawing.Point(21, 260);
+            this.coordinatesL.Location = new System.Drawing.Point(33, 266);
             this.coordinatesL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.coordinatesL.Name = "coordinatesL";
             this.coordinatesL.Size = new System.Drawing.Size(57, 20);
@@ -318,7 +320,7 @@
             // addBuildingRB
             // 
             this.addBuildingRB.AutoSize = true;
-            this.addBuildingRB.Location = new System.Drawing.Point(10, 171);
+            this.addBuildingRB.Location = new System.Drawing.Point(10, 203);
             this.addBuildingRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.addBuildingRB.Name = "addBuildingRB";
             this.addBuildingRB.Size = new System.Drawing.Size(121, 24);
@@ -587,6 +589,18 @@
             this.playGB.TabStop = false;
             this.playGB.Text = "Play";
             // 
+            // eraseNutrientsRB
+            // 
+            this.eraseNutrientsRB.AutoSize = true;
+            this.eraseNutrientsRB.Location = new System.Drawing.Point(10, 169);
+            this.eraseNutrientsRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.eraseNutrientsRB.Name = "eraseNutrientsRB";
+            this.eraseNutrientsRB.Size = new System.Drawing.Size(144, 24);
+            this.eraseNutrientsRB.TabIndex = 14;
+            this.eraseNutrientsRB.Text = "Erase Nutrients";
+            this.eraseNutrientsRB.UseVisualStyleBackColor = true;
+            this.eraseNutrientsRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
+            // 
             // MainMenuWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -666,5 +680,6 @@
         private System.Windows.Forms.Label heightL;
         private System.Windows.Forms.GroupBox loadMapGB;
         private System.Windows.Forms.GroupBox playGB;
+        private System.Windows.Forms.RadioButton eraseNutrientsRB;
     }
 }
