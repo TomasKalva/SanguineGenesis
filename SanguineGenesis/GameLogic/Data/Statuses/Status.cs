@@ -374,7 +374,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return $"{(AnimalsUnderGround.Count()<=1? "There is ":"There are ")} {AnimalsUnderGround.Count()} animals underground.";
+            return $"The number of animals underground is {AnimalsUnderGround.Count()}.";
         }
     }
 

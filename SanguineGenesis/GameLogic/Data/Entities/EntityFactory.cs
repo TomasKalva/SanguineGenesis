@@ -34,7 +34,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             EnergyCost = energyCost;
             ViewRange = viewRange;
             Abilities = new List<Ability>();
-            StatusFactories = statusFactories;
+            StatusFactories = new List<StatusFactory>();
+            foreach (var status in statusFactories)
+                AddStatusFactory(status);
         }
 
         /// <summary>
@@ -46,12 +48,22 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 statFac.ApplyToStatusOwner(entity);
             return entity;
         }
+
+        /// <summary>
+        /// Adds new ability to this entity's factory, if the ability has correct caster type.
+        /// </summary>
+        public abstract void AddAbility(Ability ability);
+
+        /// <summary>
+        /// Adds new status to this entity's factory, if the status has correct owner type.
+        /// </summary>
+        public abstract void AddStatusFactory(StatusFactory status);
     }
 
     /// <summary>
     /// Used for creating Buildings.
     /// </summary>
-    class BuildingFactory : EntityFactory
+    abstract class BuildingFactory : EntityFactory
     {
         public int Size { get; }
         public Biome Biome { get; }
@@ -117,6 +129,22 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             RootsDistance = rootsDistance;
             Air = air;
         }
+
+        public override void AddAbility(Ability ability)
+        {
+            if (ability.CasterType.IsAssignableFrom(typeof(Plant)))
+            {
+                Abilities.Add(ability);
+            }
+        }
+
+        public override void AddStatusFactory(StatusFactory statusFac)
+        {
+            if (statusFac.OwnerType.IsAssignableFrom(typeof(Plant)))
+            {
+                StatusFactories.Add(statusFac);
+            }
+        }
     }
 
     /// <summary>
@@ -139,12 +167,27 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
         {
         }
+        public override void AddAbility(Ability ability)
+        {
+            if (ability.CasterType.IsAssignableFrom(typeof(Structure)))
+            {
+                Abilities.Add(ability);
+            }
+        }
+
+        public override void AddStatusFactory(StatusFactory statusFac)
+        {
+            if (statusFac.OwnerType.IsAssignableFrom(typeof(Structure)))
+            {
+                StatusFactories.Add(statusFac);
+            }
+        }
     }
 
     /// <summary>
     /// Used for creating Units.
     /// </summary>
-    class UnitFactory : EntityFactory
+    abstract class UnitFactory : EntityFactory
     {
         public float Radius { get; }//randius of the circle collider
 
@@ -243,6 +286,22 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Diet = diet;
             SpawningTime = spawningTime;
             Air = air;
+        }
+
+        public override void AddAbility(Ability ability)
+        {
+            if (ability.CasterType.IsAssignableFrom(typeof(Animal)))
+            {
+                Abilities.Add(ability);
+            }
+        }
+
+        public override void AddStatusFactory(StatusFactory statusFac)
+        {
+            if (statusFac.OwnerType.IsAssignableFrom(typeof(Animal)))
+            {
+                StatusFactories.Add(statusFac);
+            }
         }
     }
 }

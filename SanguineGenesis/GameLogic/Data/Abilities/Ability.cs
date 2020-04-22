@@ -71,6 +71,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         public abstract Type TargetType { get; }
         /// <summary>
+        /// Type of Caster.
+        /// </summary>
+        public abstract Type CasterType { get; }
+        /// <summary>
         /// Creates new instance of the command with specified caster and target. 
         /// Calls the generic version of this method. 
         /// </summary>
@@ -149,6 +153,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         public sealed override Type TargetType 
             => typeof(Target);
+
+        /// <summary>
+        /// Type of Caster.
+        /// </summary>
+        public sealed override Type CasterType
+            => typeof(Caster);
 
         /// <summary>
         /// Returns name of target type visible to the player.

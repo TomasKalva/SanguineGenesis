@@ -111,80 +111,80 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                         switch (abName)
                         {
                             case "unbreakableMoveTo":
-                                 factory.Abilities.Add(abilities.UnbreakableMoveTo);
+                                 factory.AddAbility(abilities.UnbreakableMoveTo);
                                 break;
                             case "moveTo":
-                                factory.Abilities.Add(abilities.MoveTo);
+                                factory.AddAbility(abilities.MoveTo);
                                 break;
                             case "unbreakableAttack":
-                                factory.Abilities.Add(abilities.UnbreakableAttack);
+                                factory.AddAbility(abilities.UnbreakableAttack);
                                 break;
                             case "attack":
-                                factory.Abilities.Add(abilities.Attack);
+                                factory.AddAbility(abilities.Attack);
                                 break;
                             case "rallyPoint":
-                                factory.Abilities.Add(abilities.SetRallyPoint);
+                                factory.AddAbility(abilities.SetRallyPoint);
                                 break;
                             case "eat":
                                 //eat command can only be added to an animal
                                 if (factory is AnimalFactory animF)
                                 {
                                     if (animF.Diet == Diet.HERBIVORE)
-                                        factory.Abilities.Add(abilities.HerbivoreEat);
+                                        factory.AddAbility(abilities.HerbivoreEat);
                                     else
-                                        factory.Abilities.Add(abilities.CarnivoreEat);
+                                        factory.AddAbility(abilities.CarnivoreEat);
                                 }
                                 break;
                             case "poisonousSpit":
-                                factory.Abilities.Add(abilities.PoisonousSpit);
+                                factory.AddAbility(abilities.PoisonousSpit);
                                 break;
                             case "activateSprint":
-                                factory.Abilities.Add(abilities.ActivateSprint);
+                                factory.AddAbility(abilities.ActivateSprint);
                                 break;
                             case "piercingBite":
-                                factory.Abilities.Add(abilities.PiercingBite);
+                                factory.AddAbility(abilities.PiercingBite);
                                 break;
                             case "consumeAnimal":
-                                factory.Abilities.Add(abilities.ConsumeAnimal);
+                                factory.AddAbility(abilities.ConsumeAnimal);
                                 break;
                             case "jump":
-                                factory.Abilities.Add(abilities.Jump);
+                                factory.AddAbility(abilities.Jump);
                                 break;
                             case "activateShell":
-                                factory.Abilities.Add(abilities.ActivateShell);
+                                factory.AddAbility(abilities.ActivateShell);
                                 break;
                             case "pull":
-                                factory.Abilities.Add(abilities.Pull);
+                                factory.AddAbility(abilities.Pull);
                                 break;
                             case "bigPull":
-                                factory.Abilities.Add(abilities.BigPull);
+                                factory.AddAbility(abilities.BigPull);
                                 break;
                             case "farSight":
-                                factory.Abilities.Add(abilities.ActivateFarSight);
+                                factory.AddAbility(abilities.ActivateFarSight);
                                 break;
                             case "knockBack":
-                                factory.Abilities.Add(abilities.KnockBack);
+                                factory.AddAbility(abilities.KnockBack);
                                 break;
                             case "climbPlant":
-                                factory.Abilities.Add(abilities.ClimbPlant);
+                                factory.AddAbility(abilities.ClimbPlant);
                                 break;
                             case "enterHole":
-                                factory.Abilities.Add(abilities.EnterHole);
+                                factory.AddAbility(abilities.EnterHole);
                                 break;
                             case "exitHole":
-                                factory.Abilities.Add(abilities.ExitHole);
+                                factory.AddAbility(abilities.ExitHole);
                                 break;
                             case "fastStrikes":
-                                factory.Abilities.Add(abilities.ActivateFastStrikes);
+                                factory.AddAbility(abilities.ActivateFastStrikes);
                                 break;
                             case "improveStructure":
-                                factory.Abilities.Add(abilities.ImproveStructure);
+                                factory.AddAbility(abilities.ImproveStructure);
                                 break;
                             case "chargeTo":
-                                factory.Abilities.Add(abilities.ChargeTo);
+                                factory.AddAbility(abilities.ChargeTo);
                                 break;
                             case "kick":
-                                factory.Abilities.Add(abilities.Kick);
+                                factory.AddAbility(abilities.Kick);
                                 break;
                         }
                     }else if (abPar.Length == 2)
@@ -193,13 +193,13 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                         switch (abName)
                         {
                             case "build":
-                                factory.Abilities.Add(abilities.BuildBuilding(abPar[1]));
+                                factory.AddAbility(abilities.BuildBuilding(abPar[1]));
                                 break;
                             case "spawn":
-                                factory.Abilities.Add(abilities.UnitSpawn(abPar[1]));
+                                factory.AddAbility(abilities.UnitSpawn(abPar[1]));
                                 break;
                             case "create":
-                                factory.Abilities.Add(abilities.UnitCreate(abPar[1]));
+                                factory.AddAbility(abilities.UnitCreate(abPar[1]));
                                 break;
                         }
                     }

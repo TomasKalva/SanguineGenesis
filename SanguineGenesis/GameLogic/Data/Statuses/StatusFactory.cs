@@ -24,6 +24,11 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         /// </summary>
         public abstract bool ApplyToStatusOwner(IStatusOwner affected);
 
+        /// <summary>
+        /// Returns type of owner.
+        /// </summary>
+        public abstract Type OwnerType { get; }
+
         public abstract string GetName();
 
         public StatusFactory(bool onlyOnce)
@@ -60,6 +65,11 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             affected.AddStatus(newStatus);
             return true;
         }
+
+        /// <summary>
+        /// Returns type of owner.
+        /// </summary>
+        public override Type OwnerType => typeof(Affected);
 
         public override string ToString() => GetName();
     }
