@@ -3,10 +3,12 @@ using SanguineGenesis.GameLogic.Maps;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Schema;
 
 namespace SanguineGenesis.GUI
@@ -37,11 +39,15 @@ namespace SanguineGenesis.GUI
         /// For each number 0-9 contains corresponding glyph. At the index
         /// -1 is glyph for '.'.
         /// </summary>
-        private Dictionary<int, Rect> glyphs;
+        private Dictionary<int, Rect> digits;
         /// <summary>
         /// Contains triangles with numbers from 0 to 99.
         /// </summary>
         private Rect[] numberedTriangles;
+        /// <summary>
+        /// Contains textures for nodes.
+        /// </summary>
+        private Dictionary<NodeDescription, Rect> nodeTextures;
 
         /// <summary>
         /// Position of white unit circle in the atlas.
@@ -85,136 +91,165 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public Rect GreenSquare { get; }
 
-
-        private static readonly ImageAtlas imageAtlas;
-        public static ImageAtlas GetImageAtlas => imageAtlas;
-        static ImageAtlas()
-        {
-            imageAtlas=new ImageAtlas();
-        }
-
-        private ImageAtlas()
-        {
-            InitializeDigitImages();
-            LoadEntitiesAnimations("Images/atlas0.xml");
-            InitializeNumberedTriangles();
-
-            //circles
-            UnitCircleGray = ToRelative(GridToCoordinates(0, 19, 2, 2));
-            UnitCircleRed = ToRelative(GridToCoordinates(2, 19, 2, 2));
-            UnitCircleBlue = ToRelative(GridToCoordinates(4, 19, 2, 2));
-            UnitCircleYellow = ToRelative(GridToCoordinates(6, 19, 2, 2));
-            UnitCircleWhite = ToRelative(GridToCoordinates(8, 19, 2, 2));
-
-            UnitsSelector = ToRelative(GridToCoordinates(3, 0, 1, 1));
-
-            //squares
-            BlackSquare = ToRelative(GridToCoordinates(0, 1, 1, 1));
-            RedSquare = ToRelative(GridToCoordinates(0, 2, 1, 1));
-            GreenSquare = ToRelative(GridToCoordinates(1, 2, 1, 1));
-            BlueSquare = ToRelative(GridToCoordinates(2, 2, 1, 1));
-
-        }
-
         /// <summary>
-        /// Initialize glyphs with images of digits, '.' and '/'.
+        /// Composite index for nodeTextures.
         /// </summary>
-        private void InitializeDigitImages()
+        class NodeDescription
         {
-            glyphs = new Dictionary<int, Rect>();
-            float offset = 0;
-            AddGlyphImage(0, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(1, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(2, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(3, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(4, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(5, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(6, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(7, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(8, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(9, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(10, offset, 3, 0.5f, 1);
-            offset += 0.5f;
-            AddGlyphImage(11, offset, 3, 0.5f, 1);
-        }
-
-        /// <summary>
-        /// Add image for the glyph number.
-        /// </summary>
-        private void AddGlyphImage(int glyph, float left, float bottom, float width, float height)
-        {
-            glyphs.Add(glyph, ToRelative(GridToCoordinates(new Rect(left, bottom, left + width, bottom + height))));
-        }
-
-        /// <summary>
-        /// Initialize numbered triangles.
-        /// </summary>
-        private void InitializeNumberedTriangles()
-        {
-            numberedTriangles = new Rect[100];
-            int tableTop = 30;
-            int tableLeft = 0;
-            for (int i = 0; i < 100; i++)
+            public Biome Biome { get; }
+            public Terrain Terrain { get; }
+            public SoilQuality SoilQuality { get; }
+            public bool Visible { get; }
+            
+            public NodeDescription(Biome biome, Terrain terrain, SoilQuality soilQuality, bool visible)
             {
-                int x = tableLeft + (i / 10);
-                int y = tableTop - (i % 10);
-                numberedTriangles[i] = ToRelative(GridToCoordinates(new Rect(x, y, x+1, y+1)));
+                Biome = biome;
+                Terrain = terrain;
+                SoilQuality = soilQuality;
+                Visible = visible;
+            }
+
+            public static bool operator ==(NodeDescription a, NodeDescription b) =>
+                a.Biome == b.Biome && a.Terrain == b.Terrain &&
+                a.SoilQuality == b.SoilQuality && a.Visible == b.Visible;
+
+            public static bool operator !=(NodeDescription a, NodeDescription b) => !(a == b);
+
+            public override bool Equals(object obj)
+            {
+                if (obj is NodeDescription nd)
+                    return this == nd;
+                else
+                    return false;
+            }
+
+            public override int GetHashCode()
+            {
+                return Biome.GetHashCode() * 7 + Terrain.GetHashCode() * 13 + SoilQuality.GetHashCode() * 23 + Visible.GetHashCode() * 37;
             }
         }
 
         /// <summary>
-        /// Loads animations from the file.
+        /// Singleton instance of this class.
         /// </summary>
-        /// <param name="animationDescriptionFileName">The file name.</param>
-        private void LoadEntitiesAnimations(string animationDescriptionFileName)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(animationDescriptionFileName);
+        public static ImageAtlas GetImageAtlas { get; private set; }
 
+        /// <summary>
+        /// Initializes this class with new instance.
+        /// </summary>
+        public static void Init() 
+        {
+            if(GetImageAtlas==null)
+                GetImageAtlas = new ImageAtlas();
+        }
+
+        private ImageAtlas()
+        {
+            XDocument doc = XDocument.Load("Images/atlas.xml");
+
+            //returns child element of root with name=elemName
+            Func<string, XElement> elWithName =
+                (string elemName) => (from el in doc.Root.Elements()
+                                      where el.Name.LocalName == elemName
+                                      select el).First();
+
+            InitializeDigitImages(elWithName("Digits"));
+            LoadEntitiesAnimations(elWithName("Entities"));
+            InitializeNumberedTriangles(elWithName("NumbersArray"));
+            InitializeNodes(elWithName("Nodes"));
+
+            XElement shapes = (from el in doc.Root.Elements() where el.Name.LocalName == "Shapes" select el).First();
+            //finds subelement with attribute name=attrName
+            Func<string, XElement> shapesImgElWithName = 
+                (string attrName) => (from el in shapes.Elements() 
+                                      where el.Attribute("Name").Value==attrName 
+                                      select (XElement)el.FirstNode).First();
+
+            //circles
+            UnitCircleGray = LoadImage(shapesImgElWithName("UnitCircleGray"));
+            UnitCircleRed = LoadImage(shapesImgElWithName("UnitCircleRed"));
+            UnitCircleBlue = LoadImage(shapesImgElWithName("UnitCircleBlue"));
+            UnitCircleYellow = LoadImage(shapesImgElWithName("UnitCircleYellow"));
+            UnitCircleWhite = LoadImage(shapesImgElWithName("UnitCircleWhite"));
+
+            UnitsSelector = LoadImage(shapesImgElWithName("UnitsSelector"));
+
+            //squares
+            BlackSquare = LoadImage(shapesImgElWithName("BlackSquare"));
+            RedSquare = LoadImage(shapesImgElWithName("RedSquare"));
+            GreenSquare = LoadImage(shapesImgElWithName("GreenSquare"));
+            BlueSquare = LoadImage(shapesImgElWithName("BlueSquare"));
+        }
+
+        /// <summary>
+        /// Initialize digits with images of digits, '.' and '/'.
+        /// </summary>
+        private void InitializeDigitImages(XElement digits)
+        {
+            this.digits = new Dictionary<int, Rect>();
+
+            foreach(XElement digit in digits.Elements())
+            {
+                int value = int.Parse(digit.Attribute("Value").Value, CultureInfo.InvariantCulture);
+                this.digits.Add(value, LoadImage((XElement)digit.FirstNode));
+            }
+        }
+
+        /// <summary>
+        /// Initialize numbered triangles, numbersArray determines number of the triangles.
+        /// </summary>
+        private void InitializeNumberedTriangles(XElement numbersArray)
+        {
+            int tableTop = int.Parse(numbersArray.Attribute("Y").Value, CultureInfo.InvariantCulture);
+            int tableLeft = int.Parse(numbersArray.Attribute("X").Value, CultureInfo.InvariantCulture);
+            int width = int.Parse(numbersArray.Attribute("Width").Value, CultureInfo.InvariantCulture);
+            int height = int.Parse(numbersArray.Attribute("Height").Value, CultureInfo.InvariantCulture);
+
+            //initialize numbered triangles with the image extents
+            int arraySize = width * height;
+            numberedTriangles = new Rect[arraySize];
+            for (int i = 0; i < arraySize; i++)
+            {
+                int x = tableLeft + (i / width);
+                int y = tableTop - (i % height);
+                numberedTriangles[i] = ToRelative(GridToCoordinates(x, y, 1, 1));
+            }
+        }
+
+        /// <summary>
+        /// Loads entities.
+        /// </summary>
+        /// <param name="animationDescriptionFileName">Element whose subelements are entities.</param>
+        private void LoadEntitiesAnimations(XElement entities)
+        {
             //iterate over all entities
             entitiesAnimations = new Dictionary<string, Animation>();
-            foreach (XmlElement entity in doc.GetElementsByTagName("Entities")[0].ChildNodes)
+            foreach (XElement entity in entities.Elements())
             {
-                string entityType = entity.GetAttribute("EntityType");
+                string entityType = entity.Attribute("EntityType").Value;
                 //iterate over all animations of the entity
-                foreach (XmlElement animation in entity.ChildNodes)
+                foreach (XElement animation in entity.Elements())
                 {
-                    XmlElement firstImage = (XmlElement)animation.FirstChild;
-                    float centerX = float.Parse(animation.GetAttribute("CenterX"), CultureInfo.InvariantCulture);
-                    float centerY = float.Parse(animation.GetAttribute("CenterY"), CultureInfo.InvariantCulture);
-                    float animWidth = float.Parse(firstImage.GetAttribute("Width"), CultureInfo.InvariantCulture);
-                    float animHeight = float.Parse(firstImage.GetAttribute("Height"), CultureInfo.InvariantCulture);
-                    string action = animation.GetAttribute("Action");
+                    XElement firstImage = (XElement)animation.FirstNode;
+                    float centerX = float.Parse(animation.Attribute("CenterX").Value, CultureInfo.InvariantCulture);
+                    float centerY = float.Parse(animation.Attribute("CenterY").Value, CultureInfo.InvariantCulture);
+                    float animWidth = float.Parse(firstImage.Attribute("Width").Value, CultureInfo.InvariantCulture);
+                    float animHeight = float.Parse(firstImage.Attribute("Height").Value, CultureInfo.InvariantCulture);
+                    string action = animation.Attribute("Action").Value;
 
                     //iterate over all images of the animation
                     var animationImages = new List<Rect>();
                     var animChangeTime = new List<float>(animationImages.Count);
-                    foreach (XmlElement image in animation.ChildNodes)
+                    foreach (XElement image in animation.Elements())
                     {
                         //load extents of the image
-                        float x = float.Parse(image.GetAttribute("X"), CultureInfo.InvariantCulture);
-                        float y = float.Parse(image.GetAttribute("Y"), CultureInfo.InvariantCulture);
-                        float width = float.Parse(image.GetAttribute("Width"), CultureInfo.InvariantCulture);
-                        float height = float.Parse(image.GetAttribute("Height"), CultureInfo.InvariantCulture);
-                        animationImages.Add(
-                            ToRelative(
-                                GridToCoordinates(x, y, width, height)));
+                        animationImages.Add(LoadImage(image));
 
                         //load duration of the image
-                        string dur = image.GetAttribute("Duration");
-                        if (dur != "")
+                        var dur = image.Attribute("Duration");
+                        if (dur != null)
                         {
-                            float duration = float.Parse(dur, CultureInfo.InvariantCulture);
+                            float duration = float.Parse(dur.Value, CultureInfo.InvariantCulture);
                             animChangeTime.Add(duration);
                         }
                         else
@@ -229,10 +264,48 @@ namespace SanguineGenesis.GUI
                     AddEntitiesAnimation(animationName, action, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
                 }
             }
+        }
 
+        /// <summary>
+        /// Loads nodes images.
+        /// </summary>
+        /// <param name="animationDescriptionFileName">Element whose subelements are nodes.</param>
+        private void InitializeNodes(XElement nodes)
+        {
+            //iterate over all nodes
+            nodeTextures = new Dictionary<NodeDescription, Rect>();
+            foreach (XElement node in nodes.Elements())
+            {
+                Biome biome = (Biome)Enum.Parse(typeof(Biome), node.Attribute("Biome").Value);
+                Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), node.Attribute("Terrain").Value);
+                SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), node.Attribute("SoilQuality").Value);
+                bool visible = bool.Parse(node.Attribute("Visible").Value);
+                XElement image = (XElement)node.FirstNode;
+                nodeTextures.Add(new NodeDescription(biome, terrain, soilQuality, visible), LoadImage(image));
+
+            }
         }
 
         private string AnimationName(string entityType, string action)  => entityType + "__" + action;
+
+        /// <summary>
+        /// Creates rectangle from imageElement. Extents of the rectangle are relative to the atlas extents.
+        /// </summary>
+        /// <param name="imageElement">Element that describes the image.</param>
+        /// <returns></returns>
+        private Rect LoadImage(XElement imageElement)
+        {
+            if (imageElement == null || imageElement.Name.LocalName != "Image")
+                return default(Rect);
+
+            //load extents of the image
+            float x = float.Parse(imageElement.Attribute("X").Value, CultureInfo.InvariantCulture);
+            float y = float.Parse(imageElement.Attribute("Y").Value, CultureInfo.InvariantCulture);
+            float width = float.Parse(imageElement.Attribute("Width").Value, CultureInfo.InvariantCulture);
+            float height = float.Parse(imageElement.Attribute("Height").Value, CultureInfo.InvariantCulture);
+
+            return ToRelative(GridToCoordinates(x, y, width, height));
+        }
 
         /// <summary>
         /// Creates new Animation for the entity with the given parameters and adds it to entitiesAnimations.
@@ -255,14 +328,6 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Transforms coordinates of a rectangle in the grid to the coordinates in the atlas.
-        /// </summary>
-        private Rect GridToCoordinates(Rect rect)
-        {
-            return GridToCoordinates(rect.Left, rect.Bottom, rect.Width, rect.Height);
-        }
-
-        /// <summary>
         /// Makes the rect's coordinates relative to the image atlas.
         /// </summary>
         private Rect ToRelative(Rect rect)
@@ -274,83 +339,15 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Get coordinates, where the image for the terrain is located in the atlas. Returns darker
+        /// Get coordinates, where the image for the node is located in the atlas. Returns darker
         /// copy of the texture, if visible is false. The coordinates are relative to the atlas.
         /// </summary>
         public Rect GetTileCoords(Biome biome, SoilQuality soilQuality, Terrain terrain, bool visible)
         {
-            Rect coords = default;
-            if(terrain==Terrain.SHALLOW_WATER)
-                switch (biome)
-                {
-                    case Biome.DEFAULT:
-                        coords = new Rect(5, 0, 6f, 1f);
-                        break;
-                    case Biome.SAVANNA:
-                        coords = new Rect(3, 1, 4, 2);
-                        break;
-                    case Biome.RAINFOREST:
-                        coords = new Rect(1, 1, 2, 2);
-                        break;
-                }
-            else if(terrain==Terrain.DEEP_WATER)
-                switch (biome)
-                {
-                    case Biome.DEFAULT:
-                        coords = new Rect(1, 0, 2, 1);
-                        break;
-                    case Biome.SAVANNA:
-                        coords = new Rect(4, 1, 5, 2);
-                        break;
-                    case Biome.RAINFOREST:
-                        coords = new Rect(2, 1, 3, 2);
-                        break;
-                }
+            if (nodeTextures.TryGetValue(new NodeDescription(biome, terrain, soilQuality, visible), out Rect value))
+                return value;
             else
-            {
-                //terrain is land
-                switch (biome)
-                {
-                    case Biome.RAINFOREST:
-                        switch (soilQuality)
-                        {
-                            case SoilQuality.LOW:
-                                coords =  new Rect (0, 0, 1, 1);
-                                break;
-                            case SoilQuality.MEDIUM:
-                                coords =  new Rect(6, 0, 7, 1);
-                                break;
-                            case SoilQuality.HIGH:
-                                coords =  new Rect(7, 0, 8, 1);
-                                break;
-                        }
-                        break;
-                    case Biome.SAVANNA:
-                        switch (soilQuality)
-                        {
-                            case SoilQuality.LOW:
-                                coords =  new Rect(8, 0, 9, 1);
-                                break;
-                            case SoilQuality.MEDIUM:
-                                coords =  new Rect(9, 0, 10, 1);
-                                break;
-                            case SoilQuality.HIGH:
-                                throw new ArgumentException("Savanna doesn't have high quality soil!");
-                        }
-                        break;
-                    default:
-                        coords =  new Rect(4, 0, 5, 1);
-                        break;
-                }
-            }
-            //use darker variant of the square if it's not visible
-            if (!visible)
-                coords = new Rect(coords.Left, coords.Bottom + 17, coords.Right, coords.Top + 17);
-
-            if(coords.Equals(default(Rect)))
-                throw new ArgumentException("Combination " + terrain + ", " + biome + ", " + soilQuality + " isn't valid");
-
-            return ToRelative(GridToCoordinates(coords));
+                return default;
         }
 
         /// <summary>
@@ -370,12 +367,12 @@ namespace SanguineGenesis.GUI
         /// For other values argument exception is thrown.
         /// </summary>
         /// <exception cref="ArgumentException">Thrown if the image for the char doesn't exist.</exception>
-        public Rect GetGlyph(int glyph)
+        public Rect GetDigit(int digit)
         {
-            if (glyphs.TryGetValue(glyph, out Rect rect))
+            if (digits.TryGetValue(digit, out Rect rect))
                 return rect;
             else
-                throw new ArgumentException(glyph + " is not a valid glyph!");
+                throw new ArgumentException(digit + " is not a valid glyph!");
         }
 
         /// <summary>
@@ -385,10 +382,10 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public Rect GetNumberedTriangle(int number)
         {
-            if(number>= 0 && number<100)
+            if(number>= 0 && number < numberedTriangles.Length)
                 return numberedTriangles[number];
             else
-                return numberedTriangles[0];
+                return default;
         }
     }
 

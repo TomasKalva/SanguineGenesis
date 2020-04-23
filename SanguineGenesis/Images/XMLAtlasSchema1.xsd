@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="XMLAtlasSchema1"
+    targetNamespace="http://tempuri.org/XMLAtlasSchema1.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/XMLAtlasSchema1.xsd"
+    xmlns:mstns="http://tempuri.org/XMLAtlasSchema1.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name='Atlas'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='Entities'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='Entity' type='Entity' minOccurs='1' maxOccurs='unbounded' />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='Nodes'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='Node' type='Node' minOccurs='1' maxOccurs='unbounded' />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='Shapes'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='Shape' type='Shape' minOccurs='1' maxOccurs='unbounded' />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='Digits'>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name='Digit' type='Digit' minOccurs='1' maxOccurs='unbounded' />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name='NumbersArray'>
+          <xs:complexType>
+            <xs:attribute name='X' type='xs:integer'/>
+            <xs:attribute name='Y' type='xs:integer'/>
+            <xs:attribute name='Width' type='xs:integer'/>
+            <xs:attribute name='Height' type='xs:integer'/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name='Entity'>
+    <xs:sequence>
+      <xs:element name='Animation' type='Animation' minOccurs='1' maxOccurs='unbounded' />
+    </xs:sequence>
+    <xs:attribute name='EntityType' type='xs:string'/>
+  </xs:complexType>
+
+  <xs:complexType name='Animation'>
+    <xs:sequence>
+      <xs:element name='Image' type='Image' minOccurs='1' maxOccurs='unbounded' />
+    </xs:sequence>
+    <xs:attribute name='Action' type='xs:string'/>
+    <!--IDLE/RUNNING/ATTACKING-->
+    <xs:attribute name='CenterX' type='xs:float'/>
+    <xs:attribute name='CenterY' type='xs:float'/>
+  </xs:complexType>
+
+  <xs:complexType name='Image'>
+    <xs:attribute name='X' type='xs:float'/>
+    <xs:attribute name='Y' type='xs:float'/>
+    <xs:attribute name='Width' type='xs:float'/>
+    <xs:attribute name='Height' type='xs:float'/>
+    <xs:attribute name='Duration' type='xs:float' default='0.5'/>
+  </xs:complexType>
+
+  <xs:complexType name='Node'>
+    <xs:sequence>
+      <xs:element name='Image' type='Image'/>
+    </xs:sequence>
+    <xs:attribute name='Biome' type='xs:string'/>
+    <xs:attribute name='Terrain' type='xs:string'/>
+    <xs:attribute name='SoilQuality' type='xs:string'/>
+    <xs:attribute name='Visible' type='xs:boolean'/>
+  </xs:complexType>
+
+  <xs:complexType name='Shape'>
+    <xs:sequence>
+      <xs:element name='Image' type='Image'/>
+    </xs:sequence>
+    <xs:attribute name='Name' type='xs:string'/>
+  </xs:complexType>
+
+  <xs:complexType name='Digit'>
+    <xs:sequence>
+      <xs:element name='Image' type='Image'/>
+    </xs:sequence>
+    <xs:attribute name='Value' type='xs:integer'/>
+  </xs:complexType>
+</xs:schema>

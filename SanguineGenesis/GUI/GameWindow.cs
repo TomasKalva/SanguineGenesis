@@ -60,6 +60,17 @@ namespace SanguineGenesis.GUI
             GameUpdateTimer.Tick += GameUpdateTimer_MainLoop;
             GameUpdateTimer.Interval = 10;
 
+            //initialize ImageAtlas
+            try
+            {
+                ImageAtlas.Init();
+            }catch(Exception e)
+            {
+                MessageBox.Show("Failed to initialize the window: " + e.Message);
+                MainMenuWindow.CanCreateGame = false;
+                Close();
+            }
+
             //waint until the window initializes and then initialize bottom panel and opengl
             Shown += (s, e) =>
             {

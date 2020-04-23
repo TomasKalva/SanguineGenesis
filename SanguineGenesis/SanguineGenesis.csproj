@@ -211,8 +211,9 @@
     <None Include="GameLogic\Data\Entities\Animals.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\XMLAtlasSchema.xsd">
+    <None Include="Images\XMLAtlasSchema1.xsd">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -235,7 +236,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\atlas0.xml">
+    <None Include="Images\atlas.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
