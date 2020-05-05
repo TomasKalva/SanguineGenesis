@@ -25,10 +25,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         private float MaxDistToMove { get; set; }
         /// <summary>
-        /// False if the unit shouldn't be pushed by collisions.
-        /// </summary>
-        public bool CanBeMoved { get; set; }
-        /// <summary>
         /// Set to true to set WantsToMove to false in Move method.
         /// </summary>
         public bool StopMoving { get; set; }
@@ -36,6 +32,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// True if the animal is performing a MoveToCommand.
         /// </summary>
         public bool WantsToMove { get; set; }
+        
         /// <summary>
         /// Direction the unit is facing.
         /// </summary>
@@ -45,6 +42,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public bool FacingLeft => Direction.X <= 0;
 
+        /// <summary>
+        /// False if the animal shouldn't be pushed by collisions.
+        /// </summary>
+        public bool CanBeMoved { get; set; }
         /// <summary>
         /// Energy regenerated from eating food.
         /// </summary>
@@ -82,7 +83,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public float MaxSpeedWater { get; }
         /// <summary>
-        /// Where the unit can walk.
+        /// Where the animal can walk.
         /// </summary>
         public Movement Movement { get; }
         /// <summary>
@@ -180,11 +181,13 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         #endregion IShowable
 
         #region Movement
+
         /// <summary>
         /// Animal moves using its velocity.
         /// </summary>
         public void Move(Map map, float deltaT)
         {
+            //stop moving
             if (StopMoving)
             {
                 StopMoving = false;
@@ -208,7 +211,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Add acceleration to units velocity. The length of the result velocity will be at most maxDistance.
+        /// Accelerate animal's velocity. The length of the result velocity will be at most maxDistance.
         /// </summary>
         public void Accelerate(Vector2 direction, float maxDistance, Map map)
         {

@@ -268,11 +268,25 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Deals damage to the entity, equal to the damage.
+        /// Deals damage to the entity. physical should be true iff the damage
+        /// is dealth physical (by being hit). Non-physical damage is poison,
+        /// bleeding, ...
         /// </summary>
         public virtual void Damage(float damage, bool physical)
         {
             Damage(damage);
+        }
+
+        /// <summary>
+        /// Called after this entity dies. Can add a new Structure to neutral faction but only from
+        /// not neutral faction.
+        /// </summary>
+        public virtual void Die(Game game)
+        {
+            //reset commands - some commands might require entity to be unregistered (e.g. MoveTo)
+            ResetCommands();
+            //reset statuses
+            ResetStatuses();
         }
 
         /// <summary>
@@ -291,21 +305,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             return (this.Center - n.Center).Length - this.Radius - 0.5f;
         }
 
-        /// <summary>
-        /// Called after this entity dies. Can add a new Structure to neutral faction but only from
-        /// not neutral faction.
-        /// </summary>
-        public virtual void Die(Game game)
-        {
-            //reset commands - some commands might require entity to be unregistered (e.g. MoveTo)
-            ResetCommands();
-            //reset statuses
-            ResetStatuses();
-        }
-
         float ITargetable.DistanceTo(Entity entity)
         {
-            return (entity.Center - Center).Length - entity.Radius - Radius;
+            return DistanceTo(entity);
         }
 
         #region IShowable
