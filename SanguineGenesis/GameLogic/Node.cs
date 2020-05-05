@@ -37,25 +37,25 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Terrain of this node.
         /// </summary>
-        public Terrain Terrain { get; set; }
+        public Terrain Terrain { get; }
         /// <summary>
         /// Backing field for Nutrients.
         /// </summary>
-        private float activeNutrients;
+        private FloatRange activeNutrients;
         /// <summary>
-        /// Amount of nutrients in this node. Belongs to [0, MAX_NUTRIENTS].
+        /// Amount of nutrients in this node. Belongs to [0, MAX_ACTIVE_NUTRIENTS].
         /// </summary>
         public float ActiveNutrients
         {
             get => activeNutrients;
             set
             {
-                activeNutrients = Math.Min(MAX_ACTIVE_NUTRIENTS, Math.Max(0, value));
+                activeNutrients = new FloatRange(MAX_ACTIVE_NUTRIENTS, value);
                 SoilQuality = Terrain.Quality(Biome, ActiveNutrients);
             }
         }
         /// <summary>
-        /// The amount of nutrients that can be extracted from this node.
+        /// The amount of nutrients that can be extracted from this node. Belongs to [0, MAX_PASSIVE_NUTRIENTS].
         /// </summary>
         public FloatRange PassiveNutrients { get; set; }
         /// <summary>
@@ -77,24 +77,19 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Soil quality of this node.
         /// </summary>
-        public SoilQuality SoilQuality { get; set; }
+        public SoilQuality SoilQuality { get; private set; }
         /// <summary>
         /// True iff a building or structure is standing on this node.
         /// </summary>
-        public bool Blocked { get; private set; }
+        public bool Blocked => Building != null;
         /// <summary>
         /// True iff physical building is standing on this node.
         /// </summary>
         public bool MovementBlocked => Building != null && Building.Physical;
-        private Building building;
         /// <summary>
         /// Building standing on this node.
         /// </summary>
-        public Building Building
-        {
-            get { return building; }
-            set { building = value; Blocked = building != null; }
-        }
+        public Building Building { get; set; }
         /// <summary>
         /// List of plants whose roots are on this node.
         /// </summary>
@@ -108,11 +103,11 @@ namespace SanguineGenesis.GameLogic
         {
             Terrain = terrain;
             Biome = biome;
-            ActiveNutrients = activeNutrients;
+            ActiveNutrients = new FloatRange(MAX_ACTIVE_NUTRIENTS, activeNutrients);
             PassiveNutrients = new FloatRange(MAX_PASSIVE_NUTRIENTS, passiveNutrients);
             X = x;
             Y = y;
-            Blocked = false;
+            Building = null;
             Roots = new List<Plant>();
         }
 

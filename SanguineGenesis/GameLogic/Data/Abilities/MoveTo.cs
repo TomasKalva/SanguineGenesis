@@ -132,13 +132,15 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (CommandedEntity.AnimationState.Animation.Action!="RUNNING")
                 CommandedEntity.SetAnimation("RUNNING");
 
-            //if an enemy is in attack range, attack it instead of other commands
+            //if an enemy animal is in attack range, attack it instead of other commands
             if (Ability.AttackEnemyInstead)
             {
-                Entity enemy = game.GetAll<Entity>().Where(
-                            (a) => a.Faction.FactionID == CommandedEntity.Faction.FactionID.Opposite()
-                            && CommandedEntity.DistanceTo(a) <= CommandedEntity.AttackDistance
-                            && CommandedEntity.Faction.CanSee(a)).FirstOrDefault();
+                Animal enemy = game.Players[CommandedEntity.Faction.FactionID.Opposite()]
+                                .GetAll<Animal>().Where(
+                                    (a) => a.Faction.FactionID == CommandedEntity.Faction.FactionID.Opposite()
+                                    && CommandedEntity.DistanceTo(a) <= CommandedEntity.AttackDistance
+                                    && CommandedEntity.Faction.CanSee(a))
+                                .FirstOrDefault();
                 if (enemy != null)
                 {
                     //attack the enemy

@@ -21,6 +21,22 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     abstract class Entity: ITargetable, IMovementTarget, IRectangle, IShowable, IStatusOwner
     {
         /// <summary>
+        /// Name of the entity.
+        /// </summary>
+        public string EntityType { get; }
+        /// <summary>
+        /// If health reaches 0 the unit dies and is removed from the game.
+        /// </summary>
+        public FloatRange Health { get; set; }
+        /// <summary>
+        /// The entity will be removed from the game.
+        /// </summary>
+        public virtual bool IsDead => Health <= 0;
+        /// <summary>
+        /// Used for casting abilities.
+        /// </summary>
+        public FloatRange Energy { get; set; }
+        /// <summary>
         /// Center of this entity on the map.
         /// </summary>
         public virtual Vector2 Center { get; }
@@ -29,60 +45,46 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public abstract float Radius { get; }
         /// <summary>
+        /// True iff the entity collides with other physical entities.
+        /// </summary>
+        public bool Physical { get; set; }
+        /// <summary>
         /// How far the unit sees.
         /// </summary>
         public float ViewRange { get; set; }
         /// <summary>
-        /// The entity is selected by the player and highlighted on the map.
+        /// Faction which owns this unit.
         /// </summary>
-        public bool Selected { get; set; }
-        /// <summary>
-        /// The commands this entity will perform.
-        /// </summary>
-        public CommandQueue CommandQueue { get; }
+        public Faction Faction { get; }
+
         /// <summary>
         /// Represents parameters of this entity's view of the map. Can be used from
         /// other thread.
         /// </summary>
         public View View => new View(Center, ViewRange);
         /// <summary>
-        /// Faction which owns this unit.
-        /// </summary>
-        public Faction Faction { get; }
-        /// <summary>
         /// Entity's current animation.
         /// </summary>
         public AnimationState AnimationState { get; set; }
         /// <summary>
-        /// The entity will be removed from the game.
+        /// The entity is selected by the player and highlighted on the map.
         /// </summary>
-        public virtual bool IsDead => Health <= 0;
-        /// <summary>
-        /// If health reaches 0 the unit dies and is removed from the game.
-        /// </summary>
-        public FloatRange Health { get; set; }
-        /// <summary>
-        /// Used for casting abilities.
-        /// </summary>
-        public FloatRange Energy { get; set; }
-        /// <summary>
-        /// Name of the entity.
-        /// </summary>
-        public string EntityType { get; }
-        /// <summary>
-        /// True iff the entity collides with other physical entities.
-        /// </summary>
-        public bool Physical { get; set; }
+        public bool Selected { get; set; }
+
         /// <summary>
         /// Abilities this entity can cast.
         /// </summary>
         public List<Ability> Abilities { get; }
         /// <summary>
+        /// The commands this entity will perform.
+        /// </summary>
+        public CommandQueue CommandQueue { get; }
+        /// <summary>
         /// Statuses that are affecting this entity.
         /// </summary>
         public List<Status> Statuses { get; }
 
-        //map extents
+        //entity extents
         public float Left => Center.X - Radius;
         public float Right => Center.X + Radius;
         public float Bottom => Center.Y - Radius;

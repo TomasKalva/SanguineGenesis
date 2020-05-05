@@ -261,7 +261,7 @@ namespace SanguineGenesis.GameLogic.Maps
         private float nutrientUpdateTimer = NUTRIENT_UPDATE_TIME;
 
         /// <summary>
-        /// Plants draing nutrients from nodes and nodes with roots generate nutrients.
+        /// Plants draining nutrients from nodes and nodes with roots generate nutrients.
         /// </summary>
         public void UpdateNutrientsMap(IEnumerable<Plant> plants, float deltaT)
         {
@@ -280,7 +280,6 @@ namespace SanguineGenesis.GameLogic.Maps
                 }
             }
 
-
             //nutrients biomes and terrain can't be updated in this step after calling this method
             LoseBiome();
         }
@@ -289,7 +288,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// Nodes with roots of producers produce nutrients trients. Nutrients can't be produced under
         /// structures.
         /// </summary>
-        public void ProduceNutrients()
+        private void ProduceNutrients()
         {
             //generate nutrients
             for (int i = 0; i < Width; i++)
@@ -307,7 +306,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <summary>
         /// Spread biomes to neighbor nodes.
         /// </summary>
-        public void SpreadBiomes()
+        private void SpreadBiomes()
         {
             //spread biome to neighbors
             Biome[,] newBiomes = new Biome[Width, Height];
@@ -366,7 +365,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <summary>
         /// Node loses biome if the soil quality is bad.
         /// </summary>
-        public void LoseBiome()
+        private void LoseBiome()
         {
             //lose biome if the soil quality is too bad
             for (int i = 0; i < Width; i++)

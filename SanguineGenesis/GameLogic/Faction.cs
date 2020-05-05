@@ -281,7 +281,6 @@ namespace SanguineGenesis.GameLogic
                         destN.Biome = sourceN.Biome;
                         destN.ActiveNutrients = sourceN.ActiveNutrients;
                         destN.PassiveNutrients = sourceN.PassiveNutrients;
-                        destN.Terrain = sourceN.Terrain;
                     }
                 }
         }

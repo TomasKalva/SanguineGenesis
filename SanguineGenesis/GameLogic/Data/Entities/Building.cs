@@ -23,7 +23,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public override float Radius => Size / 2f;
         /// <summary>
-        /// True iff the building was built.
+        /// True iff building of this building was finished.
         /// </summary>
         public bool Built { get; set; }
         /// <summary>

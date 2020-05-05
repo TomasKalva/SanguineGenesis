@@ -100,30 +100,30 @@ namespace SanguineGenesis.GameLogic.Maps
 
         public static implicit operator FloatRange(float fl)
             => new FloatRange(fl, fl);
-        public static FloatRange operator +(FloatRange decR, float dec)
-            => new FloatRange(decR.MaxValue, decR.Value + dec);
-        public static FloatRange operator -(FloatRange decR, float dec)
-            => new FloatRange(decR.MaxValue, decR.Value - dec);
-        public static FloatRange operator *(FloatRange decR, float dec)
-            => new FloatRange(decR.MaxValue, decR.Value * dec);
-        public static FloatRange operator /(FloatRange decR, float dec)
-            => new FloatRange(decR.MaxValue, decR.Value / dec);
-        public static bool operator ==(FloatRange decR, float dec)
-           => decR.Value == dec;
-        public static bool operator !=(FloatRange decR, float dec)
-           => decR.Value != dec;
-        public static bool operator ==(FloatRange decRa, FloatRange decRb)
-           => decRa.Value == decRb.Value;
-        public static bool operator !=(FloatRange decRa, FloatRange decRb)
-           => decRa.Value != decRb.Value;
-        public static bool operator <(FloatRange decR, float dec)
-           => decR.Value < dec;
-        public static bool operator >(FloatRange decR, float dec)
-           => decR.Value > dec;
-        public static bool operator <=(FloatRange decR, float dec)
-           => decR.Value <= dec;
-        public static bool operator >=(FloatRange decR, float dec)
-           => decR.Value >= dec;
+        public static FloatRange operator +(FloatRange flR, float fl)
+            => new FloatRange(flR.MaxValue, flR.Value + fl);
+        public static FloatRange operator -(FloatRange flR, float fl)
+            => new FloatRange(flR.MaxValue, flR.Value - fl);
+        public static FloatRange operator *(FloatRange flR, float fl)
+            => new FloatRange(flR.MaxValue, flR.Value * fl);
+        public static FloatRange operator /(FloatRange flR, float fl)
+            => new FloatRange(flR.MaxValue, flR.Value / fl);
+        public static bool operator ==(FloatRange flR, float fl)
+           => flR.Value == fl;
+        public static bool operator !=(FloatRange flR, float fl)
+           => flR.Value != fl;
+        public static bool operator ==(FloatRange flRa, FloatRange flRb)
+           => flRa.Value == flRb.Value;
+        public static bool operator !=(FloatRange flRa, FloatRange flRb)
+           => flRa.Value != flRb.Value;
+        public static bool operator <(FloatRange flR, float fl)
+           => flR.Value < fl;
+        public static bool operator >(FloatRange flR, float fl)
+           => flR.Value > fl;
+        public static bool operator <=(FloatRange flR, float fl)
+           => flR.Value <= fl;
+        public static bool operator >=(FloatRange flR, float fl)
+           => flR.Value >= fl;
         public override bool Equals(object o)
         {
             if (o is FloatRange)
@@ -137,8 +137,8 @@ namespace SanguineGenesis.GameLogic.Maps
         {
             return value.GetHashCode();
         }
-        public static implicit operator float(FloatRange decR)
-          => decR.Value;
+        public static implicit operator float(FloatRange flR)
+          => flR.Value;
 
         public float Percentage => MaxValue != 0 ? Value / MaxValue : 0;
         public float AmountNotFilled => MaxValue - Value;

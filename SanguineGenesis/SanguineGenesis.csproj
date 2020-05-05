@@ -132,9 +132,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GameLogic\Maps\MovementGenerating\FlowField.cs" />
-    <Compile Include="GameControls\GameControls.cs" />
+    <Compile Include="GUI\GameControls\GameControls.cs" />
     <Compile Include="GameLogic\GameQuerying.cs" />
-    <Compile Include="GameControls\SelectedGroup.cs" />
+    <Compile Include="GUI\GameControls\SelectedGroup.cs" />
     <Compile Include="GameLogic\Data\Abilities\Command.cs" />
     <Compile Include="GUI\WinFormsComponents\ButtonArray.cs">
       <SubType>Component</SubType>
@@ -147,9 +147,9 @@
     </Compile>
     <Compile Include="GUI\IRectangle.cs" />
     <Compile Include="GameLogic\Maps\IMap.cs" />
-    <Compile Include="GameControls\MapMovementInput.cs" />
-    <Compile Include="GameControls\MapSelectorFrame.cs" />
-    <Compile Include="GameControls\MapView.cs" />
+    <Compile Include="GUI\GameControls\MapMovementInput.cs" />
+    <Compile Include="GUI\GameControls\MapSelectorFrame.cs" />
+    <Compile Include="GUI\GameControls\MapView.cs" />
     <Compile Include="GameLogic\Maps\ObstacleMap.cs" />
     <Compile Include="GUI\OpenGL\ImageAtlas.cs" />
     <Compile Include="GUI\OpenGL\OpenGLAtlasDrawer.cs" />
@@ -157,7 +157,7 @@
     <Compile Include="GameLogic\Faction.cs" />
     <Compile Include="GameLogic\Maps\PushingMapGenerator.cs" />
     <Compile Include="GameLogic\Rect.cs" />
-    <Compile Include="GameControls\SelectionInput.cs" />
+    <Compile Include="GUI\GameControls\SelectionInput.cs" />
     <Compile Include="GameLogic\Terrain.cs" />
     <Compile Include="GameLogic\Data\Entities\Entity.cs" />
     <Compile Include="GUI\WinFormsComponents\GameMenu.cs">

@@ -70,26 +70,34 @@ namespace SanguineGenesis.GameLogic.Maps
         }
 
         /// <summary>
-        /// Returns terrain corresponding to the color c.
+        /// Loads buildings to the game, MapDescription has to have same size
+        /// as the game map. If game.Map is null, exception is thrown.
         /// </summary>
-        private Terrain GetTerrain(Color c)
-        {
-            return ColorToTerrain[c];
-        }
-
-        /// <summary>
-        /// Loads buildings to the game, the image with map of buildings has to have the same size
-        /// as the game map.
-        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if game.Map is null.</exception>
         public void LoadBuildings(Game game)
         {
+            if (game.Map == null)
+                throw new ArgumentException("Map has to be loaded before loading buildings.");
+
             Map map = game.Map;
             List<BuildingDescriptor> buildings = MapDescription.GetBuildings;
             //add buildings
-            foreach(BuildingDescriptor bd in buildings)
+            foreach (BuildingDescriptor bd in buildings)
             {
                 SetBuilding(bd.Type, map[bd.X, bd.Y], game);
             }
+        }
+
+        /// <summary>
+        /// Returns terrain corresponding to the color c. Returns Terrain.LAND for
+        /// incorrect color.
+        /// </summary>
+        private Terrain GetTerrain(Color c)
+        {
+            if (ColorToTerrain.TryGetValue(c, out Terrain terrain))
+                return terrain;
+            else
+                return Terrain.LAND;
         }
 
         /// <summary>
