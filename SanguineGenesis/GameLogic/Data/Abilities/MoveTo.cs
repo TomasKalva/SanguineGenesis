@@ -144,7 +144,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 if (enemy != null)
                 {
                     //attack the enemy
-                    CommandedEntity.StopMoving = true;
+                    CommandedEntity.WantsToMove = false;
                     RemoveFromAssignment();
                     CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy, game.CurrentPlayer.GameStaticData.Abilities.Attack));
                     return false;//new command is already set
@@ -226,7 +226,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override void OnRemove()
         {
-            CommandedEntity.StopMoving = true;
+            CommandedEntity.WantsToMove = false;
             CommandedEntity.SetAnimation("IDLE");
             RemoveFromAssignment();
         }

@@ -25,10 +25,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         private float MaxDistToMove { get; set; }
         /// <summary>
-        /// Set to true to set WantsToMove to false in Move method.
-        /// </summary>
-        public bool StopMoving { get; set; }
-        /// <summary>
         /// True if the animal is performing a MoveToCommand.
         /// </summary>
         public bool WantsToMove { get; set; }
@@ -188,12 +184,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public void Move(Map map, float deltaT)
         {
             //stop moving
-            if (StopMoving)
-            {
-                StopMoving = false;
-                WantsToMove = false;
-                Velocity = new Vector2(0, 0);
-            }
+            if (!WantsToMove)
+                Velocity = new Vector2(0,0);
+
             var dPos = deltaT * Velocity;
             //make the position delta shorter if it's to long
             if (dPos.Length > MaxDistToMove)

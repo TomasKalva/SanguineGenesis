@@ -294,7 +294,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                             animal.SetAnimation("ATTACKING");
                         else
                             animal.SetAnimation("IDLE");
-                        animal.StopMoving = true;
+                        animal.WantsToMove = false;
                     }
                 }
             }
