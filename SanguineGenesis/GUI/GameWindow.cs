@@ -1,5 +1,6 @@
 ﻿using SanguineGenesis.GameControls;
 using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.Data;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
@@ -32,6 +33,10 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
         /// <summary>
+        /// Data about the game.
+        /// </summary>
+        public GameData GameData { get; }
+        /// <summary>
         /// True if the window was initialized.
         /// </summary>
         public bool Initialized { get; set; }
@@ -60,10 +65,11 @@ namespace SanguineGenesis.GUI
             GameUpdateTimer.Tick += GameUpdateTimer_MainLoop;
             GameUpdateTimer.Interval = 10;
 
-            //initialize ImageAtlas
+            //initialize ImageAtlas and GameData
             try
             {
                 ImageAtlas.Init();
+                GameData = new GameData();
             }catch(Exception e)
             {
                 MessageBox.Show("Failed to initialize the window: " + e.Message);
@@ -107,7 +113,7 @@ namespace SanguineGenesis.GUI
                 GameUpdateTimer.Enabled = false;
             }
             //initialize game
-            Game = new Game(mapDescription, playersBiome, GameplayOptions);
+            Game = new Game(mapDescription, playersBiome, GameplayOptions, GameData);
             //reset game controls
             GameControls.Reset();
             //spawn testing animals

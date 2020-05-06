@@ -53,14 +53,14 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public int AirTaken { get; private set; }
 
-        public Faction(FactionType factionID)
+        public Faction(FactionType factionID, GameData gameData)
         {
             FactionID = factionID;
             Animals = new List<Animal>();
             Plants = new List<Plant>();
             Structures = new List<Structure>();
             Corpses = new List<Corpse>();
-            GameData = new GameData();
+            GameData = gameData;
         }
 
         /// <summary>
@@ -190,8 +190,8 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public IAI Ai { get; }
 
-        public Player(FactionType factionID, Biome biome, IAIFactory aiFactory)
-            : base(factionID)
+        public Player(FactionType factionID, Biome biome,GameData gameData, IAIFactory aiFactory)
+            : base(factionID, gameData)
         {
             //SpawnTestingAnimals();
             VisibleBuildings = new List<Building>();
@@ -202,7 +202,7 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Spawns 3 instances of each animal in the game.
+        /// Spawns 6 instances of each animal in the game.
         /// </summary>
         public void SpawnTestingAnimals()
         {
@@ -216,7 +216,7 @@ namespace SanguineGenesis.GameLogic
             int pos = 0;
             foreach (AnimalFactory a in factories.Select(kvp => kvp.Value))
             {
-                for (int j = 0; j < 7; j++)
+                for (int j = 0; j < 6; j++)
                 {
                     var animal = a.NewInstance(this, new Vector2(step * ((pos % gridPoints) + 1),
                                                                  step * ((pos / gridPoints) + 1)));

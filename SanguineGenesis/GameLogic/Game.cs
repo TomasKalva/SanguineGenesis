@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SanguineGenesis.GameLogic.AI;
+using SanguineGenesis.GameLogic.Data;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
@@ -60,7 +61,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         private FactionType nextVisibilityPlayer;
 
-        public Game(MapDescription mapDescription, Biome firstPlayersBiome, GameplayOptions gameplayOptions)
+        public Game(MapDescription mapDescription, Biome firstPlayersBiome, GameplayOptions gameplayOptions, GameData gameData)
         {
             GameEnded = false;
             Winner = null;
@@ -68,11 +69,11 @@ namespace SanguineGenesis.GameLogic
             //factions
             Players = new Dictionary<FactionType, Player>
             {
-                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null) },
-                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, new DumbAIFactory()) }
+                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, gameData, null) },
+                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, gameData, new DumbAIFactory()) }
             };
             CurrentPlayer = Players[FactionType.PLAYER0];
-            NeutralFaction = new Faction(FactionType.NEUTRAL);
+            NeutralFaction = new Faction(FactionType.NEUTRAL, gameData);
 
              //map
             var mapLoader = new MapLoader(mapDescription);
