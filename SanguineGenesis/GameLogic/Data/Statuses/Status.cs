@@ -319,13 +319,13 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public override void Added()
         {
             //add ability for animals climbing down from the tree
-            AffectedEntity.Abilities.Add(AffectedEntity.Faction.GameStaticData.Abilities.ClimbDownTree);
+            AffectedEntity.Abilities.Add(AffectedEntity.Faction.GameData.Abilities.ClimbDownTree);
         }
 
         public override void Removed()
         {
             //remove ability for animals climbing down from the tree
-            AffectedEntity.Abilities.Remove(AffectedEntity.Faction.GameStaticData.Abilities.ClimbDownTree);
+            AffectedEntity.Abilities.Remove(AffectedEntity.Faction.GameData.Abilities.ClimbDownTree);
         }
 
         public override bool Step(Game game, float deltaT)

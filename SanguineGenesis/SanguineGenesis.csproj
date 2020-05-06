@@ -109,7 +109,7 @@
     <Compile Include="GameLogic\Maps\MovementGenerating\CommandAssignment.cs" />
     <Compile Include="GameLogic\GameplayOptions.cs" />
     <Compile Include="GameLogic\Maps\MovementGenerating\MovementGenerator.cs" />
-    <Compile Include="GameLogic\Data\Entities\Tree.cs" />
+    <Compile Include="GameLogic\Data\Entities\Plant.cs" />
     <Compile Include="GameLogic\Data\Entities\Animal.cs" />
     <Compile Include="GameLogic\Maps\Vector2.cs" />
     <Compile Include="GameLogic\Maps\VisibilityGenerating\VisibilityGenerator.cs" />

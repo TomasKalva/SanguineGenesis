@@ -15,6 +15,18 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     abstract class Building : Entity
     {
         /// <summary>
+        /// X coordinate of bottom left node.
+        /// </summary>
+        public int NodeLeft { get; }
+        /// <summary>
+        /// Y coordinate of bottom left node.
+        /// </summary>
+        public int NodeBottom { get; }
+        /// <summary>
+        /// How many nodes horizontally and also vertically it takes.
+        /// </summary>
+        public int Size { get; }
+        /// <summary>
         /// Center of this building on the map.
         /// </summary>
         public override Vector2 Center { get; }
@@ -27,21 +39,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public bool Built { get; set; }
         /// <summary>
-        /// X coordinate of bottom left node.
-        /// </summary>
-        public int NodeLeft { get; }
-        /// <summary>
-        /// Y coordinate of bottom left node.
-        /// </summary>
-        public int NodeBottom { get; }
-        /// <summary>
         /// Nodes under the building.
         /// </summary>
         public Node[,] Nodes { get; }
-        /// <summary>
-        /// How many nodes horizontally and also vertically it takes.
-        /// </summary>
-        public int Size { get; }
         /// <summary>
         /// Biome required under the building. Energy is taken only from nodes with this biome.
         /// </summary>
@@ -51,26 +51,17 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Terrain Terrain { get; }
         /// <summary>
-        /// Minimal soil quality required under the building. Energy is taken only from nodes with
-        /// at least this soil quality.
+        /// Minimal soil quality required under the building.
         /// </summary>
         public SoilQuality SoilQuality { get; }
-        /// <summary>
-        /// Produces energy for nodes around it.
-        /// </summary>
-        public bool Producer { get; }
-        /// <summary>
-        /// Distance at which this building can be built.
-        /// </summary>
-        public float BuildingDistance { get; }
-        /// <summary>
-        /// Point to which created units go after they spawn.
-        /// </summary>
-        public Vector2? RallyPoint { get; set; }
         /// <summary>
         /// True iff the building blocks vision.
         /// </summary>
         public bool BlocksVision { get; set; }
+        /// <summary>
+        /// Point to which created units go after they spawn.
+        /// </summary>
+        public Vector2? RallyPoint { get; set; }
         // Map extents
         public new int Left => NodeLeft;
         public new int Right => Left + Nodes.GetLength(0);
@@ -80,7 +71,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public new int Height => Top - Bottom;
 
         public Building(Faction faction, string buildingType, Node[,] nodes, float maxHealth, float maxEnergy, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, bool blocksVision, List<Ability> abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, float viewRange, bool blocksVision, List<Ability> abilities)
             : base(faction, buildingType, maxHealth, viewRange, maxEnergy, physical, abilities)
         {
             Nodes = nodes;
@@ -88,8 +79,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Biome = biome;
             Terrain = terrain;
             SoilQuality = soilQuality;
-            Producer = producer;
-            BuildingDistance = buildingDistance;
             BlocksVision = blocksVision;
 
             NodeLeft = nodes[0, 0].X;

@@ -42,7 +42,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Entities factories, abilities and statuses used by the player.
         /// </summary>
-        public GameData GameStaticData { get; }
+        public GameData GameData { get; }
         /// <summary>
         /// Maximum amount of air that can be taken by animals. If reached or exceeded, 
         /// no new animals can be created.
@@ -60,7 +60,7 @@ namespace SanguineGenesis.GameLogic
             Plants = new List<Plant>();
             Structures = new List<Structure>();
             Corpses = new List<Corpse>();
-            GameStaticData = new GameData();
+            GameData = new GameData();
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace SanguineGenesis.GameLogic
         public void SpawnTestingAnimals()
         {
             //calculate extents
-            var factories = GameStaticData.AnimalFactories.Factorys;
+            var factories = GameData.AnimalFactories.Factorys;
             int gridPoints = (int)Math.Ceiling(Math.Sqrt(factories.Count));
             float gridSize = 29f;
             float step = gridSize / (gridPoints + 1);
@@ -344,9 +344,9 @@ namespace SanguineGenesis.GameLogic
         {
             switch (Biome)
             {
-                case Biome.SAVANNA: return GameStaticData.PlantFactories["BAOBAB"];
-                case Biome.RAINFOREST: return GameStaticData.PlantFactories["KAPOC"];
-                default: return GameStaticData.StructureFactories["ROCK"];
+                case Biome.SAVANNA: return GameData.PlantFactories["BAOBAB"];
+                case Biome.RAINFOREST: return GameData.PlantFactories["KAPOC"];
+                default: return GameData.StructureFactories["ROCK"];
             }
         }
 

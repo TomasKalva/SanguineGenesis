@@ -66,6 +66,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// If true, the entity should die.
         /// </summary>
         bool Decayed { get; set; }
+        /// <summary>
+        /// One step of decaying.
+        /// </summary>
         void Decay(float energyDamage);
     }
 }

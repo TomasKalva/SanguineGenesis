@@ -11,7 +11,7 @@ using SanguineGenesis.GUI.WinFormsComponents;
 namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
-    /// Represent building that doesn't do anything special.
+    /// Represent not living building.
     /// </summary>
     class Structure : Building, IDecayable
     {
@@ -19,8 +19,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public override bool IsDead => base.IsDead || Decayed;
 
         public Structure(Faction faction, string buildingType, Node[,] nodes, float maxHealth, float maxEnergy, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, bool blocksVision, List<Ability> abilities)
-            : base(faction, buildingType, nodes, maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, float viewRange, bool blocksVision, List<Ability> abilities)
+            : base(faction, buildingType, nodes, maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, viewRange, blocksVision, abilities)
         {
             Decayed = false;
         }
@@ -38,8 +38,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 new Stat( "Terrain", Terrain.ToString()),
                 new Stat( "Soil quality", SoilQuality.ToString()),
                 new Stat( "Physical", Physical.ToString()),
-                new Stat( "View range", ViewRange.ToString("0.0")),
-                new Stat( "Producer", Producer.ToString())
+                new Stat( "View range", ViewRange.ToString("0.0"))
             };
             return stats;
         }

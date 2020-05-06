@@ -259,13 +259,12 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[7]);
             SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[8]);
             List<StatusFactory> statusFactories = ParseStatuses(fields[10], statuses);
-            bool producer = fields[11] == "yes";
-            float buildingDistance = float.Parse(fields[12], CultureInfo.InvariantCulture);
-            float viewRange = float.Parse(fields[13], CultureInfo.InvariantCulture);
-            bool blocksVision = fields[14] == "yes";
+            float buildingDistance = float.Parse(fields[11], CultureInfo.InvariantCulture);
+            float viewRange = float.Parse(fields[12], CultureInfo.InvariantCulture);
+            bool blocksVision = fields[13] == "yes";
 
             StructureFactory newFactory = new StructureFactory(structureType, maxHealth, maxEnergy, size, physical, energyCost,
-                biome, terrain, soilQuality,  producer, buildingDistance, viewRange, blocksVision, statusFactories);
+                biome, terrain, soilQuality, buildingDistance, viewRange, blocksVision, statusFactories);
             Factorys.Add(structureType, newFactory);
             abilitiesList.Add(structureType, fields[9]);
         }

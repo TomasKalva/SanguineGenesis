@@ -48,7 +48,7 @@ namespace SanguineGenesis.GameLogic.AI
     }
 
     /// <summary>
-    /// Sends all of its units to attack selected units of the enemy player. BuildBuildings and
+    /// Sends all of its animals to attack selected animals of the enemy player. BuildBuildings and
     /// CreateAnimal are used randomly.
     /// </summary>
     class DumbAI:IAI
@@ -101,7 +101,7 @@ namespace SanguineGenesis.GameLogic.AI
             if (idleAnimals.Any()
                 && target != null)
             {
-                ControlledPlayer.GameStaticData.Abilities.Attack.SetCommands(idleAnimals, target, false, ActionLog);
+                ControlledPlayer.GameData.Abilities.Attack.SetCommands(idleAnimals, target, false, ActionLog);
             }
         }
 
@@ -157,6 +157,9 @@ namespace SanguineGenesis.GameLogic.AI
         {
             var plants = ControlledPlayer.GetAll<Plant>();
 
+            if (plants.Count() > 40)
+                return;
+
             //only do it for 3 buildings so that the ai doesn't perform too many actions per second
             foreach (Plant b in plants.ToList().ToRandomizedList().Take(3))
             {
@@ -196,6 +199,7 @@ namespace SanguineGenesis.GameLogic.AI
                         if (!buildingAbilities.Any())
                             return;
                         ToBuildNext[caster] = buildingAbilities[random.Next(buildingAbilities.Count)];
+                        break;
                     }
                 }
         }

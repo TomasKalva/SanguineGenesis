@@ -51,10 +51,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public float FoodEatingPeriod { get; }
         /// <summary>
-        /// Energy required to spawn/create this animal.
-        /// </summary>
-        public float EnergyCost { get; }
-        /// <summary>
         /// Damage this animal deals in one attack.
         /// </summary>
         public float AttackDamage { get; }
@@ -96,10 +92,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Diet Diet { get; }
         /// <summary>
-        /// Time it takes for this animal to spawn.
-        /// </summary>
-        public float SpawningTime { get; }
-        /// <summary>
         /// Amount of air taken by this animal.
         /// </summary>
         public int Air { get; }
@@ -122,9 +114,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Movement movement,
             bool thickSkin,
             Diet diet,
-            float spawningTime,
             bool physical,
-            float energyCost,
             float viewRange,
             List<Ability> abilities,
             int air)
@@ -136,7 +126,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
             FoodEnergyRegen = foodEnergyRegen;
             FoodEatingPeriod = foodEatingPeriod;
-            EnergyCost = energyCost;
             AttackDamage = attackDamage;
             AttackPeriod = attackPeriod;
             AttackDistance = attackDistance;
@@ -146,7 +135,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             Movement = movement;
             ThickSkin = thickSkin;
             Diet = diet;
-            SpawningTime = spawningTime;
             Air = air;
         }
         #region IShowable
@@ -259,9 +247,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             if(Energy > 0)
             {
                 var corpse = new Corpse(game.NeutralFaction, "CORPSE", Energy, Energy, Position, 0.2f);
-                Faction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(corpse);
+                Faction.GameData.Statuses.DecayFactory.ApplyToAffected(corpse);
                 game.NeutralFaction.AddEntity(corpse);
-
             }
         }
 
@@ -294,6 +281,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             PushBackToMap(map);
         }
 
+        /// <summary>
+        /// Pushes animal that is out of the map back to the map.
+        /// </summary>
         public void PushBackToMap(Map map)
         {
             Position = new Vector2(

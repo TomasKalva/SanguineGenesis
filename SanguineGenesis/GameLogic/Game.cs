@@ -158,7 +158,7 @@ namespace SanguineGenesis.GameLogic
                 var n = Map[x, y];
                 if (n!=null && !a.CanMoveOn(n.Terrain))
                 {
-                    NeutralFaction.GameStaticData.Statuses.SuffocatingFactory.ApplyToAffected(a);
+                    NeutralFaction.GameData.Statuses.SuffocatingFactory.ApplyToAffected(a);
                 }
             }
 
@@ -199,7 +199,7 @@ namespace SanguineGenesis.GameLogic
                     var opposite = a.Faction.FactionID.Opposite();
                     Entity en = Players[opposite].GetAll<Animal>().Where((v) => a.DistanceTo(v) < a.AttackDistance && a.Faction.CanSee(v)).FirstOrDefault();
                     if(en!=null)
-                        a.CommandQueue.Enqueue(CurrentPlayer.GameStaticData.Abilities.Attack.NewCommand(a, en));
+                        a.CommandQueue.Enqueue(CurrentPlayer.GameData.Abilities.Attack.NewCommand(a, en));
                 }
             }
 

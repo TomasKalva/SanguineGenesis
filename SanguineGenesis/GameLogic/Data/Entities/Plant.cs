@@ -24,17 +24,25 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// Maximal distance of roots.
         /// </summary>
         public int RootDistance { get; }
+        /// <summary>
+        /// Produces energy for nodes around it.
+        /// </summary>
+        public bool Producer { get; }
+        /// <summary>
+        /// How much air this plant produces.
+        /// </summary>
         public int Air { get; }
 
 
         public Plant(Faction faction, string plantType, Node[,] nodes, Node[,] rootNodes, int rootDistance, float maxHealth, float maxEnergy, float maxEnergyIntake, int size,
-            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float buildingDistance, float viewRange, bool blocksVision, int air, List<Ability> abilities)
-            : base(faction, plantType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, abilities)
+            bool physical, Biome biome, Terrain terrain, SoilQuality soilQuality, bool producer, float viewRange, bool blocksVision, int air, List<Ability> abilities)
+            : base(faction, plantType, nodes,  maxHealth, maxEnergy, size, physical, biome, terrain, soilQuality, viewRange, blocksVision, abilities)
         {
             MaxEnergyIntake = maxEnergyIntake;
             RootNodes = rootNodes;
             RootDistance = rootDistance;
             Air = air;
+            Producer = producer;
             foreach(Node n in rootNodes)
                 n.Roots.Add(this);
         }
@@ -67,11 +75,11 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             {
                 var neutralFaction = game.NeutralFaction;
                 Structure deadPlant = new Structure(neutralFaction, "DEAD_TREE", Nodes, Energy, Energy, Size,
-                    Physical, Biome, Terrain, SoilQuality.BAD, false, 0, 0, true, new List<Ability>())
+                    Physical, Biome, Terrain, SoilQuality.BAD, 0, true, new List<Ability>())
                 {
                     Energy = Energy
                 };
-                neutralFaction.GameStaticData.Statuses.DecayFactory.ApplyToAffected(deadPlant);
+                neutralFaction.GameData.Statuses.DecayFactory.ApplyToAffected(deadPlant);
                 neutralFaction.AddEntity(deadPlant);
                 game.Map.AddBuilding(deadPlant);
             }
