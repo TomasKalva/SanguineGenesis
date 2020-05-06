@@ -101,7 +101,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     return true;
                 }
 
-                game.Map.PlaceBuilding(Ability.BuildingFactory, CommandedEntity.Faction, nX, nY);
+                game.Map.PlaceBuilding(Ability.BuildingFactory, CommandedEntity.Faction, nX, nY, game);
             }
 
             //the command always immediately finishes regardless of the success of placing the building

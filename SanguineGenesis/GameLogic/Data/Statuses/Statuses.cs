@@ -44,7 +44,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             AllStatusFactories.Add(ConsumedAnimalFactory);
 
             //animals on plant
-            AnimalsOnPlantFactory = new AnimalsOnTreeFactory();
+            AnimalsOnPlantFactory = new AnimalsOnTreeFactory(new Abilities.ClimbDownPlant(0, 0.5f));
             AllStatusFactories.Add(AnimalsOnPlantFactory);
 
             //underground

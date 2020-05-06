@@ -79,7 +79,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 {
                     Energy = Energy
                 };
-                neutralFaction.GameData.Statuses.DecayFactory.ApplyToAffected(deadPlant);
+                game.GameData.Statuses.DecayFactory.ApplyToAffected(deadPlant);
                 neutralFaction.AddEntity(deadPlant);
                 game.Map.AddBuilding(deadPlant);
             }

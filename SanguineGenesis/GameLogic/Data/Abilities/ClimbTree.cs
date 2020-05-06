@@ -18,7 +18,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         internal ClimbPlant(float energyCost, float climbingTime)
             : base(0.1f, energyCost, false, false, duration:climbingTime)
         {
-            AnimalsOnPlantFactory = new AnimalsOnTreeFactory();
+            AnimalsOnPlantFactory = new AnimalsOnTreeFactory(new ClimbDownPlant(0, 0.5f));
         }
 
         public override Command NewCommand(Animal caster, Plant target)

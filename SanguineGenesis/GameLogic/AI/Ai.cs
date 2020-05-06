@@ -101,7 +101,7 @@ namespace SanguineGenesis.GameLogic.AI
             if (idleAnimals.Any()
                 && target != null)
             {
-                ControlledPlayer.GameData.Abilities.Attack.SetCommands(idleAnimals, target, false, ActionLog);
+                game.GameData.Abilities.Attack.SetCommands(idleAnimals, target, false, ActionLog);
             }
         }
 

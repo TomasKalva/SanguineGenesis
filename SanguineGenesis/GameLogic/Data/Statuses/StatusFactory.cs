@@ -1,4 +1,5 @@
-﻿using SanguineGenesis.GameLogic.Data.Entities;
+﻿using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Data.Statuses;
 using SanguineGenesis.GameLogic.Maps;
 using System;
@@ -177,11 +178,14 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         /// Animal that will be put on the tree. Should be set right before using this factory to apply status.
         /// </summary>
         public Animal PutOnTree { get; set; }
+        public ClimbDownPlant ClimbDownPlant { get; }
 
-        public AnimalsOnTreeFactory()
+        public AnimalsOnTreeFactory(ClimbDownPlant climbDownPlant)
             : base(true)
         {
+            ClimbDownPlant = climbDownPlant;
         }
+
         protected override Status NewInstance(Plant affected)
         {
             return new AnimalsOnTree(affected, this, PutOnTree);

@@ -120,14 +120,14 @@ namespace SanguineGenesis.GameLogic.Maps
             else if (type == BuildingType.ROCK)
             {
                 //neutral rock
-                GameData gsd = game.NeutralFaction.GameData;
-                game.Map.PlaceBuilding(gsd.StructureFactories["ROCK"], game.NeutralFaction, n.X, n.Y);
+                GameData gd = game.GameData;
+                game.Map.PlaceBuilding(gd.StructureFactories["ROCK"], game.NeutralFaction, n.X, n.Y, game);
             }
             else if (type == BuildingType.BIG_ROCK)
             {
                 //neutral big rock
-                GameData gsd = game.NeutralFaction.GameData;
-                game.Map.PlaceBuilding(gsd.StructureFactories["BIG_ROCK"], game.NeutralFaction, n.X, n.Y);
+                GameData gd = game.GameData;
+                game.Map.PlaceBuilding(gd.StructureFactories["BIG_ROCK"], game.NeutralFaction, n.X, n.Y, game);
 
             }
         }
@@ -141,7 +141,7 @@ namespace SanguineGenesis.GameLogic.Maps
             if (n.Terrain != Terrain.LAND)
                 return;
 
-            BuildingFactory buildingFactory = player.GetMainBuildingFactory();
+            BuildingFactory buildingFactory = player.GetMainBuildingFactory(game);
 
             //set correct biome and number of nutrients
             int size = buildingFactory.Size;
@@ -155,7 +155,7 @@ namespace SanguineGenesis.GameLogic.Maps
                 }
 
             //place the building on the map
-            game.Map.PlaceBuilding(buildingFactory, player, n.X, n.Y);
+            game.Map.PlaceBuilding(buildingFactory, player, n.X, n.Y, game);
 
             //set it to max energy and set its root nodes to be in the same biome
             var mainBuilding = player.GetAll<Plant>().Where(t => t.EntityType == buildingFactory.EntityType).FirstOrDefault();

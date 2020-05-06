@@ -187,7 +187,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// Places the building created by buildingFactory on the coordinates of this map. The building
         /// will be owned by owner.
         /// </summary>
-        public void PlaceBuilding(BuildingFactory buildingFactory, Faction owner, int x, int y)
+        public void PlaceBuilding(BuildingFactory buildingFactory, Faction owner, int x, int y, Game game)
         {
             //don't place the building if it can't be placed
             if (!BuildingCanBePlaced(buildingFactory, x, y))
@@ -204,7 +204,8 @@ namespace SanguineGenesis.GameLogic.Maps
                 rootNodes = GameQuerying.SelectNodes(this, x - rDist, y - rDist, x + (size + rDist - 1), y + (size + rDist - 1));
                 newBuilding = trF.NewInstance(owner, buildNodes, rootNodes);
                 //make the plant grow
-                owner.GameData.Abilities.Grow.SetCommands(new List<Plant>(1) { (Plant)newBuilding }, Nothing.Get, true, ActionLog.ThrowAway);
+                Command com = game.GameData.Abilities.Grow.NewCommand(newBuilding, Nothing.Get);
+                newBuilding.AddCommand(com);
             }
             else
             {

@@ -247,7 +247,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             if(Energy > 0)
             {
                 var corpse = new Corpse(game.NeutralFaction, "CORPSE", Energy, Energy, Position, 0.2f);
-                Faction.GameData.Statuses.DecayFactory.ApplyToAffected(corpse);
+                game.GameData.Statuses.DecayFactory.ApplyToAffected(corpse);
                 game.NeutralFaction.AddEntity(corpse);
             }
         }

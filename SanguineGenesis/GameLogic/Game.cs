@@ -23,6 +23,10 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public Map Map { get; }
         /// <summary>
+        /// Entities factories, abilities and statuses used by the player.
+        /// </summary>
+        public GameData GameData { get; }
+        /// <summary>
         /// Stores entities owned by none of the players.
         /// </summary>
         public Faction NeutralFaction { get; }
@@ -65,15 +69,16 @@ namespace SanguineGenesis.GameLogic
         {
             GameEnded = false;
             Winner = null;
+            GameData = gameData;
 
             //factions
             Players = new Dictionary<FactionType, Player>
             {
-                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, gameData, null) },
-                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, gameData, new DumbAIFactory()) }
+                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null) },
+                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, new DumbAIFactory()) }
             };
             CurrentPlayer = Players[FactionType.PLAYER0];
-            NeutralFaction = new Faction(FactionType.NEUTRAL, gameData);
+            NeutralFaction = new Faction(FactionType.NEUTRAL);
 
              //map
             var mapLoader = new MapLoader(mapDescription);
@@ -95,7 +100,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public void SpawnTestingAnimals()
         {
-            CurrentPlayer.SpawnTestingAnimals();
+            CurrentPlayer.SpawnTestingAnimals(this.GameData);
         }
 
         /// <summary>
@@ -126,10 +131,6 @@ namespace SanguineGenesis.GameLogic
 
             //map changing phase
 
-            //update air values
-            foreach (var kvp in Players)
-                kvp.Value.CalulateAir();
-
             //generate and drain nutrients by plants
             Map.UpdateNutrientsMap(GetAll<Plant>(), deltaT);
 
@@ -159,7 +160,7 @@ namespace SanguineGenesis.GameLogic
                 var n = Map[x, y];
                 if (n!=null && !a.CanMoveOn(n.Terrain))
                 {
-                    NeutralFaction.GameData.Statuses.SuffocatingFactory.ApplyToAffected(a);
+                    GameData.Statuses.SuffocatingFactory.ApplyToAffected(a);
                 }
             }
 
@@ -200,7 +201,7 @@ namespace SanguineGenesis.GameLogic
                     var opposite = a.Faction.FactionID.Opposite();
                     Entity en = Players[opposite].GetAll<Animal>().Where((v) => a.DistanceTo(v) < a.AttackDistance && a.Faction.CanSee(v)).FirstOrDefault();
                     if(en!=null)
-                        a.CommandQueue.Enqueue(CurrentPlayer.GameData.Abilities.Attack.NewCommand(a, en));
+                        a.CommandQueue.Enqueue(GameData.Abilities.Attack.NewCommand(a, en));
                 }
             }
 

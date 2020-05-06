@@ -146,7 +146,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     //attack the enemy
                     CommandedEntity.WantsToMove = false;
                     RemoveFromAssignment();
-                    CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy, game.CurrentPlayer.GameData.Abilities.Attack));
+                    CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy, game.GameData.Abilities.Attack));
                     return false;//new command is already set
                 }
             }

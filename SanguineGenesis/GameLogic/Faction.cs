@@ -40,10 +40,6 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public FactionType FactionID { get; }
         /// <summary>
-        /// Entities factories, abilities and statuses used by the player.
-        /// </summary>
-        public GameData GameData { get; }
-        /// <summary>
         /// Maximum amount of air that can be taken by animals. If reached or exceeded, 
         /// no new animals can be created.
         /// </summary>
@@ -53,14 +49,14 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public int AirTaken { get; private set; }
 
-        public Faction(FactionType factionID, GameData gameData)
+        public Faction(FactionType factionID)
         {
             FactionID = factionID;
             Animals = new List<Animal>();
             Plants = new List<Plant>();
             Structures = new List<Structure>();
             Corpses = new List<Corpse>();
-            GameData = gameData;
+            CalulateAir();
         }
 
         /// <summary>
@@ -76,6 +72,7 @@ namespace SanguineGenesis.GameLogic
                 Structures.Add((Structure)e);
             if (e.GetType() == typeof(Corpse))
                 Corpses.Add((Corpse)e);
+            CalulateAir();
         }
 
         /// <summary>
@@ -91,6 +88,7 @@ namespace SanguineGenesis.GameLogic
                 Structures.Remove((Structure)e);
             if (e.GetType() == typeof(Corpse))
                 Corpses.Remove((Corpse)e);
+            CalulateAir();
         }
 
         /// <summary>
@@ -190,8 +188,8 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public IAI Ai { get; }
 
-        public Player(FactionType factionID, Biome biome,GameData gameData, IAIFactory aiFactory)
-            : base(factionID, gameData)
+        public Player(FactionType factionID, Biome biome, IAIFactory aiFactory)
+            : base(factionID)
         {
             //SpawnTestingAnimals();
             VisibleBuildings = new List<Building>();
@@ -204,10 +202,10 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Spawns 6 instances of each animal in the game.
         /// </summary>
-        public void SpawnTestingAnimals()
+        public void SpawnTestingAnimals(GameData gameData)
         {
             //calculate extents
-            var factories = GameData.AnimalFactories.Factorys;
+            var factories = gameData.AnimalFactories.Factorys;
             int gridPoints = (int)Math.Ceiling(Math.Sqrt(factories.Count));
             float gridSize = 29f;
             float step = gridSize / (gridPoints + 1);
@@ -340,13 +338,13 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Returns the factory of main building of this players biome.
         /// </summary>
-        public BuildingFactory GetMainBuildingFactory()
+        public BuildingFactory GetMainBuildingFactory(Game game)
         {
             switch (Biome)
             {
-                case Biome.SAVANNA: return GameData.PlantFactories["BAOBAB"];
-                case Biome.RAINFOREST: return GameData.PlantFactories["KAPOC"];
-                default: return GameData.StructureFactories["ROCK"];
+                case Biome.SAVANNA: return game.GameData.PlantFactories["BAOBAB"];
+                case Biome.RAINFOREST: return game.GameData.PlantFactories["KAPOC"];
+                default: return game.GameData.StructureFactories["ROCK"];
             }
         }
 

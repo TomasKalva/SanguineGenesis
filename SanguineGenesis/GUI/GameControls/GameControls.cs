@@ -170,7 +170,7 @@ namespace SanguineGenesis.GameControls
             if (enemy == null)
             {
                 //no enemy selected => move to the movement target building that is at clicked coordinates
-                var moveToAbility = game.CurrentPlayer.GameData.Abilities.UnbreakableMoveTo;
+                var moveToAbility = game.GameData.Abilities.UnbreakableMoveTo;
                 ITargetable movementTarget = FindAbilityTarget(game, moveToAbility, SelectionInput.TargetCoordinates);
                 //if there is no building at clicked coordinates, move to the coordinates
                 if (!(movementTarget is Building))
@@ -181,7 +181,7 @@ namespace SanguineGenesis.GameControls
             else
             {
                 //enemy selected => attack it
-                game.CurrentPlayer.GameData.Abilities.UnbreakableAttack.SetCommands(SelectedGroup.Entities, enemy, resetQueue, ActionLog);
+                game.GameData.Abilities.UnbreakableAttack.SetCommands(SelectedGroup.Entities, enemy, resetQueue, ActionLog);
             }
         }
 

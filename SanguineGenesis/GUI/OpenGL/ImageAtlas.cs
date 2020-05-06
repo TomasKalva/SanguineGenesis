@@ -148,22 +148,19 @@ namespace SanguineGenesis.GUI
             XDocument doc = XDocument.Load("Images/atlas.xml");
 
             //returns child element of root with name=elemName
-            Func<string, XElement> elWithName =
-                (string elemName) => (from el in doc.Root.Elements()
-                                      where el.Name.LocalName == elemName
-                                      select el).First();
+            XElement elWithName(string elemName) => (from el in doc.Root.Elements()
+                                                     where el.Name.LocalName == elemName
+                                                     select el).First();
 
             InitializeDigitImages(elWithName("Digits"));
             LoadEntitiesAnimations(elWithName("Entities"));
             InitializeNumberedTriangles(elWithName("NumbersArray"));
             InitializeNodes(elWithName("Nodes"));
 
-            XElement shapes = (from el in doc.Root.Elements() where el.Name.LocalName == "Shapes" select el).First();
             //finds subelement with attribute name=attrName
-            Func<string, XElement> shapesImgElWithName = 
-                (string attrName) => (from el in shapes.Elements() 
-                                      where el.Attribute("Name").Value==attrName 
-                                      select (XElement)el.FirstNode).First();
+            XElement shapesImgElWithName(string attrName) => (from el in (from el in doc.Root.Elements() where el.Name.LocalName == "Shapes" select el).First().Elements()
+                                                              where el.Attribute("Name").Value == attrName
+                                                              select (XElement)el.FirstNode).First();
 
             //circles
             UnitCircleGray = LoadImage(shapesImgElWithName("UnitCircleGray"));
@@ -296,7 +293,7 @@ namespace SanguineGenesis.GUI
         private Rect LoadImage(XElement imageElement)
         {
             if (imageElement == null || imageElement.Name.LocalName != "Image")
-                return default(Rect);
+                return default;
 
             //load extents of the image
             float x = float.Parse(imageElement.Attribute("X").Value, CultureInfo.InvariantCulture);
