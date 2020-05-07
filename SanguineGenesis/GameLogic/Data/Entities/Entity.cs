@@ -33,7 +33,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public virtual bool IsDead => Health <= 0;
         /// <summary>
-        /// Used for casting abilities.
+        /// Used for useing abilities.
         /// </summary>
         public FloatRange Energy { get; set; }
         /// <summary>
@@ -72,7 +72,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public bool Selected { get; set; }
 
         /// <summary>
-        /// Abilities this entity can cast.
+        /// Abilities this entity can use.
         /// </summary>
         public List<Ability> Abilities { get; }
         /// <summary>

@@ -22,9 +22,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public BuildingFactory BuildingFactory { get; }
 
-        public override Command NewCommand(Entity caster, Node target)
+        public override Command NewCommand(Entity user, Node target)
         {
-            return new BuildBuildingCommand(caster, target, this);
+            return new BuildBuildingCommand(user, target, this);
         }
 
         public override string ToString()
@@ -45,7 +45,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
             new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self castable", SelfCastable.ToString()),
+            new Stat( "Self useable", SelfUseable.ToString()),
             new Stat("Only one", OnlyOne.ToString()),
             new Stat( "Target type", TargetName),
             new Stat( "Building size", BuildingFactory.Size.ToString()),

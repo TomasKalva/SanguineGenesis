@@ -23,9 +23,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             ChargeSpeed = charageSpeed;
         }
 
-        public override Command NewCommand(Animal caster, Entity target)
+        public override Command NewCommand(Animal user, Entity target)
         {
-            return new ChargeToCommand(caster, target, this);
+            return new ChargeToCommand(user, target, this);
         }
 
         public override string GetName() => "CHARGE_TO";
@@ -36,7 +36,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
             new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self castable", SelfCastable.ToString()),
+            new Stat( "Self useable", SelfUseable.ToString()),
             new Stat("Only one", OnlyOne.ToString()),
             new Stat( "Target type", TargetName),
             new Stat( "Dmg mult", AttackDamageMultiplier.ToString("0.0")),

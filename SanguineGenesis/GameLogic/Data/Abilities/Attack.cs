@@ -22,9 +22,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Unbreakable = unbreakable;
         }
 
-        public override Command NewCommand(Animal caster, Entity target)
+        public override Command NewCommand(Animal user, Entity target)
         {
-            return new AttackCommand(caster, target, this);
+            return new AttackCommand(user, target, this);
         }
 
         public override string GetName() => Unbreakable?"UNBR_ATTACK":"ATTACK";

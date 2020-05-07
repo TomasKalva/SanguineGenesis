@@ -31,7 +31,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Maximal distance from the target where the ability can be cast. If null, the attack distance of animal
+        /// Maximal distance from the target where the ability can be use. If null, the attack distance of animal
         /// should be used.
         /// </summary>
         public float? Distance { get; }
@@ -44,9 +44,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         public bool OnlyOne { get; }
         /// <summary>
-        /// True iff the target of the ability can be its caster.
+        /// True iff the target of the ability can be its user.
         /// </summary>
-        public bool SelfCastable { get; }
+        public bool SelfUseable { get; }
         /// <summary>
         /// True iff the command can be removed from the first place in the command queue.
         /// </summary>
@@ -64,16 +64,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         public abstract Type TargetType { get; }
         /// <summary>
-        /// Type of Caster.
+        /// Type of User.
         /// </summary>
-        public abstract Type CasterType { get; }
+        public abstract Type UserType { get; }
 
-        public Ability(float? distance, float energyCost, bool onlyOne, bool selfCastable, bool interruptable, float duration)
+        public Ability(float? distance, float energyCost, bool onlyOne, bool selfUseable, bool interruptable, float duration)
         {
             Distance = distance;
             EnergyCost = energyCost;
             OnlyOne = onlyOne;
-            SelfCastable = selfCastable;
+            SelfUseable = selfUseable;
             Interruptable = interruptable;
             Duration = duration;
         }
@@ -81,16 +81,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Set commands to the entities. Calls the generic version of this method.
         /// </summary>
-        /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
-        /// <exception cref="NullReferenceException">If some casters are null.</exception>
-        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue, ActionLog actionLog);
+        /// <exception cref="InvalidCastException">If some users or target have incompatible type.</exception>
+        /// <exception cref="NullReferenceException">If some users are null.</exception>
+        public abstract void SetCommands(IEnumerable<Entity> users, ITargetable target, bool resetCommandQueue, ActionLog actionLog);
         
         /// <summary>
-        /// Creates new instance of the command with specified caster and target. 
+        /// Creates new instance of the command with specified user and target. 
         /// Calls the generic version of this method. 
         /// </summary>
-        /// <exception cref="InvalidCastException">If caster or target has incompatible type.</exception>
-        public abstract Command NewCommand(Entity caster, ITargetable target);
+        /// <exception cref="InvalidCastException">If user or target has incompatible type.</exception>
+        public abstract Command NewCommand(Entity user, ITargetable target);
 
         //IShowable
         public abstract string GetName();
@@ -103,42 +103,42 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
     }
 
-    abstract class Ability<Caster, Target> : Ability where Caster:Entity 
+    abstract class Ability<User, Target> : Ability where User:Entity 
                                                                     where Target: ITargetable
     {
-        public Ability(float? distance, float energyCost, bool onlyOne, bool selfCastable, bool interruptable=true, float duration = 0)
-            :base(distance, energyCost, onlyOne, selfCastable, interruptable, duration)
+        public Ability(float? distance, float energyCost, bool onlyOne, bool selfUseable, bool interruptable=true, float duration = 0)
+            :base(distance, energyCost, onlyOne, selfUseable, interruptable, duration)
         {
         }
 
         /// <summary>
-        /// Creates new instance of the command with specified caster and target. 
+        /// Creates new instance of the command with specified user and target. 
         /// Calls the generic version of this method. 
         /// </summary>
-        /// <exception cref="InvalidCastException">If caster or target has incompatible type.</exception>
-        public sealed override Command NewCommand(Entity caster, ITargetable target)
+        /// <exception cref="InvalidCastException">If user or target has incompatible type.</exception>
+        public sealed override Command NewCommand(Entity user, ITargetable target)
         {
-            return NewCommand((Caster)caster, (Target)target);
+            return NewCommand((User)user, (Target)target);
         }
 
         /// <summary>
-        /// Creates new instance of the command with specified caster and target.
+        /// Creates new instance of the command with specified user and target.
         /// </summary>
-        public abstract Command NewCommand(Caster caster, Target target);
+        public abstract Command NewCommand(User user, Target target);
 
         /// <summary>
-        /// Returns false if command with caster and target can't be created. The errors are logged.
+        /// Returns false if command with user and target can't be created. The errors are logged.
         /// </summary>
-        public virtual bool ValidArguments(Caster caster, Target target, ActionLog actionLog) => true;
+        public virtual bool ValidArguments(User user, Target target, ActionLog actionLog) => true;
 
         /// <summary>
         /// Set commands to the units. Does nothing if target has wrong type. Calls the generic version of this method.
         /// </summary>
-        /// <exception cref="NullReferenceException">If some casters are null.</exception>
-        public sealed override void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue, ActionLog actionLog)
+        /// <exception cref="NullReferenceException">If some users are null.</exception>
+        public sealed override void SetCommands(IEnumerable<Entity> users, ITargetable target, bool resetCommandQueue, ActionLog actionLog)
         {
             if(target is Target t)
-                SetCommands(casters.Where(c=>c is Caster).Cast<Caster>(), t, resetCommandQueue, actionLog);
+                SetCommands(users.Where(c=>c is User).Cast<User>(), t, resetCommandQueue, actionLog);
         }
         
         /// <summary>
@@ -156,10 +156,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             => typeof(Target);
 
         /// <summary>
-        /// Type of Caster.
+        /// Type of User.
         /// </summary>
-        public sealed override Type CasterType
-            => typeof(Caster);
+        public sealed override Type UserType
+            => typeof(User);
 
         /// <summary>
         /// Returns name of target type visible to the player.
@@ -188,73 +188,73 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Sets the command for this ability to all valid casters.
+        /// Sets the command for this ability to all valid users.
         /// </summary>
-        /// <param name="casters">Casters who should receive the command. Only valid casters will receive the command.</param>
+        /// <param name="users">Users who should receive the command. Only valid users will receive the command.</param>
         /// <param name="target">Target of the new commands.</param>
-        /// <param name="resetCommandQueue">If true, the casters CommandQueue will be reset.</param>
-        public virtual void SetCommands(IEnumerable<Caster> casters, Target target, bool resetCommandQueue, ActionLog actionLog)
+        /// <param name="resetCommandQueue">If true, the users CommandQueue will be reset.</param>
+        public virtual void SetCommands(IEnumerable<User> users, Target target, bool resetCommandQueue, ActionLog actionLog)
         {
-            //casters are put to a list so that they can be enumerated multiple times
-            List<Caster> castersWithThisAbility = casters
+            //users are put to a list so that they can be enumerated multiple times
+            List<User> usersWithThisAbility = users
                 .Where(c => c.Abilities.Where(a => a == this).Any()).ToList();
 
-            if (!castersWithThisAbility.Any())
+            if (!usersWithThisAbility.Any())
             {
-                actionLog.LogError(null, this, $"no caster with this ability");
+                actionLog.LogError(null, this, $"no user with this ability");
                 return;
             }
 
-            //select only casters who are valid for this target
-            List<Caster> castersWithValidArguments = castersWithThisAbility
-                .Where((caster) => ValidArguments(caster, target, (!OnlyOne)? actionLog : ActionLog.ThrowAway))
+            //select only users who are valid for this target
+            List<User> usersWithValidArguments = usersWithThisAbility
+                .Where((user) => ValidArguments(user, target, (!OnlyOne)? actionLog : ActionLog.ThrowAway))
                 .ToList();
 
-            //if there are no valid casters
-            if (!castersWithValidArguments.Any())
+            //if there are no valid users
+            if (!usersWithValidArguments.Any())
             {
-                actionLog.LogError(null, this, "no caster with valid target");
+                actionLog.LogError(null, this, "no user with valid target");
                 return;
             }
 
-            //select only the casters who can pay
-            List<Caster> validCasters = castersWithValidArguments
-                .Where((caster) =>caster.Energy >= EnergyCost)
+            //select only the users who can pay
+            List<User> validUsers = usersWithValidArguments
+                .Where((user) =>user.Energy >= EnergyCost)
                 .ToList();
 
-            //remove caster that is also target if the ability can't be self casted
-            if (!SelfCastable && target is Caster self)
+            //remove user that is also target if the ability can't be self useed
+            if (!SelfUseable && target is User self)
             {
-                if(validCasters.Contains(self) && validCasters.Count==1)
+                if(validUsers.Contains(self) && validUsers.Count==1)
                 {
-                    actionLog.LogError(null, this, "caster can't use this ability on itself");
+                    actionLog.LogError(null, this, "user can't use this ability on itself");
                     return;
                 }
-                validCasters.Remove(self);
+                validUsers.Remove(self);
             }
 
-            //if there are no casters that can pay do nothing
-            if (!validCasters.Any()) 
+            //if there are no users that can pay do nothing
+            if (!validUsers.Any()) 
             {
-                actionLog.LogError(null, this, "no valid caster has enough energy");
+                actionLog.LogError(null, this, "no valid user has enough energy");
                 return; 
             }
 
-            //if the ability should be cast only by one caster,
-            //find the most suitable caster to cast this ability
+            //if the ability should be use only by one user,
+            //find the most suitable user to use this ability
             if (OnlyOne)
             {
-                //minimal nuber of active commands of casters
-                int minCom = validCasters.Min(c => c.CommandQueue.Count);
-                validCasters = validCasters.Where(c=>c.CommandQueue.Count == minCom)
-                    .Take(1)//validCasters is nonempty and it has to have item with minimum command queue length
+                //minimal nuber of active commands of users
+                int minCom = validUsers.Min(c => c.CommandQueue.Count);
+                validUsers = validUsers.Where(c=>c.CommandQueue.Count == minCom)
+                    .Take(1)//validUsers is nonempty and it has to have item with minimum command queue length
                     .ToList();
             }
 
             if (resetCommandQueue)
             {
                 //reset all commands
-                foreach (Caster c in validCasters)
+                foreach (User c in validUsers)
                 {
                     c.ResetCommands();
                     if (c.CommandQueue.Any())
@@ -263,15 +263,15 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             }
 
             //move units to the target until the required distance is reached
-            if(validCasters.Where(caster => caster.GetType() == typeof(Animal)).Any() &&
+            if(validUsers.Where(user => user.GetType() == typeof(Animal)).Any() &&
                 typeof(Target) != typeof(Nothing))
-                abilities.MoveToCast(this)
-                    .SetCommands(validCasters
-                    .Where(caster=>caster.GetType()==typeof(Animal))
+                abilities.MoveToUse(this)
+                    .SetCommands(validUsers
+                    .Where(user=>user.GetType()==typeof(Animal))
                     .Cast<Animal>(), target, resetCommandQueue, actionLog);
 
-            //give command to each caster
-            foreach (Caster c in validCasters)
+            //give command to each user
+            foreach (User c in validUsers)
             {
                 //create new command and assign it to c
                 Command com = NewCommand(c, target);
@@ -296,7 +296,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
             new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self castable", SelfCastable.ToString()),
+            new Stat( "Self useable", SelfUseable.ToString()),
             new Stat("Only one", OnlyOne.ToString()),
             new Stat( "Target type", TargetName),
             new Stat( "Interruptable", Interruptable.ToString()),

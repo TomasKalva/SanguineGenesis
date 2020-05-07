@@ -120,33 +120,33 @@ namespace SanguineGenesis.GameLogic.AI
         }
 
         /// <summary>
-        /// Set CreateAnimal command to caster.
+        /// Set CreateAnimal command to user.
         /// </summary>
-        /// <param name="caster"></param>
-        private void CreateAnimals(Building caster)
+        /// <param name="user"></param>
+        private void CreateAnimals(Building user)
         {
-            //add caster to ToCreateAnimalNext if it isn't there yet, set its next ability
-            if (!ToCreateAnimalNext.ContainsKey(caster))
+            //add user to ToCreateAnimalNext if it isn't there yet, set its next ability
+            if (!ToCreateAnimalNext.ContainsKey(user))
             {
-                var spawningAbilities = caster.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
+                var spawningAbilities = user.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
                 if (!spawningAbilities.Any())
                     return;
 
-                ToCreateAnimalNext.Add(caster, spawningAbilities[random.Next(spawningAbilities.Count)]);
+                ToCreateAnimalNext.Add(user, spawningAbilities[random.Next(spawningAbilities.Count)]);
             }
 
 
-            CreateAnimal ability = ToCreateAnimalNext[caster];
-            if (caster.Energy >= ability.EnergyCost)
+            CreateAnimal ability = ToCreateAnimalNext[user];
+            if (user.Energy >= ability.EnergyCost)
             {
-                //cast the ability
-                ability.SetCommands(new List<Building>() { caster }, Nothing.Get, false, ActionLog);
+                //use the ability
+                ability.SetCommands(new List<Building>() { user }, Nothing.Get, false, ActionLog);
                 
-                //select ability to use next by caster from all of its CreateAnimal abilities
-                var spawningAbilities = caster.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
+                //select ability to use next by user from all of its CreateAnimal abilities
+                var spawningAbilities = user.Abilities.Where(a => a is CreateAnimal).Cast<CreateAnimal>().ToList();
                 if (!spawningAbilities.Any())
                     return;
-                ToCreateAnimalNext[caster] = spawningAbilities[random.Next(spawningAbilities.Count)];
+                ToCreateAnimalNext[user] = spawningAbilities[random.Next(spawningAbilities.Count)];
             }
         }
 
@@ -168,37 +168,37 @@ namespace SanguineGenesis.GameLogic.AI
         }
 
         /// <summary>
-        /// Set BuildBuilding command to caster.
+        /// Set BuildBuilding command to user.
         /// </summary>
-        private void PlaceBuildings(Plant caster, Map map)
+        private void PlaceBuildings(Plant user, Map map)
         {
-            //add caster to ToBuildNext if it isn't there yet, set its next ability
-            if (!ToBuildNext.ContainsKey(caster))
+            //add user to ToBuildNext if it isn't there yet, set its next ability
+            if (!ToBuildNext.ContainsKey(user))
             {
-                var buildingAbilities = caster.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();
+                var buildingAbilities = user.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();
                 if (!buildingAbilities.Any())
                     return;
 
-                ToBuildNext.Add(caster, buildingAbilities[random.Next(buildingAbilities.Count)]);
+                ToBuildNext.Add(user, buildingAbilities[random.Next(buildingAbilities.Count)]);
             }
 
 
-            var possibleTargets = caster.RootNodes.OfType<Node>().ToList().ToRandomizedList() ;
+            var possibleTargets = user.RootNodes.OfType<Node>().ToList().ToRandomizedList() ;
             
-            BuildBuilding ability = ToBuildNext[caster];
-            if (caster.Energy >= ability.EnergyCost)
+            BuildBuilding ability = ToBuildNext[user];
+            if (user.Energy >= ability.EnergyCost)
                 foreach (Node n in possibleTargets)
                 {
                     if(map.BuildingCanBePlaced(ability.BuildingFactory, n.X, n.Y))
                     {
-                        //cast ability
-                        ability.SetCommands(new List<Plant>() { caster }, n, false, ActionLog);
+                        //use ability
+                        ability.SetCommands(new List<Plant>() { user }, n, false, ActionLog);
 
-                        //select ability to use next by caster from all of its BuildBuilding abilities
-                        var buildingAbilities = caster.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();
+                        //select ability to use next by user from all of its BuildBuilding abilities
+                        var buildingAbilities = user.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();
                         if (!buildingAbilities.Any())
                             return;
-                        ToBuildNext[caster] = buildingAbilities[random.Next(buildingAbilities.Count)];
+                        ToBuildNext[user] = buildingAbilities[random.Next(buildingAbilities.Count)];
                         break;
                     }
                 }

@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             EnergyDamage = energyDamage;
         }
 
-        public override Command NewCommand(Animal caster, Animal target)
+        public override Command NewCommand(Animal user, Animal target)
         {
-            return new KickCommand(caster, target, this);
+            return new KickCommand(user, target, this);
         }
 
         public override string GetName() => "KICK";
@@ -34,7 +34,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
             new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self castable", SelfCastable.ToString()),
+            new Stat( "Self useable", SelfUseable.ToString()),
             new Stat("Only one", OnlyOne.ToString()),
             new Stat( "Target type", TargetName),
             new Stat( "Energy dmg", EnergyDamage.ToString("0.0")),

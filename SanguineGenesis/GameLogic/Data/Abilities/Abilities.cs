@@ -24,7 +24,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public MoveTo UnbreakableMoveTo { get; }
         public MoveTo MoveTo { get; }
-        public MoveTo MoveToCast(Ability ability) => moveToCast[ability];
+        public MoveTo MoveToUse(Ability ability) => moveToCast[ability];
         public Attack Attack { get; }
         public Attack UnbreakableAttack { get; }
         public Spawn UnitSpawn(string type) => unitSpawn[type];
@@ -190,7 +190,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Kick = new Kick(20f, 0.1f, 0.2f, 30f);
             Kick.SetAbilities(this);
 
-            //move to cast has to be initialized last because it uses other abilities
+            //move to use has to be initialized last because it uses other abilities
             moveToCast = new Dictionary<Ability, MoveTo>();
 
             MoveTo moveToAbility = new MoveTo(Attack.Distance, true);
@@ -201,7 +201,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
             foreach (Ability a in AllAbilities.Where(ab=>!(ab is Attack)))
             {
-                //move to cast abilities are not in AllAbilities to avoid infinite recursion
+                //move to use abilities are not in AllAbilities to avoid infinite recursion
                 moveToAbility = new MoveTo(a.Distance, false);
                 moveToCast.Add(a, moveToAbility);
             }

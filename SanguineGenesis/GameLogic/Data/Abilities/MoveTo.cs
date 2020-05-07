@@ -28,51 +28,51 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public float? GoalDistance { get; }
         public bool AttackEnemyInstead { get; }
 
-        public override void SetCommands(IEnumerable<Animal> casters, IMovementTarget target, bool resetCommandQueue, ActionLog actionLog)
+        public override void SetCommands(IEnumerable<Animal> users, IMovementTarget target, bool resetCommandQueue, ActionLog actionLog)
         {
-            //if there are no casters do nothing
-            if (!casters.Any())
+            //if there are no users do nothing
+            if (!users.Any())
                 return;
 
             if (resetCommandQueue)
                 //reset all commands
-                foreach (Animal c in casters)
+                foreach (Animal c in users)
                     c.ResetCommands();
 
             //player whose animals are receiving commands
-            FactionType player = casters.First().Faction.FactionID;
+            FactionType player = users.First().Faction.FactionID;
 
             //separete animals to different groups by their movement
-            var castersGroups = casters.ToLookup((unit) => unit.Movement);
+            var usersGroups = users.ToLookup((unit) => unit.Movement);
 
             //volume of all animals' circles /pi
-            float volume = casters.Select((e) => e.Radius * e.Radius).Sum();
+            float volume = users.Select((e) => e.Radius * e.Radius).Sum();
             //distance from the target when animal can stop if it gets stuck
             float minStoppingDistance = (float)Math.Sqrt(volume) * 1.3f;
 
             foreach (Movement m in Enum.GetValues(typeof(Movement)))
             {
-                IEnumerable<Animal> castersMov = castersGroups[m];
+                IEnumerable<Animal> usersMov = usersGroups[m];
                 //set commands only if some unit can receive it
-                if (!castersMov.Any())
+                if (!usersMov.Any())
                     continue;
 
-                MoveToCommandAssignment mtca = new MoveToCommandAssignment(player, castersMov.Cast<Animal>().ToList(), m, target);
-                //give command to each caster and set the command's creator
-                foreach (Animal caster in castersMov)
+                MoveToCommandAssignment mtca = new MoveToCommandAssignment(player, usersMov.Cast<Animal>().ToList(), m, target);
+                //give command to each user and set the command's creator
+                foreach (Animal user in usersMov)
                 {
-                    IComputable com = new MoveToCommand(caster, target, minStoppingDistance, this)
+                    IComputable com = new MoveToCommand(user, target, minStoppingDistance, this)
                     {
                         Assignment = mtca
                     };
 
-                    caster.AddCommand((Command)com);
+                    user.AddCommand((Command)com);
                 }
                 MovementGenerator.GetMovementGenerator().AddNewCommand(player, mtca);
             }
         }
 
-        public override Command NewCommand(Animal caster, IMovementTarget target)
+        public override Command NewCommand(Animal user, IMovementTarget target)
         {
             throw new NotImplementedException("This method is not necessary because the virtual method " + nameof(SetCommands) + " was overriden");
         }

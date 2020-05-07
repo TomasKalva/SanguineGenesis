@@ -61,7 +61,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Returns true if the caster animal should keep following the target.
+        /// Returns true if the user animal should keep following the target.
         /// </summary>
         public virtual bool FollowTarget() => false;
         /// <summary>
@@ -70,9 +70,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public MoveToCommand FollowCommand { get; set; }
     }
 
-    abstract class Command<Caster, TargetT, AbilityT> : Command where Caster : Entity
+    abstract class Command<User, TargetT, AbilityT> : Command where User : Entity
                                                                     where TargetT : ITargetable
-                                                                    where AbilityT : Ability<Caster, TargetT>
+                                                                    where AbilityT : Ability<User, TargetT>
     {
         /// <summary>
         /// The ability this command is performing.
@@ -81,7 +81,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// The entity who performs this command.
         /// </summary>
-        public Caster CommandedEntity { get; }
+        public User CommandedEntity { get; }
         /// <summary>
         /// Target of the ability.
         /// </summary>
@@ -122,7 +122,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override int Progress 
             => Math.Min(100, Ability.Duration!=0 ? (int)((ElapsedTime / Ability.Duration) * 100) : 0);
 
-        protected Command(Caster commandedEntity, TargetT target, AbilityT ability)
+        protected Command(User commandedEntity, TargetT target, AbilityT ability)
         {
             Ability = ability;
             CommandedEntity = commandedEntity;
@@ -183,10 +183,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         protected bool CanBeUsed()
         {
-            //check validity of target and caster
+            //check validity of target and user
             if (CommandedEntity.IsDead)
             {
-                ActionLog.LogError(CommandedEntity, Ability, "the caster is dead");
+                ActionLog.LogError(CommandedEntity, Ability, "the user is dead");
                 return false;
             }
             if (Target is Entity targEnt && targEnt.IsDead)
@@ -194,12 +194,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 return false;
             }
 
-            //check if both target and caster are not locked by other ability/status...
+            //check if both target and user are not locked by other ability/status...
             if (CommandedEntity is Animal commandedA)
             {
                 if (commandedA.StateChangeLock != null && commandedA.StateChangeLock != this)
                 {
-                    ActionLog.LogError(CommandedEntity, Ability, "the caster is locked by other command/status");
+                    ActionLog.LogError(CommandedEntity, Ability, "the user is locked by other command/status");
                     return false;
                 }
             }
@@ -237,7 +237,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 if (FollowCommand != null)
                 {
-                    // follow the target animal if caster is animal and too far away
+                    // follow the target animal if user is animal and too far away
                     bool moving = TryFollowTarget(game, deltaT);
                     if (moving)
                         return false;
@@ -267,7 +267,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Follow the target animal if caster is animal and too far away.
+        /// Follow the target animal if user is animal and too far away.
         /// </summary>
         private bool TryFollowTarget(Game game, float deltaT)
         {

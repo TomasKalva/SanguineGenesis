@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             EnergyPerS = energyPerS;
         }
 
-        public override Command NewCommand(Animal caster, Structure target)
+        public override Command NewCommand(Animal user, Structure target)
         {
-            return new ImproveStructureCommand(caster, target, this);
+            return new ImproveStructureCommand(user, target, this);
         }
 
         public override string GetName() => "IMPROVE_STRUCTURE";
@@ -34,7 +34,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
             new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self castable", SelfCastable.ToString()),
+            new Stat( "Self useable", SelfUseable.ToString()),
             new Stat("Only one", OnlyOne.ToString()),
             new Stat( "Target type", TargetName),
             new Stat( "Energy per s", EnergyPerS.ToString("0.0")),
