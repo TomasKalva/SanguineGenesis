@@ -80,12 +80,12 @@ namespace SanguineGenesis.GameLogic
             CurrentPlayer = Players[FactionType.PLAYER0];
             NeutralFaction = new Faction(FactionType.NEUTRAL);
 
-             //map
+            //map
             var mapLoader = new MapLoader(mapDescription);
             Map = mapLoader.LoadMap();
             mapLoader.LoadBuildings(this);
 
-            foreach(var kvp in Players)
+            foreach (var kvp in Players)
                 kvp.Value.InitializeMapView(Map);
 
             collisions = new Collisions(Map);
@@ -137,11 +137,7 @@ namespace SanguineGenesis.GameLogic
             gameTime.PrintTime("Others");
 
             //update players' visibility map
-            VisibilityGeneratorInteraction(GetAll<Building>());
-
-            //update parts of map that can be seen for each player
-            foreach (var p in Players)
-                p.Value.UpdateVisibleMap(Map);
+            VisibilityUpdate();
 
             gameTime.PrintTime("Visibility");
 
@@ -211,8 +207,6 @@ namespace SanguineGenesis.GameLogic
             foreach (var kvp in Players)
                 kvp.Value.RemoveDeadEntities(this);
             NeutralFaction.RemoveDeadEntities(this);
-            foreach (var kvp in Players)
-                kvp.Value.RemoveDeadVisibleBuildings();
 
             //set and refresh movement commands
             MovementGeneratorInteraction();
@@ -232,26 +226,24 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Sets tasks to visibilityGenerator and updates visibility maps.
         /// </summary>
-        private void VisibilityGeneratorInteraction(IEnumerable<Building> allBuildings)
+        private void VisibilityUpdate()
         {
             var visibilityGenerator = VisibilityGenerator.Get;
             if (visibilityGenerator.Done)
             {
                 FactionType current = nextVisibilityPlayer;
-                FactionType other = nextVisibilityPlayer == FactionType.PLAYER0 ?
-                                        FactionType.PLAYER1 :
-                                        FactionType.PLAYER0;
+                FactionType other = nextVisibilityPlayer.Opposite();
 
                 //update current player's visibility map
                 var newMap = visibilityGenerator.VisibilityMap;
                 if (newMap != null && FirstVisibilityTaken)
-                    Players[current].SetVisibilityMap(newMap, allBuildings);
+                    Players[current].SetVisibilityMap(newMap);
 
                 //visibility map was taken
                 if (!FirstVisibilityTaken)
                     FirstVisibilityTaken = true;
 
-                //generated visibility map for the other player
+                //generate visibility map for the other player
                 nextVisibilityPlayer = other;
 
                 //create algorithm for generating visibility map
@@ -267,6 +259,13 @@ namespace SanguineGenesis.GameLogic
                 }
 
                 visibilityGenerator.SetNewTask(visGenTask);
+            }
+
+            //update parts of map that can be seen for each player
+            foreach (var p in Players)
+            {
+                p.Value.UpdateVisibleNodes(Map);
+                p.Value.UpdateVisibleBuildings(GetAll<Building>());
             }
         }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
 {
     /// <summary>
     /// Represents ray from one point to another. It returns indices of
@@ -32,15 +32,10 @@ namespace SanguineGenesis.GameLogic.Maps
         /// Angle from Start to End relative to positive x axis.
         /// </summary>
         public float Angle { get; }
-        /// <summary>
-        /// Angle from End to Start relative to positive x axis.
-        /// </summary>
-        public float OppositeAngle => Angle + (float)Math.PI;
-        /// <summary>
-        /// Distance that was already traveled on the ray.
-        /// </summary>
-        public float TraveledDist => (Current - Start).Length;
 
+        /// <summary>
+        /// Creates a new ray with given start and end points.
+        /// </summary>
         public Ray(Vector2 start, Vector2 end, ObstacleMap obstacleMap)
         {
             this.Start = start;

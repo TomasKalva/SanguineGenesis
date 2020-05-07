@@ -14,13 +14,11 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
     /// </summary>
     class VisibilityGenerator
     {
-        private static readonly VisibilityGenerator visibilityGenerator;
-
         static VisibilityGenerator(){
-            visibilityGenerator = new VisibilityGenerator();
+            Get = new VisibilityGenerator();
         }
 
-        public static VisibilityGenerator Get => visibilityGenerator;
+        public static VisibilityGenerator Get { get; private set; }
 
         //inputs
         /// <summary>
@@ -102,7 +100,7 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
 
         /// <summary>
         /// Infinite loop for generating visibility maps. Listens to Pulses on this instance,
-        /// the pulse condition is newTask.
+        /// the conditional variable is newTask.
         /// </summary>
         public void Generate()
         {
@@ -110,6 +108,7 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
             {
                 lock(this)
                     while (!newTask) Monitor.Wait(this);
+
                 visibilityMap = task.GenerateVisibilityMap();
 
                 lock (this)
@@ -129,6 +128,9 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
         VisibilityMap GenerateVisibilityMap();
     }
 
+    /// <summary>
+    /// Only area around entity that is reacheble through no obstacles is visible.
+    /// </summary>
     class RayVisibilityGeneratingTask : IVisibilityGeneratingTask
     {
         private VisibilityMap VisibilityMap { get; }

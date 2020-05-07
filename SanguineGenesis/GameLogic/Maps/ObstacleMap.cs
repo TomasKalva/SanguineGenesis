@@ -25,8 +25,8 @@ namespace SanguineGenesis
             get => isObstacle[i+1, j+1];
             set => isObstacle[i+1, j+1] = value;
         }
-        public int Width => isObstacle.GetLength(0)-2;
-        public int Height => isObstacle.GetLength(1)-2;
+        public int Width => isObstacle.GetLength(0) - 2;
+        public int Height => isObstacle.GetLength(1) - 2;
 
         /// <summary>
         /// Creates an obstacle map with a frame around it.

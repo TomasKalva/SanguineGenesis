@@ -55,13 +55,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// How long it takes to perform this ability.
         /// </summary>
         public float Duration { get; }
-
-        /// <summary>
-        /// Set commands to the units. Calls the generic version of this method.
-        /// </summary>
-        /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
-        /// <exception cref="NullReferenceException">If some casters are null.</exception>
-        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue, ActionLog actionLog);
         /// <summary>
         /// Returns true if the target type is valid for this ability.
         /// </summary>
@@ -74,12 +67,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// Type of Caster.
         /// </summary>
         public abstract Type CasterType { get; }
-        /// <summary>
-        /// Creates new instance of the command with specified caster and target. 
-        /// Calls the generic version of this method. 
-        /// </summary>
-        /// <exception cref="InvalidCastException">If caster or target has incompatible type.</exception>
-        public abstract Command NewCommand(Entity caster, ITargetable target);
 
         public Ability(float? distance, float energyCost, bool onlyOne, bool selfCastable, bool interruptable, float duration)
         {
@@ -90,6 +77,20 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Interruptable = interruptable;
             Duration = duration;
         }
+
+        /// <summary>
+        /// Set commands to the entities. Calls the generic version of this method.
+        /// </summary>
+        /// <exception cref="InvalidCastException">If some casters or target have incompatible type.</exception>
+        /// <exception cref="NullReferenceException">If some casters are null.</exception>
+        public abstract void SetCommands(IEnumerable<Entity> casters, ITargetable target, bool resetCommandQueue, ActionLog actionLog);
+        
+        /// <summary>
+        /// Creates new instance of the command with specified caster and target. 
+        /// Calls the generic version of this method. 
+        /// </summary>
+        /// <exception cref="InvalidCastException">If caster or target has incompatible type.</exception>
+        public abstract Command NewCommand(Entity caster, ITargetable target);
 
         //IShowable
         public abstract string GetName();
@@ -126,7 +127,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public abstract Command NewCommand(Caster caster, Target target);
 
         /// <summary>
-        /// Returns false if command with caster and target can't be created.
+        /// Returns false if command with caster and target can't be created. The errors are logged.
         /// </summary>
         public virtual bool ValidArguments(Caster caster, Target target, ActionLog actionLog) => true;
 

@@ -158,6 +158,32 @@ namespace SanguineGenesis.GameLogic
         {
             return true;
         }
+
+        /// <summary>
+        /// Spawns 6 instances of each animal in the game.
+        /// </summary>
+        public void SpawnTestingAnimals(GameData gameData)
+        {
+            //calculate extents
+            var factories = gameData.AnimalFactories.Factorys;
+            int gridPoints = (int)Math.Ceiling(Math.Sqrt(factories.Count));
+            float gridSize = 29f;
+            float step = gridSize / (gridPoints + 1);
+
+            //create animals
+            int pos = 0;
+            foreach (AnimalFactory a in factories.Select(kvp => kvp.Value))
+            {
+                for (int j = 0; j < 6; j++)
+                {
+                    var animal = a.NewInstance(this, new Vector2(step * ((pos % gridPoints) + 1),
+                                                                 step * ((pos / gridPoints) + 1)));
+                    animal.Energy = animal.Energy.MaxValue;
+                    AddEntity(animal);
+                }
+                pos++;
+            }
+        }
     }
 
     class Player : Faction
@@ -200,37 +226,31 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Spawns 6 instances of each animal in the game.
+        /// Copy map to the player's VisibleMap.
         /// </summary>
-        public void SpawnTestingAnimals(GameData gameData)
+        public void InitializeMapView(Map map)
         {
-            //calculate extents
-            var factories = gameData.AnimalFactories.Factorys;
-            int gridPoints = (int)Math.Ceiling(Math.Sqrt(factories.Count));
-            float gridSize = 29f;
-            float step = gridSize / (gridPoints + 1);
-            
-            //create animals
-            int pos = 0;
-            foreach (AnimalFactory a in factories.Select(kvp => kvp.Value))
-            {
-                for (int j = 0; j < 6; j++)
-                {
-                    var animal = a.NewInstance(this, new Vector2(step * ((pos % gridPoints) + 1),
-                                                                 step * ((pos / gridPoints) + 1)));
-                    animal.Energy = animal.Energy.MaxValue;
-                    AddEntity(animal);
-                }
-                pos++;
-            }
+            VisibleMap = new Map(map);
+        }
+
+        /// <summary>
+        /// Sets VisibilityMap and updates visible buildings.
+        /// </summary>
+        public void SetVisibilityMap(VisibilityMap visMap)
+        {
+            //add vision under this player's buildings
+            foreach (Building b in GetAll<Building>())
+                foreach (Node n in b.Nodes)
+                    visMap[n.X, n.Y] = true;
+
+            VisibilityMap = visMap;
         }
 
         /// <summary>
         /// Add buildings that weren't visible and now are to VisibleBuildings. Remove 
         /// buildings that were visible but now can be seen that they no longer exist.
         /// </summary>
-        /// <param name="buildings"></param>
-        public void UpdateBuildingsView(IEnumerable<Building> buildings)
+        public void UpdateVisibleBuildings(IEnumerable<Building> buildings)
         {
             if (VisibilityMap == null)
                 return;
@@ -256,13 +276,36 @@ namespace SanguineGenesis.GameLogic
             }
 
             //remove visible buildings for which it can be seen that they no longer exist
+            foreach(var b in VisibleBuildings) 
+            {
+                if ( CanSee(b) && b.IsDead) 
+                    VisibleMap.RemoveBuilding(b);
+            }
             VisibleBuildings.RemoveAll((b) => CanSee(b) && b.IsDead);
+        }
+
+        /// <summary>
+        /// Adds building to VisibleBuildings and updates VisibleMap.
+        /// </summary>
+        private void AddVisibleBuilding(Building building)
+        {
+            VisibleBuildings.Add(building);
+            VisibleMap.AddBuilding(building);
+        }
+
+        /// <summary>
+        /// Removes building from VisibleBuildings and updates VisibleMap.
+        /// </summary>
+        private void RemoveVisibleBuilding(Building building)
+        {
+            VisibleBuildings.Remove(building);
+            VisibleMap.RemoveBuilding(building);
         }
 
         /// <summary>
         /// Update visible nodes.
         /// </summary>
-        public void UpdateVisibleMap(Map map)
+        public void UpdateVisibleNodes(Map map)
         {
             if (VisibilityMap == null)
                 return;
@@ -281,71 +324,6 @@ namespace SanguineGenesis.GameLogic
                         destN.PassiveNutrients = sourceN.PassiveNutrients;
                     }
                 }
-        }
-
-        /// <summary>
-        /// Removes building from VisibleBuildings and updates VisibleMap.
-        /// </summary>
-        private void RemoveVisibleBuilding(Building building)
-        {
-            VisibleBuildings.Remove(building);
-            VisibleMap.RemoveBuilding(building);
-        }
-
-        /// <summary>
-        /// Adds building to VisibleBuildings and updates VisibleMap.
-        /// </summary>
-        private void AddVisibleBuilding(Building building)
-        {
-            VisibleBuildings.Add(building);
-            VisibleMap.AddBuilding(building);
-        }
-
-        /// <summary>
-        /// Sets VisibilityMap and updates visible buildings.
-        /// </summary>
-        public void SetVisibilityMap(VisibilityMap visMap, IEnumerable<Building> buildings)
-        {
-            //add vision under this player's buildings
-            foreach (Building b in GetAll<Building>())
-                foreach (Node n in b.Nodes)
-                    visMap[n.X, n.Y] = true;
-
-            VisibilityMap = visMap;
-            UpdateBuildingsView(buildings);
-        }
-
-        /// <summary>
-        /// Removes all visible buildings that are dead.
-        /// </summary>
-        public void RemoveDeadVisibleBuildings()
-        {
-            VisibleBuildings.ForEach((building) =>
-            {
-                if (building.IsDead) VisibleMap.RemoveBuilding(building);
-            });
-            VisibleBuildings.RemoveAll((building) => building.IsDead);
-        }
-
-        /// <summary>
-        /// Copy map to the player's VisibleMap.
-        /// </summary>
-        public void InitializeMapView(Map map)
-        {
-            VisibleMap = new Map(map);
-        }
-
-        /// <summary>
-        /// Returns the factory of main building of this players biome.
-        /// </summary>
-        public BuildingFactory GetMainBuildingFactory(Game game)
-        {
-            switch (Biome)
-            {
-                case Biome.SAVANNA: return game.GameData.PlantFactories["BAOBAB"];
-                case Biome.RAINFOREST: return game.GameData.PlantFactories["KAPOC"];
-                default: return game.GameData.StructureFactories["ROCK"];
-            }
         }
 
         /// <summary>
@@ -379,6 +357,19 @@ namespace SanguineGenesis.GameLogic
             else
                 //visibility map is null => player can't see anything
                 return false;
+        }
+
+        /// <summary>
+        /// Returns the factory of main building of this players biome.
+        /// </summary>
+        public BuildingFactory GetMainBuildingFactory(Game game)
+        {
+            switch (Biome)
+            {
+                case Biome.SAVANNA: return game.GameData.PlantFactories["BAOBAB"];
+                case Biome.RAINFOREST: return game.GameData.PlantFactories["KAPOC"];
+                default: return game.GameData.StructureFactories["ROCK"];
+            }
         }
     }
 
