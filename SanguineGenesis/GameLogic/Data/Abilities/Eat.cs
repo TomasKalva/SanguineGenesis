@@ -17,20 +17,20 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override Command NewCommand(Animal caster, IHerbivoreFood target)
+        public override Command NewCommand(Animal user, IHerbivoreFood target)
         {
-            return new HerbivoreEatCommand(caster, target, this);
+            return new HerbivoreEatCommand(user, target, this);
         }
 
         /// <summary>
-        /// Make sure that animals don't eat dirt.
+        /// Make sure that animals don't eat dirt and target has food.
         /// </summary>
-        public override bool ValidArguments(Animal caster, IHerbivoreFood target, ActionLog actionLog)
+        public override bool ValidArguments(Animal user, IHerbivoreFood target, ActionLog actionLog)
         {
-            if (target is Node tNode &&
-                tNode.Biome == Biome.DEFAULT)
+            if ((target is Node tNode &&
+                tNode.Biome == Biome.DEFAULT) ||
+                !target.FoodLeft)
             {
-                actionLog.LogError(caster, this, "animal can't eat dirt");
                 return false;
             }
             return true;
@@ -58,15 +58,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!Target.FoodLeft)
-            {
-                CommandedEntity.CanBeMoved = true;
-                return true;
-            }
+            //set direction of animal
+            CommandedEntity.TurnToPoint(Target.Center);
 
-            CommandedEntity.Direction = Target.Center - CommandedEntity.Center;
-
-            CommandedEntity.CanBeMoved = false;
             if (ElapsedTime >= CommandedEntity.FoodEatingPeriod)
             {
                 //eat
@@ -91,9 +85,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override Command NewCommand(Animal caster, ICarnivoreFood target)
+        public override Command NewCommand(Animal user, ICarnivoreFood target)
         {
-            return new CarnivoreEatCommand(caster, target, this);
+            return new CarnivoreEatCommand(user, target, this);
+        }
+
+        public override bool ValidArguments(Animal user, ICarnivoreFood target, ActionLog actionLog)
+        {
+            //check if there is food left
+            if (!target.FoodLeft)
+            {
+                return false;
+            }
+            return true;
         }
 
         public override string ToString()
@@ -119,15 +123,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (!Target.FoodLeft)
-            {
-                CommandedEntity.CanBeMoved = true;
-                return true;
-            }
+            //set direction of animal
+            CommandedEntity.TurnToPoint(Target.Center);
 
-            CommandedEntity.Direction = Target.Center - CommandedEntity.Center;
-
-            CommandedEntity.CanBeMoved = false;
             if (ElapsedTime >= CommandedEntity.FoodEatingPeriod)
             {
                 //eat

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
-    /// Pull the target to the caster.
+    /// Pull the target to the user.
     /// </summary>
     sealed class Pull : Ability<Animal, Animal>
     {
@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             PullSpeed = pullSpeed;
         }
 
-        public override Command NewCommand(Animal caster, Animal target)
+        public override Command NewCommand(Animal user, Animal target)
         {
-            return new PullCommand(caster, target, this);
+            return new PullCommand(user, target, this);
         }
 
         public override string GetName() => "PULL";

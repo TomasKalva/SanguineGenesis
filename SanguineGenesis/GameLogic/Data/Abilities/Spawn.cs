@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public AnimalFactory SpawningUnitFactory { get; }
 
-        public override Command NewCommand(Entity caster, Vector2 target)
+        public override Command NewCommand(Entity user, Vector2 target)
         {
-            return new SpawnCommand(caster, target, this);
+            return new SpawnCommand(user, target, this);
         }
 
         public override string ToString()

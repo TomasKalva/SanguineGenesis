@@ -35,9 +35,15 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 return;
 
             if (resetCommandQueue)
+            {
                 //reset all commands
                 foreach (Animal c in users)
+                {
                     c.ResetCommands();
+                    if (c.CommandQueue.Any())
+                        actionLog.LogError(c, this, $"{c} has unremovable commands");
+                }
+            }
 
             //player whose animals are receiving commands
             FactionType player = users.First().Faction.FactionID;

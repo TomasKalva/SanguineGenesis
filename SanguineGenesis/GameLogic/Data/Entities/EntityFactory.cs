@@ -50,7 +50,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Adds new ability to this entity's factory, if the ability has correct caster type.
+        /// Adds new ability to this entity's factory, if the ability has correct user type.
         /// </summary>
         public abstract void AddAbility(Ability ability);
 
@@ -132,7 +132,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
         public override void AddAbility(Ability ability)
         {
-            if (ability.CasterType.IsAssignableFrom(typeof(Plant)))
+            if (ability.UserType.IsAssignableFrom(typeof(Plant)))
             {
                 Abilities.Add(ability);
             }
@@ -169,7 +169,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
         public override void AddAbility(Ability ability)
         {
-            if (ability.CasterType.IsAssignableFrom(typeof(Structure)))
+            if (ability.UserType.IsAssignableFrom(typeof(Structure)))
             {
                 Abilities.Add(ability);
             }
@@ -288,7 +288,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
         public override void AddAbility(Ability ability)
         {
-            if (ability.CasterType.IsAssignableFrom(typeof(Animal)))
+            if (ability.UserType.IsAssignableFrom(typeof(Animal)))
             {
                 Abilities.Add(ability);
             }

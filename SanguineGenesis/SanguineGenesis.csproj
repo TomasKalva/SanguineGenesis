@@ -75,7 +75,7 @@
     <Compile Include="GameLogic\Data\Abilities\Attack.cs" />
     <Compile Include="GameLogic\Data\Abilities\BuildBuilding.cs" />
     <Compile Include="GameLogic\Data\Abilities\ChargeTo.cs" />
-    <Compile Include="GameLogic\Data\Abilities\ClimbTree.cs" />
+    <Compile Include="GameLogic\Data\Abilities\ClimbPlant.cs" />
     <Compile Include="GameLogic\Data\Abilities\ConsumeAnimal.cs" />
     <Compile Include="GameLogic\Data\Abilities\CreateAnimal.cs" />
     <Compile Include="GameLogic\Data\Abilities\Eat.cs" />

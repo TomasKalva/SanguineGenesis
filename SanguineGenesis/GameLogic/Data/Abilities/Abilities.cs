@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
+using SanguineGenesis.GameLogic.Data.Entities;
 
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
@@ -13,22 +14,26 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     class Abilities
     {
         /// <summary>
-        /// List of all abilities that aren't moveToCast ability.
+        /// List of all abilities that aren't values in moveToUse.
         /// </summary>
         public List<Ability> AllAbilities { get; }
 
-        private readonly Dictionary<Ability, MoveTo> moveToCast;
-        private readonly Dictionary<string, Spawn> unitSpawn;
-        private readonly Dictionary<string, CreateAnimal> unitCreate;
+        /// <summary>
+        /// MoveTo ability for each ability in AllAbilities.
+        /// </summary>
+        private readonly Dictionary<Ability, MoveTo> moveToUse;
+        
+        private readonly Dictionary<string, Spawn> animalSpawn;
+        private readonly Dictionary<string, CreateAnimal> animalCreate;
         private readonly Dictionary<string, BuildBuilding> buildBuilding;
 
         public MoveTo UnbreakableMoveTo { get; }
         public MoveTo MoveTo { get; }
-        public MoveTo MoveToUse(Ability ability) => moveToCast[ability];
+        public MoveTo MoveToUse(Ability ability) => moveToUse[ability];
         public Attack Attack { get; }
         public Attack UnbreakableAttack { get; }
-        public Spawn UnitSpawn(string type) => unitSpawn[type];
-        public CreateAnimal UnitCreate(string type) => unitCreate[type];
+        public Spawn UnitSpawn(string type) => animalSpawn[type];
+        public CreateAnimal UnitCreate(string type) => animalCreate[type];
         public BuildBuilding BuildBuilding(string type) => buildBuilding[type];
         public Grow Grow { get; }
         public SetRallyPoint SetRallyPoint { get; }
@@ -69,22 +74,22 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             UnbreakableAttack = new Attack(true);
             UnbreakableAttack.SetAbilities(this);
 
-            //unit spawn
-            unitSpawn = new Dictionary<string, Spawn>();
-            foreach (var unitFac in gameStaticData.AnimalFactories.Factorys)
+            //animal spawn
+            animalSpawn = new Dictionary<string, Spawn>();
+            foreach (var animalFac in gameStaticData.AnimalFactories.Factorys)
             {
-                Spawn spawn = new Spawn(unitFac.Value);
+                Spawn spawn = new Spawn(animalFac.Value);
                 spawn.SetAbilities(this);
-                unitSpawn.Add(unitFac.Value.EntityType, spawn);
+                animalSpawn.Add(animalFac.Value.EntityType, spawn);
             }
 
-            //unit create
-            unitCreate = new Dictionary<string, CreateAnimal>();
-            foreach (var unitFac in gameStaticData.AnimalFactories.Factorys)
+            //animal create
+            animalCreate = new Dictionary<string, CreateAnimal>();
+            foreach (var animalFac in gameStaticData.AnimalFactories.Factorys)
             {
-                CreateAnimal createUnit = new CreateAnimal(unitFac.Value);
+                CreateAnimal createUnit = new CreateAnimal(animalFac.Value);
                 createUnit.SetAbilities(this);
-                unitCreate.Add(unitFac.Value.EntityType, createUnit);
+                animalCreate.Add(animalFac.Value.EntityType, createUnit);
             }
 
             //build buiding
@@ -170,7 +175,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             EnterHole = new EnterHole(0, 0.3f);
             EnterHole.SetAbilities(this);
 
-            //enter hole
+            //exit hole
             ExitHole = new ExitHole(0, 0.3f);
             ExitHole.SetAbilities(this);
 
@@ -191,19 +196,21 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Kick.SetAbilities(this);
 
             //move to use has to be initialized last because it uses other abilities
-            moveToCast = new Dictionary<Ability, MoveTo>();
+            moveToUse = new Dictionary<Ability, MoveTo>();
 
             MoveTo moveToAbility = new MoveTo(Attack.Distance, true);
-            moveToCast.Add(Attack, moveToAbility);
+            moveToUse.Add(Attack, moveToAbility);
 
             moveToAbility = new MoveTo(UnbreakableAttack.Distance, false);
-            moveToCast.Add(UnbreakableAttack, moveToAbility);
+            moveToUse.Add(UnbreakableAttack, moveToAbility);
 
-            foreach (Ability a in AllAbilities.Where(ab=>!(ab is Attack)))
+            foreach (Ability a in AllAbilities
+                                    .Where(ab=>!(ab is Attack) && 
+                                                ab.UserType.IsAssignableFrom(typeof(Animal))))
             {
                 //move to use abilities are not in AllAbilities to avoid infinite recursion
                 moveToAbility = new MoveTo(a.Distance, false);
-                moveToCast.Add(a, moveToAbility);
+                moveToUse.Add(a, moveToAbility);
             }
         }
     }

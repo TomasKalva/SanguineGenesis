@@ -17,14 +17,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             : base(2 * spawningUnitFactory.Radius, spawningUnitFactory.EnergyCost, true, false, duration: spawningUnitFactory.SpawningTime)
         {
             SpawningAnimalFactory = spawningUnitFactory;
-
         }
 
         public AnimalFactory SpawningAnimalFactory { get; }
 
-        public override Command NewCommand(Building caster, Nothing target)
+        public override Command NewCommand(Building user, Nothing target)
         {
-            return new CreateAnimalCommand(caster, target, this);
+            return new CreateAnimalCommand(user, target, this);
         }
 
         public override string ToString()

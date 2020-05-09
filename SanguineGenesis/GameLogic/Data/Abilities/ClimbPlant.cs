@@ -13,17 +13,17 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// </summary>
     sealed class ClimbPlant : Ability<Animal, Plant>
     {
-        public AnimalsOnTreeFactory AnimalsOnPlantFactory { get; }
+        public AnimalsOnPlantFactory AnimalsOnPlantFactory { get; }
 
         internal ClimbPlant(float energyCost, float climbingTime)
             : base(0.1f, energyCost, false, false, duration:climbingTime)
         {
-            AnimalsOnPlantFactory = new AnimalsOnTreeFactory(new ClimbDownPlant(0, 0.5f));
+            AnimalsOnPlantFactory = new AnimalsOnPlantFactory(new ClimbDownPlant(0, 0.5f));
         }
 
-        public override Command NewCommand(Animal caster, Plant target)
+        public override Command NewCommand(Animal user, Plant target)
         {
-            return new ClimbPlantCommand(caster, target, this);
+            return new ClimbPlantCommand(user, target, this);
         }
 
         public override string GetName() => "CLIMB_UP";
@@ -33,11 +33,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return "The animal climbs on the plant.";
         }
 
-        public override bool ValidArguments(Animal caster, Plant target, ActionLog actionLog)
+        public override bool ValidArguments(Animal user, Plant target, ActionLog actionLog)
         {
-            if(caster.Faction.FactionID != target.Faction.FactionID)
+            if(user.Faction.FactionID != target.Faction.FactionID)
             {
-                actionLog.LogError(caster, this, "target doesn't have the same faction");
+                actionLog.LogError(user, this, "target doesn't have the same faction");
                 return false;
             }
             return true;
@@ -58,7 +58,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 //put the animal on the target plant
                 CommandedEntity.Faction.RemoveEntity(CommandedEntity);
 
-                AnimalsOnTreeFactory anOnPlantFact = Ability.AnimalsOnPlantFactory;
+                AnimalsOnPlantFactory anOnPlantFact = Ability.AnimalsOnPlantFactory;
                 anOnPlantFact.PutOnTree = CommandedEntity;
                 anOnPlantFact.ApplyToAffected(Target);
                 return true;
@@ -78,9 +78,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override Command NewCommand(Plant caster, Nothing target)
+        public override Command NewCommand(Plant user, Nothing target)
         {
-            return new ClimbDownPlantCommand(caster, target, this);
+            return new ClimbDownPlantCommand(user, target, this);
         }
 
         public override string GetName() => "CLIMB_DOWN";

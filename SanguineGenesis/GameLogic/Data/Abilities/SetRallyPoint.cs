@@ -18,9 +18,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override Command NewCommand(Building caster, Vector2 target)
+        public override Command NewCommand(Building user, Vector2 target)
         {
-            return new SetRallyPointCommand(caster, target, this);
+            return new SetRallyPointCommand(user, target, this);
         }
 
         public override string ToString()

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 {
     /// <summary>
-    /// Used for generating flowfield using bfs with raycasting heuristics. One instance of the class
+    /// Used for generating flowfield using bfs with rayuseing heuristics. One instance of the class
     /// is one instance of the algorithm. The flowfield overlaps with movement blocked square by one
     /// node.
     /// </summary>
@@ -116,7 +116,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         {
             //ray has no length limit on the map
             float rayLength = obstacleMap.Width * obstacleMap.Height;
-            //cast rays to the lines on bottom and top of the map
+            //use rays to the lines on bottom and top of the map
             for (int i = 0; i <= obstacleMap.Width; i++)
             {
                 //top
@@ -135,7 +135,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                 while (rBottom.Next(out int x, out int y))
                     flowField[x, y] = FlowField.POINT_TO_TARGET;//direction will point straight to the target
             }
-            //cast rays to the lines on left and right of the map
+            //use rays to the lines on left and right of the map
             for (int j = 0; j <= obstacleMap.Height; j++)
             {
                 //left

@@ -27,7 +27,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new AttackCommand(user, target, this);
         }
 
-        public override string GetName() => Unbreakable?"UNBR_ATTACK":"ATTACK";
+        public override string GetName() => Unbreakable ? "UNBR_ATTACK":"ATTACK";
 
         public override string Description()
         {
@@ -46,8 +46,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
+            //set direction of animal
             CommandedEntity.TurnToPoint(Target.Center);
-            
+
+            //after CommandedEntity.AttackPeriod passes, deal damage to the target
             if (ElapsedTime >= CommandedEntity.AttackPeriod)
             {
                 ElapsedTime -= CommandedEntity.AttackPeriod;
@@ -63,12 +65,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     Target.Damage(CommandedEntity.AttackDamage, true);
                 }
             }
-
-            bool finished = CommandedEntity.DistanceTo(Target) >= CommandedEntity.AttackDistance;
-            if (finished)
-            {
-                return true;
-            }
             return false;
         }
 
@@ -80,6 +76,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             CommandedEntity.SetAnimation("IDLE");
         }
 
-        public override bool FollowTarget() => true;
+        public override bool FollowTarget => true;
     }
 }

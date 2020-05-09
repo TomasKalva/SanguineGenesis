@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             StatusFactory = statusFactory;
         }
 
-        public override Command NewCommand(Animal caster, Nothing target)
+        public override Command NewCommand(Animal user, Nothing target)
         {
-            return new ApplyStatusCommand(caster, target, this);
+            return new ApplyStatusCommand(user, target, this);
         }
 
         public override string GetName() => "APPLY_" + StatusFactory.GetName();
@@ -43,8 +43,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            //try to apply the status to the caster, if
-            //the application fails, caster gets refunded
+            //try to apply the status to the user, if
+            //the application fails, user gets refunded
             if (!Ability.StatusFactory.ApplyToStatusOwner(CommandedEntity))
             {
                 ActionLog.LogError(CommandedEntity, Ability, "status can't be added to the target");

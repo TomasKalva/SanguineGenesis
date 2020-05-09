@@ -19,20 +19,20 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override bool ValidArguments(Animal caster, Structure target, ActionLog actionLog)
+        public override bool ValidArguments(Animal user, Structure target, ActionLog actionLog)
         {
             //target has to have underground status
             if(!target.Statuses.Where((s) => s is Underground).Any())
             {
-                actionLog.LogError(caster, this, $"target doesn't have status {nameof(Underground)}");
+                actionLog.LogError(user, this, $"target doesn't have status {nameof(Underground)}");
                 return false;
             }
             return true;
         }
 
-        public override Command NewCommand(Animal caster, Structure target)
+        public override Command NewCommand(Animal user, Structure target)
         {
-            return new EnterHoleCommand(caster, target, this);
+            return new EnterHoleCommand(user, target, this);
         }
 
         public override string GetName() => "ENTER_HOLE";
@@ -79,9 +79,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override Command NewCommand(Structure caster, Nothing target)
+        public override Command NewCommand(Structure user, Nothing target)
         {
-            return new ExitHoleCommand(caster, target, this);
+            return new ExitHoleCommand(user, target, this);
         }
 
         public override string GetName() => "EXIT_HOLE";

@@ -17,9 +17,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
         }
 
-        public override Command NewCommand(Plant caster, Nothing target)
+        public override Command NewCommand(Plant user, Nothing target)
         {
-            return new GrowCommand(caster, this);
+            return new GrowCommand(user, this);
         }
 
         public override string GetName() => "GROW";

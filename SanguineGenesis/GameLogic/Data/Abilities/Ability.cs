@@ -195,20 +195,20 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <param name="resetCommandQueue">If true, the users CommandQueue will be reset.</param>
         public virtual void SetCommands(IEnumerable<User> users, Target target, bool resetCommandQueue, ActionLog actionLog)
         {
-            //users are put to a list so that they can be enumerated multiple times
-            List<User> usersWithThisAbility = users
-                .Where(c => c.Abilities.Where(a => a == this).Any()).ToList();
+            //select users who have this ability
+            IEnumerable<User> usersWithThisAbility = users
+                .Where(u => u.Abilities.Where(a => a == this).Any());
 
+            //if there are no users with this ability
             if (!usersWithThisAbility.Any())
             {
-                actionLog.LogError(null, this, $"no user with this ability");
+                actionLog.LogError(null, this, "no user with this ability");
                 return;
             }
 
             //select only users who are valid for this target
-            List<User> usersWithValidArguments = usersWithThisAbility
-                .Where((user) => ValidArguments(user, target, (!OnlyOne)? actionLog : ActionLog.ThrowAway))
-                .ToList();
+            IEnumerable<User> usersWithValidArguments = usersWithThisAbility
+                .Where((user) => ValidArguments(user, target, (!OnlyOne)? actionLog : ActionLog.ThrowAway));
 
             //if there are no valid users
             if (!usersWithValidArguments.Any())
@@ -222,7 +222,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 .Where((user) =>user.Energy >= EnergyCost)
                 .ToList();
 
-            //remove user that is also target if the ability can't be self useed
+            //remove user that is also target if the ability can't be self used
             if (!SelfUseable && target is User self)
             {
                 if(validUsers.Contains(self) && validUsers.Count==1)
@@ -240,13 +240,14 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 return; 
             }
 
-            //if the ability should be use only by one user,
+
+            //if the ability should be used only by one user,
             //find the most suitable user to use this ability
             if (OnlyOne)
             {
                 //minimal nuber of active commands of users
-                int minCom = validUsers.Min(c => c.CommandQueue.Count);
-                validUsers = validUsers.Where(c=>c.CommandQueue.Count == minCom)
+                int minCom = validUsers.Min(u => u.CommandQueue.Count);
+                validUsers = validUsers.Where(u=>u.CommandQueue.Count == minCom)
                     .Take(1)//validUsers is nonempty and it has to have item with minimum command queue length
                     .ToList();
             }
@@ -254,30 +255,32 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (resetCommandQueue)
             {
                 //reset all commands
-                foreach (User c in validUsers)
+                foreach (User u in validUsers)
                 {
-                    c.ResetCommands();
-                    if (c.CommandQueue.Any())
-                        actionLog.LogError(c, this, $"{c} has unremovable commands");
+                    u.ResetCommands();
+                    if (u.CommandQueue.Any())
+                        actionLog.LogError(u, this, $"{u} has unremovable commands");
                 }
             }
 
             //move units to the target until the required distance is reached
-            if(validUsers.Where(user => user.GetType() == typeof(Animal)).Any() &&
+            if (validUsers.Where(user => user.GetType() == typeof(Animal)).Any() &&
                 typeof(Target) != typeof(Nothing))
-                abilities.MoveToUse(this)
-                    .SetCommands(validUsers
-                    .Where(user=>user.GetType()==typeof(Animal))
-                    .Cast<Animal>(), target, resetCommandQueue, actionLog);
+            {
+                var moveTo = abilities.MoveToUse(this);
+                moveTo.SetCommands(validUsers
+                        .Where(user => user.GetType() == typeof(Animal))
+                        .Cast<Animal>(), target, resetCommandQueue, actionLog);
+            }
 
             //give command to each user
-            foreach (User c in validUsers)
+            foreach (User u in validUsers)
             {
                 //create new command and assign it to c
-                Command com = NewCommand(c, target);
+                Command com = NewCommand(u, target);
 
                 //instead of MoveTo command before com set MoveTo as FollowCommand for com
-                if (c is Animal a && com.FollowTarget())
+                if (u is Animal a && typeof(Target) != typeof(Nothing) && com.FollowTarget)
                 {
                     MoveToCommand followCommand = (MoveToCommand)a.CommandQueue.Queue.LastOrDefault();
                     a.CommandQueue.Queue.Remove(followCommand);
@@ -286,7 +289,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 //set action log to the command to report errors
                 com.ActionLog = actionLog;
 
-                c.AddCommand(com);
+                u.AddCommand(com);
             }
         }
 

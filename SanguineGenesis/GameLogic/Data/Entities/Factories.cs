@@ -22,7 +22,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Dictionary<string, Factory> Factorys { get; }
         /// <summary>
-        /// For each entity name contains list of ability names separated by ',' that
+        /// For each entity name contains list of ability names separated by ';' that
         /// this entity factory will parse.
         /// </summary>
         protected Dictionary<string, string> abilitiesList;
@@ -103,6 +103,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 string[] abilitiesDesc = entityAbilities.Value.Split(';');
                 foreach(string abilityDesc in abilitiesDesc)
                 {
+                    //parameters of ability are separated by ':'
                     string[] abPar = abilityDesc.Split(':');
                     string abName = abPar[0];
                     if (abPar.Length == 1)

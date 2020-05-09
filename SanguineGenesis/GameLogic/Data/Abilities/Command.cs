@@ -63,16 +63,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Returns true if the user animal should keep following the target.
         /// </summary>
-        public virtual bool FollowTarget() => false;
+        public virtual bool FollowTarget => false;
         /// <summary>
         /// Command used for following the target.
         /// </summary>
         public MoveToCommand FollowCommand { get; set; }
     }
 
-    abstract class Command<User, TargetT, AbilityT> : Command where User : Entity
+    abstract class Command<UserT, TargetT, AbilityT> : Command where UserT : Entity
                                                                     where TargetT : ITargetable
-                                                                    where AbilityT : Ability<User, TargetT>
+                                                                    where AbilityT : Ability<UserT, TargetT>
     {
         /// <summary>
         /// The ability this command is performing.
@@ -81,7 +81,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// The entity who performs this command.
         /// </summary>
-        public User CommandedEntity { get; }
+        public UserT CommandedEntity { get; }
         /// <summary>
         /// Target of the ability.
         /// </summary>
@@ -122,7 +122,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override int Progress 
             => Math.Min(100, Ability.Duration!=0 ? (int)((ElapsedTime / Ability.Duration) * 100) : 0);
 
-        protected Command(User commandedEntity, TargetT target, AbilityT ability)
+        protected Command(UserT commandedEntity, TargetT target, AbilityT ability)
         {
             Ability = ability;
             CommandedEntity = commandedEntity;
@@ -234,26 +234,25 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 return true;
 
             //check CommandedEntity and Targ are close enough
+            if (FollowCommand != null)
             {
-                if (FollowCommand != null)
+                // follow the target animal if user is animal and too far away
+                bool moving = TryFollowTarget(game, deltaT);
+                if (moving)
+                    return false;
+            }
+            else // FollowCommand == null
+            {
+                // target is too far away and CommandedEntity can't follow it
+                // => finish ability
+                if (Target.DistanceTo(CommandedEntity) > Distance + .2f)
                 {
-                    // follow the target animal if user is animal and too far away
-                    bool moving = TryFollowTarget(game, deltaT);
-                    if (moving)
-                        return false;
-                }
-                else // FollowCommand == null
-                {
-                    // target is too far away and CommandedEntity can't follow it
-                    // => finish ability
-                    if (Target.DistanceTo(CommandedEntity) > Distance + .2f)
-                    {
-                        ActionLog.LogError(CommandedEntity, Ability, "the target is too far away");
-                        return true;
-                    }
+                    ActionLog.LogError(CommandedEntity, Ability, "the target is too far away");
+                    return true;
                 }
             }
 
+            //animal can't be moved by collisions during command execution
             if (CommandedEntity is Animal a)
                 a.CanBeMoved = false;
 
@@ -271,13 +270,14 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         private bool TryFollowTarget(Game game, float deltaT)
         {
-            if (FollowTarget() &&
+            if (FollowTarget &&
                 Target.GetType() != typeof(Nothing) &&
                 CommandedEntity is Animal animal)
             {
-                float distance = Target.DistanceTo(animal);
-                if (distance > Distance)
+                //user is animal that can follow the target
+                if (Target.DistanceTo(animal) > Distance)
                 {
+                    //move towards the target
                     animal.CanBeMoved = true;
                     ElapsedTime = 0;
                     if (!animal.WantsToMove)
@@ -287,6 +287,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 }
                 else
                 {
+                    //stop moving towards the target if moving towards the target
                     animal.CanBeMoved = false;
                     if (animal.WantsToMove)
                     {

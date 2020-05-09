@@ -166,7 +166,7 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
             int right = (int)(v.Position.X + viewRange) + 1;
             int bottom = (int)(v.Position.Y - viewRange) - 1;
             int top = (int)(v.Position.Y + viewRange) + 1;
-            //cast rays to the lines on bottom and top of the square around v
+            //use rays to the lines on bottom and top of the square around v
             for (int i = left; i <= right; i++)
             {
                 Ray rTop = new Ray(new Vector2(v.Position.X, v.Position.Y),
@@ -187,7 +187,7 @@ namespace SanguineGenesis.GameLogic.Maps.VisibilityGenerating
                 if (x != -1 && y != -1)
                     VisibilityMap[x, y] = true;
             }
-            //cast rays to the lines on left and right of the square around v
+            //use rays to the lines on left and right of the square around v
             for (int j = bottom; j <= top; j++)
             {
                 Ray rLeft = new Ray(new Vector2(v.Position.X, v.Position.Y),

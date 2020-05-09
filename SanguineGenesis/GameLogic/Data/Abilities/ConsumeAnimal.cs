@@ -9,7 +9,7 @@ using SanguineGenesis.GameLogic.Data.Statuses;
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
-    /// The target is consumed for a short time by the caster.
+    /// The target is consumed for a short time by the user.
     /// </summary>
     sealed class ConsumeAnimal : Ability<Animal, Animal>
     {
@@ -21,19 +21,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             ConsumedAnimalFactory = consumedAnimalFactory;
         }
 
-        public override Command NewCommand(Animal caster, Animal target)
+        public override Command NewCommand(Animal user, Animal target)
         {
-            return new ConsumeAnimalCommand(caster, target, this);
+            return new ConsumeAnimalCommand(user, target, this);
         }
 
         /// <summary>
         /// Animal can only eat twice as small animals.
         /// </summary>
-        public override bool ValidArguments(Animal caster, Animal target, ActionLog actionLog)
+        public override bool ValidArguments(Animal user, Animal target, ActionLog actionLog)
         {
-            if (target.Radius * 2 > caster.Radius)
+            if (target.Radius * 2 > user.Radius)
             {
-                actionLog.LogError(caster, this, "target is too big");
+                actionLog.LogError(user, this, "target is too big");
                 return false;
             }
             return true;

@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             KnockBackFactory = knockBackFactory;
         }
 
-        public override Command NewCommand(Animal caster, Animal target)
+        public override Command NewCommand(Animal user, Animal target)
         {
-            return new KnockBackCommand(caster, target, this);
+            return new KnockBackCommand(user, target, this);
         }
 
         public override string GetName() => "KNOCK_AWAY";
@@ -43,8 +43,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            //try to apply the status to the caster, if
-            //the application fails, caster gets refunded
+            //try to apply the status to the user, if
+            //the application fails, user gets refunded
             Ability.KnockBackFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Target.Position);
             if (!Ability.KnockBackFactory.ApplyToStatusOwner(Target))
                 Refund();

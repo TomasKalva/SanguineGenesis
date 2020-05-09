@@ -20,9 +20,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             Damage = damage;
         }
 
-        public override Command NewCommand(Animal caster, Animal target)
+        public override Command NewCommand(Animal user, Animal target)
         {
-            return new PiercingBiteCommand(caster, target, this);
+            return new PiercingBiteCommand(user, target, this);
         }
 
         public override string GetName() => "PIERCING_BITE";

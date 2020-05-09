@@ -161,10 +161,6 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 if (command.PerformCommand(game, deltaT))
                 {
                     //if command is finished, remove it from the queue
-                    if (command is MoveToCommand)
-                    {
-                        ((MoveToCommand)command).RemoveFromAssignment();
-                    }
                     CommandQueue.Dequeue();
                 }
             }
@@ -210,32 +206,32 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             CommandQueue.Clear();
         }
 
+        #endregion Commands
+
+        #region Statuses
+
         /// <summary>
         /// Removes all statuses from this entity.
         /// </summary>
         public void ResetStatuses()
         {
-            foreach(var s in Statuses)
+            foreach (var s in Statuses)
             {
-                s.Removed();
+                s.OnRemove();
             }
             Statuses.Clear();
         }
 
-        #endregion Commands
-
-        #region Statuses
-
         public void AddStatus(Status status)
         {
             Statuses.Add(status);
-            status.Added();
+            status.OnAdd();
         }
 
         public void RemoveStatus(Status status)
         {
             Statuses.Remove(status);
-            status.Removed();
+            status.OnRemove();
         }
 
         /// <summary>
@@ -249,7 +245,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 {
                     //status is finished
                     toRemove.Add(s);
-                    s.Removed();
+                    s.OnRemove();
                 }
             //remove all finished statuses
             Statuses.RemoveAll((s) => toRemove.Contains(s));
@@ -354,9 +350,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public void Dequeue()
         {
             Command first = Queue.FirstOrDefault();
-            Queue.Remove(first);
-            if (first != null)
-                first.OnRemove();
+            Remove(first);
         }
 
         /// <summary>
@@ -395,6 +389,14 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 !command.Interruptable)
                 return;
 
+            Remove(command);
+        }
+
+        /// <summary>
+        /// Removes this command from the Queue.
+        /// </summary>
+        private void Remove(Command command)
+        {
             Queue.Remove(command);
             if (command != null)
                 command.OnRemove();

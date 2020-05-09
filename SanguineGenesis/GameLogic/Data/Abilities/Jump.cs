@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             JumpSpeed = jumpSpeed;
         }
 
-        public override Command NewCommand(Animal caster, Vector2 target)
+        public override Command NewCommand(Animal user, Vector2 target)
         {
-            return new JumpCommand(caster, target, this);
+            return new JumpCommand(user, target, this);
         }
 
         public override string GetName() => "JUMP";

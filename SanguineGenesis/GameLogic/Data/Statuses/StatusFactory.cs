@@ -16,11 +16,11 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     abstract class StatusFactory
     {
         /// <summary>
-        /// True iff there can be at most one instance of this status per entity.
+        /// True iff there can be at most one instance of this status per status owner.
         /// </summary>
         public bool OnlyOnce { get; }
         /// <summary>
-        /// Applies the status created by this factory to the entity. Returns true iff
+        /// Applies the status created by this factory to the status owner. Returns true iff
         /// application was successful.
         /// </summary>
         public abstract bool ApplyToStatusOwner(IStatusOwner affected);
@@ -92,9 +92,13 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         /// Removes status from Statuses.
         /// </summary>
         void RemoveStatus(Status status);
+        /// <summary>
+        /// Perfrom step of all statuses.
+        /// </summary>
+        void StepStatuses(Game game, float deltaT);
     }
 
-    class PoisonFactory : StatusFactory<Entity>
+    class PoisonFactory : StatusFactory<Animal>
     {
         /// <summary>
         /// Damage that the poison does in one tick.
@@ -117,7 +121,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             TickTime = tickTime;
         }
 
-        protected override Status NewInstance(Entity affected)
+        protected override Status NewInstance(Animal affected)
             => new Poison(affected, this);
 
         public override string GetName() => "POISON";
@@ -172,7 +176,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public override string GetName() => "CONSUMED";
     }
 
-    class AnimalsOnTreeFactory : StatusFactory<Plant>
+    class AnimalsOnPlantFactory : StatusFactory<Plant>
     {
         /// <summary>
         /// Animal that will be put on the tree. Should be set right before using this factory to apply status.
@@ -180,7 +184,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public Animal PutOnTree { get; set; }
         public ClimbDownPlant ClimbDownPlant { get; }
 
-        public AnimalsOnTreeFactory(ClimbDownPlant climbDownPlant)
+        public AnimalsOnPlantFactory(ClimbDownPlant climbDownPlant)
             : base(true)
         {
             ClimbDownPlant = climbDownPlant;

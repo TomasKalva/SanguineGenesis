@@ -21,9 +21,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             PoisonFactory = poisonFactory;
         }
 
-        public override Command NewCommand(Animal caster, Animal target)
+        public override Command NewCommand(Animal user, Animal target)
         {
-            return new PoisonousSpitCommand(caster, target, this);
+            return new PoisonousSpitCommand(user, target, this);
         }
 
         public override string GetName() => "POISONOUS_SPIT";

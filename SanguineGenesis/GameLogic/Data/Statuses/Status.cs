@@ -17,17 +17,17 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     abstract class Status: IShowable
     {
         /// <summary>
-        /// Called when the status is added to the entity.
+        /// Called when the status is added to the status owner.
         /// </summary>
-        public virtual void Added() { }
+        public virtual void OnAdd() { }
         /// <summary>
         /// Called on game update. Returns true if the status was finished and should be removed.
         /// </summary>
         public abstract bool Step(Game game, float deltaT);
         /// <summary>
-        /// Called when the status is removed from the entity.
+        /// Called when the status is removed from the status owner.
         /// </summary>
-        public virtual void Removed() { }
+        public virtual void OnRemove() { }
         /// <summary>
         /// Returns status factory, this status was created by.
         /// </summary>
@@ -43,30 +43,28 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         #endregion IShowable
     }
 
-    abstract class Status<Affected,Info>:Status where Info:StatusFactory<Affected>
+    abstract class Status<Affected, StatusFactory>:Status where StatusFactory:StatusFactory<Affected>
                                                         where Affected: class, IStatusOwner
     {
-        public override StatusFactory Creator => StatusInfo;
+        public override Data.Statuses.StatusFactory Creator => StatusFact;
         /// <summary>
-        /// Entity affected by this status.
+        /// Object affected by this status.
         /// </summary>
-        public Affected AffectedEntity { get; }
+        public Affected AffectedObj { get; }
         /// <summary>
-        /// Immutable information about the status.
+        /// Immutable factory that created this status.
         /// </summary>
-        public Info StatusInfo { get; }
+        public StatusFactory StatusFact { get; }
 
         #region IShowable
-        public override string GetName() => StatusInfo.GetName();
+        public override string GetName() => StatusFact.GetName();
         #endregion IShowable
 
-        public Status(Affected affected, Info statusInfo)
+        public Status(Affected affected, StatusFactory statusInfo)
         {
-            AffectedEntity = affected;
-            StatusInfo = statusInfo;
+            this.AffectedObj = affected;
+            StatusFact = statusInfo;
         }
-
-
     }
 
     /// <summary>
@@ -79,28 +77,28 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
         }
         
-        public override void Added()
+        public override void OnAdd()
         {
-            AffectedEntity.MaxSpeedLand += StatusInfo.SpeedBonus;
+            AffectedObj.MaxSpeedLand += StatusFact.SpeedBonus;
         }
 
-        public override void Removed()
+        public override void OnRemove()
         {
-            AffectedEntity.MaxSpeedLand -= StatusInfo.SpeedBonus;
+            AffectedObj.MaxSpeedLand -= StatusFact.SpeedBonus;
         }
 
         public override bool Step(Game game, float deltaT)
         {
             //remove the status if the animal doesn't have enough energy
-            AffectedEntity.Energy -= StatusInfo.EnergyCostPerS * (float)deltaT;
-            if (AffectedEntity.Energy <= 0)
+            AffectedObj.Energy -= StatusFact.EnergyCostPerS * (float)deltaT;
+            if (AffectedObj.Energy <= 0)
                 return true;
             return false;
         }
 
         public override string Description()
         {
-            return $"Increases speed of animal by {StatusInfo.SpeedBonus}.";
+            return $"Increases speed of animal by {StatusFact.SpeedBonus}.";
         }
     }
 
@@ -126,18 +124,18 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             timeElapsed = 0;
         }
 
-        public override void Added()
+        public override void OnAdd()
         {
             //temporarily remove the animal from list of entities
             AnimalConsumed.Faction.RemoveEntity(AnimalConsumed);
             AnimalConsumed.StateChangeLock = this;
         }
 
-        public override void Removed()
+        public override void OnRemove()
         {
             //add the consumed unit back to the list of entities
             //it spawns in front of the affected animal
-            AnimalConsumed.Position = AffectedEntity.Position + (AffectedEntity.Radius + AnimalConsumed.Radius) * AffectedEntity.Direction;
+            AnimalConsumed.Position = AffectedObj.Position + (AffectedObj.Radius + AnimalConsumed.Radius) * AffectedObj.Direction;
             AnimalConsumed.Faction.AddEntity(AnimalConsumed);
             AnimalConsumed.StateChangeLock = null;
         }
@@ -146,7 +144,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             //remove the command if the whole duration elapsed
             timeElapsed += deltaT;
-            if (timeElapsed>=StatusInfo.Duration)
+            if (timeElapsed>=StatusFact.Duration)
                 return true;
             return false;
         }
@@ -155,20 +153,20 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Duration", StatusInfo.Duration.ToString())
+                new Stat( "Duration", StatusFact.Duration.ToString())
             };
         }
 
         public override string Description()
         {
-            return $"Consumed another animal for {StatusInfo.Duration} seconds.";
+            return $"Consumed another animal for {StatusFact.Duration} seconds.";
         }
     }
 
     /// <summary>
     /// Deals damage over time.
     /// </summary>
-    class Poison : Status<Entity, PoisonFactory>
+    class Poison : Status<Animal, PoisonFactory>
     {
         /// <summary>
         /// Time from the last tick in s.
@@ -180,7 +178,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         private int ticksPerformed;
 
 
-        public Poison(Entity affected, PoisonFactory poisonInfo)
+        public Poison(Animal affected, PoisonFactory poisonInfo)
             : base(affected, poisonInfo)
         {
             ticksPerformed = 0;
@@ -190,32 +188,32 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public override bool Step(Game game, float deltaT)
         {
             tickTimeElapsed += deltaT;
-            if (tickTimeElapsed > StatusInfo.TickTime)
+            if (tickTimeElapsed > StatusFact.TickTime)
             {
                 //reset timer
-                tickTimeElapsed -= StatusInfo.TickTime;
+                tickTimeElapsed -= StatusFact.TickTime;
                 //deal damage to the entity and increment number of performed ticks
-                AffectedEntity.Damage(StatusInfo.TickDamage, false);
+                AffectedObj.Damage(StatusFact.TickDamage, false);
                 ticksPerformed++;
             }
 
             //finish if all ticks have been performed
-            return ticksPerformed > StatusInfo.TotalNumberOfTicks;
+            return ticksPerformed > StatusFact.TotalNumberOfTicks;
         }
 
         public override List<Stat> Stats()
         {
             return new List<Stat>()
             {
-                new Stat( "Damage", StatusInfo.TickDamage.ToString()),
-                new Stat( "Tick time", StatusInfo.TickTime.ToString()),
-                new Stat( "Ticks", StatusInfo.TotalNumberOfTicks.ToString()),
+                new Stat( "Damage", StatusFact.TickDamage.ToString()),
+                new Stat( "Tick time", StatusFact.TickTime.ToString()),
+                new Stat( "Ticks", StatusFact.TotalNumberOfTicks.ToString()),
             };
         }
 
         public override string Description()
         {
-            return $"Deals {StatusInfo.TickDamage} damage every {StatusInfo.TickTime} seconds.";
+            return $"Deals {StatusFact.TickDamage} damage every {StatusFact.TickTime} seconds.";
         }
     }
 
@@ -232,28 +230,28 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             timer = 0f;
         }
 
-        public override void Added()
+        public override void OnAdd()
         {
-            AffectedEntity.ThickSkin = true;
+            AffectedObj.ThickSkin = true;
         }
 
-        public override void Removed()
+        public override void OnRemove()
         {
-            AffectedEntity.ThickSkin = false;
+            AffectedObj.ThickSkin = false;
         }
 
         public override bool Step(Game game, float deltaT)
         {
             //remove the staus if the duration is over or animal moves
             timer += deltaT;
-            if (timer > StatusInfo.Duration || AffectedEntity.WantsToMove)
+            if (timer > StatusFact.Duration || AffectedObj.WantsToMove)
                 return true;
             return false;
         }
 
         public override string Description()
         {
-            return $"Gives animal thick skin. Lasts {StatusInfo.Duration} seconds. Removed if animal moves.";
+            return $"Gives animal thick skin. Lasts {StatusFact.Duration} seconds. Removed if animal moves.";
         }
     }
 
@@ -270,21 +268,21 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             timer = 0f;
         }
 
-        public override void Added()
+        public override void OnAdd()
         {
-            AffectedEntity.AttackPeriod -= StatusInfo.AttSpeedIncr;
+            AffectedObj.AttackPeriod -= StatusFact.AttSpeedIncr;
         }
 
-        public override void Removed()
+        public override void OnRemove()
         {
-            AffectedEntity.AttackPeriod += StatusInfo.AttSpeedIncr;
+            AffectedObj.AttackPeriod += StatusFact.AttSpeedIncr;
         }
 
         public override bool Step(Game game, float deltaT)
         {
             //remove the staus if the duration is over
             timer += deltaT;
-            if (timer > StatusInfo.Duration)
+            if (timer > StatusFact.Duration)
                 return true;
             return false;
         }
@@ -293,39 +291,39 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Duration", StatusInfo.Duration.ToString())
+                new Stat( "Duration", StatusFact.Duration.ToString())
             };
         }
 
         public override string Description()
         {
-            return $"Increases attack speed of animal by {StatusInfo.AttSpeedIncr} for {StatusInfo.Duration} seconds.";
+            return $"Increases attack speed of animal by {StatusFact.AttSpeedIncr} for {StatusFact.Duration} seconds.";
         }
     }
 
     /// <summary>
     /// Represents animal on plant.
     /// </summary>
-    class AnimalsOnTree : Status<Plant, AnimalsOnTreeFactory>, IAnimalStateManipulator
+    class AnimalsOnTree : Status<Plant, AnimalsOnPlantFactory>, IAnimalStateManipulator
     {
         public List<Animal> Animals { get; }
 
-        public AnimalsOnTree(Plant affected, AnimalsOnTreeFactory animalsOnTreeInfo, Animal putOnPlant)
+        public AnimalsOnTree(Plant affected, AnimalsOnPlantFactory animalsOnTreeInfo, Animal putOnPlant)
             : base(affected, animalsOnTreeInfo)
         {
             Animals = new List<Animal>(1) { putOnPlant };
         }
 
-        public override void Added()
+        public override void OnAdd()
         {
             //add ability for animals climbing down from the plant
-            AffectedEntity.Abilities.Add(StatusInfo.ClimbDownPlant);
+            AffectedObj.Abilities.Add(StatusFact.ClimbDownPlant);
         }
 
-        public override void Removed()
+        public override void OnRemove()
         {
             //remove ability for animals climbing down from the plant
-            AffectedEntity.Abilities.Remove(StatusInfo.ClimbDownPlant);
+            AffectedObj.Abilities.Remove(StatusFact.ClimbDownPlant);
         }
 
         public override bool Step(Game game, float deltaT)
@@ -352,7 +350,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     /// </summary>
     class Underground : Status<Structure, UndergroundFactory>, IAnimalStateManipulator
     {
-        public List<Animal> AnimalsUnderGround => StatusInfo.AnimalsUnderGround;
+        public List<Animal> AnimalsUnderGround => StatusFact.AnimalsUnderGround;
 
         public Underground(Structure affected, UndergroundFactory undergroundInfo)
             : base(affected, undergroundInfo)
@@ -388,20 +386,20 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
         }
 
-        public override void Added()
+        public override void OnAdd()
         {
-            AffectedEntity.ViewRange += StatusInfo.RangeExtension;
+            AffectedObj.ViewRange += StatusFact.RangeExtension;
         }
 
-        public override void Removed()
+        public override void OnRemove()
         {
-            AffectedEntity.ViewRange -= StatusInfo.RangeExtension;
+            AffectedObj.ViewRange -= StatusFact.RangeExtension;
         }
 
         public override bool Step(Game game, float deltaT)
         {
             //remove the staus if the animal moves
-            if (AffectedEntity.WantsToMove)
+            if (AffectedObj.WantsToMove)
                 return true;
             return false;
         }
@@ -410,13 +408,13 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Range bonus", StatusInfo.RangeExtension.ToString())
+                new Stat( "Range bonus", StatusFact.RangeExtension.ToString())
             };
         }
 
         public override string Description()
         {
-            return $"Increases view range by {StatusInfo.RangeExtension}. Removed if the animal moves.";
+            return $"Increases view range by {StatusFact.RangeExtension}. Removed if the animal moves.";
         }
     }
 
@@ -430,18 +428,18 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public KnockAway(Animal affected, KnockAwayFactory knockAwayInfo)
             : base(affected, knockAwayInfo)
         {
-            Vector2 targetPoint = affected.Position + StatusInfo.Distance * StatusInfo.Direction;
-            moveAnimalToPoint = new MoveAnimalToPoint(affected, targetPoint, StatusInfo.Speed, StatusInfo.Distance / StatusInfo.Speed);
+            Vector2 targetPoint = affected.Position + StatusFact.Distance * StatusFact.Direction;
+            moveAnimalToPoint = new MoveAnimalToPoint(affected, targetPoint, StatusFact.Speed, StatusFact.Distance / StatusFact.Speed);
         }
 
-        public override void Added()
+        public override void OnAdd()
         {
-            AffectedEntity.StateChangeLock = this;
+            AffectedObj.StateChangeLock = this;
         }
 
-        public override void Removed()
+        public override void OnRemove()
         {
-            AffectedEntity.StateChangeLock = null;
+            AffectedObj.StateChangeLock = null;
         }
 
         public override bool Step(Game game, float deltaT)
@@ -453,7 +451,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Distance", StatusInfo.Distance.ToString())
+                new Stat( "Distance", StatusFact.Distance.ToString())
             };
         }
 
@@ -475,14 +473,14 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override bool Step(Game game, float deltaT)
         {
-            AffectedEntity.Damage(deltaT * StatusInfo.DamagePerS, false);
+            AffectedObj.Damage(deltaT * StatusFact.DamagePerS, false);
 
             // remove the status if the animal can move on the terrain that is below it
-            int x = (int)AffectedEntity.Position.X;
-            int y = (int)AffectedEntity.Position.Y;
+            int x = (int)AffectedObj.Position.X;
+            int y = (int)AffectedObj.Position.Y;
             var n = game.Map[x, y];
             if(n!=null)
-                return AffectedEntity.CanMoveOn(n.Terrain);
+                return AffectedObj.CanMoveOn(n.Terrain);
             return true;
         }
 
@@ -490,7 +488,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Dmg per s", StatusInfo.DamagePerS.ToString())
+                new Stat( "Dmg per s", StatusFact.DamagePerS.ToString())
             };
         }
 
@@ -512,7 +510,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override bool Step(Game game, float deltaT)
         {
-            AffectedEntity.Decay(deltaT * StatusInfo.EnergyLossPerS);
+            AffectedObj.Decay(deltaT * StatusFact.EnergyLossPerS);
 
             // remove the status if the animal can move on the terrain that is below it
             return false;
@@ -522,7 +520,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Enrg loss ", StatusInfo.EnergyLossPerS.ToString())
+                new Stat( "Enrg loss ", StatusFact.EnergyLossPerS.ToString())
             };
         }
 

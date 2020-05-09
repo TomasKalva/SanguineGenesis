@@ -135,9 +135,9 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     }
 
                     //remove commands that don't need to be updated anymore
-                    Console.WriteLine("active commands: " + commands.Count);
+                    Console.WriteLine("before active commands: " + commands.Count);
                     commands.RemoveAll((c) => c.Invalid);
-                    Console.WriteLine("active commands: " + commands.Count);
+                    Console.WriteLine("after  active commands: " + commands.Count);
 
                     if (MapChanged)
                     {
