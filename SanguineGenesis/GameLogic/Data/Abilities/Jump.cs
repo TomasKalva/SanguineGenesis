@@ -52,7 +52,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
             CommandedEntity.StateChangeLock = this;
-            CommandedEntity.TurnToPoint(Target);
             
             if (!jumping)
             {

@@ -43,8 +43,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            CommandedEntity.TurnToPoint(CommandedEntity.Center);
-
             if (ElapsedTime >= Ability.Duration)
             {
                 //apply poison to the target and finish the command

@@ -58,9 +58,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            //set direction of animal
-            CommandedEntity.TurnToPoint(Target.Center);
-
             if (ElapsedTime >= CommandedEntity.FoodEatingPeriod)
             {
                 //eat
@@ -123,9 +120,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            //set direction of animal
-            CommandedEntity.TurnToPoint(Target.Center);
-
             if (ElapsedTime >= CommandedEntity.FoodEatingPeriod)
             {
                 //eat

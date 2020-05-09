@@ -252,9 +252,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 }
             }
 
-            //animal can't be moved by collisions during command execution
             if (CommandedEntity is Animal a)
+            {
+                //animal can't be moved by collisions during command execution
                 a.CanBeMoved = false;
+                //set direction of animal
+                a.TurnToPoint(Target.Center);
+            }
 
             ElapsedTime += deltaT;
             bool finished = PerformCommandLogic(game, deltaT);

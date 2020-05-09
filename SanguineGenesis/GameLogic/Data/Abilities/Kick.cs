@@ -57,8 +57,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            CommandedEntity.TurnToPoint(Target.Position);
-
             ElapsedTime += deltaT;
             if (ElapsedTime >= Ability.Duration)
             {

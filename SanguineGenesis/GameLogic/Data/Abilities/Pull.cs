@@ -55,8 +55,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             CommandedEntity.StateChangeLock = this;
             Target.StateChangeLock = this;
-
-            CommandedEntity.TurnToPoint(Target.Position);
             
             if (!pulling)
             {

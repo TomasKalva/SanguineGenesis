@@ -46,9 +46,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            //set direction of animal
-            CommandedEntity.TurnToPoint(Target.Center);
-
             //after CommandedEntity.AttackPeriod passes, deal damage to the target
             if (ElapsedTime >= CommandedEntity.AttackPeriod)
             {
