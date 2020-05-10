@@ -192,28 +192,30 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         protected override Status NewInstance(Plant affected)
         {
-            return new AnimalsOnTree(affected, this, PutOnTree);
+            return new AnimalsOnPlant(affected, this, PutOnTree);
         }
 
 
         public override bool ApplyToAffected(Plant affected)
         {
-            AnimalsOnTree alreadyApplied = (AnimalsOnTree)affected.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
+            if (PutOnTree == null)
+                return false;
+
+            AnimalsOnPlant alreadyApplied = (AnimalsOnPlant)affected.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnPlant)).FirstOrDefault();
             if(alreadyApplied!=null)
             {
                 //use existing instance of the status
-                if (PutOnTree != null)
-                {
-                    alreadyApplied.Animals.Add(PutOnTree);
-                    PutOnTree.Faction.RemoveEntity(PutOnTree);
-                    PutOnTree.StateChangeLock = alreadyApplied;
-                }
+                alreadyApplied.Animals.Add(PutOnTree);
+                PutOnTree.Faction.RemoveEntity(PutOnTree);
+                PutOnTree.StateChangeLock = alreadyApplied;
             }
             else
             {
                 //create new instance of the status
-                AnimalsOnTree newStatus = (AnimalsOnTree)NewInstance(affected);
+                AnimalsOnPlant newStatus = (AnimalsOnPlant)NewInstance(affected);
                 affected.AddStatus(newStatus);
+                PutOnTree.Faction.RemoveEntity(PutOnTree);
+                PutOnTree.StateChangeLock = newStatus;
             }
             return true;
         }

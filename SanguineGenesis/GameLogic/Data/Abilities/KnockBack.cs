@@ -11,14 +11,14 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Knock the target back.
     /// </summary>
-    sealed class KnockAway : Ability<Animal, Animal>
+    sealed class KnockBack : Ability<Animal, Animal>
     {
-        public KnockAwayFactory KnockBackFactory { get; }
+        public KnockAwayFactory KnockAwayFactory { get; }
 
-        internal KnockAway(float energyCost, float distance, float preparationTime, KnockAwayFactory knockBackFactory)
+        internal KnockBack(float energyCost, float distance, float preparationTime, KnockAwayFactory knockBackFactory)
             : base(distance, energyCost, true, false, duration:preparationTime)
         {
-            KnockBackFactory = knockBackFactory;
+            KnockAwayFactory = knockBackFactory;
         }
 
         public override Command NewCommand(Animal user, Animal target)
@@ -26,17 +26,17 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new KnockBackCommand(user, target, this);
         }
 
-        public override string GetName() => "KNOCK_AWAY";
+        public override string GetName() => "KNOCK_BACK";
 
         public override string Description()
         {
-            return "The animal knocks other animal away.";
+            return "The animal knocks other animal back.";
         }
     }
 
-    class KnockBackCommand : Command<Animal, Animal, KnockAway>
+    class KnockBackCommand : Command<Animal, Animal, KnockBack>
     {
-        public KnockBackCommand(Animal commandedEntity, Animal target, KnockAway knockBack)
+        public KnockBackCommand(Animal commandedEntity, Animal target, KnockBack knockBack)
             : base(commandedEntity, target, knockBack)
         {
         }
@@ -45,8 +45,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             //try to apply the status to the user, if
             //the application fails, user gets refunded
-            Ability.KnockBackFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Target.Position);
-            if (!Ability.KnockBackFactory.ApplyToStatusOwner(Target))
+            Ability.KnockAwayFactory.Direction = CommandedEntity.Position.UnitDirectionTo(Target.Position);
+            if (!Ability.KnockAwayFactory.ApplyToStatusOwner(Target))
                 Refund();
 
             return true;

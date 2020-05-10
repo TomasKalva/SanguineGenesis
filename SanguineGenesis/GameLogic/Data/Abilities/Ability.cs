@@ -259,7 +259,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 {
                     u.ResetCommands();
                     if (u.CommandQueue.Any())
-                        actionLog.LogError(u, this, $"{u} has unremovable commands");
+                        actionLog.LogError(u, this, $"user has unremovable commands");
                 }
             }
 
@@ -356,7 +356,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     //Marks classes that can manipulate animal's movement.
     interface IAnimalStateManipulator
     {
-
     }
 
     /// <summary>

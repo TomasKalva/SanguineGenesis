@@ -56,8 +56,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 //put the animal on the target plant
-                CommandedEntity.Faction.RemoveEntity(CommandedEntity);
-
                 AnimalsOnPlantFactory anOnPlantFact = Ability.AnimalsOnPlantFactory;
                 anOnPlantFact.PutOnTree = CommandedEntity;
                 anOnPlantFact.ApplyToAffected(Target);
@@ -100,7 +98,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            var status = (AnimalsOnTree)CommandedEntity.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnTree)).FirstOrDefault();
+            var status = (AnimalsOnPlant)CommandedEntity.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnPlant)).FirstOrDefault();
             //finish command if the status isn't on the plant anymore
             if (status == null)
                 return true;

@@ -65,7 +65,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override bool PerformCommand(Game game, float deltaT)
         {
             if (!CanBeUsed())
-                //CanBeUsed handles ActionLog
                 return true;
             
             if(CommandedEntity.DistanceTo(Target) > Ability.Distance)

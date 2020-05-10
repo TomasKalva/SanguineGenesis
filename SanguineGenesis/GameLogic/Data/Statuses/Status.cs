@@ -120,7 +120,6 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             : base(affected, consumeInfo)
         {
             AnimalConsumed = animalConsumed;
-            AnimalConsumed.StateChangeLock = this;
             timeElapsed = 0;
         }
 
@@ -291,7 +290,8 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Duration", StatusFact.Duration.ToString())
+                new Stat( "Duration", StatusFact.Duration.ToString()),
+                new Stat( "Att speed incr", StatusFact.AttSpeedIncr.ToString())
             };
         }
 
@@ -304,12 +304,12 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     /// <summary>
     /// Represents animal on plant.
     /// </summary>
-    class AnimalsOnTree : Status<Plant, AnimalsOnPlantFactory>, IAnimalStateManipulator
+    class AnimalsOnPlant : Status<Plant, AnimalsOnPlantFactory>, IAnimalStateManipulator
     {
         public List<Animal> Animals { get; }
 
-        public AnimalsOnTree(Plant affected, AnimalsOnPlantFactory animalsOnTreeInfo, Animal putOnPlant)
-            : base(affected, animalsOnTreeInfo)
+        public AnimalsOnPlant(Plant affected, AnimalsOnPlantFactory animalsOnPlantInfo, Animal putOnPlant)
+            : base(affected, animalsOnPlantInfo)
         {
             Animals = new List<Animal>(1) { putOnPlant };
         }
@@ -429,7 +429,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             : base(affected, knockAwayInfo)
         {
             Vector2 targetPoint = affected.Position + StatusFact.Distance * StatusFact.Direction;
-            moveAnimalToPoint = new MoveAnimalToPoint(affected, targetPoint, StatusFact.Speed, StatusFact.Distance / StatusFact.Speed);
+            moveAnimalToPoint = new MoveAnimalToPoint(affected, targetPoint, StatusFact.Speed);
         }
 
         public override void OnAdd()

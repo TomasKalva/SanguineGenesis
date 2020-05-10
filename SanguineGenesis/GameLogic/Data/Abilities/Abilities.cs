@@ -48,7 +48,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public Pull Pull { get; }
         public Pull BigPull { get; }
         public ApplyStatus ActivateFarSight { get; }
-        public KnockAway KnockBack { get; }
+        public KnockBack KnockBack { get; }
         public ClimbPlant ClimbPlant { get; }
         public ClimbDownPlant ClimbDownTree { get; }
         public EnterHole EnterHole { get; }
@@ -160,7 +160,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             ActivateFarSight.SetAbilities(this);
 
             //knockback
-            KnockBack = new KnockAway(20, 0.1f, 0.3f, gameStaticData.Statuses.KnockAwayFactory);
+            KnockBack = new KnockBack(20, 0.1f, 0.3f, gameStaticData.Statuses.KnockAwayFactory);
             KnockBack.SetAbilities(this);
 
             //climb plant

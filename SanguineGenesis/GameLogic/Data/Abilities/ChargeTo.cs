@@ -57,7 +57,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public ChargeToCommand(Animal commandedEntity, Entity target, ChargeTo chargeTo)
             : base(commandedEntity, target, chargeTo)
         {
-            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.ChargeSpeed, Distance/Ability.ChargeSpeed);
+            moveAnimalToPoint = new MoveAnimalToPoint(commandedEntity, target, Ability.ChargeSpeed);
         }
 
         public override bool PerformCommandLogic(Game game, float deltaT)
@@ -77,6 +77,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override void OnRemove()
         {
+            base.OnRemove();
             //remove lock of movement for this entity
             CommandedEntity.StateChangeLock = null;
             //set physical of the animal to the base value - true

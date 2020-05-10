@@ -41,7 +41,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 {
                     c.ResetCommands();
                     if (c.CommandQueue.Any())
-                        actionLog.LogError(c, this, $"{c} has unremovable commands");
+                        actionLog.LogError(c, this, $"user has unremovable commands");
                 }
             }
 

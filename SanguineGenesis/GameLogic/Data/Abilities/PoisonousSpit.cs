@@ -45,6 +45,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             if (ElapsedTime >= Ability.Duration)
             {
+                //deal damage to the target
+                Target.Damage(Ability.PoisonFactory.TickDamage * 2, false);
                 //apply poison to the target and finish the command
                 if (!Ability.PoisonFactory.ApplyToStatusOwner(Target))
                 {

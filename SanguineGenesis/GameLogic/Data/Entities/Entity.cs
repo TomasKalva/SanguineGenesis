@@ -167,12 +167,24 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Adds command to this entity. If the entity is dead, the command is not added. 
+        /// Adds command to this entity. If the entity is dead or it is animal and
+        /// its state is locked, the command is not added. 
         /// </summary>
         public void AddCommand(Command command)
         {
-            if(!IsDead)
-                CommandQueue.Enqueue(command);
+
+            if (!IsDead) 
+            { 
+                if(this is Animal a)
+                {
+                    if(a.StateChangeLock == null)
+                        CommandQueue.Enqueue(command);
+                }
+                else
+                {
+                    CommandQueue.Enqueue(command);
+                }
+            }
         }
 
         /// <summary>

@@ -257,7 +257,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 //animal can't be moved by collisions during command execution
                 a.CanBeMoved = false;
                 //set direction of animal
-                a.TurnToPoint(Target.Center);
+                if(!(Target is Nothing))
+                    a.TurnToPoint(Target.Center);
             }
 
             ElapsedTime += deltaT;
@@ -336,7 +337,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     }
 
     /// <summary>
-    /// Moves animal to point on the map with even movement in given time. During the movement
+    /// Moves animal to point on the map with linear movement in given time. During the movement
     /// the animal doesn't check for collisions and can't be used as a target for a command.
     /// </summary>
     class MoveAnimalToPoint
@@ -350,12 +351,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public float Speed { get; }
         private float timer;
 
-        public MoveAnimalToPoint(Animal animal, IMovementTarget point, float speed, float maxWaitTime)
+        public MoveAnimalToPoint(Animal animal, IMovementTarget point, float speed)
         {
             Animal = animal;
             Target = point;
             Speed = speed;
-            MaxWaitTime = maxWaitTime;
+            MaxWaitTime = (animal.Center - Target.Center).Length/speed;
             timer = 0f;
         }
 

@@ -74,8 +74,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                     Target.CommandQueue.Clear();
                     //create instance of MoveAnimalToPoint that will be moving Targ to CommandedEntity
                     Vector2 frontOfAnimal = CommandedEntity.Position + (CommandedEntity.Radius + Target.Radius) * CommandedEntity.Direction;
-                    float dist = (Target.Center - frontOfAnimal).Length;
-                    moveAnimalToPoint = new MoveAnimalToPoint(Target, frontOfAnimal, Ability.PullSpeed, dist / Ability.PullSpeed);
+                    moveAnimalToPoint = new MoveAnimalToPoint(Target, frontOfAnimal, Ability.PullSpeed);
 
                     firstPullingStep = false;
                 }

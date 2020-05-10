@@ -142,8 +142,9 @@ namespace SanguineGenesis.GameLogic
             gameTime.PrintTime("Visibility");
 
             //one step of statuses
-            //statuses can't modify any collection of entities of any player
-            foreach (Entity e in GetAll<Entity>())
+            //new list has to be constructed because the original collections can change
+            var entities = GetAll<Entity>().ToList();
+            foreach (Entity e in entities)
             {
                 e.StepStatuses(this, deltaT);
             }
@@ -161,8 +162,8 @@ namespace SanguineGenesis.GameLogic
             }
 
             //one step of commands
-            foreach (Entity e in GetAll<Entity>()
-                .ToList())//new list has to be constructed because the original collections can change
+            //the original collections can change
+            foreach (Entity e in entities)
             {
                 //remove commands of animals who are on wrong terrain
                 if(e is Animal a)

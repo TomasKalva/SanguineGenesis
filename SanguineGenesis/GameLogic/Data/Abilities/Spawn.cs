@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
     /// <summary>
-    /// Create a new animal at the target location.
+    /// Create a new animal at the target location with faction of the user.
     /// </summary>
     sealed class Spawn : Ability<Entity, Vector2>
     {
-        internal Spawn(AnimalFactory spawningUnitFactory)
-            : base(2 * spawningUnitFactory.Radius, spawningUnitFactory.EnergyCost, true, false, duration:spawningUnitFactory.SpawningTime)
+        internal Spawn(AnimalFactory spawningAnimalFactory)
+            : base(2 * spawningAnimalFactory.Radius, spawningAnimalFactory.EnergyCost, true, false, duration:spawningAnimalFactory.SpawningTime)
         {
-            SpawningUnitFactory = spawningUnitFactory;
+            SpawningAnimalFactory = spawningAnimalFactory;
         }
 
-        public AnimalFactory SpawningUnitFactory { get; }
+        public AnimalFactory SpawningAnimalFactory { get; }
 
         public override Command NewCommand(Entity user, Vector2 target)
         {
@@ -28,10 +28,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string ToString()
         {
-            return base.ToString() + " " + SpawningUnitFactory.EntityType;
+            return base.ToString() + " " + SpawningAnimalFactory.EntityType;
         }
 
-        public override string GetName() => "SPAWN_" + SpawningUnitFactory.EntityType;
+        public override string GetName() => "SPAWN_" + SpawningAnimalFactory.EntityType;
 
         public override string Description()
         {
@@ -52,7 +52,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 var newUnitOwner = CommandedEntity.Faction;
-                Animal newUnit = Ability.SpawningUnitFactory.NewInstance(newUnitOwner, Target);
+                Animal newUnit = Ability.SpawningAnimalFactory.NewInstance(newUnitOwner, Target);
                 newUnitOwner.AddEntity(newUnit);
                 return true;
             }
