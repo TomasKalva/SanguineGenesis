@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Maps;
 
-namespace SanguineGenesis.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps.PushingMapGenerating
 {
     /// <summary>
     /// Generates PushingMap for Map.
@@ -91,7 +91,7 @@ namespace SanguineGenesis.GameLogic.Maps
                         //select square around [i,j]
                         pat = new Pattern3x3(
                             obstMap[i - 1, j + 1], obstMap[i, j + 1], obstMap[i + 1, j + 1],
-                            obstMap[i - 1, j], obstMap[i, j], obstMap[i + 1, j],
+                            obstMap[i - 1, j],     obstMap[i, j],     obstMap[i + 1, j],
                             obstMap[i - 1, j - 1], obstMap[i, j - 1], obstMap[i + 1, j - 1]);
 
                         if (pat.AllBlocked())
@@ -115,7 +115,7 @@ namespace SanguineGenesis.GameLogic.Maps
                                 rotation += (float)((Math.PI) * 3 / 2f);
                             }
                             pushingMap[i, j] = new PushingSquare(directions[0], directions[3],
-                                                                directions[1], directions[2]);
+                                                                 directions[1], directions[2]);
                         }
                     }
                     else
@@ -151,29 +151,6 @@ namespace SanguineGenesis.GameLogic.Maps
             this._31 = _31;
             this._32 = _32;
             this._33 = _33;
-        }
-
-        /// <summary>
-        /// Returns a pattern that is flipped horizontaly.
-        /// </summary>
-        public Pattern3x3 FlipHoriz()
-        {
-            Pattern3x3 newP = new Pattern3x3
-            {
-                _11 = _13,
-                _12 = _12,
-                _13 = _11,
-
-                _21 = _23,
-                _22 = _22,
-                _23 = _21,
-
-                _31 = _33,
-                _32 = _32,
-                _33 = _31
-            };
-
-            return newP;
         }
 
         /// <summary>

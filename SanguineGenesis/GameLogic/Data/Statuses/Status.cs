@@ -346,14 +346,14 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     }
 
     /// <summary>
-    /// Represents animals underground.
+    /// Represents animals in hole.
     /// </summary>
-    class Underground : Status<Structure, UndergroundFactory>, IAnimalStateManipulator
+    class HoleSystem : Status<Structure, HoleSystemFactory>, IAnimalStateManipulator
     {
-        public List<Animal> AnimalsUnderGround => StatusFact.AnimalsUnderGround;
+        public List<Animal> AnimalsInHole => StatusFact.AnimalsInHole;
 
-        public Underground(Structure affected, UndergroundFactory undergroundInfo)
-            : base(affected, undergroundInfo)
+        public HoleSystem(Structure affected, HoleSystemFactory holeSystemInfo)
+            : base(affected, holeSystemInfo)
         {
         }
 
@@ -366,13 +366,13 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             return new List<Stat>()
             {
-                new Stat( "Animals", AnimalsUnderGround.Count.ToString())
+                new Stat( "Animals", AnimalsInHole.Count.ToString())
             };
         }
 
         public override string Description()
         {
-            return $"The number of animals underground is {AnimalsUnderGround.Count()}.";
+            return $"The number of animals in hole system is {AnimalsInHole.Count()}.";
         }
     }
 

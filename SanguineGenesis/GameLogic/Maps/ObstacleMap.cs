@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 [assembly : InternalsVisibleTo("GameLogicTests")]
-namespace SanguineGenesis
+namespace SanguineGenesis.GameLogic.Maps
 {
     /// <summary>
     /// Represents areas that can't be passed through. Around the map is a

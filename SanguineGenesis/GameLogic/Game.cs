@@ -180,11 +180,16 @@ namespace SanguineGenesis.GameLogic
                 e.AnimationStep(deltaT);
             }
 
+            //move animal
+            foreach (Animal a in GetAll<Animal>())
+            {
+                a.Move(Map, deltaT);
+            }
+
             gameTime.PrintTime("Ingame update");
 
             //collisions
-            collisions.MoveAnimals(Map, GetAll<Animal>(), deltaT);
-            collisions.PushAway(this);
+            collisions.ResolveCollisions(this);
             collisions.PushOutsideOfObstacles(Map, GetAll<Animal>());
 
             gameTime.PrintTime("Collisions");

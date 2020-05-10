@@ -224,27 +224,27 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     }
 
 
-    class UndergroundFactory : StatusFactory<Structure>
+    class HoleSystemFactory : StatusFactory<Structure>
     {
         /// <summary>
         /// Animal that will be put under ground. Should be set right before using this factory to apply status.
         /// </summary>
-        public Animal PutUnderground { get; set; }
+        public Animal PutInHole { get; set; }
 
-        public List<Animal> AnimalsUnderGround { get; }
+        public List<Animal> AnimalsInHole { get; }
 
-        public UndergroundFactory()
+        public HoleSystemFactory()
             : base(true)
         {
-            AnimalsUnderGround = new List<Animal>();
+            AnimalsInHole = new List<Animal>();
         }
 
         protected override Status NewInstance(Structure affected)
         {
-            return new Underground(affected, this);
+            return new HoleSystem(affected, this);
         }
 
-        public override string GetName() => "UNDERGROUND";
+        public override string GetName() => "HOLE_SYSTEM";
     }
 
     class ShellFactory : StatusFactory<Animal>

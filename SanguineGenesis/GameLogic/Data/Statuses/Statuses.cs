@@ -16,7 +16,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public SprintFactory SprintFactory { get; }
         public ConsumedAnimalFactory ConsumedAnimalFactory { get; }
         public AnimalsOnPlantFactory AnimalsOnPlantFactory { get; }
-        public UndergroundFactory UndergroundFactory { get; }
+        public HoleSystemFactory HoleSystem { get; }
         public ShellFactory ShellFactory { get; }
         public FastStrikesFactory FastStrikesFactory { get; }
         public FarSightFactory FarSightFactory { get; }
@@ -40,7 +40,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             AnimalsOnPlantFactory = new AnimalsOnPlantFactory(new Abilities.ClimbDownPlant(0, 0.5f));
 
             //underground
-            UndergroundFactory = new UndergroundFactory();
+            HoleSystem = new HoleSystemFactory();
 
             //shell
             ShellFactory = new ShellFactory(duration: 6f);

@@ -21,10 +21,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool ValidArguments(Animal user, Structure target, ActionLog actionLog)
         {
-            //target has to have underground status
-            if(!target.Statuses.Where((s) => s is Underground).Any())
+            //target has to have hole system status
+            if(!target.Statuses.Where((s) => s is HoleSystem).Any())
             {
-                actionLog.LogError(user, this, $"target doesn't have status {nameof(Underground)}");
+                actionLog.LogError(user, this, $"target doesn't have status {nameof(HoleSystem)}");
                 return false;
             }
             return true;
@@ -54,13 +54,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             if (ElapsedTime >= Ability.Duration)
             {
-                Underground underground = (Underground)Target.Statuses.Where((s) => s is Underground).FirstOrDefault();
-                if (underground != null)
+                HoleSystem holeSystem = (HoleSystem)Target.Statuses.Where((s) => s is HoleSystem).FirstOrDefault();
+                if (holeSystem != null)
                 {
                     //put the animal in the target hole
                     CommandedEntity.Faction.RemoveEntity(CommandedEntity);
-                    underground.AnimalsUnderGround.Add(CommandedEntity);
-                    CommandedEntity.StateChangeLock = underground;
+                    holeSystem.AnimalsInHole.Add(CommandedEntity);
+                    CommandedEntity.StateChangeLock = holeSystem;
                 }
                 return true;
             }
@@ -104,16 +104,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if (ElapsedTime >= Ability.Duration)
             {
                 ElapsedTime -= Ability.Duration;
-                Underground underground = (Underground)CommandedEntity.Statuses.Where((s) => s is Underground).FirstOrDefault();
-                if (underground != null)
+                HoleSystem holeSystem = (HoleSystem)CommandedEntity.Statuses.Where((s) => s is HoleSystem).FirstOrDefault();
+                if (holeSystem != null)
                 {
                     //put an animal out of the hole
-                    Animal animalInHole = underground.AnimalsUnderGround.FirstOrDefault();
+                    Animal animalInHole = holeSystem.AnimalsInHole.FirstOrDefault();
                     if (animalInHole != null)
                     {
                         animalInHole.Faction.AddEntity(animalInHole);
                         animalInHole.Position = new Vector2(CommandedEntity.Center.X, CommandedEntity.Bottom - animalInHole.Radius);
-                        underground.AnimalsUnderGround.Remove(animalInHole);
+                        holeSystem.AnimalsInHole.Remove(animalInHole);
                         animalInHole.StateChangeLock = null;
                         return false;
                     }

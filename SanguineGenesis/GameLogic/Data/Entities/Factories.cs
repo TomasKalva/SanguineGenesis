@@ -83,8 +83,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             {
                 switch (stName)
                 {
-                    case "underground":
-                        statusFactories.Add(statuses.UndergroundFactory);
+                    case "hole system":
+                        statusFactories.Add(statuses.HoleSystem);
                         break;
                 }
             }

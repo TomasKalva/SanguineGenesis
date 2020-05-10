@@ -104,14 +104,14 @@
     <Compile Include="GameLogic\Maps\MovementGenerating\BfsPathfinding.cs" />
     <Compile Include="GameLogic\Maps\MovementGenerating\IPathfinding.cs" />
     <Compile Include="GameLogic\Maps\MapLoader.cs" />
-    <Compile Include="GameLogic\Maps\PushingMap.cs" />
+    <Compile Include="GameLogic\Maps\PushingMapGenerating\PushingMap.cs" />
     <Compile Include="GameLogic\Data\Entities\Structure.cs" />
     <Compile Include="GameLogic\Maps\MovementGenerating\CommandAssignment.cs" />
     <Compile Include="GameLogic\GameplayOptions.cs" />
     <Compile Include="GameLogic\Maps\MovementGenerating\MovementGenerator.cs" />
     <Compile Include="GameLogic\Data\Entities\Plant.cs" />
     <Compile Include="GameLogic\Data\Entities\Animal.cs" />
-    <Compile Include="GameLogic\Maps\Vector2.cs" />
+    <Compile Include="GameLogic\Vector2.cs" />
     <Compile Include="GameLogic\Maps\VisibilityGenerating\VisibilityGenerator.cs" />
     <Compile Include="GameLogic\Maps\VisibilityGenerating\Ray.cs" />
     <Compile Include="GameLogic\Maps\VisibilityGenerating\VisibilityMap.cs" />
@@ -155,7 +155,7 @@
     <Compile Include="GUI\OpenGL\OpenGLAtlasDrawer.cs" />
     <Compile Include="GameLogic\Collisions.cs" />
     <Compile Include="GameLogic\Faction.cs" />
-    <Compile Include="GameLogic\Maps\PushingMapGenerator.cs" />
+    <Compile Include="GameLogic\Maps\PushingMapGenerating\PushingMapGenerator.cs" />
     <Compile Include="GameLogic\Rect.cs" />
     <Compile Include="GUI\GameControls\SelectionInput.cs" />
     <Compile Include="GameLogic\Terrain.cs" />

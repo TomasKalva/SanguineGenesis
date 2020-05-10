@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameLogic.Maps
+namespace SanguineGenesis.GameLogic
 {
     /// <summary>
     /// Represents a 2d vector.

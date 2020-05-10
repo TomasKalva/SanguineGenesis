@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanguineGenesis.GameLogic.Maps
+namespace SanguineGenesis.GameLogic.Maps.PushingMapGenerating
 {
     /// <summary>
     /// Used for pushing animals out of terrain they can't move in.
@@ -45,7 +45,7 @@ namespace SanguineGenesis.GameLogic.Maps
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <param name="speed">Length of the velocity vector.</param>
-        public Vector2 GetIntensity(Vector2 position, float speed)
+        public Vector2 GetDirection(Vector2 position)
         {
             int i = (int)position.X; int j = (int)position.Y;
             if (i < 0 || i >= Width || j < 0 || j >= Height ||
@@ -57,8 +57,8 @@ namespace SanguineGenesis.GameLogic.Maps
             if (angle != null)
                 //map pushes in the angle direction
                 return new Vector2(
-                    (float)Math.Cos(angle.Value) * speed,
-                    (float)Math.Sin(angle.Value) * speed
+                    (float)Math.Cos(angle.Value),
+                    (float)Math.Sin(angle.Value)
                     );
             else
                 //map doesn't push
@@ -69,19 +69,20 @@ namespace SanguineGenesis.GameLogic.Maps
     /// <summary>
     /// Represents one square divided into four smaller squares. Each variable corresponds to one
     /// of these square and represents a direction where animal will be pushed if it enters this square.
+    /// Directions are given by the angle from positive x axis.
     /// </summary>
     public struct PushingSquare
     {
-        public float? Dir_11 { get; }/*top left*/    public float? Dir_12 { get; }/*top right*/
-        public float? Dir_21 { get; }/*bottom left*/ public float? Dir_22 { get; }/*bottom right*/
+        public readonly float? dir_11; /*top left*/    public readonly float? dir_12; /*top right*/
+        public readonly float? dir_21;/*bottom left*/  public readonly float? dir_22; /*bottom right*/
 
         public PushingSquare(float? dir_11, float? dir_12,
                             float? dir_21, float? dir_22)
         {
-            this.Dir_11 = dir_11;
-            this.Dir_12 = dir_12;
-            this.Dir_21 = dir_21;
-            this.Dir_22 = dir_22;
+            this.dir_11 = dir_11;
+            this.dir_12 = dir_12;
+            this.dir_21 = dir_21;
+            this.dir_22 = dir_22;
         }
 
         /// <summary>
@@ -92,19 +93,19 @@ namespace SanguineGenesis.GameLogic.Maps
         {
             if (x < 0.5f)
                 if (y > 0.5f)
-                    return Dir_11;
+                    return dir_11;
                 else
-                    return Dir_21;
+                    return dir_21;
             else
                 if (y > 0.5f)
-                    return Dir_12;
+                    return dir_12;
                 else
-                    return Dir_22;
+                    return dir_22;
         }
 
         public override string ToString()
         {
-            return Dir_11 + "; " + Dir_12 + "; \n" + Dir_21 + "; " + Dir_22;
+            return dir_11 + "; " + dir_12 + "; \n" + dir_21 + "; " + dir_22;
         }
     }
 }
