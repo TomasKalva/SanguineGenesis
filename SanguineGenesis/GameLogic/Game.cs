@@ -85,10 +85,12 @@ namespace SanguineGenesis.GameLogic
             Map = mapLoader.LoadMap();
             mapLoader.LoadBuildings(this);
 
+            collisions = new Collisions(Map);
+            collisions.SetPushingMaps(Map);
+
             foreach (var kvp in Players)
                 kvp.Value.InitializeMapView(Map);
 
-            collisions = new Collisions(Map);
             MovementGenerator.GetMovementGenerator().Reset();
             nextVisibilityPlayer = FactionType.PLAYER0;
             GameplayOptions = gameplayOptions;
@@ -190,7 +192,7 @@ namespace SanguineGenesis.GameLogic
 
             //collisions
             collisions.ResolveCollisions(this);
-            collisions.PushOutsideOfObstacles(Map, GetAll<Animal>());
+            collisions.PushAllOutOfObstacles(GetAll<Animal>());
 
             gameTime.PrintTime("Collisions");
 

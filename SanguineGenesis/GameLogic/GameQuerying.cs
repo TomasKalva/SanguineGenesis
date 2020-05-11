@@ -18,23 +18,14 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Select all entities which satisfy the condition.
         /// </summary>
-        public static IEnumerable<Entity> SelectRectEntities(Game game, Rect area, Func<Entity,bool> condition)
+        public static IEnumerable<Entity> SelectEntitiesInArea(Game game, Rect area)
         {
             return game.GetAll<Entity>()
-                .Where(condition)
-                .Where((unit) =>
+                .Where((entity) =>
                 {
-                    Rect unitRect = ((IRectangle)unit).GetRect();
-                    return area.IntersectsWith(unitRect);
+                    Rect entityRect = ((IRectangle)entity).GetRect();
+                    return area.IntersectsWith(entityRect);
                 });
-        }
-
-        /// <summary>
-        /// Select all entities which satisfy the condition.
-        /// </summary>
-        public static List<Entity> SelectEntities(Game game, Func<Entity, bool> condition)
-        {
-            return game.GetAll<Entity>().Where(condition).ToList();
         }
 
         /// <summary>
@@ -46,7 +37,6 @@ namespace SanguineGenesis.GameLogic
             {
                 if (e is Unit u)
                 {
-                    //return u.IsVisible(observer.VisibilityMap);
                     return observer.CanSee(u);
                 }
                 else
@@ -71,10 +61,10 @@ namespace SanguineGenesis.GameLogic
             }
         }
 
-    /// <summary>
-    /// Select the rectangle of Nodes given by the coordinates.
-    /// </summary>
-    public static Node[,] SelectNodes(Map map, int left, int bottom, int right, int top)
+        /// <summary>
+        /// Select the rectangle of Nodes given by the coordinates.
+        /// </summary>
+        public static Node[,] SelectNodes(Map map, int left, int bottom, int right, int top)
         {
             return SelectPartOfMap(map,left,bottom,right,top);
         }
@@ -110,7 +100,7 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Select neighbors of the given rectangle of squares T.
+        /// Select direct neighbors of the given rectangle of squares T.
         /// _++++_
         /// +rrrr+
         /// +rrrr+

@@ -39,18 +39,18 @@ namespace SanguineGenesis.GameLogic.Maps.PushingMapGenerating
         }
 
         /// <summary>
-        /// Finds the velocity at given coordinates with given speed. If the coordinates
-        /// are out of the map, return zero vector.
+        /// Finds the direction at given coordinates. If the coordinates
+        /// are out of the map or the subsquare has no direction, returns null.
         /// </summary>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <param name="speed">Length of the velocity vector.</param>
-        public Vector2 GetDirection(Vector2 position)
+        public Vector2? GetDirection(Vector2 position)
         {
             int i = (int)position.X; int j = (int)position.Y;
             if (i < 0 || i >= Width || j < 0 || j >= Height ||
                 pushingSquares[i, j]==null)
-                return new Vector2(0f, 0f);
+                return null;
 
             
             float? angle = pushingSquares[i, j].Value.GetDirection(position.X % 1, position.Y % 1);
@@ -62,7 +62,7 @@ namespace SanguineGenesis.GameLogic.Maps.PushingMapGenerating
                     );
             else
                 //map doesn't push
-                return new Vector2(0, 0);
+                return null;
         }
     }
 

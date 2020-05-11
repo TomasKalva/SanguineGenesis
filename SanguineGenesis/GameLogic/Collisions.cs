@@ -41,28 +41,24 @@ namespace SanguineGenesis.GameLogic
             Map map = game.Map;
             //create structure that hashes animals by their position
             HashAnimals.Init(game.GetAll<Animal>());
-            //set push maps so that colliding animals can be correctly pushed to not blocked squares
-            SetPushMaps(map);
 
-            foreach (Animal a in game.GetAll<Animal>())
+            foreach (Animal a in game.GetAll<Animal>().Where(animal=>animal.Physical))
             {
-                //animals that aren't physical don't need to check for collisions
-                if (!a.Physical)
-                    continue;
-
-                //resolve collisions with other animals
-                foreach (Animal e in HashAnimals.CloseAnimals(a.Position.X, a.Position.Y))
+                //resolve collisions with nearby animals
+                foreach (Animal otherA in HashAnimals.CloseAnimals(a.Position.X, a.Position.Y)
+                                                        .Where(animal=>animal.Physical))
                 {
                     //calculate collisions for each pair of animals only once
-                    if (a.GetHashCode() < e.GetHashCode())
-                        Push(a, e, map);
+                    if (a != otherA && a.GetHashCode() <= otherA.GetHashCode())
+                        Push(a, otherA, map);
                 }
                 //resolve collisions with nearby buildings
                 int animalX = (int)a.Position.X;
                 int animalY = (int)a.Position.Y;
                 foreach (Building b in GameQuerying
                                         .SelectBuildingsInArea(map, new Rect(
-                                            animalX - 1, animalY - 1, animalX + 1, animalY + 1)))
+                                            animalX - 1, animalY - 1, animalX + 1, animalY + 1))
+                                        .Where(building => building.Physical))
                 {
                     Push(a, b, map);
                 }
@@ -72,10 +68,6 @@ namespace SanguineGenesis.GameLogic
 
         private void Push(Animal a, Entity e, Map map)
         {
-            //entities that aren't physical don't need to check for collisions
-            if (!e.Physical)
-                return;
-
             float dist = (a.Center - e.Center).Length;
             //if two units get stuck on top of each other, move them apart
             if (dist == 0)
@@ -84,11 +76,11 @@ namespace SanguineGenesis.GameLogic
                 a.Position = a.Center + epsilon;
                 dist = epsilon.Length;
             }
+
             float totalR = a.Radius + e.Radius;
             //check if a and e are in collision
-            if (dist < totalR && dist != 0)
+            if (dist < totalR)
             {
-                //push centres of the units from each other
                 Vector2 dirAtoE = a.Center.UnitDirectionTo(e.Center);
                 Vector2 pushVec = (totalR - dist) / 2 * dirAtoE;
                 if (e is Building)
@@ -99,7 +91,7 @@ namespace SanguineGenesis.GameLogic
                 else if (e is Corpse)
                 {
                     //corpse isn't pushed
-                    a.Push(pushVec, map);
+                    a.Push(-2 * pushVec, map);
                 }
                 else
                 {
@@ -113,10 +105,9 @@ namespace SanguineGenesis.GameLogic
                             a.Push(-2 * pushVec, map);
 
                         }
-                        else if (a1.WantsToMove && !a.WantsToMove)
+                        else if (!a.WantsToMove && a1.WantsToMove)
                         {
                             a1.Push(2 * pushVec, map);
-
                         }
                         else
                         {
@@ -134,7 +125,7 @@ namespace SanguineGenesis.GameLogic
                             a.Push(-2 * pushVec, map);
 
                         }
-                        else if (a1.CanBeMoved && !a.CanBeMoved)
+                        else if (!a.CanBeMoved && a1.CanBeMoved)
                         {
                             a1.Push(2 * pushVec, map);
                         }
@@ -146,8 +137,8 @@ namespace SanguineGenesis.GameLogic
                     }
                     //push animal with a pushing map if it gets into 
                     //collision with blocked node
-                    PushOutsideOfObstacles(a);
-                    PushOutsideOfObstacles(a1);
+                    PushOutOfObstacles(a);
+                    PushOutOfObstacles(a1);
                 }
             }
         }
@@ -230,7 +221,8 @@ namespace SanguineGenesis.GameLogic
             /// </summary>
             public IEnumerable<Animal> CloseAnimals(float x, float y)
             {
-                //extents of area with close animals
+                //extents of area with close animals, maximal radius of animal is 0.5,
+                //other animals in collision are at distance at most 1
                 int left = (int)x - 1;
                 int bottom = (int)y - 1;
                 int right = (int)x + 2;//rounding down
@@ -257,9 +249,9 @@ namespace SanguineGenesis.GameLogic
         public Dictionary<Movement, PushingMap> PushingMaps { get; }
 
         /// <summary>
-        /// Updates PushingMaps. Should be called only when the map changes.
+        /// Creates PushingMaps from ObstacleMaps of map.
         /// </summary>
-        public void UpdatePushingMaps(Map map)
+        public void SetPushingMaps(Map map)
         {
 
             ObstacleMap groundObst = map.ObstacleMaps[Movement.LAND];
@@ -274,44 +266,21 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Set pushing maps or reset them if map was changed.
-        /// </summary>
-        /// <param name="map"></param>
-        public void SetPushMaps(Map map)
-        {
-            if (map.MapWasChanged
-                || PushingMaps[Movement.LAND] == null
-                || PushingMaps[Movement.WATER] == null
-                || PushingMaps[Movement.LAND_WATER] == null)
-                UpdatePushingMaps(map);
-        }
-
-        /// <summary>
         /// Uses pushing maps to push animals that are on blocked squares.
         /// </summary>
-        public void PushOutsideOfObstacles(Map map, IEnumerable<Animal> animals)
+        public void PushAllOutOfObstacles(IEnumerable<Animal> animals)
         {
-            //set pushing maps or reset them if map was changed
-            if (map.MapWasChanged
-                || PushingMaps[Movement.LAND] == null
-                || PushingMaps[Movement.WATER] == null
-                || PushingMaps[Movement.LAND_WATER] == null)
-                UpdatePushingMaps(map);
-            foreach (Animal a in animals)
+            foreach (Animal a in animals.Where(animal=>animal.Physical))
             {
-                PushOutsideOfObstacles(a);
+                PushOutOfObstacles(a);
             }
         }
 
         /// <summary>
         /// Pushes each animal using pushing map corresponding to the animal's movement.
         /// </summary>
-        public void PushOutsideOfObstacles(Animal animal)
+        public void PushOutOfObstacles(Animal animal)
         {
-            //non-physical animals don't need to check for collisions
-            if (!animal.Physical)
-                return;
-
             PushingMap pushingMap;
             switch (animal.Movement)
             {
@@ -327,24 +296,28 @@ namespace SanguineGenesis.GameLogic
             }
 
             //move the animal outside of the blocked square in pushDirection
-            Vector2 pushDirection = pushingMap.GetDirection(animal.Center);
+            Vector2? pushDirNullable = pushingMap.GetDirection(animal.Center);
+            if (pushDirNullable == null)
+                return;
+
+            Vector2 pushDir = pushDirNullable.Value;
             float t1, t2;
             //t1 * pushDirection.X = point outside of the blocked square
-            if (pushDirection.X > 0)
-                t1 = ((float)Math.Ceiling(animal.Position.X) - animal.Position.X) / pushDirection.X;
+            if (pushDir.X > 0)
+                t1 = ((float)Math.Ceiling(animal.Position.X) - animal.Position.X) / pushDir.X;
             else
-                t1 = ((float)Math.Floor(animal.Position.X) - animal.Position.X) / pushDirection.X;
+                t1 = ((float)Math.Floor(animal.Position.X) - animal.Position.X) / pushDir.X;
 
             //t2 * pushDirection.Y = point outside of the blocked square
-            if (pushDirection.Y > 0)
-                t2 = ((float)Math.Ceiling(animal.Position.Y) - animal.Position.Y) / pushDirection.Y;
+            if (pushDir.Y > 0)
+                t2 = ((float)Math.Ceiling(animal.Position.Y) - animal.Position.Y) / pushDir.Y;
             else
-                t2 = ((float)Math.Floor(animal.Position.Y) - animal.Position.Y) / pushDirection.Y;
+                t2 = ((float)Math.Floor(animal.Position.Y) - animal.Position.Y) / pushDir.Y;
 
             //use the smaller of t1, t2 to push animal outside of the blocked square
             float t = Math.Min(t1, t2);
             if (!float.IsNaN(t) && !float.IsInfinity(t))
-                animal.Position += (t + 0.01f) * pushDirection;
+                animal.Position += (t + 0.01f) * pushDir;
         }
         #endregion Collisions with environment
 
