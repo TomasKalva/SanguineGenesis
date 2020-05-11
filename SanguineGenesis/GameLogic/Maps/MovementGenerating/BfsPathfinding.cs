@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 {
+    interface IPathfinding
+    {
+        FlowField GenerateFlowField();
+    }
+
     /// <summary>
     /// Used for generating flowfield using bfs with rayuseing heuristics. One instance of the class
     /// is one instance of the algorithm. The flowfield overlaps with movement blocked square by one

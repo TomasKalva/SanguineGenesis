@@ -96,50 +96,54 @@ namespace SanguineGenesis.GameLogic
                 else
                 {
                     Animal a1 = (Animal)e;
-                    if (a.Faction != a1.Faction)
+
+                    //if one animal can be moved and the other not, move
+                    //the animal that can be moved
+                    if (a.CanBeMoved && !a1.CanBeMoved)
                     {
-                        //if the players are different, push the animal that wants to move
-                        //if both or none want to move, push both of them
-                        if (a.WantsToMove && !a1.WantsToMove)
-                        {
-                            a.Push(-2 * pushVec, map);
+                        a.Push(-2 * pushVec, map);
 
-                        }
-                        else if (!a.WantsToMove && a1.WantsToMove)
-                        {
-                            a1.Push(2 * pushVec, map);
-                        }
-                        else
-                        {
-                            a.Push(-1 * pushVec, map);
-                            a1.Push(pushVec, map);
-
-                        }
+                    }
+                    else if (!a.CanBeMoved && a1.CanBeMoved)
+                    {
+                        a1.Push(2 * pushVec, map);
                     }
                     else
                     {
-                        //if the players are different, push the animal that wants to move
-                        //if both or none want to move, push both of them
-                        if (a.CanBeMoved && !a1.CanBeMoved)
-                        {
-                            a.Push(-2 * pushVec, map);
-
-                        }
-                        else if (!a.CanBeMoved && a1.CanBeMoved)
-                        {
-                            a1.Push(2 * pushVec, map);
-                        }
-                        else
+                        //if both animals have the same faction, push each equaly
+                        if (a.Faction == a1.Faction)
                         {
                             a.Push(-1 * pushVec, map);
                             a1.Push(pushVec, map);
                         }
+                        else
+                        {
+                            //animals have different faction, if one of them is not standing still,
+                            //move it, otherwise move both equaly
+                            if (a.WantsToMove && !a1.WantsToMove)
+                            {
+                                a.Push(-2 * pushVec, map);
+
+                            }
+                            else if (!a.WantsToMove && a1.WantsToMove)
+                            {
+                                a1.Push(2 * pushVec, map);
+                            }
+                            else
+                            {
+                                a.Push(-1 * pushVec, map);
+                                a1.Push(pushVec, map);
+                            }
+                        }
                     }
+
                     //push animal with a pushing map if it gets into 
                     //collision with blocked node
-                    PushOutOfObstacles(a);
                     PushOutOfObstacles(a1);
                 }
+                //push animal with a pushing map if it gets into 
+                //collision with blocked node
+                PushOutOfObstacles(a);
             }
         }
 
@@ -326,7 +330,7 @@ namespace SanguineGenesis.GameLogic
         /// True if physical entity with given location and radius collides with other
         /// buildings in the game.
         /// </summary>
-        public bool CollidesWithBuilding(Game game, Vector2 location, float r)
+        public bool CollidesWithBuilding(Game game, Vector2 location, float radius)
         {
             //check collisions with buildings
             foreach (Building b in
@@ -334,7 +338,7 @@ namespace SanguineGenesis.GameLogic
                                     (int)location.Y - 1, (int)location.X + 1, (int)location.Y + 1)))
             {
                 if (b.Physical &&
-                    (b.Center - location).Length < b.Radius + r)
+                    (b.Center - location).Length < b.Radius + radius)
                     return true;
             }
 
@@ -345,12 +349,12 @@ namespace SanguineGenesis.GameLogic
         /// True if physical entity with given location and radius collides with other
         /// physical units in the game.
         /// </summary>
-        public bool CollidesWithUnits(Game game, Vector2 location, float r)
+        public bool CollidesWithUnits(Game game, Vector2 location, float radius)
         {
             //check collisions with units
             var physicalUnits = game.GetAll<Unit>().Where(u => u.Physical);
             foreach (var u in physicalUnits)
-                if ((u.Center - location).Length < u.Radius + r)
+                if ((u.Center - location).Length < u.Radius + radius)
                     return true;
 
             return false;

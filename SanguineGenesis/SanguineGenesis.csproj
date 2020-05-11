@@ -102,7 +102,6 @@
     <Compile Include="GameLogic\Data\Entities\Unit.cs" />
     <Compile Include="GameLogic\Data\GameData.cs" />
     <Compile Include="GameLogic\Maps\MovementGenerating\BfsPathfinding.cs" />
-    <Compile Include="GameLogic\Maps\MovementGenerating\IPathfinding.cs" />
     <Compile Include="GameLogic\Maps\MapLoader.cs" />
     <Compile Include="GameLogic\Maps\PushingMapGenerating\PushingMap.cs" />
     <Compile Include="GameLogic\Data\Entities\Structure.cs" />

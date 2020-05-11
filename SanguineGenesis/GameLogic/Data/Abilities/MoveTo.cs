@@ -80,7 +80,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override Command NewCommand(Animal user, IMovementTarget target)
         {
-            throw new NotImplementedException("This method is not necessary because the virtual method " + nameof(SetCommands) + " was overriden");
+            throw new NotImplementedException("This method shouldn't be used because the virtual method " + nameof(SetCommands) + " was overriden");
         }
 
         public override string GetName() => AttackEnemyInstead?"MOVE_TO":"UNBR_MOVE_TO";
@@ -193,8 +193,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             
             //command is finished if unit reached the goal distance or if it was standing at one
             //place near the target position for a long time
-            if (Finished() //unit is close to the target point
-                || (NoMovementDetection.NotMovingMuch(CommandedEntity.MaxSpeedLand * deltaT / 2) && CanStop()))//unit is stuck
+            if (Finished() //animal is close to the target point
+                || NoMovement(deltaT))//animal is stuck
             {
                 return true;
             }
@@ -213,7 +213,16 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Returns true if the unit should stop because of being stuck.
+        /// Returns true iff the animal is moving to a point and it hasn't moved much lately.
+        /// </summary>
+        public bool NoMovement(float deltaT)
+        {
+            return (Target is Vector2) &&
+                    NoMovementDetection.NotMovingMuch(CommandedEntity.MaxSpeedLand * deltaT / 2) && CanStop();
+        }
+
+        /// <summary>
+        /// Returns true if the animal should stop because of being stuck.
         /// </summary>
         private bool CanStop()
         {

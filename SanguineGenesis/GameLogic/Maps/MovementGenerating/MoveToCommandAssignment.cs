@@ -95,18 +95,14 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     
             }
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
             FlowField flF = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowField();
             FlowField = flF;
-            sw.Stop();
-            //Console.WriteLine(sw.ElapsedMilliseconds);
         }
 
         /// <summary>
         /// Updates the flowfield of the commands. Used with the game locked.
         /// </summary>
-        public virtual void UpdateCommands()
+        public void UpdateCommands()
         {
             FlowField flF = FlowField;
             foreach (Animal a in Animals)
