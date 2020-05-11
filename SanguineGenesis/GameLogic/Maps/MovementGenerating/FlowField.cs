@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// <summary>
         /// If value of the flowfield is at most POINT_TO_TARGET, the intensity points to the target.
         /// </summary>
-        public const float POINT_TO_TARGET = -50f;
+        public const float POINT_TO_TARGET = -500f;
 
         /// <summary>
         /// Values are oriented angles in radians relative to the positive x axis.
@@ -47,13 +47,10 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         }
 
         /// <summary>
-        /// Finds the velocity at given coordinates with given speed. If the coordinates
+        /// Finds the direction at given coordinates. If the coordinates
         /// are out of the map, return zero vector.
         /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="speed">Length of the velocity vector.</param>
-        public Vector2 GetIntensity(Vector2 position, float speed)
+        public Vector2 GetDirection(Vector2 position)
         {
             int i = (int)position.X; int j = (int)position.Y;
             if (i < 0 || i >= Width || j < 0 || j >= Height ||
@@ -64,11 +61,11 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             float angle = directions[i, j].Value;
             //return direction that points directly to the target
             if(PointToTarget(angle))
-                return speed * (position.UnitDirectionTo(target));
+                return position.UnitDirectionTo(target);
             //return direction from this flowfield
             return new Vector2(
-                (float)Math.Cos(angle) * speed,
-                (float)Math.Sin(angle) * speed
+                (float)Math.Cos(angle),
+                (float)Math.Sin(angle)
                 );
         }
 

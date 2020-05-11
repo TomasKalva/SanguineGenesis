@@ -45,11 +45,6 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             obstacleMap = obst;
             this.targetLocation = targetLocation;
             discovered = new Queue<Coords>();
-            //initialize walkable nodes to point to target
-            for(int i=0; i<width; i++)
-                for(int j = 0; j<width; j++)
-                    if(!obst[i,j])
-                        flowField[i, j] = FlowField.POINT_TO_TARGET;
         }
 
         public FlowField GenerateFlowField()
@@ -61,14 +56,15 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             discovered = new Queue<Coords>();
             Coords target = new Coords((int)targetLocation.X,
                                         (int)targetLocation.Y);
-            if(target.Valid(width, height))
+            if(target.Valid(width, height) &&
+                !obstacleMap[target.X, target.Y])
             {
                 discovered.Enqueue(target);
             }
             else
             {
-                //return empty flowfield if target location is invalid
-                return flowField;
+                //return null if target location is invalid
+                return null;
             }
 
             while (discovered.Any())
@@ -92,7 +88,8 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             PointToCenter();
             RepairEdges();
 
-            flowField[target.X, target.Y] = null;
+            //move to target in straight line on the target node
+            flowField[target.X, target.Y] = FlowField.POINT_TO_TARGET;
 
             return flowField;
         }
@@ -102,7 +99,8 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         private void Relax(Coords relaxed, float angle)
         {
-            if (relaxed.Valid(flowField.Width, flowField.Height))
+            if (relaxed.Valid(flowField.Width, flowField.Height) &&
+                !obstacleMap[relaxed.X, relaxed.Y])
             {
                 int x = relaxed.X;
                 int y = relaxed.Y;
@@ -174,7 +172,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     if (obstacleMap[i, j])
                         continue;
 
-                    var dir = flowField.GetIntensity(new Vector2(i + .5f, j + .5f), 1f);
+                    var dir = flowField.GetDirection(new Vector2(i + .5f, j + .5f));
                     //directions of the components
                     int dirX = Math.Sign(dir.X);
                     int dirY = Math.Sign(dir.Y);

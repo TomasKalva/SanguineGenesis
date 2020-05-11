@@ -105,7 +105,7 @@
     <Compile Include="GameLogic\Maps\MapLoader.cs" />
     <Compile Include="GameLogic\Maps\PushingMapGenerating\PushingMap.cs" />
     <Compile Include="GameLogic\Data\Entities\Structure.cs" />
-    <Compile Include="GameLogic\Maps\MovementGenerating\CommandAssignment.cs" />
+    <Compile Include="GameLogic\Maps\MovementGenerating\MoveToCommandAssignment.cs" />
     <Compile Include="GameLogic\GameplayOptions.cs" />
     <Compile Include="GameLogic\Maps\MovementGenerating\MovementGenerator.cs" />
     <Compile Include="GameLogic\Data\Entities\Plant.cs" />

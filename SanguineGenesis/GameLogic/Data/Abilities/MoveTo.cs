@@ -52,9 +52,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             var usersGroups = users.ToLookup((unit) => unit.Movement);
 
             //volume of all animals' circles /pi
-            float volume = users.Select((e) => e.Radius * e.Radius).Sum();
+            float volumeNoPI = users.Select((e) => e.Radius * e.Radius).Sum();
             //distance from the target when animal can stop if it gets stuck
-            float minStoppingDistance = (float)Math.Sqrt(volume) * 1.3f;
+            float minStoppingDistance = (float)Math.Sqrt(volumeNoPI) * 1.3f;
 
             foreach (Movement m in Enum.GetValues(typeof(Movement)))
             {
@@ -171,17 +171,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 //go outside of node with building to be able to use flowfield
                 CommandedEntity.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos),1000, game.Map);
             }
-            else if (((int)Target.Center.X != (int)CommandedEntity.Center.X ||
-                 (int)Target.Center.Y != (int)CommandedEntity.Center.Y))
-            {
-                //use flowfield
-                CommandedEntity.Accelerate(FlowField.GetIntensity(CommandedEntity.Center, 1), Target.DistanceTo(CommandedEntity), game.Map);
-            }
             else
             {
-                //go in straight line
-                Vector2 direction = CommandedEntity.Center.UnitDirectionTo(Target.Center);
-                CommandedEntity.Accelerate(direction, Target.DistanceTo(CommandedEntity), game.Map);
+                //use flowfield
+                CommandedEntity.Accelerate(FlowField.GetDirection(CommandedEntity.Center), Target.DistanceTo(CommandedEntity), game.Map);
             }
 
             //update last four positions

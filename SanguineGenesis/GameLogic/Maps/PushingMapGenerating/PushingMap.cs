@@ -42,9 +42,6 @@ namespace SanguineGenesis.GameLogic.Maps.PushingMapGenerating
         /// Finds the direction at given coordinates. If the coordinates
         /// are out of the map or the subsquare has no direction, returns null.
         /// </summary>
-        /// <param name="x">X coordinate.</param>
-        /// <param name="y">Y coordinate.</param>
-        /// <param name="speed">Length of the velocity vector.</param>
         public Vector2? GetDirection(Vector2 position)
         {
             int i = (int)position.X; int j = (int)position.Y;

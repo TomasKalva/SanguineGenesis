@@ -95,8 +95,9 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     
             }
 
-            FlowField flF = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowField();
-            FlowField = flF;
+            FlowField  = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowField();
+            if (FlowField == null)
+                Invalid = true;
         }
 
         /// <summary>
