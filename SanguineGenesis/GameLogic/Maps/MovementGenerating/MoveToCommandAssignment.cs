@@ -37,7 +37,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         public bool Active { get { lock (this) return active; } set { lock (this) active = value; } }
         private bool invalid;
         /// <summary>
-        /// True iff there are no units that are using this assignment. 
+        /// True iff there are no animals that are using this assignment. 
         /// If set to true, this command assignment will be removed and all its commands canceled. Can only 
         /// be used from the MovementGenerator and also from the game thread without locking, because it can 
         /// only be set to true and reading an incorrect bool value once has no negative effects.
@@ -60,51 +60,57 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         public void Process(ObstacleMap obst)
         {
-            //if there are no more units, cancel this assignment
+            //if there are no more animals, cancel this assignment
             if (!Animals.Any())
             {
                 Invalid = true;
                 return;
             }
 
-            //map used in the pathfinding algorithm
-            ObstacleMap forPathfinding = obst;
-
-            Building targAsBuilding = Target as Building;
-            Node targAsNode = Target as Node;
-            if (targAsBuilding!=null || (targAsNode!=null))
+            //remove obstacles from the target node
+            int targX = ((int)Target.Center.X)%obst.Width;
+            int targY = ((int)Target.Center.Y)%obst.Height;
+            bool removedObstacle = false;
+            if(obst[targX, targY])
             {
-                Building blockingBuilding;
-                if (targAsNode != null)
+                obst[targX, targY] = false;
+                removedObstacle = true;
+            }
+            //remove obstacles created by building on the target node
+            Building targAsBuilding = Target as Building;
+            if (targAsBuilding != null)
+            {
+                //remove the building that is over the target on this obstacle map
+                foreach (Node n in targAsBuilding.Nodes)
                 {
-                    //remove the obstacle from target node
-                    forPathfinding[targAsNode.X, targAsNode.Y] = false;
-                    //blockingBuilding = targAsNode.Building;
-                }
-                else
-                {
-                    //remove the building that is over the target on this obstacle map
-                    blockingBuilding = targAsBuilding;
-
                     //Building's nodes are immutable
-                    forPathfinding = new ObstacleMap(obst);
-                    foreach (Node n in blockingBuilding.Nodes)
-                    {
-                        forPathfinding[n.X, n.Y] = false;
-                    }
+                    obst[n.X, n.Y] = false;
                 }
-                    
             }
 
+            //calculate flow field
             Stopwatch sw = new Stopwatch();
             sw.Start();
             //temporary variable is used because FlowField needs lock on this instance
-            FlowField flf = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowField();
-            FlowField = flf;
+            FlowField flF = new BfsPathfinding(obst, Target.Center).GenerateFlowField();
+            FlowField = flF;
             sw.Stop();
             //simulate work if flow field calculation took too short time
             if (sw.ElapsedMilliseconds < 2)
                 Thread.Sleep(10);
+
+            //put removed obstacles back on the map
+            if (removedObstacle)
+            {
+                obst[targX, targY] = true;
+            }
+            if(targAsBuilding != null)
+            {
+                foreach (Node n in targAsBuilding.Nodes)
+                {
+                    obst[n.X, n.Y] = true;
+                }
+            }
         }
 
         /// <summary>
