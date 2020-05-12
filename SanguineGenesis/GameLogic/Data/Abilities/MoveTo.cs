@@ -13,7 +13,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The animal moves to the target.
     /// </summary>
-    sealed class MoveTo : Ability<Animal, IMovementTarget>
+    class MoveTo : Ability<Animal, IMovementTarget>
     {
         internal MoveTo(float? goalDistance, bool attackEnemyInstead)
             : base(null, 0, false, false)
@@ -49,17 +49,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             FactionType player = users.First().Faction.FactionID;
 
             //separete animals to different groups by their movement
-            var usersGroups = users.ToLookup((unit) => unit.Movement);
-
-            //volume of all animals' circles /pi
-            float volumeNoPI = users.Select((e) => e.Radius * e.Radius).Sum();
-            //distance from the target when animal can stop if it gets stuck
-            float minStoppingDistance = (float)Math.Sqrt(volumeNoPI) * 1.3f;
-
-            foreach (Movement m in Enum.GetValues(typeof(Movement)))
+            var usersMovementGroups = users.ToLookup((animal) => animal.Movement);
+            foreach (var group in usersMovementGroups)
             {
-                IEnumerable<Animal> usersMov = usersGroups[m];
-                //set commands only if some unit can receive it
+                IEnumerable<Animal> usersMov = group;
+                Movement m = group.Key;
+
+                //set commands only if some animal can receive it
                 if (!usersMov.Any())
                     continue;
 
@@ -67,13 +63,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 //give command to each user and set the command's creator
                 foreach (Animal user in usersMov)
                 {
-                    IComputable com = new MoveToCommand(user, target, minStoppingDistance, this)
-                    {
-                        Assignment = mtca
-                    };
-
-                    user.AddCommand((Command)com);
+                    MoveToCommand com = new MoveToCommand(user, target, this, mtca);
+                    user.AddCommand(com);
                 }
+
+                //enqueue mtca for computation
                 MovementGenerator.GetMovementGenerator().AddNewCommand(player, mtca);
             }
         }
@@ -94,12 +88,12 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     }
 
 
-    class MoveToCommand : Command<Animal, IMovementTarget, MoveTo>, IComputable
+    class MoveToCommand : Command<Animal, IMovementTarget, MoveTo>
     {
         /// <summary>
         /// Assignment for generating flowfield in other thread.
         /// </summary>
-        public MoveToCommandAssignment Assignment { get; set; }
+        public MoveToCommandAssignment Assignment { get; }
         /// <summary>
         /// Flowfield used for navigation. It can be set after the command was assigned.
         /// </summary>
@@ -117,17 +111,23 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         private NoMovementDetection NoMovementDetection { get; }
 
-        public MoveToCommand(Animal commandedEntity, IMovementTarget target, float minStoppingDistance, MoveTo ability)
+        public MoveToCommand(Animal commandedEntity, IMovementTarget target, MoveTo ability, MoveToCommandAssignment moveToCommandAssignment)
             : base(commandedEntity, target, ability)
         {
-            MinStoppingDistance = minStoppingDistance;
+            Assignment = moveToCommandAssignment;
+            //calculate minimal distance at which animal can stop if it gets stuck
+            //R is radius of circle with area equal to sum of areas of circles of animals
+            //ra_1^2*pi + ra_2^2*pi + ... + ra_n^2*pi = R^2*pi => R = sqrt(ra_1^2 + ra_2^2 + ... + ra_n^2) = sqrt(volumeNoPI)
+            float volumeNoPI = Assignment.Animals.Select((e) => e.Radius * e.Radius).Sum();
+            float R = (float)Math.Sqrt(volumeNoPI);
+            MinStoppingDistance = R * 1.3f;
             NoMovementDetection = new NoMovementDetection();
         }
 
         public override bool PerformCommand(Game game, float deltaT)
         {
             //command immediately finishes if the assignment was invalidated
-            if (Assignment != null && Assignment.Invalid)
+            if (Assignment.Invalid)
                 return true;
 
             //set the command assignment to be active to increase its priority
@@ -149,9 +149,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                                 .FirstOrDefault();
                 if (enemy != null)
                 {
+                    OnRemove();
                     //attack the enemy
-                    CommandedEntity.WantsToMove = false;
-                    RemoveFromAssignment();
                     CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy, game.GameData.Abilities.Attack));
                     return false;//new command is already set
                 }
@@ -184,7 +183,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             if(!CommandedEntity.WantsToMove)
                 CommandedEntity.WantsToMove = true;
             
-            //command is finished if unit reached the goal distance or if it was standing at one
+            //command is finished if animal reached the goal distance or if it was standing at one
             //place near the target position for a long time
             if (Finished() //animal is close to the target point
                 || NoMovement(deltaT))//animal is stuck
@@ -234,6 +233,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override void OnRemove()
         {
+            base.OnRemove();
             CommandedEntity.WantsToMove = false;
             CommandedEntity.SetAnimation("IDLE");
             RemoveFromAssignment();
@@ -287,10 +287,5 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             }
             return false;
         }
-    }
-
-    interface IComputable
-    {
-        MoveToCommandAssignment Assignment { get; set; }
     }
 }

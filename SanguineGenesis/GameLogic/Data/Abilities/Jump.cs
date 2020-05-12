@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Jump to the target location.
     /// </summary>
-    sealed class Jump : Ability<Animal, Vector2>
+    class Jump : Ability<Animal, Vector2>
     {
         public float JumpSpeed { get; }
 

@@ -135,9 +135,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     }
 
                     //remove commands that don't need to be updated anymore
-                    Console.WriteLine("before active commands: " + commands.Count);
                     commands.RemoveAll((c) => c.Invalid);
-                    Console.WriteLine("after  active commands: " + commands.Count);
 
                     if (MapChanged)
                     {
@@ -171,10 +169,10 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             /// </summary>
             public MoveToCommandAssignment HighestPriorityAssignment()
             {
-                MoveToCommandAssignment comAss = GetCommAssWithHighestPriority(inputs);
+                MoveToCommandAssignment comAssignment = GetCommAssWithHighestPriority(inputs);
 
-                if(comAss!=null)
-                    return comAss;
+                if(comAssignment!=null)
+                    return comAssignment;
                 else
                     return GetCommAssWithHighestPriority(repeatedInputs);
             }
@@ -184,12 +182,12 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             /// </summary>
             private MoveToCommandAssignment GetCommAssWithHighestPriority(List<MoveToCommandAssignment> assignments)
             {
-                MoveToCommandAssignment comAss = assignments.FirstOrDefault();
+                MoveToCommandAssignment comAssignment = assignments.FirstOrDefault();
                 //highest priority command doesn't exist
-                if (comAss == null)
+                if (comAssignment == null)
                     return null;
 
-                Priority highest = comAss.Active ? Priority.HIGH : Priority.LOW;
+                Priority highest = comAssignment.Active ? Priority.HIGH : Priority.LOW;
                 foreach (MoveToCommandAssignment c in assignments)
                 {
                     //no higher priority can be found
@@ -200,10 +198,10 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     if (p.HigherThan(highest))
                     {
                         highest = p;
-                        comAss = c;
+                        comAssignment = c;
                     }
                 }
-                return comAss;
+                return comAssignment;
             }
 
             /// <summary>

@@ -12,7 +12,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Build a building at the target node.
     /// </summary>
-    sealed class BuildBuilding : Ability<Entity, Node>
+    class BuildBuilding : Ability<Entity, Node>
     {
         internal BuildBuilding(BuildingFactory buildingFactory)
             : base(buildingFactory.BuildingDistance, buildingFactory.EnergyCost, true, false)

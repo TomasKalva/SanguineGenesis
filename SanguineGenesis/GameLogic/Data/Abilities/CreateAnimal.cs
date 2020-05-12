@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Creates a new animal near the building.
     /// </summary>
-    sealed class CreateAnimal : Ability<Building, Nothing>
+    class CreateAnimal : Ability<Building, Nothing>
     {
         internal CreateAnimal(AnimalFactory spawningUnitFactory)
             : base(2 * spawningUnitFactory.Radius, spawningUnitFactory.EnergyCost, true, false, duration: spawningUnitFactory.SpawningTime)

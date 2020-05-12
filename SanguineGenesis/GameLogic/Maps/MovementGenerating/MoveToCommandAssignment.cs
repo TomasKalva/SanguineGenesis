@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
@@ -36,10 +37,10 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         public bool Active { get { lock (this) return active; } set { lock (this) active = value; } }
         private bool invalid;
         /// <summary>
-        /// True if the target is on unreachable square or there are no units that are using this assignment. 
+        /// True iff there are no units that are using this assignment. 
         /// If set to true, this command assignment will be removed and all its commands canceled. Can only 
         /// be used from the MovementGenerator and also from the game thread without locking, because it can 
-        /// only be set to true and reading an incorrect value once has no negative effects.
+        /// only be set to true and reading an incorrect bool value once has no negative effects.
         /// </summary>
         public bool Invalid { get { lock (this) return invalid; } set { lock (this) invalid = value; } }
         private FlowField flowField;
@@ -71,7 +72,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 
             Building targAsBuilding = Target as Building;
             Node targAsNode = Target as Node;
-            if (targAsBuilding!=null || (targAsNode!=null/* && targAsNode.Building!=null*/))
+            if (targAsBuilding!=null || (targAsNode!=null))
             {
                 Building blockingBuilding;
                 if (targAsNode != null)
@@ -95,9 +96,15 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     
             }
 
-            FlowField  = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowField();
-            if (FlowField == null)
-                Invalid = true;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            //temporary variable is used because FlowField needs lock on this instance
+            FlowField flf = new BfsPathfinding(forPathfinding, Target.Center).GenerateFlowField();
+            FlowField = flf;
+            sw.Stop();
+            //simulate work if flow field calculation took too short time
+            if (sw.ElapsedMilliseconds < 2)
+                Thread.Sleep(10);
         }
 
         /// <summary>
@@ -121,12 +128,6 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                         c.FollowCommand.Assignment == this)
                         c.FollowCommand.FlowField = flF;
                 }
-            }
-            //if there is an obstacle on the target square, cancel this assignment
-            if (!Animals.Any())
-            {
-                Invalid = true;
-                return;
             }
         }
     }

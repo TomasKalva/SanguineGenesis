@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Knock the target back.
     /// </summary>
-    sealed class KnockBack : Ability<Animal, Animal>
+    class KnockBack : Ability<Animal, Animal>
     {
         public KnockAwayFactory KnockAwayFactory { get; }
 

@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Deal energy damage to the animal.
     /// </summary>
-    sealed class Kick : Ability<Animal, Animal>
+    class Kick : Ability<Animal, Animal>
     {
         public float EnergyDamage { get; }
 

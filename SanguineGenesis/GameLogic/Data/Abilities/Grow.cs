@@ -10,7 +10,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// The plant grows until it has full energy.
     /// </summary>
-    sealed class Grow : Ability<Plant, Nothing>
+    class Grow : Ability<Plant, Nothing>
     {
         internal Grow()
             : base(0, 0, true, false, false)

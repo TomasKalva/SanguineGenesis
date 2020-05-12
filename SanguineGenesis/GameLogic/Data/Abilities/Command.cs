@@ -330,7 +330,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             base.OnRemove();
             //animal loses low priority of getting pushed by collisions
             if (CommandedEntity is Animal a)
+            {
                 a.CanBeMoved = true;
+            }
         }
 
         public override string GetName() => Ability.GetName();

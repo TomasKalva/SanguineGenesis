@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Pull the target to the user.
     /// </summary>
-    sealed class Pull : Ability<Animal, Animal>
+    class Pull : Ability<Animal, Animal>
     {
         public float PullSpeed { get; }
 

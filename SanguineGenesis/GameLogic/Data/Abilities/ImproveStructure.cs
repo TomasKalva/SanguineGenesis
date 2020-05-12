@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Transfer energy to the target structure.
     /// </summary>
-    sealed class ImproveStructure : Ability<Animal, Structure>
+    class ImproveStructure : Ability<Animal, Structure>
     {
         public float EnergyPerS { get; }
 

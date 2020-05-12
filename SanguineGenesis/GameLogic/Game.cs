@@ -284,15 +284,15 @@ namespace SanguineGenesis.GameLogic
         private void MovementGeneratorInteraction()
         {
             MovementGenerator mg = MovementGenerator.GetMovementGenerator();
-            foreach (var kvp in Players)
+            lock (mg)
             {
-                Player p = kvp.Value;
-                //if map changed, set new obstacle maps to mg and make it regenerate all
-                //movement maps
-                if (p.MapChanged)
+                foreach (var kvp in Players)
                 {
-                    lock (mg) 
-                    { 
+                    Player p = kvp.Value;
+                    //if map changed, set new obstacle maps to mg and make it regenerate all
+                    //movement maps
+                    if (p.MapChanged)
+                    {
                         //update visible obstacle maps
                         p.VisibleMap.UpdateObstacleMaps();
                         //tell movement generator that obstacle maps changed
@@ -300,10 +300,10 @@ namespace SanguineGenesis.GameLogic
                         p.VisibleMap.MapWasChanged = false;
                     }
                 }
-            }
 
-            //update move to commands
-            mg.UseProcessedCommands();
+                //update move to commands
+                mg.UseProcessedCommands();
+            }
         }
     }
 }

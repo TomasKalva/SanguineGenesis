@@ -11,7 +11,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Climb on a plant.
     /// </summary>
-    sealed class ClimbPlant : Ability<Animal, Plant>
+    class ClimbPlant : Ability<Animal, Plant>
     {
         public AnimalsOnPlantFactory AnimalsOnPlantFactory { get; }
 
@@ -69,7 +69,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Climb down a plant.
     /// </summary>
-    sealed class ClimbDownPlant : Ability<Plant, Nothing>
+    class ClimbDownPlant : Ability<Plant, Nothing>
     {
         internal ClimbDownPlant(float energyCost, float climbingTime)
             : base(0.1f, energyCost, false, false, duration:climbingTime)

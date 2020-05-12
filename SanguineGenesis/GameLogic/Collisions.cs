@@ -277,6 +277,7 @@ namespace SanguineGenesis.GameLogic
             foreach (Animal a in animals.Where(animal=>animal.Physical))
             {
                 PushOutOfObstacles(a);
+                PushOutOfObstacles(a);
             }
         }
 

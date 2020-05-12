@@ -330,7 +330,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     /// <summary>
     /// Used as generic parameter for abilities without target.
     /// </summary>
-    sealed class Nothing : ITargetable
+    class Nothing : ITargetable
     {
         /// <summary>
         /// Throws an exception.
