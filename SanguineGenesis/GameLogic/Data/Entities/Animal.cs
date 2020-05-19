@@ -192,9 +192,9 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Accelerate animal's velocity. The length of the result velocity will be at most maxDistance.
+        /// Sets animal's velocity. The length of the result velocity will be at most maxDistance.
         /// </summary>
-        public void Accelerate(Vector2 direction, float maxDistance, Map map)
+        public void SetVelocity(Vector2 direction, float maxDistance, Map map)
         {
             Vector2 vel;
             //determine current max speed

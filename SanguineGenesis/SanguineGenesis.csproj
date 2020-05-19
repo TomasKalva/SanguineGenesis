@@ -69,7 +69,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameLogic\AI\Ai.cs" />
+    <Compile Include="GameLogic\AI\AI.cs" />
     <Compile Include="GameLogic\Data\Abilities\Abilities.cs" />
     <Compile Include="GameLogic\Data\Abilities\ApplyStatus.cs" />
     <Compile Include="GameLogic\Data\Abilities\Attack.cs" />

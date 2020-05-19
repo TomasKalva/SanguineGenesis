@@ -37,13 +37,13 @@ namespace SanguineGenesis.GameLogic.AI
     }
 
     /// <summary>
-    /// Creates DumbAI.
+    /// Creates DefaultAI.
     /// </summary>
-    class DumbAIFactory: IAIFactory
+    class DefaultAIFactory: IAIFactory
     {
         public IAI NewInstance(Player controlledPlayer)
         {
-            return new DumbAI(controlledPlayer, 1f);
+            return new DefaultAI(controlledPlayer, 1f);
         }
     }
 
@@ -51,7 +51,7 @@ namespace SanguineGenesis.GameLogic.AI
     /// Sends all of its animals to attack selected animals of the enemy player. BuildBuildings and
     /// CreateAnimal are used randomly.
     /// </summary>
-    class DumbAI:IAI
+    class DefaultAI:IAI
     {
         readonly Random random = new Random(42);
         public Player ControlledPlayer { get; }
@@ -67,7 +67,7 @@ namespace SanguineGenesis.GameLogic.AI
         /// </summary>
         private Dictionary<Building, CreateAnimal> ToCreateAnimalNext { get; }
 
-        public DumbAI(Player controlledPlayer, float decisionPeriod)
+        public DefaultAI(Player controlledPlayer, float decisionPeriod)
         {
             ControlledPlayer = controlledPlayer;
             DecisionPeriod = decisionPeriod;
@@ -115,15 +115,14 @@ namespace SanguineGenesis.GameLogic.AI
             //only do it for 3 buildings so that the ai doesn't perform too many actions per second
             foreach (Building b in buildings.ToList().ToRandomizedList().Take(3))
             {
-                CreateAnimals(b);
+                CreateAnimal(b);
             }
         }
 
         /// <summary>
         /// Set CreateAnimal command to user.
         /// </summary>
-        /// <param name="user"></param>
-        private void CreateAnimals(Building user)
+        private void CreateAnimal(Building user)
         {
             //add user to ToCreateAnimalNext if it isn't there yet, set its next ability
             if (!ToCreateAnimalNext.ContainsKey(user))
@@ -134,7 +133,6 @@ namespace SanguineGenesis.GameLogic.AI
 
                 ToCreateAnimalNext.Add(user, spawningAbilities[random.Next(spawningAbilities.Count)]);
             }
-
 
             CreateAnimal ability = ToCreateAnimalNext[user];
             if (user.Energy >= ability.EnergyCost)
@@ -163,14 +161,14 @@ namespace SanguineGenesis.GameLogic.AI
             //only do it for 3 buildings so that the ai doesn't perform too many actions per second
             foreach (Plant b in plants.ToList().ToRandomizedList().Take(3))
             {
-                PlaceBuildings(b, map);
+                PlaceBuilding(b, map);
             }
         }
 
         /// <summary>
         /// Set BuildBuilding command to user.
         /// </summary>
-        private void PlaceBuildings(Plant user, Map map)
+        private void PlaceBuilding(Plant user, Map map)
         {
             //add user to ToBuildNext if it isn't there yet, set its next ability
             if (!ToBuildNext.ContainsKey(user))
@@ -178,15 +176,14 @@ namespace SanguineGenesis.GameLogic.AI
                 var buildingAbilities = user.Abilities.Where(a => a is BuildBuilding).Cast<BuildBuilding>().ToList();
                 if (!buildingAbilities.Any())
                     return;
-
                 ToBuildNext.Add(user, buildingAbilities[random.Next(buildingAbilities.Count)]);
             }
 
-
+            //possible targets of the ability are nodes that contain roots of this plant
             var possibleTargets = user.RootNodes.OfType<Node>().ToList().ToRandomizedList() ;
-            
             BuildBuilding ability = ToBuildNext[user];
             if (user.Energy >= ability.EnergyCost)
+                //try to cast ability on one of the possible targets
                 foreach (Node n in possibleTargets)
                 {
                     if(map.BuildingCanBePlaced(ability.BuildingFactory, n.X, n.Y))
@@ -213,7 +210,7 @@ namespace SanguineGenesis.GameLogic.AI
         private static readonly Random random = new Random(0);
 
         /// <summary>
-        /// Returns random permutation of list.
+        /// Returns random permutation of list. The original list is emptied.
         /// </summary>
         public static List<T> ToRandomizedList<T>(this List<T> list)
         {

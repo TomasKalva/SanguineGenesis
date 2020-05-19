@@ -13,34 +13,31 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
     /// </summary>
     class MovementGenerator
     {
-        private static readonly MovementGenerator movementGenerator;
-        public static MovementGenerator GetMovementGenerator() => movementGenerator;
-        
+        public static MovementGenerator GetMovementGenerator { get; }
+
         static MovementGenerator()
         {
-            movementGenerator = new MovementGenerator();
-            movementGenerator.StartThread();
+            GetMovementGenerator = new MovementGenerator();
+            Thread t = new Thread(() => GetMovementGenerator.Generate())
+            {
+                IsBackground = true
+            };
+            t.Start();
         }
 
-        private readonly Dictionary<FactionType, PlayerMovementGenerator> playersMovementGenerators;
+        /// <summary>
+        /// Movement generators for each player.
+        /// </summary>
+        private readonly Dictionary<FactionType, PlayerMovementGenerator> playerMovementGenerators;
         /// <summary>
         /// The player whose next command will be processed. Players switch after each iteration.
         /// </summary>
         private FactionType NextPlayer { get; set; }
+
         /// <summary>
         /// If set to true, all command assignments are removed during the next iteration.
         /// </summary>
         private bool reset;
-        /// <summary>
-        /// Sets reset to true.
-        /// </summary>
-        public void Reset()
-        {
-            lock (this)
-            {
-                reset = true;
-            }
-        }
 
         /// <summary>
         /// Calculates movement flowfields for one player.
@@ -126,6 +123,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     foreach (Movement m in Enum.GetValues(typeof(Movement)))
                         obstMaps[m] = newObstMaps[m];
 
+                    //add new commands
                     if (AddedCommands)
                     {
                         commands.AddRange(newCommands);
@@ -135,8 +133,9 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     }
 
                     //remove commands that don't need to be updated anymore
-                    commands.RemoveAll((c) => c.Invalid);
+                    commands.RemoveAll((c) => c.Empty);
 
+                    //reset inputs if map changes
                     if (MapChanged)
                     {
                         inputs = commands.ToList();//we don't want the same reference
@@ -144,24 +143,27 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                         MapChanged = false;
                     }
 
-                    if (inputs.Any())
-                        CurrentWork = Work.INPUTS;
+                    CurrentWork = GetWork();
                 }
             }
 
             /// <summary>
-            /// Resets the command assignment queue.
+            /// Resets the command assignment queue. Has to be called from MovementGenerator thread.
             /// </summary>
             public void Reset()
             {
-                lock (this)
-                {
-                    Output.Clear();
-                    inputs.Clear();
-                    repeatedInputs.Clear();
-                    commands.Clear();
-                    CurrentWork = Work.NOTHING;
-                }
+                Output.Clear();
+                inputs.Clear();
+                repeatedInputs.Clear();
+                commands.Clear();
+                CurrentWork = Work.NOTHING;
+                newCommands.Clear();
+                newObstMaps[Movement.LAND] = null;
+                newObstMaps[Movement.WATER] = null;
+                newObstMaps[Movement.LAND_WATER] = null;
+                obstMaps[Movement.LAND] = null;
+                obstMaps[Movement.WATER] = null;
+                obstMaps[Movement.LAND_WATER] = null;
             }
 
             /// <summary>
@@ -187,14 +189,15 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                 if (comAssignment == null)
                     return null;
 
-                Priority highest = comAssignment.Active ? Priority.HIGH : Priority.LOW;
+                //iterate assignments to find highest priority
+                Priority highest = GetPriority(comAssignment);
                 foreach (MoveToCommandAssignment c in assignments)
                 {
                     //no higher priority can be found
                     if (highest == Priority.HIGH)
                         break;
 
-                    Priority p = c.Active ? Priority.HIGH : Priority.LOW;
+                    Priority p = GetPriority(c);
                     if (p.HigherThan(highest))
                     {
                         highest = p;
@@ -214,13 +217,40 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                 if (c == null)
                     return Priority.NO_COMMANDS;
                 else
-                    return c.Active ? Priority.HIGH : Priority.LOW;
+                    return GetPriority(c);
             }
 
             /// <summary>
-            /// Processes the command with the highest prioirty and puts it to the output.
+            /// Returns priority of c.
             /// </summary>
-            public void ProcessCommand(object movementGenerator)
+            private Priority GetPriority(MoveToCommandAssignment c)
+            {
+                return c.Active ? Priority.HIGH : Priority.LOW;
+            }
+
+            /// <summary>
+            /// Returns type of work this instance is working on.
+            /// </summary>
+            private Work GetWork()
+            {
+
+                if (!inputs.Any())
+                {
+                    if (!repeatedInputs.Any())
+                        return Work.NOTHING;
+                    else
+                        return Work.REPEATED_INPUTS;
+                }
+                else
+                {
+                    return Work.INPUTS;
+                }
+            }
+
+            /// <summary>
+            /// Processes the command assignment with the highest prioirty and puts it to the output.
+            /// </summary>
+            public void ProcessCommandAssignment(object movementGenerator)
             {
                 MoveToCommandAssignment current = HighestPriorityAssignment();
                 //remove command from the corresponding list
@@ -230,17 +260,11 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                     repeatedInputs.Remove(current);
 
                 //animal targets can move so the flowfield needs to be repeatedly recalculated
-                if (current.Target is Animal && current.Animals.Any())
+                if (current.Target is Animal && !current.Empty)
                     repeatedInputs.Add(current);
 
                 //set current state of work
-                if (!inputs.Any())
-                {
-                    if (!repeatedInputs.Any())
-                        CurrentWork = Work.NOTHING;
-                    else
-                        CurrentWork = Work.REPEATED_INPUTS;
-                }
+                CurrentWork = GetWork();
 
                 //don't do anything if obstacle map for the movement doesn't exist
                 if (obstMaps[current.Movement] == null)
@@ -251,20 +275,24 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 
                 //put the command assignment to outputs
                 lock (movementGenerator)
-                    Output.Add(current);
+                {
+                    if(!Output.Contains(current))
+                        Output.Add(current);
+                }
             }
 
             /// <summary>
-            /// Sets the newObstMaps.
+            /// Sets the newObstMaps. MovementGenerator instance has to be locked.
             /// </summary>
-            public void SetObstMaps(Dictionary<Movement,ObstacleMap> obstMaps)
+            public void SetNewObstMaps(Dictionary<Movement,ObstacleMap> obstMaps)
             {
                 foreach(Movement m in Enum.GetValues(typeof(Movement)))
                     newObstMaps[m] = obstMaps[m];
+                MapChanged = true;
             }
 
             /// <summary>
-            /// Adds command to newCommands.
+            /// Adds command to newCommands. MovementGenerator instance has to be locked.
             /// </summary>
             public void AddNewCommand(MoveToCommandAssignment command)
             {
@@ -275,35 +303,22 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
 
         public MovementGenerator()
         {
-            playersMovementGenerators = new Dictionary<FactionType, PlayerMovementGenerator>
+            playerMovementGenerators = new Dictionary<FactionType, PlayerMovementGenerator>
             {
                 { FactionType.PLAYER0, new PlayerMovementGenerator() },
                 { FactionType.PLAYER1, new PlayerMovementGenerator() }
             };
         }
-
-        /// <summary>
-        /// Starts a new thread for creating flow maps.
-        /// </summary>
-        private void StartThread()
-        {
-            Thread t = new Thread(() => Generate())
-            {
-                IsBackground = true
-            };
-            t.Start();
-        }
         
         /// <summary>
         /// Sets MapChanged for the player to true, and sets new obstacle maps.
         /// </summary>
-        public void SetMapChanged(FactionType player, Dictionary<Movement,ObstacleMap> obstMaps)
+        public void SetNewObstMaps(FactionType player, Dictionary<Movement,ObstacleMap> obstMaps)
         {
-            PlayerMovementGenerator mg = playersMovementGenerators[player];
+            PlayerMovementGenerator mg = playerMovementGenerators[player];
             lock (this)
             {
-                mg.SetObstMaps(obstMaps);
-                mg.MapChanged = true;
+                mg.SetNewObstMaps(obstMaps);
                 Monitor.Pulse(this);
             }
         }
@@ -313,49 +328,61 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         public void AddNewCommand(FactionType player, MoveToCommandAssignment command)
         {
-            PlayerMovementGenerator mg = playersMovementGenerators[player];
+            PlayerMovementGenerator mg = playerMovementGenerators[player];
             lock (this)
             {
                 mg.AddNewCommand(command);
                 Monitor.Pulse(this);
             }
         }
+
         /// <summary>
-        /// Update commands with the newly created flowfields.
+        /// Sets reset to true.
+        /// </summary>
+        public void Reset()
+        {
+            lock (this)
+            {
+                reset = true;
+            }
+        }
+
+        /// <summary>
+        /// Update commands with the newly created flowfields. Called from the main thread.
         /// </summary>
         public void UseProcessedCommands()
         {
             lock (this)
             {
-                PlayerMovementGenerator mg0 = playersMovementGenerators[FactionType.PLAYER0];
-                PlayerMovementGenerator mg1 = playersMovementGenerators[FactionType.PLAYER1];
+                PlayerMovementGenerator mg0 = playerMovementGenerators[FactionType.PLAYER0];
+                PlayerMovementGenerator mg1 = playerMovementGenerators[FactionType.PLAYER1];
                 foreach (MoveToCommandAssignment c in mg0.Output)
                 {
                     c.UpdateCommands();
                 }
-                mg0.Output.RemoveAll(ca => ca.Invalid);
+                mg0.Output.RemoveAll(ca => ca.Empty);
                 foreach (MoveToCommandAssignment c in mg1.Output)
                 {
                     c.UpdateCommands();
                 }
-                mg1.Output.RemoveAll(ca => ca.Invalid);
+                mg1.Output.RemoveAll(ca => ca.Empty);
             }
         } 
 
         /// <summary>
-        /// Infinite loop for generating movement maps.
+        /// Infinite loop for generating flow fields.
         /// </summary>
-        public void Generate()
+        private void Generate()
         {
             //movement generatings for players don't change
-            PlayerMovementGenerator mg0 = playersMovementGenerators[FactionType.PLAYER0];
-            PlayerMovementGenerator mg1 = playersMovementGenerators[FactionType.PLAYER1];
+            PlayerMovementGenerator mg0 = playerMovementGenerators[FactionType.PLAYER0];
+            PlayerMovementGenerator mg1 = playerMovementGenerators[FactionType.PLAYER1];
             while (true)
             {
                 //wait until at least one of the players needs to recalculate the commands
                 lock (this)
                 {
-                    while (!StartNewCycle()) 
+                    while (!ShouldStartNewCycle())
                     {
                         TryReset();
                         Monitor.Wait(this); 
@@ -372,14 +399,14 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                 while (!CycleFinished())
                 {
                     //determine which player's command will be processed next
-                    Priority nextPr = playersMovementGenerators[NextPlayer].GetHighestPriority();
-                    Priority oppPr = playersMovementGenerators[Next(NextPlayer)].GetHighestPriority();
+                    Priority nextPr = playerMovementGenerators[NextPlayer].GetHighestPriority();
+                    Priority oppPr = playerMovementGenerators[Next(NextPlayer)].GetHighestPriority();
                     if (oppPr.HigherThan(nextPr))
                         NextPlayer = Next(NextPlayer);
 
                     //process the command from NextPlayer with the highest priority
-                    PlayerMovementGenerator nMg = playersMovementGenerators[NextPlayer];
-                    nMg.ProcessCommand(this);
+                    PlayerMovementGenerator nMg = playerMovementGenerators[NextPlayer];
+                    nMg.ProcessCommandAssignment(this);
                     
                     NextPlayer = Next(NextPlayer);
 
@@ -393,8 +420,8 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         private void TryReset()
         {
-            PlayerMovementGenerator mg0 = playersMovementGenerators[FactionType.PLAYER0];
-            PlayerMovementGenerator mg1 = playersMovementGenerators[FactionType.PLAYER1];
+            PlayerMovementGenerator mg0 = playerMovementGenerators[FactionType.PLAYER0];
+            PlayerMovementGenerator mg1 = playerMovementGenerators[FactionType.PLAYER1];
             lock (this)
                 if (reset)
                 {
@@ -410,8 +437,8 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         private bool CycleFinished()
         {
-            PlayerMovementGenerator mg0 = playersMovementGenerators[FactionType.PLAYER0];
-            PlayerMovementGenerator mg1 = playersMovementGenerators[FactionType.PLAYER1];
+            PlayerMovementGenerator mg0 = playerMovementGenerators[FactionType.PLAYER0];
+            PlayerMovementGenerator mg1 = playerMovementGenerators[FactionType.PLAYER1];
             if (mg0.CurrentWork == Work.NOTHING && mg1.CurrentWork == Work.NOTHING)
                 //cycle is finished if both mg0 and mg1 are doing nothing
                 return true;
@@ -420,9 +447,9 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
                 return false;
             else
             {
-                //mg0 and mg1 can only be working on repeated inputs - finish if there are no
+                //mg0 or mg1 can only be working on repeated inputs - finish if there are no
                 //new regular inputs waiting to be calculated in the next cycle
-                if (StartNewCycle())
+                if (ShouldStartNewCycle())
                     return true;
                 else
                     return false;
@@ -434,10 +461,10 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// <summary>
         /// Returns true iff new calculation cycle should begin.
         /// </summary>
-        private bool StartNewCycle()
+        private bool ShouldStartNewCycle()
         {
-            PlayerMovementGenerator mg0 = playersMovementGenerators[FactionType.PLAYER0];
-            PlayerMovementGenerator mg1 = playersMovementGenerators[FactionType.PLAYER1];
+            PlayerMovementGenerator mg0 = playerMovementGenerators[FactionType.PLAYER0];
+            PlayerMovementGenerator mg1 = playerMovementGenerators[FactionType.PLAYER1];
             lock (this)
             {
                 return (mg0.MapChanged ||
@@ -453,11 +480,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         private FactionType Next(FactionType p)
         {
-            switch (p)
-            {
-                case FactionType.PLAYER0: return FactionType.PLAYER1;
-                default: return FactionType.PLAYER0;
-            }
+            return p.Opposite();
         }
     }
 

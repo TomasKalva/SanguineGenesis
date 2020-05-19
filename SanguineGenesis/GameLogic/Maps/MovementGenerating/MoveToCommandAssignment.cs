@@ -23,36 +23,42 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         public FactionType Player { get; }
         /// <summary>
-        /// Where the animals should go.
-        /// </summary>
-        public IMovementTarget Target { get; }
-        /// <summary>
         /// Movement type of the animals.
         /// </summary>
         public Movement Movement { get; }
+        /// <summary>
+        /// Where the animals should go. Only type of the target and its immutable properties can be accessed.
+        /// </summary>
+        public IMovementTarget Target { get; }
+        private Vector2 targetPoint;
+        /// <summary>
+        /// Coordinates of Target.
+        /// </summary>
+        public Vector2 TargetPoint { get { lock (this) return targetPoint; } set { lock (this) targetPoint = value; } }
         private bool active;
         /// <summary>
         /// True if any animals are currently using this command.
         /// </summary>
         public bool Active { get { lock (this) return active; } set { lock (this) active = value; } }
-        private bool invalid;
+        private bool empty;
         /// <summary>
         /// True iff there are no animals that are using this assignment. 
         /// If set to true, this command assignment will be removed and all its commands canceled. Can only 
         /// be used from the MovementGenerator and also from the game thread without locking, because it can 
         /// only be set to true and reading an incorrect bool value once has no negative effects.
         /// </summary>
-        public bool Invalid { get { lock (this) return invalid; } set { lock (this) invalid = value; } }
+        public bool Empty { get { lock (this) return empty; } set { lock (this) empty = value; } }
         private FlowField flowField;
         private FlowField FlowField { get { lock (this) return flowField; } set { lock (this) flowField = value; } }
 
-        public MoveToCommandAssignment(FactionType player, List<Animal> units, Movement movement, IMovementTarget target)
+        public MoveToCommandAssignment(FactionType player, List<Animal> animals, Movement movement, IMovementTarget target)
         {
             Movement = movement;
             Active = false;
             Player = player;
-            Animals = units;
+            Animals = animals;
             Target = target;
+            TargetPoint = Target.Center;
         }
 
         /// <summary>
@@ -60,16 +66,13 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         /// </summary>
         public void Process(ObstacleMap obst)
         {
-            //if there are no more animals, cancel this assignment
-            if (!Animals.Any())
-            {
-                Invalid = true;
+            if (Empty)
                 return;
-            }
 
             //remove obstacles from the target node
-            int targX = ((int)Target.Center.X)%obst.Width;
-            int targY = ((int)Target.Center.Y)%obst.Height;
+            var targ = TargetPoint; //copy TargetPoint to temporary variable because it might change
+            int targX = ((int)targ.X)%obst.Width;
+            int targY = ((int)targ.Y)%obst.Height;
             bool removedObstacle = false;
             if(obst[targX, targY])
             {
@@ -89,15 +92,9 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
             }
 
             //calculate flow field
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
             //temporary variable is used because FlowField needs lock on this instance
             FlowField flF = new BfsPathfinding(obst, Target.Center).GenerateFlowField();
             FlowField = flF;
-            sw.Stop();
-            //simulate work if flow field calculation took too short time
-            if (sw.ElapsedMilliseconds < 2)
-                Thread.Sleep(10);
 
             //put removed obstacles back on the map
             if (removedObstacle)
@@ -114,10 +111,20 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         }
 
         /// <summary>
-        /// Updates the flowfield of the commands. Used with the game locked.
+        /// Updates the flowfield of the commands. Used from the main thread.
         /// </summary>
         public void UpdateCommands()
         {
+            //if there are no more animals, cancel this assignment
+            if (!Animals.Any())
+            {
+                Empty = true;
+                return;
+            }
+
+            //update target point
+            TargetPoint = Target.Center;
+
             FlowField flF = FlowField;
             foreach (Animal a in Animals)
             {

@@ -86,7 +86,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 return true;
             }
 
-            if (game.collisions.CollidesWithUnits(game, targetCenter, buildingRadius))
+            if (game.Collisions.CollidesWithUnits(game, targetCenter, buildingRadius))
             {
                 ActionLog.LogError(CommandedEntity, Ability, "units collide with the new building");
                 return true;

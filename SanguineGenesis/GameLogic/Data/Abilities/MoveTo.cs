@@ -68,7 +68,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 }
 
                 //enqueue mtca for computation
-                MovementGenerator.GetMovementGenerator().AddNewCommand(player, mtca);
+                MovementGenerator.GetMovementGenerator.AddNewCommand(player, mtca);
             }
         }
 
@@ -105,7 +105,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Distance from the target when unit can stop if it gets stuck.
         /// </summary>
-        private float MinStoppingDistance { get; }
+        private float MinNoMovement { get; }
         /// <summary>
         /// Detects if the animal got stuck.
         /// </summary>
@@ -120,41 +120,19 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             //ra_1^2*pi + ra_2^2*pi + ... + ra_n^2*pi = R^2*pi => R = sqrt(ra_1^2 + ra_2^2 + ... + ra_n^2) = sqrt(volumeNoPI)
             float volumeNoPI = Assignment.Animals.Select((e) => e.Radius * e.Radius).Sum();
             float R = (float)Math.Sqrt(volumeNoPI);
-            MinStoppingDistance = R * 1.3f;
+            MinNoMovement = R * 1.3f;
             NoMovementDetection = new NoMovementDetection();
         }
 
         public override bool PerformCommand(Game game, float deltaT)
         {
-            //command immediately finishes if the assignment was invalidated
-            if (Assignment.Invalid)
-                return true;
-
             //set the command assignment to be active to increase its priority
             if (!Assignment.Active)
                 Assignment.Active = true;
 
-            //set correct animation
-            if (CommandedEntity.AnimationState.Animation.Action!="RUNNING")
-                CommandedEntity.SetAnimation("RUNNING");
-
             //if an enemy animal is in attack range, attack it instead of other commands
-            if (Ability.AttackEnemyInstead)
-            {
-                Animal enemy = game.Players[CommandedEntity.Faction.FactionID.Opposite()]
-                                .GetAll<Animal>().Where(
-                                    (a) => a.Faction.FactionID == CommandedEntity.Faction.FactionID.Opposite()
-                                    && CommandedEntity.DistanceTo(a) <= CommandedEntity.AttackDistance
-                                    && CommandedEntity.Faction.CanSee(a))
-                                .FirstOrDefault();
-                if (enemy != null)
-                {
-                    OnRemove();
-                    //attack the enemy
-                    CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy, game.GameData.Abilities.Attack));
-                    return false;//new command is already set
-                }
-            }
+            if (AttackEnemyInstead(game))
+                return false;//new command is already set
 
             //check if the map was set yet
             if (FlowField == null)
@@ -168,20 +146,24 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 && blockingBuilding.Physical)
             {
                 //go outside of node with building to be able to use flowfield
-                CommandedEntity.Accelerate(blockingBuilding.Center.UnitDirectionTo(animalPos),1000, game.Map);
+                CommandedEntity.SetVelocity(blockingBuilding.Center.UnitDirectionTo(animalPos),1000, game.Map);
             }
             else
             {
                 //use flowfield
-                CommandedEntity.Accelerate(FlowField.GetDirection(CommandedEntity.Center), Target.DistanceTo(CommandedEntity), game.Map);
+                CommandedEntity.SetVelocity(FlowField.GetDirection(CommandedEntity.Center), Target.DistanceTo(CommandedEntity), game.Map);
             }
+
+            //set correct animation
+            if (CommandedEntity.AnimationState.Animation.Action != "RUNNING")
+                CommandedEntity.SetAnimation("RUNNING");
+
+            //set that unit wants to move
+            if (!CommandedEntity.WantsToMove)
+                CommandedEntity.WantsToMove = true;
 
             //update last four positions
             NoMovementDetection.AddNextPosition(CommandedEntity.Center);
-
-            //set that unit wants to move
-            if(!CommandedEntity.WantsToMove)
-                CommandedEntity.WantsToMove = true;
             
             //command is finished if animal reached the goal distance or if it was standing at one
             //place near the target position for a long time
@@ -197,6 +179,31 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             => throw new NotImplementedException("This method is never used.");
 
         /// <summary>
+        /// If an enemy animal is in attack range, attack it instead of other commands. Returns
+        /// true if attack command was set.
+        /// </summary>
+        private bool AttackEnemyInstead(Game game)
+        {
+            if (Ability.AttackEnemyInstead)
+            {
+                Animal enemy = game.Players[CommandedEntity.Faction.FactionID.Opposite()]
+                                .GetAll<Animal>().Where(
+                                    (a) => a.Faction.FactionID == CommandedEntity.Faction.FactionID.Opposite()
+                                    && CommandedEntity.DistanceTo(a) <= CommandedEntity.AttackDistance
+                                    && CommandedEntity.Faction.CanSee(a))
+                                .FirstOrDefault();
+                if (enemy != null)
+                {
+                    OnRemove();
+                    //attack the enemy
+                    CommandedEntity.SetCommand(new AttackCommand(CommandedEntity, enemy, game.GameData.Abilities.Attack));
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Returns true iff the animal is close enough to the target.
         /// </summary>
         public bool Finished()
@@ -205,12 +212,18 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Returns true iff the animal is moving to a point and it hasn't moved much lately.
+        /// Returns true iff the animal is moving to a point, is close to it
+        /// and it hasn't moved much lately.
         /// </summary>
         public bool NoMovement(float deltaT)
         {
+            float speed;
+            if (Assignment.Movement == Movement.WATER)
+                speed = CommandedEntity.MaxSpeedWater;
+            else
+                speed = CommandedEntity.MaxSpeedLand;
             return (Target is Vector2) &&
-                    NoMovementDetection.NotMovingMuch(CommandedEntity.MaxSpeedLand * deltaT / 2) && CanStop();
+                    NoMovementDetection.NotMovingMuch(speed * deltaT / 2) && CanStop();
         }
 
         /// <summary>
@@ -218,7 +231,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         private bool CanStop()
         {
-            return Target.DistanceTo(CommandedEntity) < MinStoppingDistance;
+            return Target.DistanceTo(CommandedEntity) < MinNoMovement;
         }
 
         /// <summary>
@@ -259,7 +272,6 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Adds a next position.
         /// </summary>
-        /// <param name="v"></param>
         public void AddNextPosition(Vector2 v)
         {
             last4positions[3] = last4positions[2];
@@ -270,6 +282,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         /// <summary>
         /// Returns true if the animal hasn't moved at least minDistSum in last 3 moves.
+        /// Four last positions have to be defined.
         /// </summary>
         public bool NotMovingMuch(float minDistSum)
         {

@@ -44,6 +44,10 @@ namespace SanguineGenesis.GUI
         /// True if the window should be closed.
         /// </summary>
         public bool CloseWindow { get; set; }
+        /// <summary>
+        /// True if the game is over.
+        /// </summary>
+        public bool GameEnded { get; set; }
 
         public GameWindow(Icons icons, MainMenuWindow mainMenuWindow)
         {
@@ -113,7 +117,7 @@ namespace SanguineGenesis.GUI
                 GameUpdateTimer.Enabled = false;
             }
             //initialize game
-            Game = new Game(mapDescription, playersBiome, GameplayOptions, GameData);
+            Game = new Game(mapDescription, playersBiome, GameData, GameplayOptions);
             //reset game controls
             GameControls.Reset();
             //spawn testing animals
@@ -122,11 +126,12 @@ namespace SanguineGenesis.GUI
             //initialize game time
             GameTime = new GameTime(Console.Out);
             GameUpdateTimer.Enabled = true;
+            GameEnded = false;
         }
 
         public void GameUpdateTimer_MainLoop(object sender, EventArgs e)
         {
-            if (Game.GameEnded)
+            if (GameEnded)
                 return;
 
             //update time
@@ -608,7 +613,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void MainWinformWindow_Closing(object sender, FormClosingEventArgs e)
         {
-            Game.GameEnded = true;
+            GameEnded = true;
             GameUpdateTimer.Enabled = false;
             if (!CloseWindow)
             {

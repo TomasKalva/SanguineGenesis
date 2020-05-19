@@ -212,7 +212,7 @@ namespace SanguineGenesis.GameLogic
         /// <summary>
         /// Aritificial intelligence that controls this player.
         /// </summary>
-        public IAI Ai { get; }
+        public IAI AI { get; }
 
         public Player(FactionType factionID, Biome biome, IAIFactory aiFactory)
             : base(factionID)
@@ -221,7 +221,7 @@ namespace SanguineGenesis.GameLogic
             VisibleBuildings = new List<Building>();
             Biome = biome;
             if(aiFactory!=null)
-                Ai = aiFactory.NewInstance(this);
+                AI = aiFactory.NewInstance(this);
 
         }
 

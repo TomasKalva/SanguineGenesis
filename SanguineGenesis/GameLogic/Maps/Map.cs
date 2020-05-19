@@ -45,9 +45,9 @@ namespace SanguineGenesis.GameLogic.Maps
             this.Nodes = nodes;
             ObstacleMaps = new Dictionary<Movement, ObstacleMap>();
             InitializeObstacleMaps();
-            MovementGenerating.MovementGenerator mg = MovementGenerating.MovementGenerator.GetMovementGenerator();
-            mg.SetMapChanged(FactionType.PLAYER0, ObstacleMaps);
-            mg.SetMapChanged(FactionType.PLAYER1, ObstacleMaps);
+            MovementGenerating.MovementGenerator mg = MovementGenerating.MovementGenerator.GetMovementGenerator;
+            mg.SetNewObstMaps(FactionType.PLAYER0, ObstacleMaps);
+            mg.SetNewObstMaps(FactionType.PLAYER1, ObstacleMaps);
             VisibilityObstacles = new ObstacleMap(Width, Height);
         }
 
@@ -79,12 +79,9 @@ namespace SanguineGenesis.GameLogic.Maps
         /// </summary>
         private void InitializeObstacleMaps()
         {
-            ObstacleMaps.Add(Movement.LAND, new ObstacleMap(Width, Height));
-            ObstacleMaps.Add(Movement.WATER, new ObstacleMap(Width, Height));
-            ObstacleMaps.Add(Movement.LAND_WATER, new ObstacleMap(Width, Height));
-            UpdateObstacleMap(Movement.LAND);
-            UpdateObstacleMap(Movement.WATER);
-            UpdateObstacleMap(Movement.LAND_WATER);
+            ObstacleMaps.Add(Movement.LAND, GetObstacleMap(Movement.LAND));
+            ObstacleMaps.Add(Movement.WATER, GetObstacleMap(Movement.WATER));
+            ObstacleMaps.Add(Movement.LAND_WATER, GetObstacleMap(Movement.LAND_WATER));
         }
 
         /// <summary>
@@ -92,11 +89,11 @@ namespace SanguineGenesis.GameLogic.Maps
         /// </summary>
         public void UpdateObstacleMaps()
         {
-            lock (MovementGenerator.GetMovementGenerator())
+            lock (MovementGenerator.GetMovementGenerator)
             {
-                UpdateObstacleMap(Movement.LAND);
-                UpdateObstacleMap(Movement.WATER);
-                UpdateObstacleMap(Movement.LAND_WATER);
+                ObstacleMaps[Movement.LAND] = GetObstacleMap(Movement.LAND);
+                ObstacleMaps[Movement.WATER] = GetObstacleMap(Movement.WATER);
+                ObstacleMaps[Movement.LAND_WATER] = GetObstacleMap(Movement.LAND_WATER);
                 MapWasChanged = false;
             }
         }
@@ -113,19 +110,11 @@ namespace SanguineGenesis.GameLogic.Maps
         }
 
         /// <summary>
-        /// Updates the obstacle map from this Map for movement.
+        /// Creates new obstacle map from this Map for movement.
         /// </summary>
-        public void UpdateObstacleMap(Movement movement)
+        public ObstacleMap GetObstacleMap(Movement movement)
         {
-            ObstacleMaps.TryGetValue(movement, out ObstacleMap obstMap);
-            //check if the map exists, if it doesn't exist, create a new one
-            if (obstMap==null ||
-                obstMap.Width != Width ||
-                obstMap.Height != Height)
-            {
-                ObstacleMaps[movement] = new ObstacleMap(Width, Height);
-                obstMap = ObstacleMaps[movement];
-            }
+            ObstacleMap obstMap = new ObstacleMap(Width, Height);
 
             for (int i = 0; i < Width; i++)
                 for (int j = 0; j < Height; j++)
@@ -147,6 +136,7 @@ namespace SanguineGenesis.GameLogic.Maps
                             break;
                     }
                 }
+            return obstMap;
         }
 
         #endregion Obstacle maps

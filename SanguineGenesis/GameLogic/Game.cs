@@ -36,10 +36,6 @@ namespace SanguineGenesis.GameLogic
         public Dictionary<FactionType, Player> Players { get; }
 
         /// <summary>
-        /// True if the game is over.
-        /// </summary>
-        public bool GameEnded { get; set; }
-        /// <summary>
         /// The player who won this game.
         /// </summary>
         public FactionType? Winner { get; set; }
@@ -51,50 +47,52 @@ namespace SanguineGenesis.GameLogic
         /// Describes customizable parts of the game.
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
-        /// <summary>
-        /// True if the first visibility map was taken from visibility generator this game.
-        /// </summary>
-        private bool FirstVisibilityTaken { get; set; }
 
         /// <summary>
         /// Used for handling collisions.
         /// </summary>
-        public Collisions collisions;
+        public Collisions Collisions { get; }
+        /// <summary>
+        /// True if the first visibility map was taken from visibility generator this game.
+        /// </summary>
+        private bool firstVisibilityTaken;
         /// <summary>
         /// The next player to whom will be generated visibility map.
         /// </summary>
         private FactionType nextVisibilityPlayer;
 
-        public Game(MapDescription mapDescription, Biome firstPlayersBiome, GameplayOptions gameplayOptions, GameData gameData)
+        public Game(MapDescription mapDescription, Biome firstPlayersBiome, GameData gameData, GameplayOptions gameplayOptions)
         {
-            GameEnded = false;
             Winner = null;
             GameData = gameData;
+            GameplayOptions = gameplayOptions;
 
             //factions
             Players = new Dictionary<FactionType, Player>
             {
                 { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null) },
-                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, new DumbAIFactory()) }
+                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, new DefaultAIFactory()) }
             };
             CurrentPlayer = Players[FactionType.PLAYER0];
             NeutralFaction = new Faction(FactionType.NEUTRAL);
 
             //map
             var mapLoader = new MapLoader(mapDescription);
-            Map = mapLoader.LoadMap();
+            Map = mapLoader.LoadMap();//Map has to be assigned before calling LoadBuildings, because it uses game.Map
             mapLoader.LoadBuildings(this);
 
-            collisions = new Collisions(Map);
-            collisions.SetPushingMaps(Map);
+            //collisions
+            Collisions = new Collisions(Map);
+            Collisions.SetPushingMaps(Map);
 
+            //visibility
             foreach (var kvp in Players)
                 kvp.Value.InitializeMapView(Map);
-
-            MovementGenerator.GetMovementGenerator().Reset();
             nextVisibilityPlayer = FactionType.PLAYER0;
-            GameplayOptions = gameplayOptions;
-            FirstVisibilityTaken = false;
+            firstVisibilityTaken = false;
+
+            //movement generator
+            MovementGenerator.GetMovementGenerator.Reset();
         }
 
         /// <summary>
@@ -128,13 +126,8 @@ namespace SanguineGenesis.GameLogic
 
             //ai
             foreach (var p in Players.Values)
-                if (p.Ai != null)
-                    p.Ai.Play(deltaT, this);
-
-            //map changing phase
-
-            //generate and drain nutrients by plants
-            Map.UpdateNutrientsMap(GetAll<Plant>(), deltaT);
+                if (p.AI != null)
+                    p.AI.Play(deltaT, this);
 
             gameTime.PrintTime("Others");
 
@@ -191,8 +184,8 @@ namespace SanguineGenesis.GameLogic
             gameTime.PrintTime("Ingame update");
 
             //collisions
-            collisions.ResolveCollisions(this);
-            collisions.PushAllOutOfObstacles(GetAll<Animal>());
+            Collisions.ResolveCollisions(this);
+            Collisions.PushAllOutOfObstacles(GetAll<Animal>());
 
             gameTime.PrintTime("Collisions");
 
@@ -219,6 +212,9 @@ namespace SanguineGenesis.GameLogic
             //set and refresh movement commands
             MovementGeneratorInteraction();
 
+            //generate and drain nutrients by plants
+            Map.UpdateNutrientsMap(GetAll<Plant>(), deltaT);
+
             //test if someone won the game
             if (Winner == null)
             {
@@ -244,12 +240,12 @@ namespace SanguineGenesis.GameLogic
 
                 //update current player's visibility map
                 var newMap = visibilityGenerator.VisibilityMap;
-                if (newMap != null && FirstVisibilityTaken)
+                if (newMap != null && firstVisibilityTaken)
                     Players[current].SetVisibilityMap(newMap);
 
                 //visibility map was taken
-                if (!FirstVisibilityTaken)
-                    FirstVisibilityTaken = true;
+                if (!firstVisibilityTaken)
+                    firstVisibilityTaken = true;
 
                 //generate visibility map for the other player
                 nextVisibilityPlayer = other;
@@ -283,7 +279,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         private void MovementGeneratorInteraction()
         {
-            MovementGenerator mg = MovementGenerator.GetMovementGenerator();
+            MovementGenerator mg = MovementGenerator.GetMovementGenerator;
             lock (mg)
             {
                 foreach (var kvp in Players)
@@ -296,7 +292,7 @@ namespace SanguineGenesis.GameLogic
                         //update visible obstacle maps
                         p.VisibleMap.UpdateObstacleMaps();
                         //tell movement generator that obstacle maps changed
-                        mg.SetMapChanged(kvp.Key, p.VisibleMap.ObstacleMaps);
+                        mg.SetNewObstMaps(kvp.Key, p.VisibleMap.ObstacleMaps);
                         p.VisibleMap.MapWasChanged = false;
                     }
                 }
