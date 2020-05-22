@@ -1302,7 +1302,7 @@ namespace SanguineGenesis.GUI
         /// Write texture atlas coordinates to the array.
         /// </summary>
         /// <param name="texBotLeftWidthHeight">Writing array.</param>
-        /// <param name="imageCoords">Coordinates of the image in the atlas with format: Rect(x, y, withd, height).</param>
+        /// <param name="imageCoords">Coordinates of the image in the atlas.</param>
         /// <param name="index">Index of the first coordinate in array.</param>
         /// <param name="vertCount">Number of times this coordinates should be repeated (for each vertex once).</param>
         private static void SetAtlasCoordinates(float[] texBotLeftWidthHeight, Rect imageCoords, int index,
