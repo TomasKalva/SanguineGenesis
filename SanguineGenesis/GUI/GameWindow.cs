@@ -5,7 +5,7 @@ using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GameLogic.Maps.MovementGenerating;
-using SanguineGenesis.GUI.WinFormsComponents;
+using SanguineGenesis.GUI.WinFormsControls;
 using SharpGL;
 using System;
 using System.Collections.Generic;
@@ -471,7 +471,7 @@ namespace SanguineGenesis.GUI
         private void MainWinformWindow_KeyDown(object sender, KeyEventArgs e)
         {
             int abilityIndex;
-            int ctrlGroupIndex;
+            int controlGroupIndex;
             if ((abilityIndex = AbilityButtonArray.KeyToAbilityIndex(e.KeyCode)) != -1)
             {
                 //select the ability
@@ -490,13 +490,13 @@ namespace SanguineGenesis.GUI
                     GameControls.SelectionInput.State==SelectionInputState.UNITS_SELECTED)
                     GameControls.SelectedGroup.KeepSelected(EntityButtonArray.Selected.EntityType);
             }
-            else if ((ctrlGroupIndex = ControlGroupButtonArray.KeyToGroupIndex(e.KeyCode)) != -1)
+            else if ((controlGroupIndex = ControlGroupButtonArray.KeyToGroupIndex(e.KeyCode)) != -1)
             {
                 //modify control groups
                 if (e.Control)
                 {
                     //saves selected entities to the group
-                    ControlGroupButtonArray.SaveGroupWithIndex(ctrlGroupIndex);
+                    ControlGroupButtonArray.SaveGroupWithIndex(controlGroupIndex);
                 }
                 else if (GameControls.SelectionInput.State == SelectionInputState.IDLE ||
                     GameControls.SelectionInput.State == SelectionInputState.UNITS_SELECTED)
@@ -505,7 +505,7 @@ namespace SanguineGenesis.GUI
                     if (e.Shift)
                         GameControls.SelectedGroup.NextOperation = Operation.ADD;
 
-                    ControlGroupButtonArray.LoadGroupWithIndex(ctrlGroupIndex);
+                    ControlGroupButtonArray.LoadGroupWithIndex(controlGroupIndex);
 
                 }
             }

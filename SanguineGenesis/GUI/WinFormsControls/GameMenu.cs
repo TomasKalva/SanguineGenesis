@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SanguineGenesis.GUI.WinFormsComponents
+namespace SanguineGenesis.GUI.WinFormsControls
 {
     /// <summary>
     /// Contains buttons for closing the game and opening options menu.

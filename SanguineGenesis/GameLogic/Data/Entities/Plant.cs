@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GUI;
-using SanguineGenesis.GUI.WinFormsComponents;
+using SanguineGenesis.GUI.WinFormsControls;
 
 namespace SanguineGenesis.GameLogic.Data.Entities
 {

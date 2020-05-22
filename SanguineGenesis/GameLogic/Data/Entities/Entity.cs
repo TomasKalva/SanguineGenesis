@@ -11,7 +11,7 @@ using SanguineGenesis.GameLogic.Data.Statuses;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
 using SanguineGenesis.GUI;
-using SanguineGenesis.GUI.WinFormsComponents;
+using SanguineGenesis.GUI.WinFormsControls;
 
 namespace SanguineGenesis.GameLogic.Data.Entities
 {

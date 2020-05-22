@@ -10,7 +10,7 @@ using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Data.Statuses;
 
-namespace SanguineGenesis.GUI.WinFormsComponents
+namespace SanguineGenesis.GUI.WinFormsControls
 {
     /// <summary>
     /// Shows info about entity.

@@ -8,7 +8,7 @@ using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 using SanguineGenesis.GUI;
-using SanguineGenesis.GUI.WinFormsComponents;
+using SanguineGenesis.GUI.WinFormsControls;
 
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {

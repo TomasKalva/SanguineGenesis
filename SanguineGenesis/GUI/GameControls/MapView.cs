@@ -16,11 +16,11 @@ namespace SanguineGenesis.GameControls
     class MapView:IRectangle
     {
         /// <summary>
-        /// Width of the component this view is drawn to.
+        /// Width of the control this view is drawn to.
         /// </summary>
         private float actualWidth;
         /// <summary>
-        /// Height of the component this view is drawn to.
+        /// Height of the control this view is drawn to.
         /// </summary>
         private float actualHeight;
         /// <summary>
@@ -136,7 +136,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Sets extents of the component this MapView is drawn to.
+        /// Sets extents of the control this MapView is drawn to.
         /// </summary>
         public void SetActualExtents(float width, float height)
         {

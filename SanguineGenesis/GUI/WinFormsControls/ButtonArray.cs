@@ -14,9 +14,9 @@ using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Data.Statuses;
 using SanguineGenesis.GUI;
-using SanguineGenesis.GUI.WinFormsComponents;
+using SanguineGenesis.GUI.WinFormsControls;
 
-namespace SanguineGenesis.GUI.WinFormsComponents
+namespace SanguineGenesis.GUI.WinFormsControls
 {
     /// <summary>
     /// Parent of ButtonArray<T>, contains icons for buttons.
@@ -574,7 +574,6 @@ namespace SanguineGenesis.GUI.WinFormsComponents
             }
         }
     }
-
 
     interface IShowable
     {

@@ -1,5 +1,5 @@
 ﻿using SanguineGenesis.GameLogic;
-using SanguineGenesis.GUI.WinFormsComponents;
+using SanguineGenesis.GUI.WinFormsControls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

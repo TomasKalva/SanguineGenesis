@@ -36,8 +36,8 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private Dictionary<string, Animation> entitiesAnimations;
         /// <summary>
-        /// For each number 0-9 contains corresponding glyph. At the index
-        /// -1 is glyph for '.'.
+        /// For each digit 0-9 contains corresponding symbol. At the index
+        /// 10 is symbol for '.', 11 is '/'.
         /// </summary>
         private Dictionary<int, Rect> digits;
         /// <summary>

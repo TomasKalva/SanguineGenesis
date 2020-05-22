@@ -124,12 +124,12 @@ namespace SanguineGenesis.GameLogic
         {
             float deltaT = gameTime.DeltaT;
 
-            //ai
+            //AI
             foreach (var p in Players.Values)
                 if (p.AI != null)
                     p.AI.Play(deltaT, this);
 
-            gameTime.PrintTime("Others");
+            gameTime.PrintTime("AI");
 
             //update players' visibility map
             VisibilityUpdate();
@@ -143,16 +143,17 @@ namespace SanguineGenesis.GameLogic
             {
                 e.StepStatuses(this, deltaT);
             }
-            
+
             // add suffocating status to animals on wrong terrain
-            foreach(Animal a in GetAll<Animal>())
+            var suffocFact = GameData.Statuses.SuffocatingFactory;
+            foreach (Animal a in GetAll<Animal>())
             {
                 int x = (int)a.Position.X;
                 int y = (int)a.Position.Y;
                 var n = Map[x, y];
                 if (n!=null && !a.CanMoveOn(n.Terrain))
                 {
-                    GameData.Statuses.SuffocatingFactory.ApplyToAffected(a);
+                    suffocFact.ApplyToAffected(a);
                 }
             }
 
@@ -181,13 +182,12 @@ namespace SanguineGenesis.GameLogic
                 a.Move(Map, deltaT);
             }
 
-            gameTime.PrintTime("Ingame update");
+            //remove dead entities
+            foreach (var kvp in Players)
+                kvp.Value.RemoveDeadEntities(this);
+            NeutralFaction.RemoveDeadEntities(this);
 
-            //collisions
-            Collisions.ResolveCollisions(this);
-            Collisions.PushAllOutOfObstacles(GetAll<Animal>());
-
-            gameTime.PrintTime("Collisions");
+            gameTime.PrintTime("Entities update");
 
             //attack nearby enemy if idle
             foreach (Animal a in GetAll<Animal>())
@@ -196,6 +196,7 @@ namespace SanguineGenesis.GameLogic
                 {
                     //animal isn't doing anything
                     var opposite = a.Faction.FactionID.Opposite();
+                    //find enemy in attack range
                     Entity en = Players[opposite].GetAll<Animal>().Where((v) => a.DistanceTo(v) < a.AttackDistance && a.Faction.CanSee(v)).FirstOrDefault();
                     if(en!=null)
                         a.CommandQueue.Enqueue(GameData.Abilities.Attack.NewCommand(a, en));
@@ -204,13 +205,16 @@ namespace SanguineGenesis.GameLogic
 
             gameTime.PrintTime("Finding target");
 
-            //remove dead units
-            foreach (var kvp in Players)
-                kvp.Value.RemoveDeadEntities(this);
-            NeutralFaction.RemoveDeadEntities(this);
+            //collisions
+            Collisions.ResolveCollisions(this);
+            Collisions.PushAllOutOfObstacles(GetAll<Animal>());
+
+            gameTime.PrintTime("Collisions");
 
             //set and refresh movement commands
             MovementGeneratorInteraction();
+
+            gameTime.PrintTime("Movement");
 
             //generate and drain nutrients by plants
             Map.UpdateNutrientsMap(GetAll<Plant>(), deltaT);
@@ -224,7 +228,7 @@ namespace SanguineGenesis.GameLogic
                     Winner = FactionType.PLAYER0;
             }
 
-            gameTime.PrintTime("Others2");
+            gameTime.PrintTime("Nutrients");
         }
 
         /// <summary>

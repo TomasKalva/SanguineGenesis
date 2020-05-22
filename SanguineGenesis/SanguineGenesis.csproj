@@ -127,7 +127,7 @@
     <Compile Include="GUI\GameWindow.Designer.cs">
       <DependentUpon>GameWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\WinFormsComponents\AdditionalInfo.cs">
+    <Compile Include="GUI\WinFormsControls\AdditionalInfo.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GameLogic\Maps\MovementGenerating\FlowField.cs" />
@@ -135,13 +135,13 @@
     <Compile Include="GameLogic\GameQuerying.cs" />
     <Compile Include="GUI\GameControls\SelectedGroup.cs" />
     <Compile Include="GameLogic\Data\Abilities\Command.cs" />
-    <Compile Include="GUI\WinFormsComponents\ButtonArray.cs">
+    <Compile Include="GUI\WinFormsControls\ButtonArray.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GUI\WinFormsComponents\EntityInfoPanel.cs">
+    <Compile Include="GUI\WinFormsControls\EntityInfoPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GUI\WinFormsComponents\GameOptionsMenu.cs">
+    <Compile Include="GUI\WinFormsControls\GameOptionsMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GUI\IRectangle.cs" />
@@ -159,11 +159,11 @@
     <Compile Include="GUI\GameControls\SelectionInput.cs" />
     <Compile Include="GameLogic\Terrain.cs" />
     <Compile Include="GameLogic\Data\Entities\Entity.cs" />
-    <Compile Include="GUI\WinFormsComponents\GameMenu.cs">
+    <Compile Include="GUI\WinFormsControls\GameMenu.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GUI\Icons.cs" />
-    <Compile Include="GUI\WinFormsComponents\PlayerPropertiesPanel.cs">
+    <Compile Include="GUI\WinFormsControls\PlayerPropertiesPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="GameLogic\Game.cs" />
@@ -171,10 +171,10 @@
   <ItemGroup>
     <Compile Include="GameLogic\Maps\Map.cs" />
     <Compile Include="GameLogic\Node.cs" />
-    <Compile Include="GUI\WinFormsComponents\StatsTable.cs">
+    <Compile Include="GUI\WinFormsControls\StatsTable.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GUI\WinFormsComponents\VictoryPanel.cs">
+    <Compile Include="GUI\WinFormsControls\VictoryPanel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />

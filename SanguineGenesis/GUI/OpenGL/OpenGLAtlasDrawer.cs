@@ -28,7 +28,7 @@ namespace SanguineGenesis.GUI
     /// </summary>
     static class OpenGLAtlasDrawer
     {
-        //the projection, view and model matrices.
+        //the projection matrix
         private static mat4 projectionMatrix;
 
         //vertex shader attribute indices
