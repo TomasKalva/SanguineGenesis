@@ -96,7 +96,7 @@ namespace SanguineGenesis.GUI
             gl.Enable(OpenGL.GL_BLEND);
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
             //loads the texture to gl
-            LoadTexture("Images/bigTileMap.png", gl, shaderProgram);
+            LoadTexture("Images/atlas.png", gl, shaderProgram);
 
             //depth testing is not needed for drawing 2d images
             gl.Disable(OpenGL.GL_DEPTH);
