@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Atlas xmlns="http://tempuri.org/XMLAtlasSchema1.xsd">
+<Atlas xmlns="http://tempuri.org/XMLAtlasSchema.xsd">
   <Entities>
     <Entity EntityType="NO_ENTITY">
       <Animation Action="NO_ACTION" CenterX="0.5" CenterY="0.2">

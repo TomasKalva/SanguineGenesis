@@ -76,7 +76,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
             //animal spawn
             animalSpawn = new Dictionary<string, Spawn>();
-            foreach (var animalFac in gameStaticData.AnimalFactories.Factorys)
+            foreach (var animalFac in gameStaticData.AnimalFactories.FactoryMap)
             {
                 Spawn spawn = new Spawn(animalFac.Value);
                 spawn.SetAbilities(this);
@@ -85,7 +85,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
             //animal create
             animalCreate = new Dictionary<string, CreateAnimal>();
-            foreach (var animalFac in gameStaticData.AnimalFactories.Factorys)
+            foreach (var animalFac in gameStaticData.AnimalFactories.FactoryMap)
             {
                 CreateAnimal createUnit = new CreateAnimal(animalFac.Value);
                 createUnit.SetAbilities(this);
@@ -94,13 +94,13 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
             //build buiding
             buildBuilding = new Dictionary<string, BuildBuilding>();
-            foreach (var plantFac in gameStaticData.PlantFactories.Factorys)
+            foreach (var plantFac in gameStaticData.PlantFactories.FactoryMap)
             {
                 BuildBuilding plant = new BuildBuilding(plantFac.Value);
                 plant.SetAbilities(this);
                 buildBuilding.Add(plantFac.Value.EntityType, plant);
             }
-            foreach (var structureFac in gameStaticData.StructureFactories.Factorys)
+            foreach (var structureFac in gameStaticData.StructureFactories.FactoryMap)
             {
                 BuildBuilding plant = new BuildBuilding(structureFac.Value);
                 plant.SetAbilities(this);

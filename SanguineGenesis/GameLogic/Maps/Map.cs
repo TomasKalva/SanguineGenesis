@@ -163,7 +163,6 @@ namespace SanguineGenesis.GameLogic.Maps
                             return false;
                     }
 
-
                 return true;
             }
             else

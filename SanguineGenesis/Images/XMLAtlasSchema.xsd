@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="XMLAtlasSchema1"
-    targetNamespace="http://tempuri.org/XMLAtlasSchema1.xsd"
+<xs:schema id="XMLAtlasSchema"
+    targetNamespace="http://tempuri.org/XMLAtlasSchema.xsd"
     elementFormDefault="qualified"
-    xmlns="http://tempuri.org/XMLAtlasSchema1.xsd"
-    xmlns:mstns="http://tempuri.org/XMLAtlasSchema1.xsd"
+    xmlns="http://tempuri.org/XMLAtlasSchema.xsd"
+    xmlns:mstns="http://tempuri.org/XMLAtlasSchema.xsd"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
   <xs:element name='Atlas'>

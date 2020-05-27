@@ -124,10 +124,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             Animation anim = AnimationState.Animation;
             return new Rect(
-                Math.Min(Center.X - Radius, Center.X - anim.LeftBottom.X),
-                Math.Min(Center.Y - Radius, Center.Y - anim.LeftBottom.Y),
-                Math.Max(Center.X + Radius, Center.X - anim.LeftBottom.X + anim.Width),
-                Math.Max(Center.Y + Radius, Center.Y - anim.LeftBottom.Y + anim.Height));
+                Math.Min(Center.X - Radius, Center.X - anim.Center.X),
+                Math.Min(Center.Y - Radius, Center.Y - anim.Center.Y),
+                Math.Max(Center.X + Radius, Center.X - anim.Center.X + anim.Width),
+                Math.Max(Center.Y + Radius, Center.Y - anim.Center.Y + anim.Height));
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public void SetAnimation(string action)
         {
-            AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetAnimation(EntityType, action));
+            AnimationState = new AnimationState(ImageAtlas.GetImageAtlas.GetEntityAnimation(EntityType, action));
         }
         #endregion Animation
         

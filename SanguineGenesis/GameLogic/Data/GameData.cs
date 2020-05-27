@@ -23,11 +23,11 @@ namespace SanguineGenesis.GameLogic.Data
             Statuses = new Statuses.Statuses();
 
             StructureFactories = new StructureFactories();
-            StructureFactories.InitFactorys("GameLogic/Data/Entities/Structures.csv", Statuses);
+            StructureFactories.InitFactoryMap("GameLogic/Data/Entities/Structures.csv", Statuses);
             PlantFactories = new PlantFactories();
-            PlantFactories.InitFactorys("GameLogic/Data/Entities/Plants.csv", Statuses);
+            PlantFactories.InitFactoryMap("GameLogic/Data/Entities/Plants.csv", Statuses);
             AnimalFactories = new AnimalFactories();
-            AnimalFactories.InitFactorys("GameLogic/Data/Entities/Animals.csv", Statuses);
+            AnimalFactories.InitFactoryMap("GameLogic/Data/Entities/Animals.csv", Statuses);
 
             Abilities = new Abilities.Abilities(this);
 

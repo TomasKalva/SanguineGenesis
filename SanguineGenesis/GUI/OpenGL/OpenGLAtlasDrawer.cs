@@ -4,22 +4,14 @@ using SharpGL.Shaders;
 using SharpGL.VertexBuffers;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
 using SanguineGenesis.GameLogic;
-using SanguineGenesis.GameLogic.Maps;
-using SanguineGenesis.GUI;
 using SanguineGenesis.GameControls;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps.MovementGenerating;
-using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
 
 namespace SanguineGenesis.GUI
 {
@@ -40,6 +32,21 @@ namespace SanguineGenesis.GUI
         static private ShaderProgram shaderProgram;
 
         static private uint[] textureIds;
+
+        //vertex buffer arrays which contain the buffers for vertex, 
+        //texture and bottom left coordinates of textures
+        private static MyBufferArray map;
+        private static MyBufferArray flowField;
+        private static MyBufferArray nutrientsMap;
+        private static MyBufferArray entityCircles;
+        private static MyBufferArray entities;
+        private static MyBufferArray entityIndicators;
+        private static MyBufferArray selectionFrame;
+
+        //true if there are no entities to draw
+        private static bool entitiesEmpty;
+        //true if there are no entity indicators to draw
+        private static bool entityIndicatorsEmpty;
 
         #region Initialization
 
@@ -62,29 +69,27 @@ namespace SanguineGenesis.GUI
                 fragmentShaderSource = fragReader.ReadToEnd();
             }
             shaderProgram.Create(gl, vertexShaderSource, fragmentShaderSource, null);
-            
-
-            //set indices for the shader program attributes
             shaderProgram.BindAttributeLocation(gl, attributeIndexPosition, "in_Position");
             shaderProgram.BindAttributeLocation(gl, attributeIndexUVCoord, "in_TexCoord");
             shaderProgram.BindAttributeLocation(gl, attributeIndexTexBL, "in_TexLeftBottomWidthHeight");
-
-            //compile the program
             shaderProgram.AssertValid(gl);
 
             //create projection matrix that maps points directly to screen coordinates
             projectionMatrix = glm.ortho(0f, width, 0f, height, 0f, 100f);
-
-            //load image used as atlas and pass it to the shader program
-            InitializeAtlas(gl, shaderProgram);
             
             //bind the shader program and set its parameters
             shaderProgram.Bind(gl);
             shaderProgram.SetUniformMatrix4(gl, "projectionMatrix", projectionMatrix.to_array());
+
+            //load image used as atlas and pass it to the shader program
+            InitializeAtlas(gl, shaderProgram);
+
+            //initializes MyBufferArrays for map, entities and selector frame
+            InitMyBufferArrays(gl);
         }
 
         /// <summary>
-        /// Loads the tile map texture, binds it and sets texture drawing parameters.
+        /// Loads the atlas texture, binds it and sets texture drawing parameters.
         /// </summary>
         /// <param name="gl">The OpenGL instance.</param>
         private static void InitializeAtlas(OpenGL gl, ShaderProgram shaderProgram)
@@ -97,9 +102,6 @@ namespace SanguineGenesis.GUI
             gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
             //loads the texture to gl
             LoadTexture("Images/atlas.png", gl, shaderProgram);
-
-            //depth testing is not needed for drawing 2d images
-            gl.Disable(OpenGL.GL_DEPTH);
 
             //set linear filtering
             gl.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR);
@@ -118,7 +120,6 @@ namespace SanguineGenesis.GUI
             textureImage.RotateFlip(RotateFlipType.RotateNoneFlipY);
 
             //generate id for the texture and then bind the image with this id
-            //uint[] textureIds = new uint[1];
             textureIds = new uint[1];
             gl.GenTextures(1, textureIds);
             gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[0]);
@@ -136,12 +137,24 @@ namespace SanguineGenesis.GUI
             gl.BindTexture(OpenGL.GL_TEXTURE_2D, textureIds[0]);
         }
 
-        #endregion Initialization
+        /// <summary>
+        /// Initializes MyBufferArrays for map, entities and selector frame.
+        /// </summary>
+        private static void InitMyBufferArrays(OpenGL gl)
+        {
+            map = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            nutrientsMap = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
+            entityCircles = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            entities = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            entityIndicators = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            flowField = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
+            selectionFrame = new MyBufferArray(gl, CreateSquareUVCoordinates);
+        }
 
         /// <summary>
         /// Destructs all buffers and programs created in gl.
         /// </summary>
-        public static void Destruct(OpenGL gl) 
+        public static void Destruct(OpenGL gl)
         {
             //delete shader program
             shaderProgram.Delete(gl);
@@ -154,87 +167,37 @@ namespace SanguineGenesis.GUI
             entityIndicators.Dispose(gl);
             selectionFrame.Dispose(gl);
             //delete textures
-            if(textureIds!=null)
+            if (textureIds != null)
                 gl.DeleteTextures(textureIds.Length, textureIds);
         }
-
-        /// <summary>
-        /// Draws the scene.
-        /// </summary>
-        /// <param name="gl">The OpenGL instance.</param>
-        public static void Draw(OpenGL gl, GameplayOptions gameplayOptions)
-        {
-            //clear the scene
-            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT | OpenGL.GL_STENCIL_BUFFER_BIT);
-
-            //draw vertex array buffers
-            
-            //draw map
-            map.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_QUADS, 0, map.VertexCount);
-            
-            //draw nutrients map
-            if (gameplayOptions.NutrientsVisible)
-            {
-                nutrientsMap.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, nutrientsMap.VertexCount);
-            }
-
-            //draw flowfield
-            if (gameplayOptions.ShowFlowfield)
-            {
-                flowField.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, flowField.VertexCount);
-            }
-
-            //draw entities
-            if (!entitiesEmpty)
-            {
-                entityCircles.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_QUADS, 0, entityCircles.VertexCount);
-
-                entities.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_QUADS, 0, entities.VertexCount);
-            }
-            if (!entityIndicatorsEmpty) 
-            { 
-                entityIndicators.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_QUADS, 0, entityIndicators.VertexCount);
-            }
-            
-            //draw selection frame
-            selectionFrame.VertexBufferArray.Bind(gl);
-            gl.DrawArrays(OpenGL.GL_QUADS, 0, 4);
-            
-        }
-
+        #endregion Initialization
 
         /// <summary>
         /// Represents data that can be drawn by the shader program.
         /// </summary>
         private class MyBufferArray
         {
-            public VertexBufferArray VertexBufferArray { get; set; }
-            public VertexBuffer VertexDataBuffer { get; set; }
-            public VertexBuffer UVDataBuffer { get; set; }
-            public VertexBuffer TexAtlasDataBuffer { get; set; }
-
-            /// <summary>
-            /// Fills the array with uv textures when it is created or resized.
-            /// </summary>
-            public delegate float[] UVFiller(int size);
-            public UVFiller UvFiller { get; }
+            public VertexBufferArray VertexBufferArray { get; }
+            public VertexBuffer VertexDataBuffer { get; }
+            public VertexBuffer UVDataBuffer { get; }
+            public VertexBuffer TexAtlasDataBuffer { get; }
 
             public float[] vertices;
             public float[] uv;
             public float[] texAtlas;
 
             /// <summary>
+            /// Creates new array with UV coordinates with given length.
+            /// </summary>
+            public delegate float[] UVCreator(int size);
+            public UVCreator UvCreator { get; }
+
+            /// <summary>
             /// True if the buffers contains no data.
             /// </summary>
             public bool Clear { get; private set; }
 
-            public MyBufferArray(OpenGL gl, UVFiller uvFiller)
+            public MyBufferArray(OpenGL gl, UVCreator uvCreator)
             {
                 //initialize VertexBufferArray and link it to its VertexBuffers
                 VertexBufferArray = new VertexBufferArray();
@@ -260,7 +223,7 @@ namespace SanguineGenesis.GUI
                 uv = new float[0];
                 texAtlas = new float[0];
 
-                UvFiller = uvFiller;
+                UvCreator = uvCreator;
             }
 
             /// <summary>
@@ -274,7 +237,6 @@ namespace SanguineGenesis.GUI
 
                 VertexDataBuffer.Bind(gl);
                 VertexDataBuffer.SetData(gl, attributeIndexPosition, vValues, false, vStride);
-                VertexDataBuffer.Unbind(gl);
 
                 UVDataBuffer.Bind(gl);
                 UVDataBuffer.SetData(gl, attributeIndexUVCoord, uvValues, false, uvStride);
@@ -303,8 +265,6 @@ namespace SanguineGenesis.GUI
                 TexAtlasDataBuffer.SetData(gl, attributeIndexTexBL, aValues, false, aStride);
 
                 VertexBufferArray.Unbind(gl);
-
-                Clear = false;
             }
 
             /// <summary>
@@ -315,6 +275,7 @@ namespace SanguineGenesis.GUI
                 InitArray(ref vertices, verticesSize);
                 InitUV(gl, ref uv, uvSize);
                 InitArray(ref texAtlas, texAtlasSize);
+                Clear = false;
             }
 
             /// <summary>
@@ -329,13 +290,13 @@ namespace SanguineGenesis.GUI
             }
 
             /// <summary>
-            /// Sets uv coordinates by UvFiller if UVDataBuffer is too small or it was Cleared.
+            /// Sets uv coordinates by UvCreator if UVDataBuffer is too small or it was Cleared.
             /// </summary>
             private void InitUV(OpenGL gl, ref float[] uvArray, int uvSize)
             {
                 if (uv.Length < uvSize || Clear)
                 {
-                    uvArray = UvFiller(uvSize);
+                    uvArray = UvCreator(uvSize);
                     VertexBufferArray.Bind(gl);
                     UVDataBuffer.Bind(gl);
                     UVDataBuffer.SetData(gl, attributeIndexUVCoord, uvArray, false, 2/*uv stride*/);
@@ -343,7 +304,11 @@ namespace SanguineGenesis.GUI
                 }
             }
 
-            public int VertexCount => vertices == null ? 0 : vertices.Length / 3;
+            /// <summary>
+            /// Number of vertices. Each vertex is defined by three consecutive floats in
+            /// the array vertices.
+            /// </summary>
+            public int VerticesCount => vertices == null ? 0 : vertices.Length / 3;
 
             public void ClearBuffers(OpenGL gl)
             {
@@ -370,31 +335,59 @@ namespace SanguineGenesis.GUI
             }
         }
 
-        //vertex buffer arrays which contain the buffers for vertex, 
-        //texture and bottom left coordinates of textures
-        private static MyBufferArray map;
-        private static MyBufferArray flowField;
-        private static MyBufferArray nutrientsMap;
-        private static MyBufferArray entityCircles;
-        private static MyBufferArray entities;
-        private static MyBufferArray entityIndicators;
-        private static MyBufferArray selectionFrame;
-
-        //true if there are no entities to draw
-        private static bool entitiesEmpty;
-        //true if there are no entity indicators to draw
-        private static bool entityIndicatorsEmpty;
-
-        #region Map
         /// <summary>
-        /// Creates vertex buffer array and its buffers for gl.
+        /// Draws the scene.
         /// </summary>
-        /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateMap(OpenGL gl)
+        /// <param name="gl">The OpenGL instance.</param>
+        public static void Draw(OpenGL gl, GameplayOptions gameplayOptions)
         {
-            map = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            //clear the scene
+            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+
+            //draw vertex array buffers
+            {
+                //draw map
+                map.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_QUADS, 0, map.VerticesCount);
+
+                //draw nutrients map
+                if (gameplayOptions.NutrientsVisible)
+                {
+                    nutrientsMap.VertexBufferArray.Bind(gl);
+                    gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, nutrientsMap.VerticesCount);
+                }
+
+                //draw flowfield
+                if (gameplayOptions.ShowFlowfield)
+                {
+                    flowField.VertexBufferArray.Bind(gl);
+                    gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, flowField.VerticesCount);
+                }
+
+                //draw entities
+                if (!entitiesEmpty)
+                {
+                    entityCircles.VertexBufferArray.Bind(gl);
+                    gl.DrawArrays(OpenGL.GL_QUADS, 0, entityCircles.VerticesCount);
+
+                    entities.VertexBufferArray.Bind(gl);
+                    gl.DrawArrays(OpenGL.GL_QUADS, 0, entities.VerticesCount);
+                }
+                if (!entityIndicatorsEmpty)
+                {
+                    entityIndicators.VertexBufferArray.Bind(gl);
+                    gl.DrawArrays(OpenGL.GL_QUADS, 0, entityIndicators.VerticesCount);
+                }
+
+                //draw selection frame
+                selectionFrame.VertexBufferArray.Bind(gl);
+                gl.DrawArrays(OpenGL.GL_QUADS, 0, 4);
+            }
         }
 
+        #region Updates
+        
+        #region Map
         /// <summary>
         /// Updates buffers of vertexArrayBuffer with the information about the map
         /// from mapView.
@@ -444,7 +437,7 @@ namespace SanguineGenesis.GUI
                     if (visibleVisibility != null)
                         isVisible = visibleVisibility[i, j];
                     
-                    Rect atlasCoords = ImageAtlas.GetImageAtlas.GetTileCoords(current.Biome,current.SoilQuality,current.Terrain, isVisible);
+                    Rect atlasCoords = ImageAtlas.GetImageAtlas.GetNodeTexture(current.Biome,current.SoilQuality,current.Terrain, isVisible);
 
                     //tile position
                     float bottom = (current.Y - viewBottom) * sqH;
@@ -464,18 +457,9 @@ namespace SanguineGenesis.GUI
 
         #region Nutrients map
         /// <summary>
-        /// Creates vertex buffer array and its buffers for gl.
-        /// </summary>
-        /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateNutrientsMap(OpenGL gl)
-        {
-            nutrientsMap = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
-        }
-
-        /// <summary>
         /// Clears all buffers representing nutrients map.
         /// </summary>
-        public static void TryClearNutrientsMapDataBuffers(OpenGL gl)
+        public static void ClearNutrientsMapDataBuffers(OpenGL gl)
         {
             if (!nutrientsMap.Clear)
                 nutrientsMap.ClearBuffers(gl);
@@ -551,17 +535,135 @@ namespace SanguineGenesis.GUI
         }
 
         #endregion Nutrients map
-        
-        #region Entity circles
+
+        #region Flowfield
         /// <summary>
-        /// Creates vertex buffer array and its buffers for gl.
+        /// Clears all buffers representing flow map.
         /// </summary>
-        /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateUnitCircles(OpenGL gl)
+        public static void ClearFlowFieldDataBuffers(OpenGL gl)
         {
-            entityCircles = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            if (!flowField.Clear)
+                flowField.ClearBuffers(gl);
         }
 
+        /// <summary>
+        /// Updates buffers of vertexArrayBuffer with the information about the flow map
+        /// from mapView.
+        /// </summary>
+        /// <param name="gl">Instance of OpenGL.</param>
+        /// <param name="mapView">Map view describing the map.</param>
+        public static void UpdateFlowFieldDataBuffers(OpenGL gl, MapView mapView, FlowField flowfield)
+        {
+            //prepare data
+            float nodeSize = mapView.NodeSize;
+            float viewLeft = mapView.Left;
+            float viewBottom = mapView.Bottom;
+            float?[,] flowF = mapView.GetVisibleFlowField(flowfield);
+            int width = flowF.GetLength(0);
+            int height = flowF.GetLength(1);
+
+            int vertPerObj = 3;
+
+            //extents of one rectangle
+            float sqW = nodeSize;
+            float sqH = nodeSize;
+
+            int verticesPerOne = width * height * vertPerObj;
+            int verticesSize = verticesPerOne * 3;
+            int uvSize = verticesPerOne * 2;
+            int textureAtlasSize = verticesPerOne * 4;
+
+            flowField.InitializeArrays(gl, verticesSize, uvSize, textureAtlasSize);
+            float[] vertices = flowField.vertices;
+            float[] texAtlas = flowField.texAtlas;
+
+            //triangle
+            vec2 triLB = new vec2(-0.25f, -0.15f);
+            vec2 triLT = new vec2(-0.25f, 0.15f);
+            vec2 triRM = new vec2(0.25f, 0f);
+            vec2 triOffset = new vec2(0.5f, 0.5f);
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    //buffer indices
+                    int coord = (i + j * width) * vertPerObj * 3;
+                    int bottomLeftInd = (i + j * width) * vertPerObj * 4;
+
+
+                    vec2 leftBottom = new vec2((i - (viewLeft % 1)), (j - (viewBottom % 1)));
+                    vec2 squareExt = new vec2(sqW, sqH);
+
+                    //geometry of the triangle
+                    int offset = 0;
+                    if (flowF[i, j] == null)
+                    {
+                        //no triangle
+                        vertices[coord + 0] = vertices[coord + 1] = vertices[coord + 2]
+                            = vertices[coord + 3] = vertices[coord + 4] = vertices[coord + 5] = 0;
+                    }
+                    else
+                    {
+                        float angle = flowF[i, j].Value;
+
+                        vec2 rotTriLB;
+                        vec2 rotTriLT;
+                        vec2 rotTriRM;
+                        if (FlowField.PointToTarget(angle))
+                        {
+                            //triangle that represents that the animal should move directly to the target
+                            rotTriLB = (new vec2(-0.2f, 0.15f) + triOffset + leftBottom) * squareExt;
+                            rotTriLT = (new vec2(0.2f, 0.15f) + triOffset + leftBottom) * squareExt;
+                            rotTriRM = (new vec2(0, -0.20f) + triOffset + leftBottom) * squareExt;
+                        }
+                        else
+                        {
+                            //rotates the point vec around the origin by angle
+                            vec2 Rotate(vec2 vec)
+                            {
+                                float cosA = (float)Math.Cos(angle);
+                                float sinA = (float)Math.Sin(angle);
+                                return new vec2(cosA * vec.x - sinA * vec.y,
+                                                sinA * vec.x + cosA * vec.y);
+                            }
+
+                            //rotated triangle coordinates
+                            rotTriLB = (Rotate(triLB) + triOffset + leftBottom) * squareExt;
+                            rotTriLT = (Rotate(triLT) + triOffset + leftBottom) * squareExt;
+                            rotTriRM = (Rotate(triRM) + triOffset + leftBottom) * squareExt;
+                        }
+                        //bottom left
+                        vertices[coord + offset + 0] = rotTriLB.x;
+                        vertices[coord + offset + 1] = rotTriLB.y;
+                        vertices[coord + offset + 2] = -9;
+
+                        offset += 3;
+
+                        //top left
+                        vertices[coord + offset + 0] = rotTriLT.x;
+                        vertices[coord + offset + 1] = rotTriLT.y;
+                        vertices[coord + offset + 2] = -9;
+
+                        offset += 3;
+
+                        //top right
+                        vertices[coord + offset + 0] = rotTriRM.x;
+                        vertices[coord + offset + 1] = rotTriRM.y;
+                        vertices[coord + offset + 2] = -9;
+                    }
+
+                    Rect atlasCoords = ImageAtlas.GetImageAtlas.BlackSquare;//the triangles are black
+                    SetAtlasCoordinates(texAtlas, atlasCoords, bottomLeftInd, vertPerObj);
+                }
+            }
+
+            flowField.BindData(gl, 3, vertices, 4, texAtlas);
+        }
+
+        #endregion Flowfield
+
+        #region Entity circles
         /// <summary>
         /// Updates buffers of vertexArrayBuffer with the information about the map
         /// from mapView.
@@ -577,7 +679,7 @@ namespace SanguineGenesis.GUI
 
             int vertPerObj = 4;
 
-            List<Entity> visEntity = mapView.GetVisibleEntities(game, game.CurrentPlayer);
+            List<Entity> visEntity = mapView.GetVisibleEntities(game, game.CurrentPlayer).ToList();
 
             //check if there are any entities to draw
             int size = visEntity.Count;
@@ -667,15 +769,6 @@ namespace SanguineGenesis.GUI
 
         #region Entity
         /// <summary>
-        /// Creates vertex buffer array and its buffers for gl.
-        /// </summary>
-        /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateEntities(OpenGL gl)
-        {
-            entities = new MyBufferArray(gl, CreateSquareUVCoordinates);
-        }
-
-        /// <summary>
         /// Updates buffers of vertexArrayBuffer with the information about the map
         /// from mapView.
         /// </summary>
@@ -691,7 +784,7 @@ namespace SanguineGenesis.GUI
 
             int vertPerObj = 4;
 
-            List<Entity> visEntities = mapView.GetVisibleEntities(game, game.CurrentPlayer);
+            List<Entity> visEntities = mapView.GetVisibleEntities(game, game.CurrentPlayer).ToList();
 
             //check if there are any entities to draw
             int size = visEntities.Count;
@@ -736,9 +829,9 @@ namespace SanguineGenesis.GUI
                     Animation anim = current.AnimationState.Animation;
 
                     //position of the center of the image
-                    Vector2 imageCenter = anim.LeftBottom;
+                    Vector2 imageCenter = anim.Center;
                     if (current is Animal && !((Animal)current).FacingLeft)
-                        imageCenter = new Vector2(anim.Width - anim.LeftBottom.X, anim.LeftBottom.Y);
+                        imageCenter = new Vector2(anim.Width - anim.Center.X, anim.Center.Y);
 
                     //image position
                     float bottom = (current.Center.Y - imageCenter.Y - viewBottom) * entitySize;
@@ -756,7 +849,7 @@ namespace SanguineGenesis.GUI
                     if(current is Animal && !((Animal)current).FacingLeft)
                         SetHorizFlipSquareTextureCoordinates(uv, texIndex);
                     else
-                       SetSquareTextureCoordinates(uv, texIndex);
+                        SetSquareTextureCoordinates(uv, texIndex);
 
                     //atlas coordinates
                     Rect entityImage = current.AnimationState.CurrentImage;
@@ -769,15 +862,6 @@ namespace SanguineGenesis.GUI
         #endregion Entity
 
         #region Entity indicators
-        /// <summary>
-        /// Creates vertex buffer array and its buffers for gl.
-        /// </summary>
-        /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateEntitiesIndicators(OpenGL gl)
-        {
-            entityIndicators = new MyBufferArray(gl, CreateSquareUVCoordinates);
-        }
-
         /// <summary>
         /// Updates buffers of vertexArrayBuffer with the information about the map
         /// from mapView.
@@ -797,7 +881,8 @@ namespace SanguineGenesis.GUI
             int vertPerObj = 4;
             int objInOne = 4;
 
-            //only show indicators for entities that player can directly see = are in visible area of map
+            //only show indicators for entities that player can directly see and don't have full
+            //health and energy
             List<Entity> visEntities = game.GetAll<Entity>().Where((e) => observer.CanSee(e))
                 .Where(e=>e.Health!=e.Health.MaxValue || e.Energy !=e.Energy.MaxValue).ToList();
 
@@ -844,8 +929,8 @@ namespace SanguineGenesis.GUI
                     Animation anim = current.AnimationState.Animation;
 
                     //rectangle
-                    float bottom = (current.Center.Y - anim.LeftBottom.Y - viewBottom + anim.Height) * unitSize;
-                    float top = (current.Center.Y - anim.LeftBottom.Y - viewBottom + anim.Height + indicatorHeight) * unitSize;
+                    float bottom = (current.Center.Y - anim.Center.Y - viewBottom + anim.Height) * unitSize;
+                    float top = (current.Center.Y - anim.Center.Y - viewBottom + anim.Height + indicatorHeight) * unitSize;
                     float left = (current.Center.X - indicatorWidth/2f - viewLeft) * unitSize;
                     float right = (current.Center.X + indicatorWidth/2f - viewLeft) * unitSize;
 
@@ -883,145 +968,8 @@ namespace SanguineGenesis.GUI
         }
 
         #endregion Entity indicators
-
-        #region Flowfield
-
-        /// <summary>
-        /// Creates vertex buffer array and its buffers for gl.
-        /// </summary>
-        /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateFlowField(OpenGL gl)
-        {
-            flowField = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
-        }
-
-        /// <summary>
-        /// Clears all buffers representing flow map.
-        /// </summary>
-        public static void TryClearFlowFieldDataBuffers(OpenGL gl)
-        {
-            if (!flowField.Clear)
-                flowField.ClearBuffers(gl);
-        }
-
-        /// <summary>
-        /// Updates buffers of vertexArrayBuffer with the information about the flow map
-        /// from mapView.
-        /// </summary>
-        /// <param name="gl">Instance of OpenGL.</param>
-        /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateFlowFieldDataBuffers(OpenGL gl, MapView mapView, FlowField flowfield)
-        {
-            //prepare data
-            float nodeSize = mapView.NodeSize;
-            float viewLeft = mapView.Left;
-            float viewBottom = mapView.Bottom;
-            float?[,] flowF = mapView.GetVisibleFlowField(flowfield);
-            int width = flowF.GetLength(0);
-            int height = flowF.GetLength(1);
-
-            int vertPerObj = 3;
-
-            //extents of one rectangle
-            float sqW = nodeSize;
-            float sqH = nodeSize;
-            
-            int verticesPerOne = width * height * vertPerObj;
-            int verticesSize = verticesPerOne * 3;
-            int uvSize = verticesPerOne * 2;
-            int textureAtlasSize = verticesPerOne * 4;
-
-            flowField.InitializeArrays(gl, verticesSize, uvSize, textureAtlasSize);
-            float[] vertices = flowField.vertices;
-            float[] texAtlas = flowField.texAtlas;
-
-            //triangle
-            vec2 triLB = new vec2(-0.25f, -0.15f);
-            vec2 triLT = new vec2(-0.25f, 0.15f);
-            vec2 triRM = new vec2(0.25f, 0f);
-            vec2 triOffset = new vec2(0.5f, 0.5f);
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    //buffer indices
-                    int coord = (i + j * width) * vertPerObj * 3;
-                    int bottomLeftInd = (i + j * width) * vertPerObj * 4;
-
-
-                    vec2 leftBottom =new vec2((i - (viewLeft % 1)), (j - (viewBottom % 1)));
-                    vec2 squareExt = new vec2(sqW, sqH);
-
-                    //geometry of the triangle
-                    int offset = 0;
-                    if (flowF[i, j] == null)
-                    {
-                        //no triangle
-                        vertices[coord + 0] = vertices[coord + 1] = vertices[coord + 2]
-                            = vertices[coord + 3] = vertices[coord + 4] = vertices[coord + 5] = 0;
-                    }
-                    else
-                    {
-                        float angle = flowF[i, j].Value;
-
-                        vec2 rotTriLB;
-                        vec2 rotTriLT;
-                        vec2 rotTriRM;
-                        if (FlowField.PointToTarget(angle))
-                        {
-                            //triangle that represents that the animal should move directly to the target
-                            rotTriLB = (new vec2(-0.2f, 0.15f) + triOffset + leftBottom) * squareExt;
-                            rotTriLT = (new vec2(0.2f, 0.15f) + triOffset + leftBottom) * squareExt;
-                            rotTriRM = (new vec2(0, -0.20f) + triOffset + leftBottom) * squareExt;
-                        }
-                        else
-                        {
-                            //rotated triangle coordinates
-                            rotTriLB = (Rotate(triLB, angle) + triOffset + leftBottom) * squareExt;
-                            rotTriLT = (Rotate(triLT, angle) + triOffset + leftBottom) * squareExt;
-                            rotTriRM = (Rotate(triRM, angle) + triOffset + leftBottom) * squareExt;
-                        }
-                        //bottom left
-                        vertices[coord + offset + 0] = rotTriLB.x;
-                        vertices[coord + offset + 1] = rotTriLB.y;
-                        vertices[coord + offset + 2] = -9;
-
-                        offset += 3;
-
-                        //top left
-                        vertices[coord + offset + 0] = rotTriLT.x;
-                        vertices[coord + offset + 1] = rotTriLT.y;
-                        vertices[coord + offset + 2] = -9;
-
-                        offset += 3;
-
-                        //top right
-                        vertices[coord + offset + 0] = rotTriRM.x;
-                        vertices[coord + offset + 1] = rotTriRM.y;
-                        vertices[coord + offset + 2] = -9;
-                    }
-                    
-                    Rect atlasCoords = ImageAtlas.GetImageAtlas.BlackSquare;//the triangles are black
-                    SetAtlasCoordinates(texAtlas, atlasCoords, bottomLeftInd, vertPerObj);
-                }
-            }
-
-            flowField.BindData(gl, 3, vertices, 4, texAtlas);
-        }
-
-        #endregion Flowfield
         
         #region Selection frame
-        /// <summary>
-        /// Creates vertex buffer array and its buffers for gl.
-        /// </summary>
-        /// <param name="gl">The instance of OpenGL.</param>
-        public static void CreateSelectionFrame(OpenGL gl)
-        {
-            selectionFrame = new MyBufferArray(gl, CreateSquareUVCoordinates);
-        }
-
         /// <summary>
         /// Updates buffers of vertexArrayBuffer with the information about the flow map
         /// from mapView.
@@ -1046,6 +994,7 @@ namespace SanguineGenesis.GUI
                 float top = selectorFrame.Top - viewBottom;
                 float left = selectorFrame.Left - viewLeft;
                 float right = selectorFrame.Right - viewLeft;
+
                 SetRectangleVertices(vertices, bottom * nodeSize, top * nodeSize,
                     left * nodeSize, right * nodeSize, -1f, 0);
                 Rect atlasCoords = ImageAtlas.GetImageAtlas.UnitsSelector;
@@ -1055,6 +1004,8 @@ namespace SanguineGenesis.GUI
             selectionFrame.BindData(gl, 3, vertices, 4, texBottomLeft);
         }
         #endregion Selection frame
+        
+        #endregion Updates
 
         #region Array writing methods
         /// <summary>
@@ -1336,16 +1287,5 @@ namespace SanguineGenesis.GUI
             SetAtlasCoordinates(texAtlas, image, aInd, 4);
         }
         #endregion Array writing methods
-
-        /// <summary>
-        /// Rotates the vector by the angle.
-        /// </summary>
-        private static vec2 Rotate(vec2 vec, float angle)
-        {
-            float cosA = (float)Math.Cos(angle);
-            float sinA = (float)Math.Sin(angle);
-            return new vec2(cosA * vec.x - sinA * vec.y,
-                            sinA * vec.x + cosA * vec.y);
-        }
     }
 }

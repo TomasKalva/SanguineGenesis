@@ -83,6 +83,8 @@ namespace SanguineGenesis.GameControls
             this.maxNodeSize = maxNodeSize;
         }
 
+        #region Data retrieval
+
         /// <summary>
         /// Returns sub-rectangle of the map visible by this MapView.
         /// Returns Node[0, 0] if actual extents haven't been set.
@@ -125,15 +127,18 @@ namespace SanguineGenesis.GameControls
         /// Returns all entities visible by this MapView and also visible by observer.
         /// Returns empty list if actual extents haven't been set.
         /// </summary>
-        public List<Entity> GetVisibleEntities(Game game, Player observer)
+        public IEnumerable<Entity> GetVisibleEntities(Game game, Player observer)
         {
             if (actualHeight == 0 || actualWidth == 0)
                 return new List<Entity>(); ;
 
             return GameQuerying
-                .SelectVisibleEntities(observer, game.GetAll<Entity>())
-                .ToList();
+                .SelectVisibleEntities(observer, game.GetAll<Entity>());
         }
+
+        #endregion Data retrieval
+
+        #region Position and zoom changing
 
         /// <summary>
         /// Sets extents of the control this MapView is drawn to.
@@ -207,7 +212,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Sets view position into the map.
+        /// Sets view position back into the map.
         /// </summary>
         public void CorrectPosition(Map map)
         {
@@ -220,6 +225,8 @@ namespace SanguineGenesis.GameControls
             if (Bottom < 0)
                 Bottom = 0;
         }
+
+        #endregion Position and zoom changing
 
         /// <summary>
         /// Finds map coordinates (relative to the size of one node) that

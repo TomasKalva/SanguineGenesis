@@ -14,7 +14,7 @@ using System.Xml.Schema;
 namespace SanguineGenesis.GUI
 {
     /// <summary>
-    /// Describes the contents of the tile map. All images are aligned to a square grid.
+    /// Describes the contents of the texture atlas. All images are aligned to a square grid.
     /// </summary>
     class ImageAtlas
     {
@@ -153,7 +153,7 @@ namespace SanguineGenesis.GUI
                                                      select el).First();
 
             InitializeDigitImages(elWithName("Digits"));
-            LoadEntitiesAnimations(elWithName("Entities"));
+            InitializeEntitiesAnimations(elWithName("Entities"));
             InitializeNumberedTriangles(elWithName("NumbersArray"));
             InitializeNodes(elWithName("Nodes"));
 
@@ -209,7 +209,7 @@ namespace SanguineGenesis.GUI
             {
                 int x = tableLeft + (i / width);
                 int y = tableTop - (i % height);
-                numberedTriangles[i] = ToRelative(GridToCoordinates(x, y, 1, 1));
+                numberedTriangles[i] = ToRelative(GridToPixels(x, y, 1, 1));
             }
         }
 
@@ -217,7 +217,7 @@ namespace SanguineGenesis.GUI
         /// Loads entities.
         /// </summary>
         /// <param name="animationDescriptionFileName">Element whose subelements are entities.</param>
-        private void LoadEntitiesAnimations(XElement entities)
+        private void InitializeEntitiesAnimations(XElement entities)
         {
             //iterate over all entities
             entitiesAnimations = new Dictionary<string, Animation>();
@@ -301,21 +301,21 @@ namespace SanguineGenesis.GUI
             float width = float.Parse(imageElement.Attribute("Width").Value, CultureInfo.InvariantCulture);
             float height = float.Parse(imageElement.Attribute("Height").Value, CultureInfo.InvariantCulture);
 
-            return ToRelative(GridToCoordinates(x, y, width, height));
+            return ToRelative(GridToPixels(x, y, width, height));
         }
 
         /// <summary>
         /// Creates new Animation for the entity with the given parameters and adds it to entitiesAnimations.
         /// </summary>
-        private void AddEntitiesAnimation(string animationName, string action, Vector2 leftBottom,float width, float height, List<float> animChangeTimes, List<Rect> images)
+        private void AddEntitiesAnimation(string animationName, string action, Vector2 center,float width, float height, List<float> animChangeTimes, List<Rect> images)
         {
-            entitiesAnimations.Add(animationName, new Animation(action, leftBottom,width, height, animChangeTimes, images));
+            entitiesAnimations.Add(animationName, new Animation(action, center,width, height, animChangeTimes, images));
         }
 
         /// <summary>
         /// Transforms coordinates of a rectangle in the grid to the coordinates in the atlas.
         /// </summary>
-        private Rect GridToCoordinates(float left, float bottom, float width, float height)
+        private Rect GridToPixels(float left, float bottom, float width, float height)
         {
             float l = (int)(left * TILE_SIZE) + 1;
             float b = (int)(bottom * TILE_SIZE) + 1;
@@ -339,7 +339,7 @@ namespace SanguineGenesis.GUI
         /// Get coordinates, where the image for the node is located in the atlas. Returns darker
         /// copy of the texture, if visible is false. The coordinates are relative to the atlas.
         /// </summary>
-        public Rect GetTileCoords(Biome biome, SoilQuality soilQuality, Terrain terrain, bool visible)
+        public Rect GetNodeTexture(Biome biome, SoilQuality soilQuality, Terrain terrain, bool visible)
         {
             if (nodeTextures.TryGetValue(new NodeDescription(biome, terrain, soilQuality, visible), out Rect value))
                 return value;
@@ -350,13 +350,13 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Get animation for the entity.
         /// </summary>
-        public Animation GetAnimation(string entityType, string action)
+        public Animation GetEntityAnimation(string entityType, string action)
         {
             string animationName = AnimationName(entityType, action);
             if (entitiesAnimations.TryGetValue(animationName, out Animation anim))
                 return anim;
             else
-                return GetAnimation("NO_ENTITY","NO_ACTION");
+                return GetEntityAnimation("NO_ENTITY","NO_ACTION");
         }
 
         /// <summary>
@@ -369,7 +369,7 @@ namespace SanguineGenesis.GUI
             if (digits.TryGetValue(digit, out Rect rect))
                 return rect;
             else
-                throw new ArgumentException(digit + " is not a valid glyph!");
+                return default;
         }
 
         /// <summary>
@@ -392,9 +392,9 @@ namespace SanguineGenesis.GUI
     class Animation
     {
         /// <summary>
-        /// Left bottom position in the atlas. In grid coordinates.
+        /// Center of the image (on the map). In grid coordinates.
         /// </summary>
-        public Vector2 LeftBottom { get; }
+        public Vector2 Center { get; }
         /// <summary>
         /// Rectangles describe position and extens of the images of animation in the atlas.
         /// In coordinates relative to the atlas extents.
@@ -425,15 +425,15 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Creates new animation.
         /// </summary>
-        /// <param name="leftBottom">Left bottom coordinate in the atlas.</param>
+        /// <param name="center">Left bottom coordinate in the atlas.</param>
         /// <param name="width">Width of the images in animation.</param>
         /// <param name="height">Height of the images in animation.</param>
         /// <param name="animChangeTimes">Time it takes to change images.</param>
         /// <param name="images">First two numbers represent left bottom position of the image, second two represent width and height.</param>
-        public Animation(string action, Vector2 leftBottom, float width, float height, List<float> animChangeTimes, List<Rect> images)
+        public Animation(string action, Vector2 center, float width, float height, List<float> animChangeTimes, List<Rect> images)
         {
             Action = action;
-            LeftBottom = leftBottom;
+            Center = center;
             Images = images;
             Width = width;
             Height = height;
@@ -453,7 +453,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Time the current image was shown for.
         /// </summary>
-        private float progress;
+        private float timeOfImage;
         /// <summary>
         /// Index of the current image.
         /// </summary>
@@ -467,7 +467,7 @@ namespace SanguineGenesis.GUI
         public AnimationState(Animation anim)
         {
             Animation = anim;
-            progress = 0;
+            timeOfImage = 0;
         }
 
         /// <summary>
@@ -475,11 +475,11 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public void Step(float deltaT)
         {
-            progress += deltaT;
-            if (progress >= Animation.ChangeTimes[image])
+            timeOfImage += deltaT;
+            if (timeOfImage >= Animation.ChangeTimes[image])
             {
                 //move to the next image
-                progress -= Animation.ChangeTimes[image];
+                timeOfImage -= Animation.ChangeTimes[image];
                 image = (image + 1) % Animation.Length;
             }
         }

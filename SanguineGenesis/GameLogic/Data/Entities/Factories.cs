@@ -20,7 +20,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// For each entity name created by Factory contains a factory that
         /// creates the entity.
         /// </summary>
-        public Dictionary<string, Factory> Factorys { get; }
+        public Dictionary<string, Factory> FactoryMap { get; }
         /// <summary>
         /// For each entity name contains list of ability names separated by ';' that
         /// this entity factory will parse.
@@ -29,7 +29,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
         public Factories()
         {
-            Factorys = new Dictionary<string, Factory>();
+            FactoryMap = new Dictionary<string, Factory>();
             abilitiesList = new Dictionary<string, string>();
         }
 
@@ -40,7 +40,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         {
             get
             {
-                if (Factorys.TryGetValue(entityType, out Factory factory))
+                if (FactoryMap.TryGetValue(entityType, out Factory factory))
                     return factory;
                 else
                     throw new ArgumentException("There is no "+ typeof(Factory)+" for " + entityType);
@@ -48,11 +48,11 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Load Factorys and abilities from the file.
+        /// Load FactoryMap and abilities from the file.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="statuses">Statuses that can be given to factories that require them.</param>
-        public void InitFactorys(string fileName, Statuses.Statuses statuses)
+        public void InitFactoryMap(string fileName, Statuses.Statuses statuses)
         {
             using (StreamReader fileReader = new StreamReader(fileName))
             {
@@ -66,7 +66,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Adds a new factory to the Factorys.
+        /// Adds a new factory to the FactoryMap.
         /// </summary>
         /// <param name="description">String that describes the factory's properties.</param>
         /// <param name="statuses">Statuses that can be given to the factory if it requires them.</param>
@@ -92,8 +92,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Uses abilitiesList to set abilities to the already created Factorys. Has to be called after
-        /// InitFactorys.
+        /// Uses abilitiesList to set abilities to the already created FactoryMap. Has to be called after
+        /// InitFactoryMap.
         /// </summary>
         public void InitAbilities(Abilities.Abilities abilities)
         {
@@ -237,7 +237,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
             PlantFactory newFactory = new PlantFactory(plantType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
                 biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, rootsDistance, air, statusFactories);
-            Factorys.Add(plantType, newFactory);
+            FactoryMap.Add(plantType, newFactory);
             abilitiesList.Add(plantType, fields[11]);
         }
     }
@@ -266,7 +266,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
 
             StructureFactory newFactory = new StructureFactory(structureType, maxHealth, maxEnergy, size, physical, energyCost,
                 biome, terrain, soilQuality, buildingDistance, viewRange, blocksVision, statusFactories);
-            Factorys.Add(structureType, newFactory);
+            FactoryMap.Add(structureType, newFactory);
             abilitiesList.Add(structureType, fields[9]);
         }
     }
@@ -300,7 +300,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             List<StatusFactory> statusFactories = ParseStatuses(fields[19], statuses);
             int air = int.Parse(fields[20], CultureInfo.InvariantCulture);
 
-            Factorys.Add(unitType, 
+            FactoryMap.Add(unitType, 
                 new AnimalFactory(
                     unitType: unitType,
                     maxHealth: maxHealth,

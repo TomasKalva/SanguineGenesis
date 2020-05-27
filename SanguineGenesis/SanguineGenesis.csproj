@@ -211,7 +211,7 @@
     <None Include="GameLogic\Data\Entities\Animals.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\XMLAtlasSchema1.xsd">
+    <None Include="Images\XMLAtlasSchema.xsd">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

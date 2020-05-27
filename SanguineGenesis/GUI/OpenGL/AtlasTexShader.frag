@@ -1,7 +1,7 @@
 ﻿#version 330 core
 
 in vec2 pass_TexCoord;					// uv coordinates
-in vec4 pass_TexLeftBottomWidthHeight;	// coordinates in atlas
+in vec4 pass_TexLeftBottomWidthHeight;	// coordinates in atlas [left, bottom, width, height]
 
 out vec4 out_Color;
 

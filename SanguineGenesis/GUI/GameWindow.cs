@@ -369,13 +369,6 @@ namespace SanguineGenesis.GUI
             {
                 OpenGL gl = openGLControl.OpenGL;
                 OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl.Width, (float)openGLControl.Height);
-                OpenGLAtlasDrawer.CreateMap(gl);
-                OpenGLAtlasDrawer.CreateNutrientsMap(gl);
-                OpenGLAtlasDrawer.CreateUnitCircles(gl);
-                OpenGLAtlasDrawer.CreateEntities(gl);
-                OpenGLAtlasDrawer.CreateEntitiesIndicators(gl);
-                OpenGLAtlasDrawer.CreateFlowField(gl);
-                OpenGLAtlasDrawer.CreateSelectionFrame(gl);
             }catch(Exception e)
             {
                 MessageBox.Show("Failed to initialize window: "+e.Message);
@@ -411,7 +404,7 @@ namespace SanguineGenesis.GUI
                 if (Game.GameplayOptions.NutrientsVisible)
                     OpenGLAtlasDrawer.UpdateNutrientsMapDataBuffers(gl, GameControls.MapView, Game);
                 else
-                    OpenGLAtlasDrawer.TryClearNutrientsMapDataBuffers(gl);
+                    OpenGLAtlasDrawer.ClearNutrientsMapDataBuffers(gl);
 
                 //flowfield
                 if (Game.GameplayOptions.ShowFlowfield)
@@ -422,11 +415,11 @@ namespace SanguineGenesis.GUI
                         OpenGLAtlasDrawer.UpdateFlowFieldDataBuffers(gl, GameControls.MapView, flF);
                     else
                         //clear flowfield
-                        OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+                        OpenGLAtlasDrawer.ClearFlowFieldDataBuffers(gl);
                 }
                 else
                     //clear flowfield
-                    OpenGLAtlasDrawer.TryClearFlowFieldDataBuffers(gl);
+                    OpenGLAtlasDrawer.ClearFlowFieldDataBuffers(gl);
             }
 
             //set entities data

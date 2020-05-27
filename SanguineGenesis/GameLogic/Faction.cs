@@ -165,7 +165,7 @@ namespace SanguineGenesis.GameLogic
         public void SpawnTestingAnimals(GameData gameData)
         {
             //calculate extents
-            var factories = gameData.AnimalFactories.Factorys;
+            var factories = gameData.AnimalFactories.FactoryMap;
             int gridPoints = (int)Math.Ceiling(Math.Sqrt(factories.Count));
             float gridSize = 29f;
             float step = gridSize / (gridPoints + 1);
