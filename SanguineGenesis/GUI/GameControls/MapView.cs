@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
@@ -133,7 +132,7 @@ namespace SanguineGenesis.GameControls
                 return new List<Entity>(); ;
 
             return GameQuerying
-                .SelectVisibleEntities(observer, game.GetAll<Entity>());
+                .SelectVisibleEntities(observer, GameQuerying.SelectEntitiesInArea(game, ((IRectangle)this).GetRect()));
         }
 
         #endregion Data retrieval

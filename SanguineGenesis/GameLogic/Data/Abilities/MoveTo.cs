@@ -141,7 +141,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             //accelerate animal
             Vector2 animalPos = CommandedEntity.Position;
             Building blockingBuilding;
+            //check if the animal is stuck on node with building (other node than node where its target is)
             if ((blockingBuilding = game.Map[(int)animalPos.X, (int)animalPos.Y].Building) != null
+                && game.Map[(int)animalPos.X, (int)animalPos.Y] != game.Map[(int)Target.Center.X, (int)Target.Center.Y]
                 && blockingBuilding != Target
                 && blockingBuilding.Physical)
             {

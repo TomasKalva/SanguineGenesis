@@ -1,28 +1,26 @@
 ﻿using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
-using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanguineGenesis.GameControls
 {
     /// <summary>
     /// Represents rectangle for selecting units.
     /// </summary>
-    class MapSelectorFrame:IRectangle
+    class MapSelectorRect:IRectangle
     {   
         /// <summary>
-        /// The starting point of this frame. In map coordinates.
+        /// The starting point of this rectangle. In map coordinates.
         /// </summary>
-        public Vector2 OriginalPoint { get; }
+        private Vector2 StartPoint { get; }
+        private Vector2 endPoint;
         /// <summary>
-        /// The last selected point of this frame. In map coordinates.
+        /// The last selected point of this rectangle. In map coordinates.
         /// </summary>
-        public Vector2 EndPoint { get; private set; }
+        public Vector2 EndPoint { get => endPoint; set { endPoint = value; Update(); } }
         
         /// <summary>
         /// In map coordinates.
@@ -49,33 +47,25 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public float Height => Top - Bottom;
         
-        public MapSelectorFrame(Vector2 originalPoint)
+        public MapSelectorRect(Vector2 originalPoint)
         {
-            OriginalPoint = originalPoint;
+            StartPoint = originalPoint;
             EndPoint = originalPoint;
-        }
-
-        /// <summary>
-        /// Sets EndPoint.
-        /// </summary>
-        public void SetEndPoint(Vector2 endPoint)
-        {
-            EndPoint = endPoint;
         }
 
         /// <summary>
         /// Update the rectangle coordinates.
         /// </summary>
-        public void Update()
+        private void Update()
         {
-            Left = Math.Min(OriginalPoint.X, EndPoint.X);
-            Right = Math.Max(OriginalPoint.X, EndPoint.X);
-            Bottom = Math.Min(OriginalPoint.Y, EndPoint.Y);
-            Top = Math.Max(OriginalPoint.Y, EndPoint.Y);
+            Left = Math.Min(StartPoint.X, EndPoint.X);
+            Right = Math.Max(StartPoint.X, EndPoint.X);
+            Bottom = Math.Min(StartPoint.Y, EndPoint.Y);
+            Top = Math.Max(StartPoint.Y, EndPoint.Y);
         }
 
         /// <summary>
-        /// Returns all entities colliding with this MapSelectorFrame.
+        /// Returns all entities of current player colliding with this MapSelectorRect.
         /// </summary>
         public IEnumerable<Entity> GetSelectedEntities(Game game)
         {

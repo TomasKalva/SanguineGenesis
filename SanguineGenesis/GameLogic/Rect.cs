@@ -45,5 +45,22 @@ namespace SanguineGenesis.GameLogic
             return !(rect.Left > Right || rect.Right < Left ||
                     rect.Bottom > Top || rect.Top < Bottom);
         }
+
+        /// <summary>
+        /// Returns true if this rectangle collides circle with given center and radius.
+        /// </summary>
+        public bool IntersectsWith(Vector2 center, float radius)
+        {
+            //closest point to the circle inside the rectangle
+            float closestX = Math.Max(Left, Math.Min(Right, center.X));
+            float closestY = Math.Max(Bottom, Math.Min(Top, center.Y));
+
+            float dx = center.X - closestX;
+            float dy = center.Y - closestY;
+            if (dx * dx + dy * dy < radius * radius)
+                return true;
+            else
+                return false;
+        }
     }
 }

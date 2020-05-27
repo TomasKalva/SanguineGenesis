@@ -13,16 +13,18 @@ namespace SanguineGenesis.GameControls
     /// </summary>
     class GameControls
     {
-        //State of the UI.
+        //State related to the map.
         public MapMovementInput MapMovementInput { get; private set; }
         public MapView MapView { get; private set; }
-        public MapSelectorFrame MapSelectorFrame { get; private set; }
+        public MapSelectorRect MapSelectorRect { get; private set; }
 
-        //State of selected in game objects.
+        //State of selected game objects.
         public SelectionInput SelectionInput { get; private set; }
         public SelectedGroup SelectedGroup { get; private set; }
 
-        //Receives errors during command setting and execution.
+        /// <summary>
+        /// Receives errors during command setting and execution.
+        /// </summary>
         public ActionLog ActionLog { get; private set; }
 
         public GameControls()
@@ -38,7 +40,7 @@ namespace SanguineGenesis.GameControls
             MapView = new MapView(0, 0, 60);
             MapMovementInput = new MapMovementInput();
             SelectionInput = new SelectionInput();
-            MapSelectorFrame = null;
+            MapSelectorRect = null;
             SelectedGroup = new SelectedGroup();
             ActionLog = new ActionLog(4);
         }
@@ -55,7 +57,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Selects entities based on EntityCommandsInput and MapSelector frame. Sets commands
+        /// Selects entities based on EntityCommandsInput and MapSelectorRect. Sets commands
         /// to SelectedEntities.
         /// </summary>
         public void UpdateEntitiesByInput(Game game)
@@ -67,11 +69,11 @@ namespace SanguineGenesis.GameControls
                 {
                     Vector2 mapPoint = SelectionInput.SelectingCoordinates;
 
-                    //initialize map selector frame
-                    if (MapSelectorFrame == null)
+                    //initialize map selector rectangle
+                    if (MapSelectorRect == null)
                     {
-                        //create new map selector frame
-                        MapSelectorFrame = new MapSelectorFrame(mapPoint);
+                        //create new map selector rectangle
+                        MapSelectorRect = new MapSelectorRect(mapPoint);
 
                         //remove all previously selected entities
                         SelectedGroup.ClearTemporary();
@@ -81,15 +83,14 @@ namespace SanguineGenesis.GameControls
                     }
                         
                     //update selected entities
-                    MapSelectorFrame.SetEndPoint(mapPoint);
-                    MapSelectorFrame.Update();
-                    List<Entity> selected = MapSelectorFrame.GetSelectedEntities(game).ToList();
+                    MapSelectorRect.EndPoint = mapPoint;
+                    List<Entity> selected = MapSelectorRect.GetSelectedEntities(game).ToList();
                     SelectedGroup.SetTemporaryEntities(selected);
 
                     //finish selecting
                     if (SelectionInput.State == SelectionInputState.FINISH_SELECTING_ENTITIES)
                     {
-                        MapSelectorFrame = null;
+                        MapSelectorRect = null;
                         if (SelectedGroup.Entities.Any())
                         {
                             SelectedGroup.CommitEntities();

@@ -278,8 +278,8 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Enable computation of flow maps if map was changed, and update MoveTo commands
-        /// with computed flow maps.
+        /// Enable computation of flow fields if map was changed, and update MoveTo commands
+        /// with computed flow fields.
         /// </summary>
         private void MovementGeneratorInteraction()
         {

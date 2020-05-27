@@ -147,7 +147,7 @@
     <Compile Include="GUI\IRectangle.cs" />
     <Compile Include="GameLogic\Maps\IMap.cs" />
     <Compile Include="GUI\GameControls\MapMovementInput.cs" />
-    <Compile Include="GUI\GameControls\MapSelectorFrame.cs" />
+    <Compile Include="GUI\GameControls\MapSelectorRect.cs" />
     <Compile Include="GUI\GameControls\MapView.cs" />
     <Compile Include="GameLogic\Maps\ObstacleMap.cs" />
     <Compile Include="GUI\OpenGL\ImageAtlas.cs" />
@@ -193,6 +193,7 @@
     </Compile>
     <EmbeddedResource Include="GUI\MainMenuWindow.resx">
       <DependentUpon>MainMenuWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\GameWindow.resx">
       <DependentUpon>GameWindow.cs</DependentUpon>
@@ -201,6 +202,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="GameLogic\Data\Entities\Structures.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

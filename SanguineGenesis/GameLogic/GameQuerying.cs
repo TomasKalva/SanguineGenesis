@@ -16,15 +16,14 @@ namespace SanguineGenesis.GameLogic
     static class GameQuerying
     {
         /// <summary>
-        /// Select all entities which satisfy the condition.
+        /// Select all entities in area.
         /// </summary>
         public static IEnumerable<Entity> SelectEntitiesInArea(Game game, Rect area)
         {
             return game.GetAll<Entity>()
                 .Where((entity) =>
                 {
-                    Rect entityRect = ((IRectangle)entity).GetRect();
-                    return area.IntersectsWith(entityRect);
+                    return area.IntersectsWith(entity.Center, entity.Radius);
                 });
         }
 

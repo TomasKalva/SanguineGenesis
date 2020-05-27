@@ -26,7 +26,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Set new corner for selection frame.
+        /// Set new corner for selector rectangle.
         /// </summary>
         public void NewPoint(Vector2 mousePos)
         {
@@ -35,7 +35,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Set new corner for selection frame and end selecting.
+        /// Set new corner for selector rectangle and end selecting.
         /// </summary>
         public void EndSelection(Vector2 mousePos)
         {

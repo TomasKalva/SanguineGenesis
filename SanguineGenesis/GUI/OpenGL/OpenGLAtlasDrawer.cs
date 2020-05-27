@@ -43,7 +43,7 @@ namespace SanguineGenesis.GUI
         private static MyBufferArray entityCircles;
         private static MyBufferArray entities;
         private static MyBufferArray entityIndicators;
-        private static MyBufferArray selectionFrame;
+        private static MyBufferArray selectorRect;
 
         //true if there are no entities to draw
         private static bool entitiesEmpty;
@@ -86,7 +86,7 @@ namespace SanguineGenesis.GUI
             //load image used as atlas and pass it to the shader program
             InitializeAtlas(gl, shaderProgram);
 
-            //initializes MyBufferArrays for map, entities and selector frame
+            //initializes MyBufferArrays for map, entities and selector rectangle
             InitMyBufferArrays(gl);
         }
 
@@ -140,7 +140,7 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Initializes MyBufferArrays for map, entities and selector frame.
+        /// Initializes MyBufferArrays for map, entities and selector rectangle.
         /// </summary>
         private static void InitMyBufferArrays(OpenGL gl)
         {
@@ -150,7 +150,7 @@ namespace SanguineGenesis.GUI
             entities = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
             entityIndicators = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
             flowField = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
-            selectionFrame = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
+            selectorRect = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace SanguineGenesis.GUI
             entityCircles.Dispose(gl);
             entities.Dispose(gl);
             entityIndicators.Dispose(gl);
-            selectionFrame.Dispose(gl);
+            selectorRect.Dispose(gl);
             //delete textures
             if (textureIds != null)
                 gl.DeleteTextures(textureIds.Length, textureIds);
@@ -381,8 +381,8 @@ namespace SanguineGenesis.GUI
                     gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entityIndicators.VerticesCount);
                 }
 
-                //draw selection frame
-                selectionFrame.VertexBufferArray.Bind(gl);
+                //draw selection rectangle
+                selectorRect.VertexBufferArray.Bind(gl);
                 gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 6);
             }
         }
@@ -391,8 +391,7 @@ namespace SanguineGenesis.GUI
         
         #region Map
         /// <summary>
-        /// Updates buffers of vertexArrayBuffer with the information about the map
-        /// from mapView.
+        /// Updates buffers of MyBufferArray with the information about map.
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
@@ -468,8 +467,7 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Updates buffers of vertexArrayBuffer with the information about the map
-        /// from mapView.
+        /// Updates buffers of MyBufferArray with the information about nutrients map.
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
@@ -540,7 +538,7 @@ namespace SanguineGenesis.GUI
 
         #region Flowfield
         /// <summary>
-        /// Clears all buffers representing flow map.
+        /// Clears all buffers representing flow field.
         /// </summary>
         public static void ClearFlowFieldDataBuffers(OpenGL gl)
         {
@@ -549,7 +547,7 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Updates buffers of vertexArrayBuffer with the information about the flow map
+        /// Updates buffers of MyBufferArray with the information about the flow field
         /// from mapView.
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
@@ -667,8 +665,7 @@ namespace SanguineGenesis.GUI
 
         #region Entity circles
         /// <summary>
-        /// Updates buffers of vertexArrayBuffer with the information about the map
-        /// from mapView.
+        /// Updates buffers of MyBufferArray with the information about entities.
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
@@ -771,8 +768,7 @@ namespace SanguineGenesis.GUI
 
         #region Entity
         /// <summary>
-        /// Updates buffers of vertexArrayBuffer with the information about the map
-        /// from mapView.
+        /// Updates buffers of MyBufferArray with the information about entities.
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
@@ -865,8 +861,7 @@ namespace SanguineGenesis.GUI
 
         #region Entity indicators
         /// <summary>
-        /// Updates buffers of vertexArrayBuffer with the information about the map
-        /// from mapView.
+        /// Updates buffers of MyBufferArray with the information entities.
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
@@ -885,7 +880,7 @@ namespace SanguineGenesis.GUI
 
             //only show indicators for entities that player can directly see and don't have full
             //health and energy
-            List<Entity> visEntities = game.GetAll<Entity>().Where((e) => observer.CanSee(e))
+            List<Entity> visEntities = mapView.GetVisibleEntities(game, observer).Where((e) => observer.CanSee(e))
                 .Where(e=>e.Health!=e.Health.MaxValue || e.Energy !=e.Energy.MaxValue).ToList();
 
             //check if there are any entities to draw
@@ -971,14 +966,13 @@ namespace SanguineGenesis.GUI
 
         #endregion Entity indicators
         
-        #region Selection frame
+        #region Selector rectangle
         /// <summary>
-        /// Updates buffers of vertexArrayBuffer with the information about the flow map
-        /// from mapView.
+        /// Updates buffers of MyBufferArray with new positions.
         /// </summary>
         /// <param name="gl">Instance of OpenGL.</param>
         /// <param name="mapView">Map view describing the map.</param>
-        public static void UpdateSelectionFrameDataBuffers(OpenGL gl, MapView mapView, MapSelectorFrame selectorFrame)
+        public static void UpdateSelectorRectDataBuffers(OpenGL gl, MapView mapView, MapSelectorRect selectorRect)
         {
             float nodeSize = mapView.NodeSize;
             float viewLeft = mapView.Left;
@@ -989,13 +983,13 @@ namespace SanguineGenesis.GUI
             float[] vertices = new float[vertPerObj * 3];
             float[] texBottomLeft = new float[vertPerObj * 4];
             
-            //draw selector frame only if it exists
-            if (selectorFrame != null)
+            //draw selector rect only if it exists
+            if (selectorRect != null)
             {
-                float bottom = selectorFrame.Bottom - viewBottom;
-                float top = selectorFrame.Top - viewBottom;
-                float left = selectorFrame.Left - viewLeft;
-                float right = selectorFrame.Right - viewLeft;
+                float bottom = selectorRect.Bottom - viewBottom;
+                float top = selectorRect.Top - viewBottom;
+                float left = selectorRect.Left - viewLeft;
+                float right = selectorRect.Right - viewLeft;
 
                 SetRectangleVerticesTri(vertices, bottom * nodeSize, top * nodeSize,
                     left * nodeSize, right * nodeSize, -1f, 0);
@@ -1003,9 +997,9 @@ namespace SanguineGenesis.GUI
                 SetAtlasCoordinates(texBottomLeft, atlasCoords, 0, vertPerObj);
             }
 
-            selectionFrame.BindData(gl, 3, vertices, 4, texBottomLeft);
+            OpenGLAtlasDrawer.selectorRect.BindData(gl, 3, vertices, 4, texBottomLeft);
         }
-        #endregion Selection frame
+        #endregion Selector rectangle
         
         #endregion Updates
 

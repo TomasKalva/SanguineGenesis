@@ -432,8 +432,8 @@ namespace SanguineGenesis.GUI
                 OpenGLAtlasDrawer.UpdateEntityIndicatorsDataBuffers(gl, GameControls.MapView, Game.CurrentPlayer, Game);
             }
 
-            //selection frame
-            OpenGLAtlasDrawer.UpdateSelectionFrameDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorFrame);
+            //selector rectangle
+            OpenGLAtlasDrawer.UpdateSelectorRectDataBuffers(gl, GameControls.MapView, GameControls.MapSelectorRect);
 
 
             //draw the data
@@ -536,7 +536,7 @@ namespace SanguineGenesis.GUI
         {
             if (e.Button == MouseButtons.Left)
             {
-                //update vertex of selector frame
+                //update vertex of selector rectangle
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.SelectionInput.NewPoint(mapCoordinates);
@@ -591,7 +591,7 @@ namespace SanguineGenesis.GUI
         {
             if (GameControls.SelectionInput.State == SelectionInputState.SELECTING_ENTITIES)
             {
-                //update selection frame
+                //update selector rectangle
                 Vector2 mapCoordinates = GameControls.MapView
                     .ScreenToMap(new Vector2(e.X, e.Y));
                 GameControls.SelectionInput.NewPoint(mapCoordinates);
