@@ -465,7 +465,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
                             if (InfoSources[index] != null)
                             {
                                 selectedGroup.SetTemporaryEntities(InfoSources[index].Entities);
-                                gameControls.SelectionInput.State = SelectionInputState.UNITS_SELECTED;
+                                gameControls.SelectionInput.State = SelectionInputState.ENTITIES_SELECTED;
                             }
                             else
                             {

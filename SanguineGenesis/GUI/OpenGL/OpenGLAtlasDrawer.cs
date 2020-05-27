@@ -20,17 +20,19 @@ namespace SanguineGenesis.GUI
     /// </summary>
     static class OpenGLAtlasDrawer
     {
-        //the projection matrix
-        private static mat4 projectionMatrix;
+        
+        //the shader program for the vertex and fragment shader
+        static private ShaderProgram shaderProgram;
 
         //vertex shader attribute indices
         private const uint attributeIndexPosition = 0;
         private const uint attributeIndexUVCoord = 1;
         private const uint attributeIndexTexBL = 2;
-        
-        //the shader program for the vertex and fragment shader
-        static private ShaderProgram shaderProgram;
 
+        //the projection matrix
+        private static mat4 projectionMatrix;
+
+        //identifier of atlas texture at position 0
         static private uint[] textureIds;
 
         //vertex buffer arrays which contain the buffers for vertex, 
@@ -142,13 +144,13 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private static void InitMyBufferArrays(OpenGL gl)
         {
-            map = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            map = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
             nutrientsMap = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
-            entityCircles = new MyBufferArray(gl, CreateSquareUVCoordinates);
-            entities = new MyBufferArray(gl, CreateSquareUVCoordinates);
-            entityIndicators = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            entityCircles = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
+            entities = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
+            entityIndicators = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
             flowField = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
-            selectionFrame = new MyBufferArray(gl, CreateSquareUVCoordinates);
+            selectionFrame = new MyBufferArray(gl, CreateSquareUVCoordinatesTri);
         }
 
         /// <summary>
@@ -348,7 +350,7 @@ namespace SanguineGenesis.GUI
             {
                 //draw map
                 map.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_QUADS, 0, map.VerticesCount);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, map.VerticesCount);
 
                 //draw nutrients map
                 if (gameplayOptions.NutrientsVisible)
@@ -368,20 +370,20 @@ namespace SanguineGenesis.GUI
                 if (!entitiesEmpty)
                 {
                     entityCircles.VertexBufferArray.Bind(gl);
-                    gl.DrawArrays(OpenGL.GL_QUADS, 0, entityCircles.VerticesCount);
+                    gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entityCircles.VerticesCount);
 
                     entities.VertexBufferArray.Bind(gl);
-                    gl.DrawArrays(OpenGL.GL_QUADS, 0, entities.VerticesCount);
+                    gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entities.VerticesCount);
                 }
                 if (!entityIndicatorsEmpty)
                 {
                     entityIndicators.VertexBufferArray.Bind(gl);
-                    gl.DrawArrays(OpenGL.GL_QUADS, 0, entityIndicators.VerticesCount);
+                    gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, entityIndicators.VerticesCount);
                 }
 
                 //draw selection frame
                 selectionFrame.VertexBufferArray.Bind(gl);
-                gl.DrawArrays(OpenGL.GL_QUADS, 0, 4);
+                gl.DrawArrays(OpenGL.GL_TRIANGLES, 0, 6);
             }
         }
 
@@ -401,7 +403,7 @@ namespace SanguineGenesis.GUI
             float viewLeft = mapView.Left;
             float viewBottom = mapView.Bottom;
 
-            int vertPerObj = 4;
+            int vertPerObj = 6;
 
             bool[,] visibleVisibility = mapView.GetVisibleVisibilityMap(game.Players[game.CurrentPlayer.FactionID].VisibilityMap);
             Node[,] visible = mapView.GetVisibleNodes(game.Players[game.CurrentPlayer.FactionID].VisibleMap);
@@ -439,13 +441,13 @@ namespace SanguineGenesis.GUI
                     
                     Rect atlasCoords = ImageAtlas.GetImageAtlas.GetNodeTexture(current.Biome,current.SoilQuality,current.Terrain, isVisible);
 
-                    //tile position
+                    //node position
                     float bottom = (current.Y - viewBottom) * sqH;
                     float top = (current.Y - viewBottom + 1) * sqH;
                     float left = (current.X - viewLeft) * sqW;
                     float right = (current.X - viewLeft + 1) * sqW;
 
-                    SetRectangleVertices(vertices, bottom, top, left, right, -10, coord);
+                    SetRectangleVerticesTri(vertices, bottom, top, left, right, -10, coord);
                     SetAtlasCoordinates(texAtlas, atlasCoords, bottomLeftInd, vertPerObj);
                 }
             }
@@ -511,11 +513,11 @@ namespace SanguineGenesis.GUI
 
                     //active nutrients
                     int activeNutrients = (int)(current.ActiveNutrients * 10);
-                    Rect atlasCoordsRight = ImageAtlas.GetImageAtlas.GetNumberedTriangle(activeNutrients);
+                    Rect atlasActiveNutrients = ImageAtlas.GetImageAtlas.GetNumberedTriangle(activeNutrients);
 
                     //passive nutrients
                     int passiveNutrients = (int)(current.PassiveNutrients);
-                    Rect atlasCoordsLeft = ImageAtlas.GetImageAtlas.GetNumberedTriangle(passiveNutrients);
+                    Rect atlasPassiveNutrients = ImageAtlas.GetImageAtlas.GetNumberedTriangle(passiveNutrients);
 
                     //tile position
                     float bottom = (current.Y - viewBottom) * sqH;
@@ -525,9 +527,9 @@ namespace SanguineGenesis.GUI
 
                     SetRectangleVerticesTri(vertices, bottom, top, left, right, -10, coord);
                     //top left triangle
-                    SetAtlasCoordinates(texAtlas, atlasCoordsLeft, bottomLeftInd , 3);
+                    SetAtlasCoordinates(texAtlas, atlasPassiveNutrients, bottomLeftInd , 3);
                     //bottom right triangle
-                    SetAtlasCoordinates(texAtlas, atlasCoordsRight, bottomLeftInd + 4 * 3, 3);
+                    SetAtlasCoordinates(texAtlas, atlasActiveNutrients, bottomLeftInd + 4 * 3, 3);
                 }
             }
 
@@ -677,7 +679,7 @@ namespace SanguineGenesis.GUI
             float viewLeft = mapView.Left;
             float viewBottom = mapView.Bottom;
 
-            int vertPerObj = 4;
+            int vertPerObj = 6;
 
             List<Entity> visEntity = mapView.GetVisibleEntities(game, game.CurrentPlayer).ToList();
 
@@ -723,7 +725,7 @@ namespace SanguineGenesis.GUI
                     float right = (current.Right - viewLeft) * entitySize;
 
                     //vertices
-                    SetRectangleVertices(vertices, bottom, top, left, right, -8, index);
+                    SetRectangleVerticesTri(vertices, bottom, top, left, right, -8, index);
 
                     Rect atlasCoords;
                     //colors
@@ -782,7 +784,7 @@ namespace SanguineGenesis.GUI
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            int vertPerObj = 4;
+            int vertPerObj = 6;
 
             List<Entity> visEntities = mapView.GetVisibleEntities(game, game.CurrentPlayer).ToList();
 
@@ -843,13 +845,13 @@ namespace SanguineGenesis.GUI
                     float depth = 4f + current.Center.Y / game.Map.Height;
 
                     //vertices
-                    SetRectangleVertices(vertices, bottom, top, left, right, -depth, index);
+                    SetRectangleVerticesTri(vertices, bottom, top, left, right, -depth, index);
 
                     //uv coordinates
                     if(current is Animal && !((Animal)current).FacingLeft)
-                        SetHorizFlipSquareTextureCoordinates(uv, texIndex);
+                        SetHorizFlipSquareTextureCoordinatesTri(uv, texIndex);
                     else
-                        SetSquareTextureCoordinates(uv, texIndex);
+                        SetSquareTextureCoordinatesTri(uv, texIndex);
 
                     //atlas coordinates
                     Rect entityImage = current.AnimationState.CurrentImage;
@@ -878,7 +880,7 @@ namespace SanguineGenesis.GUI
             float viewBottom = mapView.Bottom;
             float viewRight = mapView.Right;
 
-            int vertPerObj = 4;
+            int vertPerObj = 6;
             int objInOne = 4;
 
             //only show indicators for entities that player can directly see and don't have full
@@ -941,12 +943,12 @@ namespace SanguineGenesis.GUI
                     Rect redRect = ImageAtlas.GetImageAtlas.RedSquare;
                     Rect greenRect = ImageAtlas.GetImageAtlas.GreenSquare;
                     //energy
-                    AddRectangle(left, bottom, right, top, blackRect, depth, index, vertices,
+                    AddRectangleTri(left, bottom, right, top, blackRect, depth, index, vertices,
                          atlasInd, texAtlas);
                     index += vertPerObj * 3;
                     atlasInd += vertPerObj * 4;
                     float energyRight = Math.Max(left, left + (right - left) * (float)(current.Energy.Percentage));
-                    AddRectangle(left, bottom, energyRight, top, greenRect, depth, index, vertices,
+                    AddRectangleTri(left, bottom, energyRight, top, greenRect, depth, index, vertices,
                          atlasInd, texAtlas);
                     index += vertPerObj * 3;
                     atlasInd += vertPerObj * 4;
@@ -954,12 +956,12 @@ namespace SanguineGenesis.GUI
                     //health
                     bottom += indicatorHeight*unitSize;
                     top += indicatorHeight*unitSize;
-                    AddRectangle(left, bottom, right, top, blackRect, depth, index, vertices,
+                    AddRectangleTri(left, bottom, right, top, blackRect, depth, index, vertices,
                          atlasInd, texAtlas);
                     index += vertPerObj * 3;
                     atlasInd += vertPerObj * 4;
                     float healthRight =Math.Max(left, left + (right - left) * (float)(current.Health.Percentage));
-                    AddRectangle(left, bottom, healthRight, top, redRect, depth, index, vertices,
+                    AddRectangleTri(left, bottom, healthRight, top, redRect, depth, index, vertices,
                          atlasInd, texAtlas);
                 }
             }
@@ -982,7 +984,7 @@ namespace SanguineGenesis.GUI
             float viewLeft = mapView.Left;
             float viewBottom = mapView.Bottom;
 
-            int vertPerObj = 4;
+            int vertPerObj = 6;
 
             float[] vertices = new float[vertPerObj * 3];
             float[] texBottomLeft = new float[vertPerObj * 4];
@@ -995,7 +997,7 @@ namespace SanguineGenesis.GUI
                 float left = selectorFrame.Left - viewLeft;
                 float right = selectorFrame.Right - viewLeft;
 
-                SetRectangleVertices(vertices, bottom * nodeSize, top * nodeSize,
+                SetRectangleVerticesTri(vertices, bottom * nodeSize, top * nodeSize,
                     left * nodeSize, right * nodeSize, -1f, 0);
                 Rect atlasCoords = ImageAtlas.GetImageAtlas.UnitsSelector;
                 SetAtlasCoordinates(texBottomLeft, atlasCoords, 0, vertPerObj);
@@ -1008,48 +1010,6 @@ namespace SanguineGenesis.GUI
         #endregion Updates
 
         #region Array writing methods
-        /// <summary>
-        /// Write rectangle vertices with the given parameters to the index of the array. The rectangle
-        /// is made of quad.
-        /// </summary>
-        /// <param name="vertices">Writing array.</param>
-        /// <param name="bottom">Bottom of the rectangle.</param>
-        /// <param name="top">Top of the rectangle.</param>
-        /// <param name="left">Left of the rectangle.</param>
-        /// <param name="right">Right of the rectangle.</param>
-        /// <param name="depth">Depth of the vertices.</param>
-        /// <param name="index">Index of the first vertex in array.</param>
-        private static void SetRectangleVertices(float[] vertices, float bottom, float top,
-                                                float left, float right, float depth, int index)
-        {
-            int offset = 0;
-
-            //bottom left
-            vertices[index + offset + 0] = left;
-            vertices[index + offset + 1] = bottom;
-            vertices[index + offset + 2] = depth;
-
-            offset += 3;
-
-            //top left
-            vertices[index + offset + 0] = left;
-            vertices[index + offset + 1] = top;
-            vertices[index + offset + 2] = depth;
-
-            offset += 3;
-
-            //top right
-            vertices[index + offset + 0] = right;
-            vertices[index + offset + 1] = top;
-            vertices[index + offset + 2] = depth;
-
-            offset += 3;
-
-            //bottom right
-            vertices[index + offset + 0] = right;
-            vertices[index + offset + 1] = bottom;
-            vertices[index + offset + 2] = depth;
-        }
 
         /// <summary>
         /// Write rectangle vertices with the given parameters to the index of the array. The rectangle
@@ -1108,24 +1068,6 @@ namespace SanguineGenesis.GUI
             vertices[index + offset + 2] = depth;
         }
 
-
-        /// <summary>
-        /// Write texture UV coordinates for a square made of quad.
-        /// </summary>
-        /// <param name="textureCoords">Writing array.</param>
-        /// <param name="index">Index of the first UV coordinate in array.</param>
-        private static float[] CreateSquareUVCoordinates(int size)
-        {
-            float[] uv = new float[size];
-            int uvPerObj = 2 * 4;
-            for(int i = 0; i < size/ uvPerObj; i++)
-            {
-                int index = i * uvPerObj;
-                SetSquareTextureCoordinates(uv, index);
-            }
-            return uv;
-        }
-
         /// <summary>
         /// Write texture UV coordinates for a square made of two triangles.
         /// </summary>
@@ -1141,38 +1083,6 @@ namespace SanguineGenesis.GUI
                 SetSquareTextureCoordinatesTri(uv, index);
             }
             return uv;
-        }
-
-        /// <summary>
-        /// Write texture UV coordinates for a square made of quad.
-        /// </summary>
-        /// <param name="textureCoords">Writing array.</param>
-        /// <param name="index">Index of the first UV coordinate in array.</param>
-        private static void SetSquareTextureCoordinates(float[] textureCoords, int index)
-        {
-            int offset = 0;
-
-            //bottom left
-            textureCoords[index + offset + 0] = 0;
-            textureCoords[index + offset + 1] = 0;
-
-            offset += 2;
-
-            //top left
-            textureCoords[index + offset + 0] = 0;
-            textureCoords[index + offset + 1] = 1;
-
-            offset += 2;
-
-            //top right
-            textureCoords[index + offset + 0] = 1;
-            textureCoords[index + offset + 1] = 1;
-
-            offset += 2;
-
-            //bottom right
-            textureCoords[index + offset + 0] = 1;
-            textureCoords[index + offset + 1] = 0;
         }
 
         /// <summary>
@@ -1218,11 +1128,11 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Write texture UV coordinates for a square made of quad. The texture is horizontaly flipped.
+        /// Write texture UV coordinates for a square made of two triangles. The texture is horizontaly flipped.
         /// </summary>
         /// <param name="textureCoords">Writing array.</param>
         /// <param name="index">Index of the first UV coordinate in array.</param>
-        private static void SetHorizFlipSquareTextureCoordinates(float[] textureCoords, int index)
+        private static void SetHorizFlipSquareTextureCoordinatesTri(float[] textureCoords, int index)
         {
             int offset = 0;
 
@@ -1247,6 +1157,16 @@ namespace SanguineGenesis.GUI
             //bottom right
             textureCoords[index + offset + 0] = 0;
             textureCoords[index + offset + 1] = 0;
+            offset += 2;
+
+            //bottom left
+            textureCoords[index + offset + 0] = 1;
+            textureCoords[index + offset + 1] = 0;
+            offset += 2;
+
+            //top right
+            textureCoords[index + offset + 0] = 0;
+            textureCoords[index + offset + 1] = 1;
         }
 
         /// <summary>
@@ -1272,19 +1192,18 @@ namespace SanguineGenesis.GUI
             }
         }
 
-
         /// <summary>
         /// Adds a rectangle with the parameters to the arrays.
         /// </summary>
-        public static void AddRectangle(float left, float bottom, float right, float top, Rect image, float depth,
+        public static void AddRectangleTri(float left, float bottom, float right, float top, Rect image, float depth,
                                             int vInd, float[] vertices,
                                             int aInd, float[] texAtlas)
         {
             //vertices
-            SetRectangleVertices(vertices, bottom, top, left, right, -depth, vInd);
+            SetRectangleVerticesTri(vertices, bottom, top, left, right, -depth, vInd);
 
             //atlas coordinates
-            SetAtlasCoordinates(texAtlas, image, aInd, 4);
+            SetAtlasCoordinates(texAtlas, image, aInd, 6);
         }
         #endregion Array writing methods
     }

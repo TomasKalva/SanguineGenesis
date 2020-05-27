@@ -480,7 +480,7 @@ namespace SanguineGenesis.GUI
             {
                 //select only entities of current type
                 if(EntityButtonArray.Selected!=null &&
-                    GameControls.SelectionInput.State==SelectionInputState.UNITS_SELECTED)
+                    GameControls.SelectionInput.State==SelectionInputState.ENTITIES_SELECTED)
                     GameControls.SelectedGroup.KeepSelected(EntityButtonArray.Selected.EntityType);
             }
             else if ((controlGroupIndex = ControlGroupButtonArray.KeyToGroupIndex(e.KeyCode)) != -1)
@@ -492,7 +492,7 @@ namespace SanguineGenesis.GUI
                     ControlGroupButtonArray.SaveGroupWithIndex(controlGroupIndex);
                 }
                 else if (GameControls.SelectionInput.State == SelectionInputState.IDLE ||
-                    GameControls.SelectionInput.State == SelectionInputState.UNITS_SELECTED)
+                    GameControls.SelectionInput.State == SelectionInputState.ENTITIES_SELECTED)
                 {
                     //loads selected entities from the group
                     if (e.Shift)
@@ -589,7 +589,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void MouseMoveHandler(object sender, MouseEventArgs e)
         {
-            if (GameControls.SelectionInput.State == SelectionInputState.SELECTING_UNITS)
+            if (GameControls.SelectionInput.State == SelectionInputState.SELECTING_ENTITIES)
             {
                 //update selection frame
                 Vector2 mapCoordinates = GameControls.MapView
@@ -645,11 +645,11 @@ namespace SanguineGenesis.GUI
                 selectedEntities.Sort((e1, e2) => string.Compare(e1.EntityType, e2.EntityType));
 
                 //update selected entity if the old one was removed or player is currently selecting entities
-                if (GameControls.SelectionInput.State == SelectionInputState.SELECTING_UNITS ||
+                if (GameControls.SelectionInput.State == SelectionInputState.SELECTING_ENTITIES ||
                     ShouldSetSelected ||
                     !selectedEntities.Contains(EntityButtonArray.Selected))
                     EntityButtonArray.Selected = selectedEntities.FirstOrDefault();
-                ShouldSetSelected = GameControls.SelectionInput.State == SelectionInputState.SELECTING_UNITS;
+                ShouldSetSelected = GameControls.SelectionInput.State == SelectionInputState.SELECTING_ENTITIES;
 
                 //set selected entities
                 EntityButtonArray.InfoSources = selectedEntities;
@@ -855,7 +855,7 @@ namespace SanguineGenesis.GUI
         public void UpdateMoveMap()
         {
             //check if player is selecting entities
-            if (!(GameControls.SelectionInput.State == SelectionInputState.SELECTING_UNITS))
+            if (!(GameControls.SelectionInput.State == SelectionInputState.SELECTING_ENTITIES))
             {
                 Point mousePos = Cursor.Position;
 

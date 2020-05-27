@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using SanguineGenesis.GameLogic;
+﻿using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
-using SanguineGenesis.GameLogic.Data.Entities;
-using SanguineGenesis.GameLogic.Maps;
 
 namespace SanguineGenesis.GameControls
 {
+    /// <summary>
+    /// Contains objects currently selected by user.
+    /// </summary>
     class SelectionInput
     {
         public SelectionInputState State { get; set; }
         public Vector2 SelectingCoordinates { get; private set; }
         public Vector2 TargetCoordinates { get; private set; }
-        public Entity TargetedEntity { get; private set; }
         public Ability SelectedAbility { get; set; }
         public bool IsAbilitySelected => SelectedAbility != null;
         /// <summary>
@@ -36,7 +30,7 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public void NewPoint(Vector2 mousePos)
         {
-            State = SelectionInputState.SELECTING_UNITS;
+            State = SelectionInputState.SELECTING_ENTITIES;
             SelectingCoordinates = mousePos;
         }
 
@@ -45,7 +39,7 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public void EndSelection(Vector2 mousePos)
         {
-            State = SelectionInputState.FINISH_SELECTING_UNITS;
+            State = SelectionInputState.FINISH_SELECTING_ENTITIES;
             SelectingCoordinates = mousePos;
         }
 
@@ -54,7 +48,7 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public void SetTarget(Vector2 mousePos)
         {
-            if (State == SelectionInputState.UNITS_SELECTED)
+            if (State == SelectionInputState.ENTITIES_SELECTED)
             {
                 TargetCoordinates = mousePos;
                 State = SelectionInputState.ABILITY_TARGET_SELECTED;
@@ -68,9 +62,9 @@ namespace SanguineGenesis.GameControls
     public enum SelectionInputState
     {
         IDLE,
-        SELECTING_UNITS,
-        FINISH_SELECTING_UNITS,
-        UNITS_SELECTED,
+        SELECTING_ENTITIES,
+        FINISH_SELECTING_ENTITIES,
+        ENTITIES_SELECTED,
         ABILITY_TARGET_SELECTED
     }
 }
