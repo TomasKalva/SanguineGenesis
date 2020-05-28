@@ -203,7 +203,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
         /// the entity from selected entities on right click.
         /// </summary>
         public void ShowInfoOnClick(GameControls.GameControls gameControls,
-                                    SelectionInput entityCommandsInput)
+                                    SelectionInput selectionInput)
         {
             for (int i = 0; i < ColumnCount; i++)
                 for (int j = 0; j < RowCount; j++)
@@ -224,7 +224,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
                             {
                                 //select this entity
                                 Selected = info;
-                                entityCommandsInput.SelectedAbility = null;
+                                selectionInput.SelectedAbility = null;
                             }
                         }
                     };
@@ -438,7 +438,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
                     {
                         if(index >= 0 && index < InfoSources.Count)
                         { 
-                            var entities = gameControls.SelectedGroup.Entities;
+                            var entities = gameControls.SelectedGroup.Entities();
                             if (entities.Any())
                             {
                                 //group contains entities

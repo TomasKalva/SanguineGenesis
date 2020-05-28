@@ -51,13 +51,13 @@ namespace SanguineGenesis.GameControls
             if (State == SelectionInputState.ENTITIES_SELECTED)
             {
                 TargetCoordinates = mousePos;
-                State = SelectionInputState.ABILITY_TARGET_SELECTED;
+                State = SelectionInputState.TARGET_SELECTED;
             }
         }
     }
 
     /// <summary>
-    /// States of EntityCommandsInput.
+    /// States of SelectionInput.
     /// </summary>
     public enum SelectionInputState
     {
@@ -65,6 +65,6 @@ namespace SanguineGenesis.GameControls
         SELECTING_ENTITIES,
         FINISH_SELECTING_ENTITIES,
         ENTITIES_SELECTED,
-        ABILITY_TARGET_SELECTED
+        TARGET_SELECTED
     }
 }

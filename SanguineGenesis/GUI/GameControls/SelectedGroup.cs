@@ -29,9 +29,10 @@ namespace SanguineGenesis.GameControls
         /// <summary>
         /// List of currently selected entities.
         /// </summary>
-        public List<Entity> Entities => ComposeGroups(NextOperation, TotalGroup, TemporaryGroup);
+        public List<Entity> Entities() => ComposeGroups(NextOperation, TotalGroup, TemporaryGroup);
         /// <summary>
-        /// Set to true after Entities is changed.
+        /// Set to true after Entities() is changed. Set to false after object using data of this instance
+        /// acknowledges this change.
         /// </summary>
         public bool Changed { get; set; }
 
@@ -54,7 +55,6 @@ namespace SanguineGenesis.GameControls
             foreach(Entity e in TotalGroup)
                 e.Selected = true;
 
-
             ClearTemporary();
             foreach (Entity e in entities)
             {
@@ -69,7 +69,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Removes entity from Entities.
+        /// Removes entity from Entities().
         /// </summary>
         public void RemoveEntity(Entity entity)
         {
@@ -80,7 +80,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Removes dead entities from Entities.
+        /// Removes dead entities from Entities().
         /// </summary>
         public void RemoveDead()
         {
@@ -114,24 +114,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Sorts entities by their entity type and hash code.
-        /// </summary>
-        public void SortEntities()
-        {
-            TotalGroup.Sort((e1, e2) =>
-            {
-                int typeDifference = e1.EntityType.GetHashCode() - e2.EntityType.GetHashCode();
-                if (typeDifference != 0)
-                    return typeDifference;
-                else
-                    return e1.GetHashCode() - e2.GetHashCode();
-            });
-            Changed = true;
-        }
-
-        /// <summary>
         /// Transfers TemporaryGroup to TotalGroup using NextOperation. 
-        /// Sorts entities by their entity type and hash code.
         /// </summary>
         public void CommitEntities()
         {

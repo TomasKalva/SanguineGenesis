@@ -641,7 +641,7 @@ namespace SanguineGenesis.GUI
             {
                 //selected entities changed since the last update
                 GameControls.SelectedGroup.Changed = false;
-                List<Entity> selectedEntities = GameControls.SelectedGroup.Entities;
+                List<Entity> selectedEntities = GameControls.SelectedGroup.Entities();
                 selectedEntities.Sort((e1, e2) => string.Compare(e1.EntityType, e2.EntityType));
 
                 //update selected entity if the old one was removed or player is currently selecting entities

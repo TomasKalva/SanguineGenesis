@@ -18,7 +18,7 @@ namespace SanguineGenesis.GameControls
         public MapView MapView { get; private set; }
         public MapSelectorRect MapSelectorRect { get; private set; }
 
-        //State of selected game objects.
+        //State of communication with game logic.
         public SelectionInput SelectionInput { get; private set; }
         public SelectedGroup SelectedGroup { get; private set; }
 
@@ -57,7 +57,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Selects entities based on EntityCommandsInput and MapSelectorRect. Sets commands
+        /// Selects entities based on SelectionInput and MapSelectorRect. Sets commands
         /// to SelectedEntities.
         /// </summary>
         public void UpdateEntitiesByInput(Game game)
@@ -91,12 +91,9 @@ namespace SanguineGenesis.GameControls
                     if (SelectionInput.State == SelectionInputState.FINISH_SELECTING_ENTITIES)
                     {
                         MapSelectorRect = null;
-                        if (SelectedGroup.Entities.Any())
-                        {
-                            SelectedGroup.CommitEntities();
-                            SelectedGroup.SortEntities();
+                        SelectedGroup.CommitEntities();
+                        if (SelectedGroup.Entities().Any())
                             SelectionInput.State = SelectionInputState.ENTITIES_SELECTED;
-                        }
                         else
                             SelectionInput.State = SelectionInputState.IDLE;
                     }
@@ -110,17 +107,14 @@ namespace SanguineGenesis.GameControls
                         && selectedAbility.TargetType == typeof(Nothing))
                     {
                         //use the ability
-                        IEnumerable<Entity> entitiesWithAbil = SelectedGroup.Entities.Where((e) => e.Abilities.Contains(selectedAbility));
-                        if (entitiesWithAbil != null)
-                        {
-                            selectedAbility.SetCommands(entitiesWithAbil, Nothing.Get, SelectionInput.ResetCommandsQueue, ActionLog);
-                        }
+                        IEnumerable<Entity> entitiesWithAbil = SelectedGroup.Entities();
+                        selectedAbility.SetCommands(entitiesWithAbil, Nothing.Get, SelectionInput.ResetCommandsQueue, ActionLog);
                         //reset ability selection
                         SelectionInput.SelectedAbility = null;
                     }
                     break;
                 }
-                case SelectionInputState.ABILITY_TARGET_SELECTED:
+                case SelectionInputState.TARGET_SELECTED:
                 {
                     if (!SelectionInput.IsAbilitySelected)
                     //ability wasn't selected, use default abilities
@@ -131,11 +125,11 @@ namespace SanguineGenesis.GameControls
                     //ability was selected
                     {
                         Ability ability = SelectionInput.SelectedAbility;
-                        ITargetable target=FindAbilityTarget(game, ability, SelectionInput.TargetCoordinates);
+                        ITargetable target = FindAbilityTarget(game, ability, SelectionInput.TargetCoordinates);
                         if (target != null)
                         {
                             //use the ability if a valid target was selected
-                            IEnumerable<Entity> entitiesWithAbil = SelectedGroup.Entities.Where((e) => e.Abilities.Contains(ability));
+                            IEnumerable<Entity> entitiesWithAbil = SelectedGroup.Entities();
                             ability.SetCommands(entitiesWithAbil, target, SelectionInput.ResetCommandsQueue, ActionLog);
                         }
                         else
@@ -150,6 +144,7 @@ namespace SanguineGenesis.GameControls
                     break;
                 }
             }
+            //update selected group
             SelectedGroup.RemoveDead();
         }
 
@@ -168,16 +163,16 @@ namespace SanguineGenesis.GameControls
                 //no enemy selected => move to the movement target building that is at clicked coordinates
                 var moveToAbility = game.GameData.Abilities.UnbreakableMoveTo;
                 ITargetable movementTarget = FindAbilityTarget(game, moveToAbility, SelectionInput.TargetCoordinates);
-                //if there is no building at clicked coordinates, move to the coordinates
+                //if there is no building at clicked coordinates, move to the coordinates, otherwise move to the building
                 if (!(movementTarget is Building))
                     movementTarget = targetCoords;
-                moveToAbility.SetCommands(SelectedGroup.Entities
-                    .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), movementTarget, resetQueue, ActionLog);
+                moveToAbility.SetCommands(SelectedGroup.Entities()
+                    .Where((e) => e.GetType() == typeof(Animal)).Cast<Animal>(), movementTarget, resetQueue, ActionLog.ThrowAway);
             }
             else
             {
                 //enemy selected => attack it
-                game.GameData.Abilities.UnbreakableAttack.SetCommands(SelectedGroup.Entities, enemy, resetQueue, ActionLog);
+                game.GameData.Abilities.UnbreakableAttack.SetCommands(SelectedGroup.Entities(), enemy, resetQueue, ActionLog.ThrowAway);
             }
         }
 
@@ -232,7 +227,7 @@ namespace SanguineGenesis.GameControls
         /// Selects target visible for the selecting player of the given type. Instances of the type have to implement
         /// ITargetable.
         /// </summary>
-        /// <exception cref="ArgumentException">Thrown if instances of type don't implement ITargetable.</exception>
+        /// <exception cref="ArgumentException">Thrown if the instance of type doesn't implement ITargetable.</exception>
         private ITargetable SelectClickedEntityTarget(Game game, float x, float y, Player selectingPlayer, Func<Entity,bool> condition, Type type)
         {
             if (!typeof(ITargetable).IsAssignableFrom(type))
@@ -240,8 +235,7 @@ namespace SanguineGenesis.GameControls
 
             IEnumerable<Entity> allEntities = GameQuerying.SelectEntitiesInArea(
                                     game, new Rect(x, y, x, y))
-                                    .Where((entity) => type.IsAssignableFrom(entity.GetType()) && condition(entity))
-                                    .ToList();
+                                    .Where((entity) => type.IsAssignableFrom(entity.GetType()) && condition(entity));
             return GameQuerying.SelectVisibleEntities(selectingPlayer, allEntities).FirstOrDefault();
         }
     }
