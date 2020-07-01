@@ -200,7 +200,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                                 factory.AddAbility(abilities.UnitSpawn(abPar[1]));
                                 break;
                             case "create":
-                                factory.AddAbility(abilities.UnitCreate(abPar[1]));
+                                factory.AddAbility(abilities.AnimalCreate(abPar[1]));
                                 break;
                         }
                     }

@@ -42,7 +42,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         public bool Active { get { lock (this) return active; } set { lock (this) active = value; } }
         private bool empty;
         /// <summary>
-        /// True iff there are no animals that are using this assignment. 
+        /// True if there are no animals that are using this assignment. 
         /// If set to true, this command assignment will be removed and all its commands canceled. Can only 
         /// be used from the MovementGenerator and also from the game thread without locking, because it can 
         /// only be set to true and reading an incorrect bool value once has no negative effects.

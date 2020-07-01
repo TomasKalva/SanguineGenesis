@@ -40,15 +40,15 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         public float EnergyCost { get; }
         /// <summary>
-        /// True iff this ability should be performed only by one of the selected units.
+        /// True if this ability should be performed only by one of the selected units.
         /// </summary>
         public bool OnlyOne { get; }
         /// <summary>
-        /// True iff the target of the ability can be its user.
+        /// True if the target of the ability can be its user.
         /// </summary>
         public bool SelfUseable { get; }
         /// <summary>
-        /// True iff the command can be removed from the first place in the command queue.
+        /// True if the command can be removed from the first place in the command queue.
         /// </summary>
         public bool Interruptable { get; }
         /// <summary>
@@ -142,7 +142,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
         
         /// <summary>
-        /// Returns true iff target has valid type.
+        /// Returns true if target has valid type.
         /// </summary>
         public sealed override bool ValidTargetType(ITargetable target)
         {

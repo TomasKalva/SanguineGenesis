@@ -17,7 +17,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
         /// <summary>
         /// Icons used for the buttons.
         /// </summary>
-        public static Icons Icons { get; set; }
+        public static Icons Icons { get; } = new Icons();
     }
 
     /// <summary>

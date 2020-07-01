@@ -34,7 +34,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public Vector2 Direction { get; set; }
         /// <summary>
-        /// True iff the unit is facing left.
+        /// True if the unit is facing left.
         /// </summary>
         public bool FacingLeft => Direction.X <= 0;
 
@@ -63,7 +63,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public float AttackDistance { get; }
         /// <summary>
-        /// True iff the animal deals extra damage to buildings.
+        /// True if the animal deals extra damage to buildings.
         /// </summary>
         public bool MechanicalDamage { get; }
         /// <summary>

@@ -70,7 +70,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         }
 
         /// <summary>
-        /// Returns true iff the angle indicates that angle pointing to the target should be used,
+        /// Returns true if the angle indicates that angle pointing to the target should be used,
         /// instead of this angle.
         /// </summary>
         public static bool PointToTarget(float angle) => angle <= POINT_TO_TARGET;

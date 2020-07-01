@@ -166,7 +166,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Decreases size of viewed area. Returns true iff zoom was succesfull.
+        /// Decreases size of viewed area. Returns true if zoom was succesfull.
         /// </summary>
         public bool ZoomIn(Map map)
         {
@@ -181,7 +181,7 @@ namespace SanguineGenesis.GameControls
         }
 
         /// <summary>
-        /// Increases size of viewed area. Returns true iff zoom was succesfull.
+        /// Increases size of viewed area. Returns true if zoom was succesfull.
         /// </summary>
         public bool ZoomOut(Map map)
         {

@@ -18,7 +18,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
     abstract class Command : IShowable
     {
         /// <summary>
-        /// True iff the command can be removed from the first place in the command queue.
+        /// True if the command can be removed from the first place in the command queue.
         /// </summary>
         public abstract bool Interruptable { get; }
         /// <summary>
@@ -105,7 +105,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             }
         }
         /// <summary>
-        /// True iff the ability was paid.
+        /// True if the ability was paid.
         /// </summary>
         protected bool Paid { get; private set; }
         /// <summary>
@@ -113,7 +113,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// </summary>
         protected float ElapsedTime { get; set; }
         /// <summary>
-        /// True iff it can be removed while being performed.
+        /// True if it can be removed while being performed.
         /// </summary>
         public override bool Interruptable => Ability.Interruptable;
         /// <summary>
@@ -179,7 +179,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
         
         /// <summary>
-        /// Returns true iff the commanded entity and target can be used by this command.
+        /// Returns true if the commanded entity and target can be used by this command.
         /// </summary>
         protected bool CanBeUsed()
         {

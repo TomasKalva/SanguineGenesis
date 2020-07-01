@@ -35,7 +35,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public override float Radius => Size / 2f;
         /// <summary>
-        /// True iff building of this building was finished.
+        /// True if building of this building was finished.
         /// </summary>
         public bool Built { get; set; }
         /// <summary>
@@ -55,7 +55,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public SoilQuality SoilQuality { get; }
         /// <summary>
-        /// True iff the building blocks vision.
+        /// True if the building blocks vision.
         /// </summary>
         public bool BlocksVision { get; set; }
         /// <summary>

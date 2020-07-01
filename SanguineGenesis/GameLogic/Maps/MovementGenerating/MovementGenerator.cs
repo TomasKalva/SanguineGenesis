@@ -433,7 +433,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         }
 
         /// <summary>
-        /// Returns true iff the calculation cycle should finish.
+        /// Returns true if the calculation cycle should finish.
         /// </summary>
         private bool CycleFinished()
         {
@@ -459,7 +459,7 @@ namespace SanguineGenesis.GameLogic.Maps.MovementGenerating
         }
 
         /// <summary>
-        /// Returns true iff new calculation cycle should begin.
+        /// Returns true if new calculation cycle should begin.
         /// </summary>
         private bool ShouldStartNewCycle()
         {

@@ -45,7 +45,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         public abstract float Radius { get; }
         /// <summary>
-        /// True iff the entity collides with other physical entities.
+        /// True if the entity collides with other physical entities.
         /// </summary>
         public bool Physical { get; set; }
         /// <summary>
@@ -276,7 +276,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Deals damage to the entity. physical should be true iff the damage
+        /// Deals damage to the entity. physical should be true if the damage
         /// is dealth physical (by being hit). Non-physical damage is poison,
         /// bleeding, ...
         /// </summary>
@@ -420,7 +420,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         public List<Command> ToList() => Queue.ToList();
 
         /// <summary>
-        /// True iff the queue is not empty.
+        /// True if the queue is not empty.
         /// </summary>
         public bool Any() => Queue.Any();
 

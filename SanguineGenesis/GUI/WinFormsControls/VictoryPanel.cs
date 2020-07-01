@@ -14,7 +14,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
     class VictoryPanel:Panel
     {
         /// <summary>
-        /// True iff the panel has been shown already.
+        /// True if the panel has been shown already.
         /// </summary>
         public bool AlreadyShown { get; set; }
         /// <summary>

@@ -16,7 +16,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
     abstract class StatusFactory
     {
         /// <summary>
-        /// True iff there can be at most one instance of this status per status owner.
+        /// True if there can be at most one instance of this status per status owner.
         /// </summary>
         public bool OnlyOnce { get; }
         /// <summary>
@@ -51,7 +51,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
             => ApplyToAffected((Affected)affected);
 
         /// <summary>
-        /// Returns true iff the status was successfuly applied.
+        /// Returns true if the status was successfuly applied.
         /// </summary>
         public virtual bool ApplyToAffected(Affected affected)
         {

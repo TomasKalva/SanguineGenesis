@@ -14,7 +14,7 @@ namespace SanguineGenesis.GameControls
         public Ability SelectedAbility { get; set; }
         public bool IsAbilitySelected => SelectedAbility != null;
         /// <summary>
-        /// True iff before setting new commands, the old should be removed.
+        /// True if before setting new commands, the old should be removed.
         /// </summary>
         public bool ResetCommandsQueue { get; set; }
 

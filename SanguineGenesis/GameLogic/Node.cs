@@ -79,11 +79,11 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public SoilQuality SoilQuality { get; private set; }
         /// <summary>
-        /// True iff a building or structure is standing on this node.
+        /// True if a building or structure is standing on this node.
         /// </summary>
         public bool Blocked => Building != null;
         /// <summary>
-        /// True iff physical building is standing on this node.
+        /// True if physical building is standing on this node.
         /// </summary>
         public bool MovementBlocked => Building != null && Building.Physical;
         /// <summary>

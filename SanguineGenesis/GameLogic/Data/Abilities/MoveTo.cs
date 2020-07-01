@@ -23,7 +23,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
         
         /// <summary>
-        /// Null iff attack distance of commanded entity should be used.
+        /// Null if attack distance of commanded entity should be used.
         /// </summary>
         public float? GoalDistance { get; }
         public bool AttackEnemyInstead { get; }
@@ -206,7 +206,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Returns true iff the animal is close enough to the target.
+        /// Returns true if the animal is close enough to the target.
         /// </summary>
         public bool Finished()
         {
@@ -214,7 +214,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         }
 
         /// <summary>
-        /// Returns true iff the animal is moving to a point, is close to it
+        /// Returns true if the animal is moving to a point, is close to it
         /// and it hasn't moved much lately.
         /// </summary>
         public bool NoMovement(float deltaT)

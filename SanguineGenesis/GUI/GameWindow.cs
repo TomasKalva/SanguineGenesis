@@ -49,7 +49,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public bool GameEnded { get; set; }
 
-        public GameWindow(Icons icons, MainMenuWindow mainMenuWindow)
+        public GameWindow(MainMenuWindow mainMenuWindow)
         {
             InitializeComponent();
             Initialized = false;
@@ -81,11 +81,11 @@ namespace SanguineGenesis.GUI
                 Close();
             }
 
-            //waint until the window initializes and then initialize bottom panel and opengl
+            //wait until the window initializes and then initialize bottom panel and opengl
             Shown += (s, e) =>
             {
                 InitializeOpenGL();
-                InitializeUserInterface(icons);
+                InitializeUserInterface();
                 GameUpdateTimer.Enabled = true;
             };
         }
@@ -138,7 +138,7 @@ namespace SanguineGenesis.GUI
             GameTime.NextStep();
 
             //update MapMovementInput
-            UpdateMoveMap();
+            UpdateMapMovementInput();
             //move map view
             GameControls.MoveMapView(Game.Map);
 
@@ -204,14 +204,13 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Initializes user interface.
         /// </summary>
-        private void InitializeUserInterface(Icons icons)
+        private void InitializeUserInterface()
         {
             //initialize bottom panel
-            InitializeBottomPanel(icons);
+            InitializeBottomPanel();
 
             //add event handlers to this window and opengl control
-            MouseWheel += Window_MouseWheel;
-            openGLControl.PreviewKeyDown += OpenGLControl_PreviewKeyDown;
+            MouseWheel += GameWindow_MouseWheel;
 
             //menu button
             MenuButton = new Button()
@@ -289,11 +288,8 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Initialize controls of the bottom panel.
         /// </summary>
-        private void InitializeBottomPanel(Icons icons)
+        private void InitializeBottomPanel()
         {
-            //set icons to ButtonArray
-            ButtonArray.Icons = icons;
-
             //initialize ui elements
             //units panel
             EntityButtonArray = new EntityButtonArray(8, 5, 300, 188);
@@ -368,7 +364,7 @@ namespace SanguineGenesis.GUI
             try
             {
                 OpenGL gl = openGLControl.OpenGL;
-                OpenGLAtlasDrawer.Initialize(gl, (float)openGLControl.Width, (float)openGLControl.Height);
+                OpenGLAtlasDrawer.Initialize(gl, openGLControl.Width, openGLControl.Height);
             }catch(Exception e)
             {
                 MessageBox.Show("Failed to initialize window: "+e.Message);
@@ -461,7 +457,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Updates information about pressed keys.
         /// </summary>
-        private void MainWinformWindow_KeyDown(object sender, KeyEventArgs e)
+        private void OpenGLControl_KeyDown(object sender, KeyEventArgs e)
         {
             int abilityIndex;
             int controlGroupIndex;
@@ -507,7 +503,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Updates information about shift being pressed.
         /// </summary>
-        private void MainWinformWindow_KeyUp(object sender, KeyEventArgs e)
+        private void OpenGLControl_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.ShiftKey)
                 GameControls.SelectionInput.ResetCommandsQueue = true;
@@ -516,7 +512,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Changes the zoom of the map.
         /// </summary>
-        private void Window_MouseWheel(object sender, MouseEventArgs e)
+        private void GameWindow_MouseWheel(object sender, MouseEventArgs e)
         {
             if (e.Delta > 0)
             {
@@ -532,7 +528,7 @@ namespace SanguineGenesis.GUI
         /// If left button is pressed, starts selecting of selected entities. If right button
         /// is pressed, chooses target of selected ability.
         /// </summary>
-        private void MouseButtonDownHandler(object sender, MouseEventArgs e)
+        private void OpenGLControl_MouseButtonDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -570,7 +566,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Finishes selecting entities.
         /// </summary>
-        private void MouseButtonUpHandler(object sender, MouseEventArgs e)
+        private void OpenGLControl_MouseButtonUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -587,7 +583,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Update selected entities.
         /// </summary>
-        private void MouseMoveHandler(object sender, MouseEventArgs e)
+        private void OpenGLControl_MouseMove(object sender, MouseEventArgs e)
         {
             if (GameControls.SelectionInput.State == SelectionInputState.SELECTING_ENTITIES)
             {
@@ -604,7 +600,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Disables this window and enables main menu window.
         /// </summary>
-        private void MainWinformWindow_Closing(object sender, FormClosingEventArgs e)
+        private void GameWindow_Closing(object sender, FormClosingEventArgs e)
         {
             GameEnded = true;
             GameUpdateTimer.Enabled = false;
@@ -622,12 +618,24 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        private void GameWindow_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            try
+            {
+                OpenGLAtlasDrawer.Destruct(openGLControl.OpenGL);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to destroy OpenGL context: " + ex.Message);
+            }
+        }
+
         #endregion event handlers
 
-        #region Utility methods for manipulating controls
+        #region Utility methods
 
         /// <summary>
-        /// True if EntityButtonArray. Selected should be set to the first entity of GameControls.SelectedGroup.Entities.
+        /// True if EntityButtonArray.Selected should be set to the first entity of GameControls.SelectedGroup.Entities.
         /// </summary>
         private bool ShouldSetSelected { get; set; }
 
@@ -670,7 +678,7 @@ namespace SanguineGenesis.GUI
             ControlGroupButtonArray.UpdateControl();
 
             //update air
-            PlayerPropertiesPanel.AirValue.Text = Game.CurrentPlayer.AirTaken + "/" + Game.CurrentPlayer.MaxAirTaken;
+            PlayerPropertiesPanel.AirValue.Text = $"{Game.CurrentPlayer.AirTaken}/{Game.CurrentPlayer.MaxAirTaken}";
 
             //update error list
             ErrorList.Text = GameControls.ActionLog.GetMessages();
@@ -781,18 +789,6 @@ namespace SanguineGenesis.GUI
             openGLControl.Focus();
         }
 
-        private void GameWindow_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            try
-            {
-                OpenGLAtlasDrawer.Destruct(openGLControl.OpenGL);
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show("Failed to destroy OpenGL context: " + ex.Message);
-            }
-        }
-
         /// <summary>
         /// Shows panel anouncing winner of the game. Disables other ui. Only shows the panel once.
         /// </summary>
@@ -821,7 +817,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Updates MapMovementInput with mouse input if player is not selecting entities.
         /// </summary>
-        public void UpdateMoveMap()
+        public void UpdateMapMovementInput()
         {
             //check if player is selecting entities
             if (!(GameControls.SelectionInput.State == SelectionInputState.SELECTING_ENTITIES))
@@ -865,7 +861,7 @@ namespace SanguineGenesis.GUI
             }
         }
 
-        #endregion Utility methods for manipulating controls
+        #endregion Utility methods
 
         #endregion User interface
     }

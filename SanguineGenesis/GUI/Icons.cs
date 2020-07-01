@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace SanguineGenesis.GUI.WinFormsControls
 {
@@ -36,20 +37,26 @@ namespace SanguineGenesis.GUI.WinFormsControls
         /// </summary>
         private void AddIcons(string directoryName)
         {
-            foreach(var name in Directory.GetFiles(directoryName)
-                                        .Select(Path.GetFileNameWithoutExtension))
-            //foreach (var name in names)
+            try
             {
-                try
+                foreach (var name in Directory.GetFiles(directoryName)
+                                            .Select(Path.GetFileNameWithoutExtension))
                 {
-                    string fileName = directoryName + name.ToLower() + ".png";
-                    var bmp = new Bitmap(fileName);
-                    icons.Add(name.ToUpper(), bmp);
+                    try
+                    {
+                        string fileName = directoryName + name.ToLower() + ".png";
+                        var bmp = new Bitmap(fileName);
+                        icons.Add(name.ToUpper(), bmp);
+                    }
+                    catch (Exception)
+                    {
+                        // icon couldn't be loaded
+                    }
                 }
-                catch (Exception)
-                {
-                    // icon couldn't be loaded - problem with opening file or duplicate key
-                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Can't load files from {directoryName}: {e.Message}");
             }
             empty = new Bitmap(1, 1);
         }

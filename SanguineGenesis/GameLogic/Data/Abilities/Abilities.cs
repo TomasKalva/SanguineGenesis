@@ -33,6 +33,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public MoveTo MoveToUse(Ability ability) => moveToUse[ability];
         public Attack Attack { get; }
         public Attack UnbreakableAttack { get; }
+        /// <summary>
+        /// Returns Spawn ability of invalid animal if animal of the type doesn't exist.
+        /// </summary>
         public Spawn UnitSpawn(string type)
         {
             if (animalSpawn.TryGetValue(type, out var anim))
@@ -45,7 +48,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 return new Spawn(new AnimalFactory($"{anim}_not_exists", 1, 1, 1, 1, 1, 1, 1, 1, false, 1, 1, Movement.LAND, false, Diet.CARNIVORE, 1, false, 1, 1, new List<Statuses.StatusFactory>(), 1));
             }
         }
-        public CreateAnimal UnitCreate(string type)
+        /// <summary>
+        /// Returns CreateAnimal ability of invalid animal if animal of the type doesn't exist.
+        /// </summary>
+        public CreateAnimal AnimalCreate(string type)
         {
             if(animalCreate.TryGetValue(type, out var anim))
             {
@@ -57,6 +63,9 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
                 return new CreateAnimal(new AnimalFactory($"{anim}_not_exists", 1, 1, 1, 1, 1, 1, 1, 1, false, 1, 1, Movement.LAND, false, Diet.CARNIVORE, 1, false, 1, 1, new List<Statuses.StatusFactory>(), 1));
             }
         }
+        /// <summary>
+        /// Returns BuildBuilding ability of invalid structure if building of the type doesn't exist.
+        /// </summary>
         public BuildBuilding BuildBuilding(string type)
         {
             if (buildBuilding.TryGetValue(type, out var buil))

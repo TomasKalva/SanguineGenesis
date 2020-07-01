@@ -85,7 +85,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         }
 
         /// <summary>
-        /// Returns true iff this building can be on the node.
+        /// Returns true if this building can be on the node.
         /// </summary>
         public bool CanBeOn(Node node)
         {

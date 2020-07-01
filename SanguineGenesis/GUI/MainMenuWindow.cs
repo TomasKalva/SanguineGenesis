@@ -36,10 +36,6 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private int MapScale { get; }
         /// <summary>
-        /// Icons used for the game gui.
-        /// </summary>
-        private Icons Icons { get; }
-        /// <summary>
         /// If set to false, new game can't be created. 
         /// </summary>
         public bool CanCreateGame { get; set; }
@@ -54,7 +50,6 @@ namespace SanguineGenesis.GUI
 
             MapScale = mapPB.Width / MAX_MAP_WIDTH;
             DrawOpt = DrawOption.NO_ACTION;
-            Icons = new Icons();
             CanCreateGame = true;
             LoadNamesOfCreatedMaps();
             //load icon
@@ -149,7 +144,7 @@ namespace SanguineGenesis.GUI
         }
 
         /// <summary>
-        /// Returns true iff the name of the map already exists.
+        /// Returns true if the name of the map already exists.
         /// </summary>
         public bool MapAlreadyExists(string name)
         {
@@ -483,7 +478,7 @@ namespace SanguineGenesis.GUI
 
                         //create new window only if it wasn't created already
                         if (gameWindow == null)
-                            gameWindow = new GameWindow(Icons, this);
+                            gameWindow = new GameWindow(this);
                         if (CanCreateGame)
                         {
                             gameWindow.Enabled = true;
@@ -560,7 +555,7 @@ namespace SanguineGenesis.GUI
             }
 
             /// <summary>
-            /// True iff the map can't be edited.
+            /// True if the map can't be edited.
             /// </summary>
             private bool Frozen { get; set; }
             private Bitmap TerrainMap { get; }
@@ -760,7 +755,7 @@ namespace SanguineGenesis.GUI
             }
 
             /// <summary>
-            /// Returns true iff the map contains main buildings of both players.
+            /// Returns true if the map contains main buildings of both players.
             /// </summary>
             public bool MainBuildingsPresent()
             {
@@ -769,12 +764,12 @@ namespace SanguineGenesis.GUI
             }
 
             /// <summary>
-            /// Returns true iff the coordinate on the map is valid.
+            /// Returns true if the coordinate on the map is valid.
             /// </summary>
             public bool ValidCoordinates(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
 
             /// <summary>
-            /// Returns true iff building of width and height can be placed to coordinates x,y.
+            /// Returns true if building of width and height can be placed to coordinates x,y.
             /// </summary>
             private bool CanBePlacedBuilding(int x, int y, int width, int height)
             {

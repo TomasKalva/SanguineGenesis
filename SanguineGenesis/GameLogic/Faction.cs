@@ -152,7 +152,7 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Returns true iff this faction can see entity.
+        /// Returns true if this faction can see entity.
         /// </summary>
         public virtual bool CanSee(Entity entity)
         {
@@ -327,7 +327,7 @@ namespace SanguineGenesis.GameLogic
         }
 
         /// <summary>
-        /// Returns true iff this player can see entity. It is assumed that entity lies on the map,
+        /// Returns true if this player can see entity. It is assumed that entity lies on the map,
         /// otherwise OutOfRangeException is thrown.
         /// </summary>
         /// <exception cref="IndexOutOfRangeException">When entity doesn't lie on the map (shouldn't happen
