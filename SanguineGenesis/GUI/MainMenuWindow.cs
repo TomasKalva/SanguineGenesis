@@ -484,14 +484,17 @@ namespace SanguineGenesis.GUI
                         //create new window only if it wasn't created already
                         if (gameWindow == null)
                             gameWindow = new GameWindow(Icons, this);
-                        gameWindow.Enabled = true;
-                        gameWindow.StartNewGame(MapDescr, PlayersBiome, testAnimalsCB.Checked);
-                        gameWindow.BringToFront();
-                        //hide this window
-                        Enabled = false;
-                        Visible = false;
-                        //show game window
-                        gameWindow.Show();
+                        if (CanCreateGame)
+                        {
+                            gameWindow.Enabled = true;
+                            gameWindow.StartNewGame(MapDescr, PlayersBiome, testAnimalsCB.Checked);
+                            gameWindow.BringToFront();
+                            //hide this window
+                            Enabled = false;
+                            Visible = false;
+                            //show game window
+                            gameWindow.Show();
+                        }
                     }
                     else
                         ErrorMessage("The map doesn't contain the main buildings of both players.");

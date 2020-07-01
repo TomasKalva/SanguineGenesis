@@ -272,7 +272,7 @@ namespace SanguineGenesis.GUI
                 TextAlign = ContentAlignment.BottomCenter
             };
             ErrorList.Height = GameControls.ActionLog.Size * ErrorList.Font.Height + 2;
-            ErrorList.Text = "Error: 4\nError: 3\nError: 2\nError: 1\n ";
+            ErrorList.Text = "";
             openGLControl.Controls.Add(ErrorList);
 
             //put openGLFocus to the background and set focus to it
@@ -300,7 +300,7 @@ namespace SanguineGenesis.GUI
             Controls.Add(EntityButtonArray);
 
             //abilities panel
-            AbilityButtonArray = new AbilityButtonArray(4, 3, 200, 200);
+            AbilityButtonArray = new AbilityButtonArray(4, 3, 200, 200, GameControls);
             Controls.Add(AbilityButtonArray);
 
             //entity info panel
@@ -314,17 +314,17 @@ namespace SanguineGenesis.GUI
                 new List<Stat>());
 
             //control groups panel
-            ControlGroupButtonArray = new ControlGroupButtonArray(6, EntityButtonArray.Width, 20);
+            ControlGroupButtonArray = new ControlGroupButtonArray(6, EntityButtonArray.Width, 20, GameControls);
             Controls.Add(ControlGroupButtonArray);
 
-            //add listeners to the buttons
+            //add handlers to the buttons
             EntityButtonArray.ShowInfoOnClick(GameControls, GameControls.SelectionInput);
             AbilityButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
             EntityInfoPanel.CommandButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
             EntityInfoPanel.CommandButtonArray.RemoveCommandOnClick();
             EntityInfoPanel.StatusButtonArray.ShowInfoOnMouseOver(AdditionalInfo);
-            AbilityButtonArray.SelectAbilityOnClick(GameControls);
-            ControlGroupButtonArray.SetEventHandlers(GameControls);
+            AbilityButtonArray.SelectAbilityOnClick();
+            ControlGroupButtonArray.LoadEntitiesOnClick();
 
             EntityButtonArray.GiveFocusTo(openGLControl);
             AbilityButtonArray.GiveFocusTo(openGLControl);
@@ -475,7 +475,7 @@ namespace SanguineGenesis.GUI
                 GameControls.SelectionInput.ResetCommandsQueue = false;
             else if (e.KeyCode == Keys.Tab)
                 //jump to next entity type
-                SelectEntityOfNextType();
+                EntityButtonArray.SelectEntityOfNextType(GameControls.SelectionInput);
             else if (e.KeyCode == Keys.Space)
             {
                 //select only entities of current type
@@ -627,7 +627,7 @@ namespace SanguineGenesis.GUI
         #region Utility methods for manipulating controls
 
         /// <summary>
-        /// True if EntityButtonArray.Selected should be set to the first entity of GameControls.SelectedGroup.Entities.
+        /// True if EntityButtonArray. Selected should be set to the first entity of GameControls.SelectedGroup.Entities.
         /// </summary>
         private bool ShouldSetSelected { get; set; }
 
@@ -692,37 +692,6 @@ namespace SanguineGenesis.GUI
                 EntityInfoPanel.SelectedEntity = selected;
                 AbilityButtonArray.InfoSources = selected.Abilities;
                 GameControls.SelectionInput.SelectedAbility = null;
-            }
-        }
-
-        /// <summary>
-        /// Selects entity of the next type.
-        /// </summary>
-        private void SelectEntityOfNextType()
-        {
-            //iterate through all entities starting at selectedEntity,
-            //select the first one with different type, keep the original
-            //entity selected if there is no entity with different type
-            List<Entity> selectedEntities = EntityButtonArray.InfoSources;
-            Entity selectedEntity = EntityButtonArray.Selected;
-            if (selectedEntities != null &&
-                selectedEntities.Any() &&
-                selectedEntity != null)
-            {
-                string currentType = selectedEntity.EntityType;
-                int start = selectedEntities.IndexOf(selectedEntity);
-                int length = selectedEntities.Count;
-                int i = (start + 1) % length;
-                while (i != start)
-                {
-                    if(selectedEntities[i].EntityType!=currentType)
-                    {
-                        EntityButtonArray.Selected = selectedEntities[i];
-                        GameControls.SelectionInput.SelectedAbility = null;
-                        break;
-                    }
-                    i = (i + 1) % length;
-                }
             }
         }
 
@@ -864,13 +833,11 @@ namespace SanguineGenesis.GUI
                 {
                     //move right
                     GameControls.MapMovementInput.AddDirection(Direction.RIGHT);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.LEFT);
                 }
                 else if (mousePos.X <= movingFrameSize)
                 {
                     //move left
                     GameControls.MapMovementInput.AddDirection(Direction.LEFT);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.RIGHT);
                 }
                 else
                 {
@@ -883,13 +850,11 @@ namespace SanguineGenesis.GUI
                 {
                     //move down
                     GameControls.MapMovementInput.AddDirection(Direction.DOWN);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.UP);
                 }
                 else if (mousePos.Y <= movingFrameSize)
                 {
                     //move up
                     GameControls.MapMovementInput.AddDirection(Direction.UP);
-                    GameControls.MapMovementInput.RemoveDirection(Direction.DOWN);
                 }
                 else
                 {

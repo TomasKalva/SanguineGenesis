@@ -65,15 +65,15 @@ namespace SanguineGenesis.GUI.WinFormsControls
 
             optionCheckboxes[0].Text = "Whole map visible";
             optionCheckboxes[0].CheckedChanged += (_s, _e) =>
-                gameplayOptions.WholeMapVisible = (bool)optionCheckboxes[0].Checked;
+                gameplayOptions.WholeMapVisible = optionCheckboxes[0].Checked;
 
             optionCheckboxes[1].Text = "Nutrients visible";
             optionCheckboxes[1].CheckedChanged += (_s, _e) =>
-                gameplayOptions.NutrientsVisible = (bool)optionCheckboxes[1].Checked;
+                gameplayOptions.NutrientsVisible = optionCheckboxes[1].Checked;
 
             optionCheckboxes[2].Text = "Show flowfield";
             optionCheckboxes[2].CheckedChanged +=(_s, _e) =>
-                gameplayOptions.ShowFlowfield = (bool)optionCheckboxes[2].Checked;
+                gameplayOptions.ShowFlowfield = optionCheckboxes[2].Checked;
 
             BackColor = Color.Gray;
         }

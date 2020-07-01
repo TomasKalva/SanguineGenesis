@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Input;
-using SanguineGenesis;
 using SanguineGenesis.GameControls;
-using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Data.Statuses;
-using SanguineGenesis.GUI;
-using SanguineGenesis.GUI.WinFormsControls;
 
 namespace SanguineGenesis.GUI.WinFormsControls
 {
@@ -32,7 +23,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
     /// <summary>
     /// Control for drawing rectangle array of buttons.
     /// </summary>
-    abstract class ButtonArray<InfoSource> : ButtonArray  where InfoSource : IShowable
+    class ButtonArray<InfoSource> : ButtonArray  where InfoSource : IShowable
     {
         /// <summary>
         /// InfoSources corresponding to the button indexes.
@@ -44,7 +35,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
         /// </summary>
         public InfoSource GetInfoSource(int index)
         {
-            if (InfoSources != null && index < InfoSources.Count)
+            if (InfoSources != null && index < InfoSources.Count && index >= 0)
                 return InfoSources[index];
             else
                 return default;
@@ -53,8 +44,22 @@ namespace SanguineGenesis.GUI.WinFormsControls
         /// Selected InfoSource.
         /// </summary>
         public InfoSource Selected { get; set; }
+        /// <summary>
+        /// Color of selected button.
+        /// </summary>
+        protected Color SelectedColor => Color.DarkGreen;
+        /// <summary>
+        /// Color of button without corresponding InfoSource.
+        /// </summary>
+        protected Color NothingColor => Color.White;
+        /// <summary>
+        /// Color of not selected button with corresponding InfoSource.
+        /// </summary>
+        protected Color DefaultColor => Color.Orange;
 
-
+        /// <summary>
+        /// Array with the real layout of this control. First index is column, second is row.
+        /// </summary>
         protected Button[,] Buttons { get; }
 
         /// <summary>
@@ -84,14 +89,14 @@ namespace SanguineGenesis.GUI.WinFormsControls
                         FlatStyle = FlatStyle.Flat
                     };
                     b.FlatAppearance.BorderSize = 1;
-                    b.Font = new Font(Button.DefaultFont.FontFamily, 6, System.Drawing.FontStyle.Regular);
+                    b.Font = new Font(DefaultFont.FontFamily, 6, FontStyle.Regular);
                     Buttons[i, j] = b;
                     Controls.Add(b);
                 }
         }
 
         /// <summary>
-        /// Sets listeners to buttons to show corresponding InfoSource in
+        /// Sets handlers to buttons to show corresponding InfoSource in
         /// additionalInfo if mouse is over it.
         /// </summary>
         public void ShowInfoOnMouseOver(AdditionalInfo additionalInfo)
@@ -100,11 +105,9 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 for (int j = 0; j < RowCount; j++)
                 {
                     Button b = Buttons[i, j];
-                    int buttonInd = ButtonIndex(j, i);//capture by value
-                    bool mouseOverButton = false;
+                    int buttonInd = InfoSourceIndex(j, i);//capture by value
                     b.MouseEnter += (sender, ev) =>
                     {
-                        mouseOverButton = true;
                         InfoSource info;
                         if ((info = GetInfoSource(buttonInd)) != null)
                             additionalInfo.Update(info);
@@ -112,24 +115,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
 
                     b.MouseLeave += (sender, ev) =>
                     {
-                        mouseOverButton = false;
                         additionalInfo.Reset();
-                    };
-                    b.VisibleChanged += (sender, ev) =>
-                    {
-                        InfoSource info = GetInfoSource(buttonInd);
-                        if (b.Visible)
-                        {
-                            //show info if button appeared under mouse
-                            if (mouseOverButton && info != null)
-                                additionalInfo.Update(info);
-                        }
-                        else
-                        {
-                            //reset info shown in additional info if its button disappeared
-                            if (info != null && info.Equals(additionalInfo.Shown))
-                                additionalInfo.Reset();
-                        }
                     };
                 }
         }
@@ -146,13 +132,13 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 for (int j = 0; j < RowCount; j++)
                 {
                     Button b = Buttons[i, j];
-                    int index = ButtonIndex(j, i);
+                    int index = InfoSourceIndex(j, i);
                     if (index >= InfoSources.Count)
                     {
                         //set default appearance of the button
                         b.Image = null;
-                        if (b.BackColor != Color.White)
-                            b.BackColor = Color.White;
+                        if (b.BackColor != NothingColor)
+                            b.BackColor = NothingColor;
                     }
                     else
                     {
@@ -161,16 +147,19 @@ namespace SanguineGenesis.GUI.WinFormsControls
                         //highlight selected
                         if (InfoSources[index].Equals(Selected))
                         {
-                            if (b.BackColor != Color.DarkGreen)
-                                b.BackColor = Color.DarkGreen;
+                            if (b.BackColor != SelectedColor)
+                                b.BackColor = SelectedColor;
                         }
-                        else if (b.BackColor != Color.Orange)
-                            b.BackColor = Color.Orange;
+                        else if (b.BackColor != DefaultColor)
+                            b.BackColor = DefaultColor;
                     }
                 }
         }
 
-        protected int ButtonIndex(int row, int column) => row + column * RowCount;
+        /// <summary>
+        /// Index of item in InfoSources for the button position.
+        /// </summary>
+        protected int InfoSourceIndex(int row, int column) => row + column * RowCount;
 
         /// <summary>
         /// Makes buttons give focus to focusTarget on click.
@@ -192,13 +181,10 @@ namespace SanguineGenesis.GUI.WinFormsControls
         public EntityButtonArray(int colulmns, int rows, int preferedWidth, int preferedHeight)
             : base(colulmns, rows, preferedWidth, preferedHeight)
         {
-            for (int i = 0; i < ColumnCount; i++)
-                for (int j = 0; j < RowCount; j++)
-                    Buttons[i, j].Font = new Font(Button.DefaultFont.FontFamily, 6 , System.Drawing.FontStyle.Regular);
         }
 
         /// <summary>
-        /// Sets listeners to buttons click to show corresponding Entity's in
+        /// Sets handlers to buttons click to show corresponding Entity in
         /// entityInfoPanel and its abilities in abilityButtonArray, and to remove
         /// the entity from selected entities on right click.
         /// </summary>
@@ -209,7 +195,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 for (int j = 0; j < RowCount; j++)
                 {
                     Button b = Buttons[i, j];
-                    int buttonInd = ButtonIndex(j, i);//capture by value
+                    int buttonInd = InfoSourceIndex(j, i);//capture by value
                     b.MouseDown += (sender, ev) =>
                     {
                         Entity info;
@@ -230,6 +216,37 @@ namespace SanguineGenesis.GUI.WinFormsControls
                     };
                 }
         }
+
+        /// <summary>
+        /// Selects entity of the next type.
+        /// </summary>
+        public void SelectEntityOfNextType(SelectionInput selectionInput)
+        {
+            //iterate through all entities starting at selectedEntity,
+            //select the first one with different type, keep the original
+            //entity selected if there is no entity with different type
+            List<Entity> selectedEntities = InfoSources;
+            Entity selectedEntity = Selected;
+            if (selectedEntities != null &&
+                selectedEntities.Any() &&
+                selectedEntity != null)
+            {
+                string currentType = selectedEntity.EntityType;
+                int start = selectedEntities.IndexOf(selectedEntity);
+                int length = selectedEntities.Count;
+                int i = (start + 1) % length;
+                while (i != start)
+                {
+                    if (selectedEntities[i].EntityType != currentType)
+                    {
+                        Selected = selectedEntities[i];
+                        selectionInput.SelectedAbility = null;
+                        break;
+                    }
+                    i = (i + 1) % length;
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -243,23 +260,15 @@ namespace SanguineGenesis.GUI.WinFormsControls
         private delegate void SelectAbility ();
         private SelectAbility[] SelectAbilityArray { get; set; }
 
-        public AbilityButtonArray(int columns, int rows, int preferedWidth, int preferedHeight)
+        public AbilityButtonArray(int columns, int rows, int preferedWidth, int preferedHeight, GameControls.GameControls gameControls)
             : base(columns, rows, preferedWidth, preferedHeight)
         {
             BackColor = Color.Gray;
             SelectAbilityArray = new SelectAbility[columns * rows];
-        }
-        
-        /// <summary>
-        /// Sets listeners to buttons click to select ability.
-        /// </summary>
-        public void SelectAbilityOnClick(GameControls.GameControls gameControls)
-        {
             for (int i = 0; i < ColumnCount; i++)
                 for (int j = 0; j < RowCount; j++)
                 {
-                    Button b = Buttons[i, j];
-                    int buttonInd = ButtonIndex(j, i);//capture by value
+                    int buttonInd = InfoSourceIndex(j, i);//capture by value
                     SelectAbilityArray[buttonInd] =
                         () =>
                         {
@@ -268,6 +277,19 @@ namespace SanguineGenesis.GUI.WinFormsControls
                                 gameControls.SelectionInput.SelectedAbility = selectedAbility;
 
                         };
+                }
+        }
+        
+        /// <summary>
+        /// Sets handlers to buttons click to select ability.
+        /// </summary>
+        public void SelectAbilityOnClick()
+        {
+            for (int i = 0; i < ColumnCount; i++)
+                for (int j = 0; j < RowCount; j++)
+                {
+                    Button b = Buttons[i, j];
+                    int buttonInd = InfoSourceIndex(j, i);//capture by value
                     b.Click += (sender, ev) => SelectAbilityArray[buttonInd]();
                 }
         }
@@ -341,7 +363,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
         }
 
         /// <summary>
-        /// Sets listeners to buttons left clicks to remove corresponding command from its entity.
+        /// Sets handlers to buttons left clicks to remove corresponding command from its entity.
         /// </summary>
         public void RemoveCommandOnClick()
         {
@@ -349,7 +371,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 for (int j = 0; j < RowCount; j++)
                 {
                     Button b = Buttons[i, j];
-                    int buttonInd = ButtonIndex(j, i);//capture by value
+                    int buttonInd = InfoSourceIndex(j, i);//capture by value
                     b.MouseDown += (sender, ev) =>
                     {
                         Command command;
@@ -411,7 +433,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
         /// </summary>
         private string GetButtonIndexText(int index) => '(' + (index + 1).ToString() + ')';
 
-        public ControlGroupButtonArray(int columns, int preferedWidth, int preferedHeight)
+        public ControlGroupButtonArray(int columns, int preferedWidth, int preferedHeight, GameControls.GameControls gameControls)
             : base(columns, 1, preferedWidth, preferedHeight)
         {
             InfoSources = new List<ControlGroup>(columns * 1);
@@ -419,25 +441,17 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 InfoSources.Add(null);
             SaveGroup = new ManipulateGroup[columns * 1];
             LoadGroup = new ManipulateGroup[columns * 1];
-            for(int i = 0; i < columns; i++)
+            for (int i = 0; i < columns; i++)
             {
-                Buttons[i,0].Text = GetButtonIndexText(i);
-            }
-        }
-
-        public void SetEventHandlers(GameControls.GameControls gameControls)
-        {
-            for (int i = 0; i < ColumnCount * RowCount; i++)
-            {
+                Buttons[i, 0].Text = GetButtonIndexText(i);
                 int column = i % ColumnCount;
                 int row = i / ColumnCount;
                 int index = i;//capture by value
-                Button b = Buttons[column, row];
                 SaveGroup[i] = () =>
                 {
                     {
-                        if(index >= 0 && index < InfoSources.Count)
-                        { 
+                        if (index >= 0 && index < InfoSources.Count)
+                        {
                             var entities = gameControls.SelectedGroup.Entities();
                             if (entities.Any())
                             {
@@ -459,7 +473,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
                         {
                             SelectedGroup selectedGroup = gameControls.SelectedGroup;
                             //commit the selected entities
-                            if(selectedGroup.NextOperation == Operation.ALREADY_SELECTED)
+                            if (selectedGroup.NextOperation == Operation.ALREADY_SELECTED)
                                 selectedGroup.NextOperation = Operation.REPLACE;
 
                             if (InfoSources[index] != null)
@@ -477,6 +491,21 @@ namespace SanguineGenesis.GUI.WinFormsControls
                         }
                     }
                 };
+            }
+        }
+
+        /// <summary>
+        /// Sets event handler to buttons to load entities of in the group of the clicked
+        /// button.
+        /// </summary>
+        public void LoadEntitiesOnClick()
+        {
+            for (int i = 0; i < ColumnCount * RowCount; i++)
+            {
+                int column = i % ColumnCount;
+                int row = i / ColumnCount;
+                int index = i;//capture by value
+                Button b = Buttons[column, row];
                 b.Click += (_s, _e) =>
                 {
                     LoadGroupWithIndex(index);
@@ -502,8 +531,8 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 {
                     //set default appearance of the button
                     b.Text = GetButtonIndexText(i);
-                    if(b.BackColor != Color.White)
-                        b.BackColor = Color.White;
+                    if(b.BackColor != NothingColor)
+                        b.BackColor = NothingColor;
                 }
                 else
                 {
@@ -514,16 +543,16 @@ namespace SanguineGenesis.GUI.WinFormsControls
                     {
                         //group contains entities
                         b.Text = GetButtonIndexText(i) + contrGr.Entities.Count.ToString();
-                        if (b.BackColor != Color.Green)
-                            b.BackColor = Color.Green;
+                        if (b.BackColor != DefaultColor)
+                            b.BackColor = DefaultColor;
                     }
                     else
                     {
                         //group doesn't contain entities - remove the control group
                         InfoSources[i] = null;
                         b.Text = GetButtonIndexText(i);
-                        if (b.BackColor != Color.White)
-                            b.BackColor = Color.White;
+                        if (b.BackColor != NothingColor)
+                            b.BackColor = NothingColor;
                     }
                 }
             }
@@ -550,17 +579,17 @@ namespace SanguineGenesis.GUI.WinFormsControls
         /// <summary>
         /// Sets entities to the group with index i.
         /// </summary>
-        public void SaveGroupWithIndex(int i)
+        public void SaveGroupWithIndex(int index)
         {
-            if (i >= 0 && i < SaveGroup.Length) SaveGroup[i]();
+            if (index >= 0 && index < SaveGroup.Length) SaveGroup[index]();
         }
 
         /// <summary>
         /// Loads entities from this group to GameControls.SelectedGroup.
         /// </summary>
-        public void LoadGroupWithIndex(int i)
+        public void LoadGroupWithIndex(int index)
         {            
-            if(i>=0 && i<LoadGroup.Length) LoadGroup[i]();
+            if(index>=0 && index<LoadGroup.Length) LoadGroup[index]();
         }
 
         /// <summary>

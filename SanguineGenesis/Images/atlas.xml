@@ -1,11 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Atlas xmlns="http://tempuri.org/XMLAtlasSchema.xsd">
   <Entities>
-    <Entity EntityType="NO_ENTITY">
-      <Animation Action="NO_ACTION" CenterX="0.5" CenterY="0.2">
-        <Image X="28" Y="11"  Width="1" Height="1"/>
-      </Animation>
-    </Entity>
     <Entity EntityType="DEAD_TREE">
       <Animation Action="IDLE" CenterX="1" CenterY="0.2">
         <Image X="18" Y="6" Width="2" Height="3"></Image>

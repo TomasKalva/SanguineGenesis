@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI.WinFormsControls
@@ -47,13 +42,13 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 Width = Width,
                 Height = captionHeight,
                 TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
-                Font = new Font(Label.DefaultFont, System.Drawing.FontStyle.Bold)
+                Font = new Font(DefaultFont, System.Drawing.FontStyle.Bold)
             };
             Controls.Add(Caption);
             Caption.Location = new System.Drawing.Point(0, 0);
 
             //stats
-            Stats = new StatsTable(6, 1, Width, statsHeight);
+            Stats = new StatsTable(6, 1, Width, statsHeight, Color.Beige);
             Controls.Add(Stats);
             Stats.Location = new System.Drawing.Point(0, captionHeight);
 

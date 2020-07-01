@@ -12,9 +12,13 @@
         <xs:element name='Entities'>
           <xs:complexType>
             <xs:sequence>
-              <xs:element name='Entity' type='Entity' minOccurs='1' maxOccurs='unbounded' />
+              <xs:element ref='Entity' minOccurs='1' maxOccurs='unbounded' />
             </xs:sequence>
           </xs:complexType>
+          <xs:unique name='UniqueType'>
+            <xs:selector xpath="mstns:Entity" />
+            <xs:field xpath="@EntityType" />
+          </xs:unique>
         </xs:element>
         <xs:element name='Nodes'>
           <xs:complexType>
@@ -49,12 +53,18 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:complexType name='Entity'>
-    <xs:sequence>
-      <xs:element name='Animation' type='Animation' minOccurs='1' maxOccurs='unbounded' />
-    </xs:sequence>
-    <xs:attribute name='EntityType' type='xs:string'/>
-  </xs:complexType>
+  <xs:element name ='Entity'>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name='Animation' type='Animation' minOccurs='1' maxOccurs='unbounded' />
+      </xs:sequence>
+      <xs:attribute name='EntityType' type='xs:string'/>
+    </xs:complexType>
+    <xs:unique name='UniqueAction'>
+      <xs:selector xpath="mstns:Animation" />
+      <xs:field xpath="@Action" />
+    </xs:unique>
+  </xs:element>
 
   <xs:complexType name='Animation'>
     <xs:sequence>

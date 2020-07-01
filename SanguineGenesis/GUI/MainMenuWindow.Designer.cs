@@ -40,6 +40,7 @@
             this.editB = new System.Windows.Forms.Button();
             this.deepWaterRB = new System.Windows.Forms.RadioButton();
             this.drawOptionsGB = new System.Windows.Forms.GroupBox();
+            this.eraseNutrientsRB = new System.Windows.Forms.RadioButton();
             this.removeBuildingRB = new System.Windows.Forms.RadioButton();
             this.nutrientsRateL = new System.Windows.Forms.Label();
             this.nutrientsRateNUD = new System.Windows.Forms.NumericUpDown();
@@ -67,7 +68,6 @@
             this.heightL = new System.Windows.Forms.Label();
             this.loadMapGB = new System.Windows.Forms.GroupBox();
             this.playGB = new System.Windows.Forms.GroupBox();
-            this.eraseNutrientsRB = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.mapPB)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.drawOptionsGB.SuspendLayout();
@@ -83,11 +83,13 @@
             // 
             // mapPB
             // 
+            this.mapPB.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.mapPB.BackColor = System.Drawing.Color.Black;
-            this.mapPB.Location = new System.Drawing.Point(436, 12);
-            this.mapPB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.mapPB.Location = new System.Drawing.Point(291, 8);
             this.mapPB.Name = "mapPB";
-            this.mapPB.Size = new System.Drawing.Size(450, 462);
+            this.mapPB.Size = new System.Drawing.Size(300, 300);
             this.mapPB.TabIndex = 0;
             this.mapPB.TabStop = false;
             this.mapPB.Paint += new System.Windows.Forms.PaintEventHandler(this.MapPB_Paint);
@@ -96,10 +98,9 @@
             // 
             // playB
             // 
-            this.playB.Location = new System.Drawing.Point(271, 52);
-            this.playB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.playB.Location = new System.Drawing.Point(181, 34);
             this.playB.Name = "playB";
-            this.playB.Size = new System.Drawing.Size(152, 62);
+            this.playB.Size = new System.Drawing.Size(101, 40);
             this.playB.TabIndex = 1;
             this.playB.Text = "Play";
             this.playB.UseVisualStyleBackColor = true;
@@ -109,11 +110,9 @@
             // 
             this.groupBox1.Controls.Add(this.rainforestRB);
             this.groupBox1.Controls.Add(this.savannaRB);
-            this.groupBox1.Location = new System.Drawing.Point(32, 27);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Location = new System.Drawing.Point(21, 18);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(212, 88);
+            this.groupBox1.Size = new System.Drawing.Size(141, 57);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Faction";
@@ -121,10 +120,9 @@
             // rainforestRB
             // 
             this.rainforestRB.AutoSize = true;
-            this.rainforestRB.Location = new System.Drawing.Point(8, 54);
-            this.rainforestRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.rainforestRB.Location = new System.Drawing.Point(5, 35);
             this.rainforestRB.Name = "rainforestRB";
-            this.rainforestRB.Size = new System.Drawing.Size(108, 24);
+            this.rainforestRB.Size = new System.Drawing.Size(73, 17);
             this.rainforestRB.TabIndex = 1;
             this.rainforestRB.Text = "Rainforest";
             this.rainforestRB.UseVisualStyleBackColor = true;
@@ -133,10 +131,9 @@
             // 
             this.savannaRB.AutoSize = true;
             this.savannaRB.Checked = true;
-            this.savannaRB.Location = new System.Drawing.Point(8, 25);
-            this.savannaRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.savannaRB.Location = new System.Drawing.Point(5, 16);
             this.savannaRB.Name = "savannaRB";
-            this.savannaRB.Size = new System.Drawing.Size(97, 24);
+            this.savannaRB.Size = new System.Drawing.Size(68, 17);
             this.savannaRB.TabIndex = 0;
             this.savannaRB.TabStop = true;
             this.savannaRB.Text = "Savanna";
@@ -144,10 +141,9 @@
             // 
             // loadB
             // 
-            this.loadB.Location = new System.Drawing.Point(287, 74);
-            this.loadB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.loadB.Location = new System.Drawing.Point(191, 48);
             this.loadB.Name = "loadB";
-            this.loadB.Size = new System.Drawing.Size(76, 46);
+            this.loadB.Size = new System.Drawing.Size(51, 30);
             this.loadB.TabIndex = 4;
             this.loadB.Text = "Load";
             this.loadB.UseVisualStyleBackColor = true;
@@ -155,10 +151,9 @@
             // 
             // saveB
             // 
-            this.saveB.Location = new System.Drawing.Point(100, 74);
-            this.saveB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.saveB.Location = new System.Drawing.Point(67, 48);
             this.saveB.Name = "saveB";
-            this.saveB.Size = new System.Drawing.Size(81, 46);
+            this.saveB.Size = new System.Drawing.Size(54, 30);
             this.saveB.TabIndex = 5;
             this.saveB.Text = "Save";
             this.saveB.UseVisualStyleBackColor = true;
@@ -167,18 +162,16 @@
             // mapNamesCB
             // 
             this.mapNamesCB.FormattingEnabled = true;
-            this.mapNamesCB.Location = new System.Drawing.Point(22, 32);
-            this.mapNamesCB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.mapNamesCB.Location = new System.Drawing.Point(15, 21);
             this.mapNamesCB.Name = "mapNamesCB";
-            this.mapNamesCB.Size = new System.Drawing.Size(340, 28);
+            this.mapNamesCB.Size = new System.Drawing.Size(228, 21);
             this.mapNamesCB.TabIndex = 6;
             // 
             // deleteB
             // 
-            this.deleteB.Location = new System.Drawing.Point(190, 74);
-            this.deleteB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.deleteB.Location = new System.Drawing.Point(127, 48);
             this.deleteB.Name = "deleteB";
-            this.deleteB.Size = new System.Drawing.Size(88, 46);
+            this.deleteB.Size = new System.Drawing.Size(59, 30);
             this.deleteB.TabIndex = 13;
             this.deleteB.Text = "Delete";
             this.deleteB.UseVisualStyleBackColor = true;
@@ -186,10 +179,9 @@
             // 
             // editB
             // 
-            this.editB.Location = new System.Drawing.Point(20, 74);
-            this.editB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.editB.Location = new System.Drawing.Point(13, 48);
             this.editB.Name = "editB";
-            this.editB.Size = new System.Drawing.Size(70, 46);
+            this.editB.Size = new System.Drawing.Size(47, 30);
             this.editB.TabIndex = 12;
             this.editB.Text = "Edit";
             this.editB.UseVisualStyleBackColor = true;
@@ -199,10 +191,9 @@
             // 
             this.deepWaterRB.AutoSize = true;
             this.deepWaterRB.Checked = true;
-            this.deepWaterRB.Location = new System.Drawing.Point(9, 29);
-            this.deepWaterRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.deepWaterRB.Location = new System.Drawing.Point(6, 19);
             this.deepWaterRB.Name = "deepWaterRB";
-            this.deepWaterRB.Size = new System.Drawing.Size(116, 24);
+            this.deepWaterRB.Size = new System.Drawing.Size(80, 17);
             this.deepWaterRB.TabIndex = 2;
             this.deepWaterRB.TabStop = true;
             this.deepWaterRB.Text = "Deep water";
@@ -211,6 +202,7 @@
             // 
             // drawOptionsGB
             // 
+            this.drawOptionsGB.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.drawOptionsGB.Controls.Add(this.eraseNutrientsRB);
             this.drawOptionsGB.Controls.Add(this.removeBuildingRB);
             this.drawOptionsGB.Controls.Add(this.nutrientsRateL);
@@ -225,22 +217,30 @@
             this.drawOptionsGB.Controls.Add(this.shallowWaterRB);
             this.drawOptionsGB.Controls.Add(this.deepWaterRB);
             this.drawOptionsGB.Enabled = false;
-            this.drawOptionsGB.Location = new System.Drawing.Point(13, 78);
-            this.drawOptionsGB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.drawOptionsGB.Location = new System.Drawing.Point(9, 51);
             this.drawOptionsGB.Name = "drawOptionsGB";
-            this.drawOptionsGB.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.drawOptionsGB.Size = new System.Drawing.Size(410, 298);
+            this.drawOptionsGB.Size = new System.Drawing.Size(273, 194);
             this.drawOptionsGB.TabIndex = 13;
             this.drawOptionsGB.TabStop = false;
             this.drawOptionsGB.Text = "Draw options";
             // 
+            // eraseNutrientsRB
+            // 
+            this.eraseNutrientsRB.AutoSize = true;
+            this.eraseNutrientsRB.Location = new System.Drawing.Point(7, 110);
+            this.eraseNutrientsRB.Name = "eraseNutrientsRB";
+            this.eraseNutrientsRB.Size = new System.Drawing.Size(97, 17);
+            this.eraseNutrientsRB.TabIndex = 14;
+            this.eraseNutrientsRB.Text = "Erase Nutrients";
+            this.eraseNutrientsRB.UseVisualStyleBackColor = true;
+            this.eraseNutrientsRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
+            // 
             // removeBuildingRB
             // 
             this.removeBuildingRB.AutoSize = true;
-            this.removeBuildingRB.Location = new System.Drawing.Point(8, 237);
-            this.removeBuildingRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.removeBuildingRB.Location = new System.Drawing.Point(5, 154);
             this.removeBuildingRB.Name = "removeBuildingRB";
-            this.removeBuildingRB.Size = new System.Drawing.Size(151, 24);
+            this.removeBuildingRB.Size = new System.Drawing.Size(104, 17);
             this.removeBuildingRB.TabIndex = 13;
             this.removeBuildingRB.Text = "Remove building";
             this.removeBuildingRB.UseVisualStyleBackColor = true;
@@ -249,24 +249,22 @@
             // nutrientsRateL
             // 
             this.nutrientsRateL.AutoSize = true;
-            this.nutrientsRateL.Location = new System.Drawing.Point(201, 260);
-            this.nutrientsRateL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.nutrientsRateL.Location = new System.Drawing.Point(134, 169);
             this.nutrientsRateL.Name = "nutrientsRateL";
-            this.nutrientsRateL.Size = new System.Drawing.Size(109, 20);
+            this.nutrientsRateL.Size = new System.Drawing.Size(73, 13);
             this.nutrientsRateL.TabIndex = 12;
             this.nutrientsRateL.Text = "Nutrients rate:";
             // 
             // nutrientsRateNUD
             // 
-            this.nutrientsRateNUD.Location = new System.Drawing.Point(327, 257);
-            this.nutrientsRateNUD.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.nutrientsRateNUD.Location = new System.Drawing.Point(218, 167);
             this.nutrientsRateNUD.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
             this.nutrientsRateNUD.Name = "nutrientsRateNUD";
-            this.nutrientsRateNUD.Size = new System.Drawing.Size(69, 26);
+            this.nutrientsRateNUD.Size = new System.Drawing.Size(46, 20);
             this.nutrientsRateNUD.TabIndex = 11;
             this.nutrientsRateNUD.Value = new decimal(new int[] {
             1,
@@ -277,17 +275,15 @@
             // brushSizeL
             // 
             this.brushSizeL.AutoSize = true;
-            this.brushSizeL.Location = new System.Drawing.Point(201, 223);
-            this.brushSizeL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.brushSizeL.Location = new System.Drawing.Point(134, 145);
             this.brushSizeL.Name = "brushSizeL";
-            this.brushSizeL.Size = new System.Drawing.Size(87, 20);
+            this.brushSizeL.Size = new System.Drawing.Size(58, 13);
             this.brushSizeL.TabIndex = 10;
             this.brushSizeL.Text = "Brush size:";
             // 
             // brushSizeNUD
             // 
-            this.brushSizeNUD.Location = new System.Drawing.Point(327, 220);
-            this.brushSizeNUD.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.brushSizeNUD.Location = new System.Drawing.Point(218, 143);
             this.brushSizeNUD.Maximum = new decimal(new int[] {
             10,
             0,
@@ -299,7 +295,7 @@
             0,
             0});
             this.brushSizeNUD.Name = "brushSizeNUD";
-            this.brushSizeNUD.Size = new System.Drawing.Size(69, 26);
+            this.brushSizeNUD.Size = new System.Drawing.Size(46, 20);
             this.brushSizeNUD.TabIndex = 9;
             this.brushSizeNUD.Value = new decimal(new int[] {
             1,
@@ -310,20 +306,18 @@
             // coordinatesL
             // 
             this.coordinatesL.AutoSize = true;
-            this.coordinatesL.Location = new System.Drawing.Point(33, 266);
-            this.coordinatesL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.coordinatesL.Location = new System.Drawing.Point(22, 173);
             this.coordinatesL.Name = "coordinatesL";
-            this.coordinatesL.Size = new System.Drawing.Size(57, 20);
+            this.coordinatesL.Size = new System.Drawing.Size(39, 13);
             this.coordinatesL.TabIndex = 8;
             this.coordinatesL.Text = "X=; Y=";
             // 
             // addBuildingRB
             // 
             this.addBuildingRB.AutoSize = true;
-            this.addBuildingRB.Location = new System.Drawing.Point(10, 203);
-            this.addBuildingRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.addBuildingRB.Location = new System.Drawing.Point(7, 132);
             this.addBuildingRB.Name = "addBuildingRB";
-            this.addBuildingRB.Size = new System.Drawing.Size(121, 24);
+            this.addBuildingRB.Size = new System.Drawing.Size(83, 17);
             this.addBuildingRB.TabIndex = 7;
             this.addBuildingRB.Text = "Add building";
             this.addBuildingRB.UseVisualStyleBackColor = true;
@@ -335,11 +329,9 @@
             this.buildingSelectionGB.Controls.Add(this.main1RB);
             this.buildingSelectionGB.Controls.Add(this.bigRockRB);
             this.buildingSelectionGB.Controls.Add(this.main0RB);
-            this.buildingSelectionGB.Location = new System.Drawing.Point(213, 28);
-            this.buildingSelectionGB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buildingSelectionGB.Location = new System.Drawing.Point(142, 18);
             this.buildingSelectionGB.Name = "buildingSelectionGB";
-            this.buildingSelectionGB.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.buildingSelectionGB.Size = new System.Drawing.Size(160, 183);
+            this.buildingSelectionGB.Size = new System.Drawing.Size(107, 119);
             this.buildingSelectionGB.TabIndex = 6;
             this.buildingSelectionGB.TabStop = false;
             this.buildingSelectionGB.Text = "Building";
@@ -347,10 +339,9 @@
             // rockRB
             // 
             this.rockRB.AutoSize = true;
-            this.rockRB.Location = new System.Drawing.Point(9, 100);
-            this.rockRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.rockRB.Location = new System.Drawing.Point(6, 65);
             this.rockRB.Name = "rockRB";
-            this.rockRB.Size = new System.Drawing.Size(71, 24);
+            this.rockRB.Size = new System.Drawing.Size(51, 17);
             this.rockRB.TabIndex = 9;
             this.rockRB.Text = "Rock";
             this.rockRB.UseVisualStyleBackColor = true;
@@ -359,10 +350,9 @@
             // main1RB
             // 
             this.main1RB.AutoSize = true;
-            this.main1RB.Location = new System.Drawing.Point(9, 65);
-            this.main1RB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.main1RB.Location = new System.Drawing.Point(6, 42);
             this.main1RB.Name = "main1RB";
-            this.main1RB.Size = new System.Drawing.Size(127, 24);
+            this.main1RB.Size = new System.Drawing.Size(88, 17);
             this.main1RB.TabIndex = 8;
             this.main1RB.Text = "Main player 1";
             this.main1RB.UseVisualStyleBackColor = true;
@@ -371,10 +361,9 @@
             // bigRockRB
             // 
             this.bigRockRB.AutoSize = true;
-            this.bigRockRB.Location = new System.Drawing.Point(9, 135);
-            this.bigRockRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.bigRockRB.Location = new System.Drawing.Point(6, 88);
             this.bigRockRB.Name = "bigRockRB";
-            this.bigRockRB.Size = new System.Drawing.Size(91, 24);
+            this.bigRockRB.Size = new System.Drawing.Size(64, 17);
             this.bigRockRB.TabIndex = 8;
             this.bigRockRB.Text = "Big rock";
             this.bigRockRB.UseVisualStyleBackColor = true;
@@ -384,10 +373,9 @@
             // 
             this.main0RB.AutoSize = true;
             this.main0RB.Checked = true;
-            this.main0RB.Location = new System.Drawing.Point(9, 29);
-            this.main0RB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.main0RB.Location = new System.Drawing.Point(6, 19);
             this.main0RB.Name = "main0RB";
-            this.main0RB.Size = new System.Drawing.Size(127, 24);
+            this.main0RB.Size = new System.Drawing.Size(88, 17);
             this.main0RB.TabIndex = 7;
             this.main0RB.TabStop = true;
             this.main0RB.Text = "Main player 0";
@@ -397,10 +385,9 @@
             // nutrientsRB
             // 
             this.nutrientsRB.AutoSize = true;
-            this.nutrientsRB.Location = new System.Drawing.Point(10, 135);
-            this.nutrientsRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.nutrientsRB.Location = new System.Drawing.Point(7, 88);
             this.nutrientsRB.Name = "nutrientsRB";
-            this.nutrientsRB.Size = new System.Drawing.Size(98, 24);
+            this.nutrientsRB.Size = new System.Drawing.Size(67, 17);
             this.nutrientsRB.TabIndex = 5;
             this.nutrientsRB.Text = "Nutrients";
             this.nutrientsRB.UseVisualStyleBackColor = true;
@@ -409,10 +396,9 @@
             // landRB
             // 
             this.landRB.AutoSize = true;
-            this.landRB.Location = new System.Drawing.Point(10, 100);
-            this.landRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.landRB.Location = new System.Drawing.Point(7, 65);
             this.landRB.Name = "landRB";
-            this.landRB.Size = new System.Drawing.Size(70, 24);
+            this.landRB.Size = new System.Drawing.Size(49, 17);
             this.landRB.TabIndex = 4;
             this.landRB.Text = "Land";
             this.landRB.UseVisualStyleBackColor = true;
@@ -421,10 +407,9 @@
             // shallowWaterRB
             // 
             this.shallowWaterRB.AutoSize = true;
-            this.shallowWaterRB.Location = new System.Drawing.Point(10, 65);
-            this.shallowWaterRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.shallowWaterRB.Location = new System.Drawing.Point(7, 42);
             this.shallowWaterRB.Name = "shallowWaterRB";
-            this.shallowWaterRB.Size = new System.Drawing.Size(132, 24);
+            this.shallowWaterRB.Size = new System.Drawing.Size(91, 17);
             this.shallowWaterRB.TabIndex = 3;
             this.shallowWaterRB.Text = "Shallow water";
             this.shallowWaterRB.UseVisualStyleBackColor = true;
@@ -434,21 +419,20 @@
             // 
             this.errorMessageL.BackColor = System.Drawing.Color.White;
             this.errorMessageL.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.errorMessageL.Location = new System.Drawing.Point(13, 13);
-            this.errorMessageL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.errorMessageL.Location = new System.Drawing.Point(9, 8);
             this.errorMessageL.Name = "errorMessageL";
-            this.errorMessageL.Size = new System.Drawing.Size(410, 60);
+            this.errorMessageL.Size = new System.Drawing.Size(273, 39);
             this.errorMessageL.TabIndex = 16;
             this.errorMessageL.Text = "Error messages";
             this.errorMessageL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // mapNameL
             // 
+            this.mapNameL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.mapNameL.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.mapNameL.Location = new System.Drawing.Point(436, 479);
-            this.mapNameL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.mapNameL.Location = new System.Drawing.Point(291, 311);
             this.mapNameL.Name = "mapNameL";
-            this.mapNameL.Size = new System.Drawing.Size(446, 75);
+            this.mapNameL.Size = new System.Drawing.Size(297, 49);
             this.mapNameL.TabIndex = 13;
             this.mapNameL.Text = "<map name>";
             this.mapNameL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -456,32 +440,35 @@
             // testAnimalsCB
             // 
             this.testAnimalsCB.AutoSize = true;
-            this.testAnimalsCB.Location = new System.Drawing.Point(271, 22);
+            this.testAnimalsCB.Location = new System.Drawing.Point(181, 14);
+            this.testAnimalsCB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.testAnimalsCB.Name = "testAnimalsCB";
-            this.testAnimalsCB.Size = new System.Drawing.Size(124, 24);
+            this.testAnimalsCB.Size = new System.Drawing.Size(85, 17);
             this.testAnimalsCB.TabIndex = 3;
             this.testAnimalsCB.Text = "Test animals";
             this.testAnimalsCB.UseVisualStyleBackColor = true;
             // 
             // newMapGB
             // 
+            this.newMapGB.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.newMapGB.Controls.Add(this.heightNUD);
             this.newMapGB.Controls.Add(this.newNameTB);
             this.newMapGB.Controls.Add(this.widthNUD);
             this.newMapGB.Controls.Add(this.widthL);
             this.newMapGB.Controls.Add(this.newMapB);
             this.newMapGB.Controls.Add(this.heightL);
-            this.newMapGB.Location = new System.Drawing.Point(13, 384);
+            this.newMapGB.Location = new System.Drawing.Point(9, 250);
+            this.newMapGB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.newMapGB.Name = "newMapGB";
-            this.newMapGB.Size = new System.Drawing.Size(411, 160);
+            this.newMapGB.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.newMapGB.Size = new System.Drawing.Size(274, 104);
             this.newMapGB.TabIndex = 16;
             this.newMapGB.TabStop = false;
             this.newMapGB.Text = "New map";
             // 
             // heightNUD
             // 
-            this.heightNUD.Location = new System.Drawing.Point(166, 104);
-            this.heightNUD.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.heightNUD.Location = new System.Drawing.Point(111, 68);
             this.heightNUD.Maximum = new decimal(new int[] {
             150,
             0,
@@ -493,7 +480,7 @@
             0,
             0});
             this.heightNUD.Name = "heightNUD";
-            this.heightNUD.Size = new System.Drawing.Size(69, 26);
+            this.heightNUD.Size = new System.Drawing.Size(46, 20);
             this.heightNUD.TabIndex = 15;
             this.heightNUD.Value = new decimal(new int[] {
             30,
@@ -503,16 +490,14 @@
             // 
             // newNameTB
             // 
-            this.newNameTB.Location = new System.Drawing.Point(23, 27);
-            this.newNameTB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.newNameTB.Location = new System.Drawing.Point(15, 18);
             this.newNameTB.Name = "newNameTB";
-            this.newNameTB.Size = new System.Drawing.Size(210, 26);
+            this.newNameTB.Size = new System.Drawing.Size(141, 20);
             this.newNameTB.TabIndex = 7;
             // 
             // widthNUD
             // 
-            this.widthNUD.Location = new System.Drawing.Point(166, 64);
-            this.widthNUD.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.widthNUD.Location = new System.Drawing.Point(111, 42);
             this.widthNUD.Maximum = new decimal(new int[] {
             150,
             0,
@@ -524,7 +509,7 @@
             0,
             0});
             this.widthNUD.Name = "widthNUD";
-            this.widthNUD.Size = new System.Drawing.Size(69, 26);
+            this.widthNUD.Size = new System.Drawing.Size(46, 20);
             this.widthNUD.TabIndex = 14;
             this.widthNUD.Value = new decimal(new int[] {
             30,
@@ -535,19 +520,17 @@
             // widthL
             // 
             this.widthL.AutoSize = true;
-            this.widthL.Location = new System.Drawing.Point(29, 67);
-            this.widthL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.widthL.Location = new System.Drawing.Point(19, 44);
             this.widthL.Name = "widthL";
-            this.widthL.Size = new System.Drawing.Size(50, 20);
+            this.widthL.Size = new System.Drawing.Size(35, 13);
             this.widthL.TabIndex = 10;
             this.widthL.Text = "Width";
             // 
             // newMapB
             // 
-            this.newMapB.Location = new System.Drawing.Point(290, 92);
-            this.newMapB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.newMapB.Location = new System.Drawing.Point(193, 60);
             this.newMapB.Name = "newMapB";
-            this.newMapB.Size = new System.Drawing.Size(108, 46);
+            this.newMapB.Size = new System.Drawing.Size(72, 30);
             this.newMapB.TabIndex = 3;
             this.newMapB.Text = "New";
             this.newMapB.UseVisualStyleBackColor = true;
@@ -556,56 +539,49 @@
             // heightL
             // 
             this.heightL.AutoSize = true;
-            this.heightL.Location = new System.Drawing.Point(29, 107);
-            this.heightL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.heightL.Location = new System.Drawing.Point(19, 70);
             this.heightL.Name = "heightL";
-            this.heightL.Size = new System.Drawing.Size(56, 20);
+            this.heightL.Size = new System.Drawing.Size(38, 13);
             this.heightL.TabIndex = 11;
             this.heightL.Text = "Height";
             // 
             // loadMapGB
             // 
+            this.loadMapGB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.loadMapGB.Controls.Add(this.deleteB);
             this.loadMapGB.Controls.Add(this.mapNamesCB);
             this.loadMapGB.Controls.Add(this.saveB);
             this.loadMapGB.Controls.Add(this.editB);
             this.loadMapGB.Controls.Add(this.loadB);
-            this.loadMapGB.Location = new System.Drawing.Point(13, 550);
+            this.loadMapGB.Location = new System.Drawing.Point(9, 357);
+            this.loadMapGB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.loadMapGB.Name = "loadMapGB";
-            this.loadMapGB.Size = new System.Drawing.Size(410, 133);
+            this.loadMapGB.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.loadMapGB.Size = new System.Drawing.Size(273, 86);
             this.loadMapGB.TabIndex = 17;
             this.loadMapGB.TabStop = false;
             this.loadMapGB.Text = "Load map";
             // 
             // playGB
             // 
+            this.playGB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.playGB.Controls.Add(this.testAnimalsCB);
             this.playGB.Controls.Add(this.playB);
             this.playGB.Controls.Add(this.groupBox1);
-            this.playGB.Location = new System.Drawing.Point(436, 550);
+            this.playGB.Location = new System.Drawing.Point(291, 357);
+            this.playGB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.playGB.Name = "playGB";
-            this.playGB.Size = new System.Drawing.Size(450, 133);
+            this.playGB.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.playGB.Size = new System.Drawing.Size(300, 86);
             this.playGB.TabIndex = 18;
             this.playGB.TabStop = false;
             this.playGB.Text = "Play";
             // 
-            // eraseNutrientsRB
-            // 
-            this.eraseNutrientsRB.AutoSize = true;
-            this.eraseNutrientsRB.Location = new System.Drawing.Point(10, 169);
-            this.eraseNutrientsRB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.eraseNutrientsRB.Name = "eraseNutrientsRB";
-            this.eraseNutrientsRB.Size = new System.Drawing.Size(144, 24);
-            this.eraseNutrientsRB.TabIndex = 14;
-            this.eraseNutrientsRB.Text = "Erase Nutrients";
-            this.eraseNutrientsRB.UseVisualStyleBackColor = true;
-            this.eraseNutrientsRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
-            // 
             // MainMenuWindow
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(901, 693);
+            this.ClientSize = new System.Drawing.Size(601, 450);
             this.Controls.Add(this.playGB);
             this.Controls.Add(this.loadMapGB);
             this.Controls.Add(this.newMapGB);
@@ -614,7 +590,6 @@
             this.Controls.Add(this.drawOptionsGB);
             this.Controls.Add(this.mapPB);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.Name = "MainMenuWindow";
             this.Text = "Sanguine Genesis";

@@ -14,9 +14,12 @@ namespace SanguineGenesis.GUI.WinFormsControls
     /// </summary>
     class StatsTable : TableLayoutPanel
     {
+        /// <summary>
+        /// Array with the real layout of this control. First index is row, second is column.
+        /// </summary>
         private Label[,] Stats { get; }
 
-        public StatsTable(int rows, int columns, int width, int height)
+        public StatsTable(int rows, int columns, int width, int height, Color backColor)
         {
             Width = width;
             Height = height;
@@ -38,13 +41,12 @@ namespace SanguineGenesis.GUI.WinFormsControls
                     };
                     Stats[i, j] = l;
                     if (i % 2 == 0)
-                        l.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+                        l.TextAlign = ContentAlignment.MiddleLeft;
                     else
-                        l.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+                        l.TextAlign = ContentAlignment.MiddleRight;
                     Controls.Add(l);
                 }
-
-            BackColor = Color.Beige;
+            BackColor = backColor;
         }
 
         /// <summary>
@@ -55,21 +57,21 @@ namespace SanguineGenesis.GUI.WinFormsControls
             for (int i = 0; i < ColumnCount / 2; i++)
                 for (int j = 0; j < RowCount; j++)
                 {
-                Label name = Stats[2 * i, j];
-                Label value = Stats[2 * i + 1, j];
+                    Label name = Stats[2 * i, j];
+                    Label value = Stats[2 * i + 1, j];
                     int statsIndex = i * RowCount + j;
-                if (statsIndex < stats.Count)
-                {
-                    Stat s = stats[statsIndex];
-                    name.Text = s.Name;
-                    value.Text = s.Value;
+                    if (statsIndex < stats.Count)
+                    {
+                        Stat s = stats[statsIndex];
+                        name.Text = s.Name;
+                        value.Text = s.Value;
+                    }
+                    else
+                    {
+                        name.Text = "";
+                        value.Text = "";
+                    }
                 }
-                else
-                {
-                    name.Text = "";
-                    value.Text = "";
-                }
-            }
         }
     }
 

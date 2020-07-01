@@ -66,7 +66,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 Height - (CommandButtonArray.Height + CommandButtonArray.Height));
 
             //entity stats table initialization
-            EntityStatsTable = new StatsTable(9, 2, Width, Height - (CommandButtonArray.Height + StatusButtonArray.Height + labelHeight));
+            EntityStatsTable = new StatsTable(9, 2, Width, Height - (CommandButtonArray.Height + StatusButtonArray.Height + labelHeight), Color.Beige);
             Controls.Add(EntityStatsTable);
             EntityStatsTable.Location = new System.Drawing.Point(0, labelHeight);
 
@@ -96,7 +96,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
         }
 
         /// <summary>
-        /// Update the components with the SelectedEntity info.
+        /// Update this control with the SelectedEntity info.
         /// </summary>
         public void UpdateControl()
         {

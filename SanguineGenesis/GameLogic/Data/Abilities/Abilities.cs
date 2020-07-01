@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
+using SanguineGenesis.GameLogic.Data.Statuses;
 
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
@@ -32,9 +33,43 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public MoveTo MoveToUse(Ability ability) => moveToUse[ability];
         public Attack Attack { get; }
         public Attack UnbreakableAttack { get; }
-        public Spawn UnitSpawn(string type) => animalSpawn[type];
-        public CreateAnimal UnitCreate(string type) => animalCreate[type];
-        public BuildBuilding BuildBuilding(string type) => buildBuilding[type];
+        public Spawn UnitSpawn(string type)
+        {
+            if (animalSpawn.TryGetValue(type, out var anim))
+            {
+                return anim;
+            }
+            else
+            {
+                //invalid animal indicating that the animal doesn't exist
+                return new Spawn(new AnimalFactory($"{anim}_not_exists", 1, 1, 1, 1, 1, 1, 1, 1, false, 1, 1, Movement.LAND, false, Diet.CARNIVORE, 1, false, 1, 1, new List<Statuses.StatusFactory>(), 1));
+            }
+        }
+        public CreateAnimal UnitCreate(string type)
+        {
+            if(animalCreate.TryGetValue(type, out var anim))
+            {
+                return anim;
+            }
+            else
+            {
+                //invalid animal indicating that the animal doesn't exist
+                return new CreateAnimal(new AnimalFactory($"{anim}_not_exists", 1, 1, 1, 1, 1, 1, 1, 1, false, 1, 1, Movement.LAND, false, Diet.CARNIVORE, 1, false, 1, 1, new List<Statuses.StatusFactory>(), 1));
+            }
+        }
+        public BuildBuilding BuildBuilding(string type)
+        {
+            if (buildBuilding.TryGetValue(type, out var buil))
+            {
+                return buil;
+            }
+            else
+            {
+                //invalid building indicating that the building doesn't exist
+                return new BuildBuilding(new StructureFactory($"{buil}_not_exists",1,1,1,false,1,Biome.DEFAULT,Terrain.LAND,SoilQuality.BAD,1,1,false,new List<StatusFactory>()));
+            }
+        }
+        //=> buildBuilding[type];
         public Grow Grow { get; }
         public SetRallyPoint SetRallyPoint { get; }
         public HerbivoreEat HerbivoreEat { get; }

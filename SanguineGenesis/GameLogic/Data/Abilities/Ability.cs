@@ -424,10 +424,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public string GetMessages()
         {
             StringBuilder messagesText = new StringBuilder();
-            for (int i = Size - 1; i >= 0; i--)
+            for (int i = 0; i < Size; i++)
             {
                 messagesText.Append(messages[i]);
-                messagesText.Append(i != 0 ? "\n" : "");
+                messagesText.Append("\n");
             }
             return messagesText.ToString();
         }

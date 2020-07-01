@@ -31,7 +31,7 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 Text = "Air taken: ",
                 Margin = Padding.Empty,
                 TextAlign = ContentAlignment.MiddleLeft,
-                ForeColor = Color.Yellow,
+                ForeColor = Color.Black,
                 Width = width / 2
             };
             Controls.Add(AirText);
@@ -42,12 +42,12 @@ namespace SanguineGenesis.GUI.WinFormsControls
                 Text = "",
                 Margin = Padding.Empty,
                 TextAlign = ContentAlignment.MiddleRight,
-                ForeColor = Color.Yellow,
+                ForeColor = Color.Black,
                 Width = width / 2
             };
             Controls.Add(AirValue);
             
-            BackColor = Color.Black;
+            BackColor = Color.LightGray;
         }
     }
 }

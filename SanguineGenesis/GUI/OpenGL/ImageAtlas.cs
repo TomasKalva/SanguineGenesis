@@ -145,37 +145,48 @@ namespace SanguineGenesis.GUI
 
         private ImageAtlas()
         {
-            XDocument doc = XDocument.Load("Images/atlas.xml");
+            try
+            {
+                XDocument doc = XDocument.Load("Images/atlas.xml");
 
-            //returns child element of root with name=elemName
-            XElement elWithName(string elemName) => (from el in doc.Root.Elements()
-                                                     where el.Name.LocalName == elemName
-                                                     select el).First();
+                //returns child element of root with name=elemName
+                XElement elWithName(string elemName) => (from el in doc.Root.Elements()
+                                                         where el.Name.LocalName == elemName
+                                                         select el).First();
 
-            InitializeDigitImages(elWithName("Digits"));
-            InitializeEntitiesAnimations(elWithName("Entities"));
-            InitializeNumberedTriangles(elWithName("NumbersArray"));
-            InitializeNodes(elWithName("Nodes"));
+                InitializeDigitImages(elWithName("Digits"));
+                InitializeEntitiesAnimations(elWithName("Entities"));
+                InitializeNumberedTriangles(elWithName("NumbersArray"));
+                InitializeNodes(elWithName("Nodes"));
 
-            //finds subelement with attribute name=attrName
-            XElement shapesImgElWithName(string attrName) => (from el in (from el in doc.Root.Elements() where el.Name.LocalName == "Shapes" select el).First().Elements()
-                                                              where el.Attribute("Name").Value == attrName
-                                                              select (XElement)el.FirstNode).First();
+                //finds subelement with attribute name=attrName
+                XElement shapesImgElWithName(string attrName) => (from el in (from el in doc.Root.Elements() where el.Name.LocalName == "Shapes" select el).First().Elements()
+                                                                  where el.Attribute("Name").Value == attrName
+                                                                  select (XElement)el.FirstNode).First();
 
-            //circles
-            UnitCircleGray = LoadImage(shapesImgElWithName("UnitCircleGray"));
-            UnitCircleRed = LoadImage(shapesImgElWithName("UnitCircleRed"));
-            UnitCircleBlue = LoadImage(shapesImgElWithName("UnitCircleBlue"));
-            UnitCircleYellow = LoadImage(shapesImgElWithName("UnitCircleYellow"));
-            UnitCircleWhite = LoadImage(shapesImgElWithName("UnitCircleWhite"));
+                //circles
+                UnitCircleGray = LoadImage(shapesImgElWithName("UnitCircleGray"));
+                UnitCircleRed = LoadImage(shapesImgElWithName("UnitCircleRed"));
+                UnitCircleBlue = LoadImage(shapesImgElWithName("UnitCircleBlue"));
+                UnitCircleYellow = LoadImage(shapesImgElWithName("UnitCircleYellow"));
+                UnitCircleWhite = LoadImage(shapesImgElWithName("UnitCircleWhite"));
 
-            UnitsSelector = LoadImage(shapesImgElWithName("UnitsSelector"));
+                UnitsSelector = LoadImage(shapesImgElWithName("UnitsSelector"));
 
-            //squares
-            BlackSquare = LoadImage(shapesImgElWithName("BlackSquare"));
-            RedSquare = LoadImage(shapesImgElWithName("RedSquare"));
-            GreenSquare = LoadImage(shapesImgElWithName("GreenSquare"));
-            BlueSquare = LoadImage(shapesImgElWithName("BlueSquare"));
+                //squares
+                BlackSquare = LoadImage(shapesImgElWithName("BlackSquare"));
+                RedSquare = LoadImage(shapesImgElWithName("RedSquare"));
+                GreenSquare = LoadImage(shapesImgElWithName("GreenSquare"));
+                BlueSquare = LoadImage(shapesImgElWithName("BlueSquare"));
+            }
+            catch(IOException ioe)
+            {
+                throw new Exception("Failed to load atlas.xml", ioe);
+            }
+            catch (Exception e ) when (e is ArgumentException || e is InvalidOperationException)
+            {
+                throw new Exception("Invalid format of atlas.xml", e);
+            }
         }
 
         /// <summary>
@@ -261,6 +272,10 @@ namespace SanguineGenesis.GUI
                     AddEntitiesAnimation(animationName, action, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
                 }
             }
+
+            //load animation of invalid entity
+            AddEntitiesAnimation(AnimationName("NO_ENTITY", "NO_ACTION"), "NO_ACTION", new Vector2(0.5f, 0f), 1, 1, 
+                new List<float>() { 0.5f }, new List<Rect>(){ ToRelative(GridToPixels(28,11,1,1))});
         }
 
         /// <summary>
