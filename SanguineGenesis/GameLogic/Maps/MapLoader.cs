@@ -80,7 +80,7 @@ namespace SanguineGenesis.GameLogic.Maps
                 throw new ArgumentException("Map has to be loaded before loading buildings.");
 
             Map map = game.Map;
-            List<BuildingDescriptor> buildings = MapDescription.GetBuildings;
+            var buildings = MapDescription.GetBuildings();
             //add buildings
             foreach (BuildingDescriptor bd in buildings)
             {

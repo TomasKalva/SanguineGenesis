@@ -1,14 +1,12 @@
 ﻿using SanguineGenesis.GameLogic;
-using SanguineGenesis.GUI.WinFormsControls;
+using SanguineGenesis.GameLogic.Data.Entities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security;
 using System.Windows.Forms;
 
 namespace SanguineGenesis.GUI
@@ -35,10 +33,6 @@ namespace SanguineGenesis.GUI
         /// How many times bigger is the drawing of the map than the map itself.
         /// </summary>
         private int MapScale { get; }
-        /// <summary>
-        /// If set to false, new game can't be created. 
-        /// </summary>
-        public bool CanCreateGame { get; set; }
 
         public MainMenuWindow()
         {
@@ -53,9 +47,9 @@ namespace SanguineGenesis.GUI
             CanCreateGame = true;
             LoadNamesOfCreatedMaps();
             //load icon
-            try { this.Icon = new Icon("Images/Icons/giraffe.ico"); } catch (IOException)
+            try { this.Icon = new Icon("Images/Icons/giraffe.ico"); } catch (IOException e)
             {
-                Console.WriteLine("Icon can't be loaded.");
+                ErrorMessage($"Icon can't be loaded: {e}");
             }
         }
 
@@ -125,7 +119,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Returns true if name can be used as a name of the map. Prints error message.
         /// </summary>
-        private bool ValidName(string name)
+        private bool IsValidName(string name)
         {
             //check emptyness
             if (name == "")
@@ -183,16 +177,15 @@ namespace SanguineGenesis.GUI
                 foreach (var d in Directory.GetDirectories(dirName))
                 {
                     string name = Path.GetFileName(d);
-                    if (ValidName(name))
+                    if (IsValidName(name))
                         mapNamesCB.Items.Add(name);
                 }
             }
-            catch(IOException)
+            catch(Exception e) when (e is IOException || e is UnauthorizedAccessException ||
+                                     e is PathTooLongException || e is DirectoryNotFoundException)
             {
-                ErrorMessage("List of maps can't be loaded.");
+                ErrorMessage($"List of maps can't be loaded: {e}");
             }
-            //clear error messages
-            Message("");
         }
 
         /// <summary>
@@ -257,27 +250,34 @@ namespace SanguineGenesis.GUI
         
         #region Event handlers
 
+        /// <summary>
+        /// Creates a new map.
+        /// </summary>
         private void NewMapB_Click(object sender, EventArgs e)
         {
             int width = (int)widthNUD.Value;
             int height = (int)heightNUD.Value;
+            
+            //check map extents
             if (!(width >= MIN_MAP_WIDTH && width <= MAX_MAP_WIDTH))
             {
-                ErrorMessage("Width has to be between " + MIN_MAP_WIDTH + " and " + MAX_MAP_WIDTH + ".");
+                ErrorMessage($"Width has to be between {MIN_MAP_WIDTH} and {MAX_MAP_WIDTH}.");
                 return;
             }
             if (!(height >= MIN_MAP_HEIGHT && height <= MAX_MAP_HEIGHT))
             {
-                ErrorMessage("Height has to be between " + MIN_MAP_HEIGHT + " and " + MAX_MAP_HEIGHT + ".");
+                ErrorMessage($"Height has to be between {MIN_MAP_HEIGHT} and {MAX_MAP_HEIGHT}.");
                 return;
             }
 
+            //check if the name is valid
             string mapName = newNameTB.Text;
-            if (ValidName(mapName))
+            if (IsValidName(mapName))
             {
+                //check if the map already exists
                 if (MapAlreadyExists(mapName))
                 {
-                    ErrorMessage("The name \"" + mapName + "\" already exits.");
+                    ErrorMessage($"The name \"{mapName}\" already exits.");
                     return;
                 }
                 MapDescr = new MapDescription(width, height, newNameTB.Text);
@@ -285,10 +285,13 @@ namespace SanguineGenesis.GUI
                 mapPB.Refresh();
                 EnableEditing();
                 mapNameL.Text = MapDescr.Name;
-                Message("The map \"" + MapDescr.Name + "\" was created.");
+                Message($"The map \"{MapDescr.Name}\" was created.");
             }
         }
 
+        /// <summary>
+        /// Selects drawing tool.
+        /// </summary>
         private void DrawOptionsRB_Click(object sender, EventArgs e)
         {
             switch (((RadioButton)sender).Name)
@@ -317,6 +320,9 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Draws the map.
+        /// </summary>
         private void MapPB_Paint(object sender, PaintEventArgs e)
         {
             if (MapDescr != null)
@@ -330,6 +336,9 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Selects building to place to the map.
+        /// </summary>
         private void BuildingRB_Click(object sender, EventArgs e)
         {
             switch (((RadioButton)sender).Name)
@@ -349,13 +358,16 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Draws into the map.
+        /// </summary>
         private void MapPB_MouseDownAction(object sender, MouseEventArgs e)
         {
             if (MapDescr == null)
                 return;
 
             Point mapPoint = MapCoordinates(e.X, e.Y);
-            coordinatesL.Text = "X = " + mapPoint.X + " ; Y = " + mapPoint.Y;
+            coordinatesL.Text = $"X = {mapPoint.X} ; Y = {mapPoint.Y}";
 
             if (e.Button == MouseButtons.Left)
             {
@@ -397,40 +409,58 @@ namespace SanguineGenesis.GUI
             }
         }
 
+        /// <summary>
+        /// Saves MapDescr.
+        /// </summary>
         private void SaveB_Click(object sender, EventArgs e)
         {
             if (MapDescr != null)
             {
                 MapDescr.RepairMap();
-                MapDescr.Save();
+                try
+                {
+                    MapDescr.Save();
+                }
+                catch(InvalidOperationException ex)
+                {
+                    ErrorMessage(ex.Message);
+                    return;
+                }
                 DisableEditing();
                 LoadNamesOfCreatedMaps();
-                Message("The map \"" + MapDescr.Name + "\" was saved.");
+                Message($"The map \"{MapDescr.Name}\" was saved.");
             }
             else
                 ErrorMessage("No map is loaded.");
         }
 
+        /// <summary>
+        /// Loads a map with name given by the mapNamesCB.Text.
+        /// </summary>
         private void LoadB_Click(object sender, EventArgs e)
         {
             string mapDirName = mapNamesCB.Text;
-            if (!ValidName(mapDirName))
+            if (!IsValidName(mapDirName))
                 return;
 
             try
             {
-                MapDescr = new MapDescription(mapDirName);
+                var mapDescr = new MapDescription(mapDirName);
+                MapDescr = mapDescr;
                 DisableEditing();
                 mapNameL.Text = MapDescr.Name;
-                Message("The map \"" + mapDirName + "\" was loaded.");
+                Message($"The map \"{mapDirName}\" was loaded.");
             }
-            catch (Exception)
+            catch (InvalidOperationException ex)
             {
-                ErrorMessage("Map \"" + mapDirName + "\" was not loaded, because it doesn't exist or has incorrect format.");
+                ErrorMessage($"Map \"{mapDirName}\" was not loaded, because it doesn't exist or has incorrect format: {ex.Message}");
             }
             mapPB.Refresh();
         }
 
+        /// <summary>
+        /// Deletes a map with name given by the mapNamesCB.Text.
+        /// </summary>
         private void DeleteB_Click(object sender, EventArgs e)
         {
             string deletedName = mapNamesCB.Text;
@@ -447,24 +477,43 @@ namespace SanguineGenesis.GUI
                 {
                     Directory.Delete(dirName, true);
                     LoadNamesOfCreatedMaps();
-                    Message("The map \"" + mapNamesCB.Text + "\" was deleted.");
+                    Message("The map \"{mapNamesCB.Text}\" was deleted.");
                 }
                 else
                 {
                     ErrorMessage("No map is loaded.");
                 }
             }
-            catch (IOException)
+            catch (Exception ex) when (ex is IOException || ex is ArgumentException || ex is UnauthorizedAccessException ||
+                                     ex is PathTooLongException || ex is DirectoryNotFoundException)
             {
-                ErrorMessage("The map can't be deleted.");
+                ErrorMessage($"The map can't be deleted: {ex}");
             }
+        }
+
+        /// <summary>
+        /// Makes map editable.
+        /// </summary>
+        private void EditB_Click(object sender, EventArgs e)
+        {
+            if (MapDescr != null)
+                EnableEditing();
+            else
+                ErrorMessage("No map is loaded.");
         }
 
         /// <summary>
         /// Window where the game is played.
         /// </summary>
         private GameWindow gameWindow;
+        /// <summary>
+        /// If set to false, new game can't be created. 
+        /// </summary>
+        public bool CanCreateGame { get; set; }
 
+        /// <summary>
+        /// Opens a game window.
+        /// </summary>
         private void PlayB_Click(object sender, EventArgs e)
         {
             if (CanCreateGame)
@@ -501,12 +550,17 @@ namespace SanguineGenesis.GUI
                 ErrorMessage("There was a problem with game window initialization.");
         }
 
-        private void EditB_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Closes the game window.
+        /// </summary>
+        private void MainMenuWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (MapDescr != null)
-                EnableEditing();
-            else
-                ErrorMessage("No map is loaded.");
+            //close the game window if it exists
+            if (gameWindow != null)
+            {
+                gameWindow.CloseWindow = true;
+                gameWindow.Close();
+            }
         }
 
         #endregion Event handlers
@@ -535,44 +589,69 @@ namespace SanguineGenesis.GUI
             public static Color ShallowWaterColor { get; }
             public static Color RockColor { get; }
             public static Color BigRockColor { get; }
-            public static Color Player0MainColor { get; }//is yellow not to coincide with water
+            public static Color Player0MainColor { get; }//is yellow to not coincide with water
             public static Color Player1MainColor { get; }
             /// <summary>
-            /// Color of something that isn't important.
+            /// Default value of BuildingsLocations.
             /// </summary>
-            public static Color NothingColor { get; }
+            public static Color NoBuildingColor { get; }
+            /// <summary>
+            /// Default value of NutrientsMap.
+            /// </summary>
+            public static Color NoNutrientsColor { get; }
 
             static MapDescription()
             {
-                LandColor = Color.FromArgb(168, 142, 78);
-                DeepWaterColor = Color.FromArgb(0, 0, 200);
-                ShallowWaterColor = Color.FromArgb(100, 100, 200);
-                RockColor = Color.FromArgb(100, 100, 100);
-                BigRockColor = Color.FromArgb(200, 200, 200);
-                Player0MainColor = Color.FromArgb(255, 255, 0);
-                Player1MainColor = Color.FromArgb(255, 0, 0);
-                NothingColor = Color.FromArgb(255, 255, 255);
+                LandColor = Color.FromArgb(168, 142, 78);//brown
+                DeepWaterColor = Color.FromArgb(0, 0, 200);//dark blue
+                ShallowWaterColor = Color.FromArgb(100, 100, 200);//light blue
+                RockColor = Color.FromArgb(100, 100, 100);//dark gray
+                BigRockColor = Color.FromArgb(200, 200, 200);//light gray
+                Player0MainColor = Color.FromArgb(255, 255, 0);//yellow
+                Player1MainColor = Color.FromArgb(255, 0, 0);//red
+                NoBuildingColor = Color.FromArgb(255, 255, 255);//white
+                NoNutrientsColor = Color.FromArgb(255, 255, 255);//white
             }
 
             /// <summary>
             /// True if the map can't be edited.
             /// </summary>
             private bool Frozen { get; set; }
-            private Bitmap TerrainMap { get; }
-            public Color GetTerrain(int i, int j) => TerrainMap.GetPixel(i, j);
-            private Bitmap NutrientsMap { get; }
-            public Color GetNutrients(int i, int j) => NutrientsMap.GetPixel(i, j);
             /// <summary>
-            /// Bitmap that contains black pixels on squares taken by buildings.
+            /// Color of pixel (i,j) represents terrain of Node (i,j). Mapping terrain to colors is in properties LandColor,
+            /// DeepWaterColor and ShallowWaterColor.
+            /// </summary>
+            private Bitmap TerrainMap { get; }
+            public Color GetTerrain(int i, int j) { if (ValidCoordinates(i, j)) return TerrainMap.GetPixel(i, j); else return NoBuildingColor; }
+            /// <summary>
+            /// Color of pixel (i,j) represents amount of passive nutrients of Node (i,j). The color is always gray, brightness 255 corresponds
+            /// to the minal number of nutrients, 0 corresponds to the maximal nubmer of nutrients.
+            /// </summary>
+            private Bitmap NutrientsMap { get; }
+            public Color GetNutrients(int i, int j) { if (ValidCoordinates(i, j)) return NutrientsMap.GetPixel(i, j); else return NoNutrientsColor; }
+            /// <summary>
+            /// Bitmap that highlights pixels taken by buildings.
             /// </summary>
             private Bitmap BuildingsLocations { get; }
+            /// <summary>
+            /// List of all buildings on this map.
+            /// </summary>
             private List<BuildingDescriptor> Buildings { get; }
             /// <summary>
             /// Returns copy of Buildings.
             /// </summary>
-            public List<BuildingDescriptor> GetBuildings => Buildings.ToList();
+            public IEnumerable<BuildingDescriptor> GetBuildings() => Buildings;
+            /// <summary>
+            /// Name of this map.
+            /// </summary>
             public string Name { get; }
+            /// <summary>
+            /// Width of this map.
+            /// </summary>
             public int Width => TerrainMap.Width;
+            /// <summary>
+            /// Height of this map.
+            /// </summary>
             public int Height => TerrainMap.Height;
 
             /// <summary>
@@ -596,7 +675,7 @@ namespace SanguineGenesis.GUI
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
                     {
-                        NutrientsMap.SetPixel(i, j, NothingColor);
+                        NutrientsMap.SetPixel(i, j, NoNutrientsColor);
                     }
 
                 //init buildings map
@@ -604,11 +683,107 @@ namespace SanguineGenesis.GUI
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
                     {
-                        BuildingsLocations.SetPixel(i, j, NothingColor);
+                        BuildingsLocations.SetPixel(i, j, NoBuildingColor);
                     }
 
                 //init buildings
                 Buildings = new List<BuildingDescriptor>();
+            }
+
+            /// <summary>
+            /// Loads map from the directory.
+            /// </summary>
+            /// <param name="mapDirectoryName">Name of the directory.</param>
+            /// <exception cref="InvalidOperationException">Thrown if the directory or some of the required files don't exist.</exception>
+            public MapDescription(string mapDirectoryName)
+            {
+                string dirName = DIRECTORY + mapDirectoryName;
+
+                if (!Directory.Exists(dirName))
+                    throw new InvalidOperationException($"Directory {dirName} doesn't exist.");
+
+                try
+                {
+                    using (var terrainReader = new FileStream(dirName + "/terrain.bmp", FileMode.Open))
+                    using (var nutrientsReader = new FileStream(dirName + "/nutrients.bmp", FileMode.Open))
+                    using (var sr = new StreamReader(dirName + "/buildings.txt"))
+                    {
+                        //load terrain and nutrients
+                        TerrainMap = new Bitmap(terrainReader);
+                        int tWidth = TerrainMap.Width;
+                        int tHeight = TerrainMap.Height;
+                        NutrientsMap = new Bitmap(nutrientsReader);
+                        int nWidth = NutrientsMap.Width;
+                        int nHeight = NutrientsMap.Height;
+
+                        //check extents of loaded maps
+                        int width = tWidth;
+                        int height = tHeight;
+                        if (tWidth > MAX_MAP_WIDTH || tWidth < MIN_MAP_HEIGHT || tHeight > MAX_MAP_HEIGHT || tHeight < MIN_MAP_HEIGHT ||
+                            nWidth > MAX_MAP_WIDTH || nWidth < MIN_MAP_HEIGHT || nHeight > MAX_MAP_HEIGHT || nHeight < MIN_MAP_HEIGHT ||
+                            tWidth != nWidth || tHeight != nHeight)
+                        {
+                            //synchronize the extents of the maps and put them to the correct range
+                            width = Math.Min(MAX_MAP_WIDTH, Math.Max(MIN_MAP_WIDTH, tWidth));
+                            height = Math.Min(MAX_MAP_HEIGHT, Math.Max(MIN_MAP_HEIGHT, tWidth));
+                            var terrainMap = new Bitmap(width, height);
+                            var nutrientsMap = new Bitmap(width, height);
+
+                            //initialize the maps
+                            for (int i = 0; i < width; i++)
+                                for (int j = 0; j < height; j++)
+                                {
+                                    //terrain
+                                    if (i >= 0 && i < TerrainMap.Width && j >= 0 && j < TerrainMap.Height)
+                                        terrainMap.SetPixel(i, j, TerrainMap.GetPixel(i, j));
+                                    else
+                                        terrainMap.SetPixel(i, j, LandColor);
+                                    //nutrients
+                                    if (i >= 0 && i < NutrientsMap.Width && j >= 0 && j < NutrientsMap.Height)
+                                        nutrientsMap.SetPixel(i, j, NutrientsMap.GetPixel(i, j));
+                                    else
+                                        nutrientsMap.SetPixel(i, j, NoNutrientsColor);
+                                }
+
+                            //set the maps to properties
+                            TerrainMap = terrainMap;
+                            NutrientsMap = nutrientsMap;
+                        }
+                        for (int i = 0; i < width; i++)
+                            for (int j = 0; j < height; j++)
+                            {
+                                //set correct to terrain map if the original is incorrect
+                                if (!IsTerrainColor(TerrainMap.GetPixel(i, j)))
+                                    TerrainMap.SetPixel(i, j, LandColor);
+                            }
+
+                        //load buildings
+                        BuildingsLocations = new Bitmap(width, height);
+                        for (int i = 0; i < width; i++)
+                            for (int j = 0; j < height; j++)
+                            {
+                                BuildingsLocations.SetPixel(i, j, NoBuildingColor);
+                            }
+                        Buildings = new List<BuildingDescriptor>();
+                        string line;
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            string[] param = line.Split(' ');
+                            int x = int.Parse(param[0]);
+                            int y = int.Parse(param[1]);
+                            string type = param[2];
+                            AddBuilding((BuildingType)Enum.Parse(typeof(BuildingType), type), x, y);
+                        }
+                    }
+                }
+                catch (Exception ex) when (ex is IOException || ex is SecurityException || ex is ArgumentException || ex is FileNotFoundException
+                                       || ex is UnauthorizedAccessException || ex is PathTooLongException || ex is DirectoryNotFoundException)
+                {
+                    throw new InvalidOperationException($"The map can't be loaded: {ex.Message}", ex);
+                }
+
+                Name = mapDirectoryName;
+                Frozen = true;
             }
 
             /// <summary>
@@ -622,70 +797,6 @@ namespace SanguineGenesis.GUI
             }
 
             /// <summary>
-            /// Loads map from the directory.
-            /// </summary>
-            /// <param name="mapDirectoryName">Name of the directory.</param>
-            /// <exception cref="IOException">Thrown if the directory or some of the required files don't exist.</exception>
-            public MapDescription(string mapDirectoryName)
-            {
-                string dirName = DIRECTORY + mapDirectoryName;
-
-                if (!Directory.Exists(dirName))
-                    throw new IOException("Directory " + dirName + " doesn't exist!");
-
-                using (var terrainReader = new FileStream(dirName + "/terrain.bmp", FileMode.Open))
-                using (var nutrientsReader = new FileStream(dirName + "/nutrients.bmp", FileMode.Open))
-                using (var sr = new StreamReader(dirName + "/buildings.txt"))
-                {
-                    TerrainMap = new Bitmap(terrainReader);
-                    int tWidth = TerrainMap.Width;
-                    int tHeight = TerrainMap.Height;
-                    NutrientsMap = new Bitmap(nutrientsReader);
-                    int nWidth = NutrientsMap.Width;
-                    int nHeight = NutrientsMap.Height;
-
-                    int width = tWidth;
-                    int height = tHeight;
-                    //check extents of loaded maps
-                    if (tWidth > MAX_MAP_WIDTH || tWidth < MIN_MAP_HEIGHT || tHeight > MAX_MAP_HEIGHT || tHeight < MIN_MAP_HEIGHT ||
-                        nWidth > MAX_MAP_WIDTH || nWidth < MIN_MAP_HEIGHT || nHeight > MAX_MAP_HEIGHT || nHeight < MIN_MAP_HEIGHT)
-                    {
-                        width = Math.Min(MAX_MAP_WIDTH, Math.Max(MIN_MAP_WIDTH, tWidth));
-                        height = Math.Min(MAX_MAP_HEIGHT, Math.Max(MIN_MAP_HEIGHT, tWidth));
-                        TerrainMap = new Bitmap(width, height);
-                        NutrientsMap = new Bitmap(width, height);
-                        for (int i = 0; i < width; i++)
-                            for (int j = 0; j < height; j++)
-                            {
-                                NutrientsMap.SetPixel(i, j, NothingColor);
-                            }
-                    }
-                    BuildingsLocations = new Bitmap(width, height);
-                    for (int i = 0; i < width; i++)
-                        for (int j = 0; j < height; j++)
-                        {
-                            BuildingsLocations.SetPixel(i, j, NothingColor);
-                            //set correct to terrain map if the original is incorrect
-                            if (!IsTerrainColor(TerrainMap.GetPixel(i, j)))
-                                TerrainMap.SetPixel(i, j, LandColor);
-                        }
-
-                    Buildings = new List<BuildingDescriptor>();
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        string[] param = line.Split(' ');
-                        int x = int.Parse(param[0]);
-                        int y = int.Parse(param[1]);
-                        string type = param[2];
-                        AddBuilding((BuildingType)Enum.Parse(typeof(BuildingType), type), x, y);
-                    }
-                }
-                Name = mapDirectoryName;
-                Frozen = true;
-            }
-
-            /// <summary>
             /// Visualization of the map.
             /// </summary>
             public Bitmap TotalMap()
@@ -695,8 +806,17 @@ namespace SanguineGenesis.GUI
                 for (int i = 0; i < Width; i++)
                     for (int j = 0; j < Height; j++)
                     {
+                        // draw buildings
+                        if (!NoBuildingColor.SameRGB(BuildingsLocations.GetPixel(i, j))) 
+                        { 
+                            total.SetPixel(i, j, BuildingsLocations.GetPixel(i, j));
+                            continue;
+                        }
+
+                        //blend nutrients to terrain
                         Color terC = TerrainMap.GetPixel(i, j);
                         Color nutC = NutrientsMap.GetPixel(i, j);
+                        // nutrients are shown as brightness of the map -- less bright => more nutrients
                         // brightness has nonzero default value
                         // so that terrain and buildings can always be seen through it
                         float brightness = 0.5f + nutC.R / 512f;
@@ -705,28 +825,6 @@ namespace SanguineGenesis.GUI
                             (int)(terC.B * brightness));
                         total.SetPixel(i, j, newColor);
                     }
-                // draw buildings
-                foreach (var bd in Buildings)
-                {
-                    if(!TryGetBuildingExtents(bd.Type, out int width, out int height))
-                        continue;
-
-                    switch (bd.Type)
-                    {
-                        case BuildingType.PLAYER_0_MAIN:
-                            FillRectWithColor(total, Player0MainColor, bd.X, bd.Y, width, height);
-                            break;
-                        case BuildingType.PLAYER_1_MAIN:
-                            FillRectWithColor(total, Player1MainColor, bd.X, bd.Y, width, height);
-                            break;
-                        case BuildingType.ROCK:
-                            FillRectWithColor(total, RockColor, bd.X, bd.Y, width, height);
-                            break;
-                        case BuildingType.BIG_ROCK:
-                            FillRectWithColor(total, BigRockColor, bd.X, bd.Y, width, height);
-                            break;
-                    }
-                }
                 return total;
             }
 
@@ -769,16 +867,18 @@ namespace SanguineGenesis.GUI
             public bool ValidCoordinates(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
 
             /// <summary>
-            /// Returns true if building of width and height can be placed to coordinates x,y.
+            /// Returns true if building of width and height can be placed to coordinates x,y. Returns correct value only
+            /// if witdth and height are positive.
             /// </summary>
             private bool CanBePlacedBuilding(int x, int y, int width, int height)
             {
+                //check if coordinates of the building are valid
                 if (ValidCoordinates(x, y) &&
                     ValidCoordinates(x + width - 1, y + height - 1))
                 {
                     for (int i = x; i < x + width; i++)
                         for (int j = y; j < y + height; j++)
-                            if (Color.Black.SameRGB(BuildingsLocations.GetPixel(i, j)) ||
+                            if (!NoBuildingColor.SameRGB(BuildingsLocations.GetPixel(i, j)) ||
                                 !LandColor.SameRGB(TerrainMap.GetPixel(i, j)))//buildings can be put only on land
                                 return false;
                     return true;
@@ -798,22 +898,23 @@ namespace SanguineGenesis.GUI
                 if (Frozen)
                     return;
 
-                FillTerrainIgnoreBuildings(color, x, y, width, height);
+                FillRectWithColor(TerrainMap, color, x, y, width, height, 
+                    (xx, yy) => NoBuildingColor.SameRGB(BuildingsLocations.GetPixel(xx, yy)));
             }
 
             /// <summary>
             /// Draws to the nutrients map. Does nothing if this object is frozen.
             /// </summary>
-            public void AddNutrients(int x, int y, int width, int height, int intensity)
+            public void AddNutrients(int x, int y, int width, int height, int value)
             {
                 if (Frozen)
                     return;
 
-                AddRectIntensity(NutrientsMap, -intensity, x, y, width, height);
+                AddRectBrightness(NutrientsMap, -value, x, y, width, height);
             }
 
             /// <summary>
-            /// Adds a new building of given type to the map. Returns error message.
+            /// Adds a new building of the given type to the map. Returns error message.
             /// Does nothing if this object is frozen.
             /// </summary>
             public string AddBuilding(BuildingType type, int x, int y)
@@ -834,14 +935,31 @@ namespace SanguineGenesis.GUI
                     if (CanBePlacedBuilding(x, y, width, height))
                     {
                         Buildings.Add(new BuildingDescriptor(type, x, y));
-                        FillRectWithColor(BuildingsLocations, Color.Black, x, y, width, height);
+
+                        Color buildingColor;
+                        switch (type)
+                        {
+                            case BuildingType.PLAYER_0_MAIN:
+                                buildingColor = Player0MainColor;
+                                break;
+                            case BuildingType.PLAYER_1_MAIN:
+                                buildingColor = Player1MainColor;
+                                break;
+                            case BuildingType.ROCK:
+                                buildingColor = RockColor;
+                                break;
+                            default: // BuildingType.BIG_ROCK:
+                                buildingColor = BigRockColor;
+                                break;
+                        }
+                        FillRectWithColor(BuildingsLocations, buildingColor, x, y, width, height, (_x, _y) => true);
                         return null;
                     }
                     else
-                        return "The building cannot be placed at the coordinates (" + x + ", " + y + ").";
+                        return $"The building cannot be placed at the coordinates ({x}, {y}).";
                 }
                 else
-                    return "The building with a type \"" + type + "\" doesn't exist.";
+                    return $"The building with a type \"{type}\" doesn't exist.";
             }
 
             /// <summary>
@@ -857,7 +975,7 @@ namespace SanguineGenesis.GUI
                     return;
 
                 //the square isn't occupied by any building
-                if (NothingColor.SameRGB(BuildingsLocations.GetPixel(x, y)))
+                if (NoBuildingColor.SameRGB(BuildingsLocations.GetPixel(x, y)))
                     return;
 
                 BuildingDescriptor? toRemove = null;//BuildingDescriptor is struct but we need null value
@@ -867,7 +985,7 @@ namespace SanguineGenesis.GUI
                     if (bd.X <= x && x < bd.X + width && bd.Y <= y && y < bd.Y + height)
                     {
                         toRemove = bd;
-                        FillRectWithColor(BuildingsLocations, Color.White, bd.X, bd.Y, width, height);
+                        FillRectWithColor(BuildingsLocations, Color.White, bd.X, bd.Y, width, height, (_x, _y) => true);
                         break;
                     }
                 }
@@ -877,9 +995,10 @@ namespace SanguineGenesis.GUI
             #endregion Public api mutating methods
 
             /// <summary>
-            /// Fills the rectangle in bitmap with color c. Coordiantes can be out of range.
+            /// Fills the rectangle in bitmap with color c. Coordiantes can be out of range. The color of the square is changed
+            /// only if squareCondition returns true for the square.
             /// </summary>
-            private void FillRectWithColor(Bitmap bitmap, Color c, int x, int y, int width, int height)
+            private void FillRectWithColor(Bitmap bitmap, Color c, int x, int y, int width, int height, Func<int, int, bool> squareCondition)
             {
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
@@ -888,35 +1007,17 @@ namespace SanguineGenesis.GUI
                         int yy = y + j;
                         if (ValidCoordinates(xx, yy))
                         {
-                            bitmap.SetPixel(xx, yy, c);
+                            if(squareCondition(xx,yy))
+                                bitmap.SetPixel(xx, yy, c);
                         }
                     }
             }
 
             /// <summary>
-            /// Fills the terrain map in the given rectangle with the color c but 
-            /// ignores the squares with buildings. Coordiantes can be out of range.
-            /// </summary>
-            private void FillTerrainIgnoreBuildings(Color c, int x, int y, int width, int height)
-            {
-                for (int i = 0; i < width; i++)
-                    for (int j = 0; j < height; j++)
-                    {
-                        int xx = x + i;
-                        int yy = y + j;
-                        if (ValidCoordinates(xx, yy))
-                        {
-                            if (NothingColor.SameRGB(BuildingsLocations.GetPixel(xx, yy)))
-                                TerrainMap.SetPixel(xx, yy, c);
-                        }
-                    }
-            }
-
-            /// <summary>
-            /// Adds the rectangle in bitmap with color c. Coordiantes can be out of range. Intensity
+            /// Adds the rectangle in bitmap with color c. Coordiantes can be out of range. Brightness
             /// is between 0 and 255.
             /// </summary>
-            private void AddRectIntensity(Bitmap bitmap, int intensity, int x, int y, int width, int height)
+            private void AddRectBrightness(Bitmap bitmap, int value, int x, int y, int width, int height)
             {
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
@@ -928,9 +1029,9 @@ namespace SanguineGenesis.GUI
                             Color color = bitmap.GetPixel(xx, yy);
                             bitmap.SetPixel(xx, yy,
                                 Color.FromArgb(
-                                    Math.Min(255, Math.Max(color.R + intensity, 0)),
-                                    Math.Min(255, Math.Max(color.G + intensity, 0)),
-                                    Math.Min(255, Math.Max(color.B + intensity, 0))));
+                                    Math.Min(255, Math.Max(color.R + value, 0)),
+                                    Math.Min(255, Math.Max(color.G + value, 0)),
+                                    Math.Min(255, Math.Max(color.B + value, 0))));
                         }
                     }
             }
@@ -1017,7 +1118,7 @@ namespace SanguineGenesis.GUI
                 for (int i = 0; i < Width - 1; i++)
                     for (int j = 0; j < Height - 1; j++)
                     {
-                        if (Color.Black.SameRGB(BuildingsLocations.GetPixel(i, j)) &&
+                        if (!NoBuildingColor.SameRGB(BuildingsLocations.GetPixel(i, j)) &&
                             !LandColor.SameRGB(TerrainMap.GetPixel(i,j)))
                         {
                             TerrainMap.SetPixel(i, j, LandColor);
@@ -1049,25 +1150,30 @@ namespace SanguineGenesis.GUI
             /// <summary>
             /// Creates a new directory with this map's name and puts there this map's data.
             /// </summary>
+            /// <exception cref="InvalidOperationException">If data can't be written to the files.</exception>
             public void Save()
             {
                 string dirName = DIRECTORY + Name;
-                if (Directory.Exists(dirName))
-                    foreach (var f in Directory.GetFiles(dirName))
-                        File.Delete(f);
-
-                Directory.CreateDirectory(dirName);
-                using (var terrainWriter = new FileStream(dirName + "/terrain.bmp", FileMode.OpenOrCreate))
-                using (var nutrientsWriter = new FileStream(dirName + "/nutrients.bmp", FileMode.OpenOrCreate))
-                using (var sw = new StreamWriter(dirName + "/buildings.txt"))
+                try
                 {
-                    ImageConverter ic = new ImageConverter();
-                    var terBytes = (byte[])ic.ConvertTo(TerrainMap, typeof(byte[]));
-                    terrainWriter.Write(terBytes, 0, terBytes.Length);
-                    var nutBytes = (byte[])ic.ConvertTo(NutrientsMap, typeof(byte[]));
-                    nutrientsWriter.Write(nutBytes, 0, nutBytes.Length);
-                    foreach (var building in Buildings)
-                        sw.WriteLine(building);
+                    Directory.CreateDirectory(dirName);
+                    using (var terrainWriter = new FileStream(dirName + "/terrain.bmp", FileMode.OpenOrCreate))
+                    using (var nutrientsWriter = new FileStream(dirName + "/nutrients.bmp", FileMode.OpenOrCreate))
+                    using (var sw = new StreamWriter(dirName + "/buildings.txt"))
+                    {
+                        ImageConverter ic = new ImageConverter();
+                        var terBytes = (byte[])ic.ConvertTo(TerrainMap, typeof(byte[]));
+                        terrainWriter.Write(terBytes, 0, terBytes.Length);
+                        var nutBytes = (byte[])ic.ConvertTo(NutrientsMap, typeof(byte[]));
+                        nutrientsWriter.Write(nutBytes, 0, nutBytes.Length);
+                        foreach (var building in Buildings)
+                            sw.WriteLine(building);
+                    }
+                }
+                catch (Exception ex) when (ex is IOException || ex is SecurityException || ex is ArgumentException || ex is FileNotFoundException
+                                        || ex is UnauthorizedAccessException || ex is PathTooLongException || ex is DirectoryNotFoundException)
+                {
+                    throw new InvalidOperationException($"The map can't be saved: {ex.Message}", ex);
                 }
             }
 
@@ -1100,7 +1206,7 @@ namespace SanguineGenesis.GUI
 
             public override string ToString()
             {
-                return X + " " + Y + " " + Type;
+                return $"{X} {Y} {Type}";
             }
         }
 
@@ -1110,16 +1216,6 @@ namespace SanguineGenesis.GUI
             PLAYER_1_MAIN,
             ROCK,
             BIG_ROCK
-        }
-
-        private void MainMenuWindow_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            //close the game window if it exists
-            if (gameWindow != null)
-            {
-                gameWindow.CloseWindow = true;
-                gameWindow.Close();
-            }
         }
     }
 }

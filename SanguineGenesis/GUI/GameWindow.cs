@@ -33,10 +33,6 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public GameplayOptions GameplayOptions { get; }
         /// <summary>
-        /// Data about the game.
-        /// </summary>
-        public GameData GameData { get; }
-        /// <summary>
         /// True if the window was initialized.
         /// </summary>
         public bool Initialized { get; set; }
@@ -45,7 +41,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public bool CloseWindow { get; set; }
         /// <summary>
-        /// True if the game is over.
+        /// True if this window is no longer used for the last game.
         /// </summary>
         public bool GameEnded { get; set; }
 
@@ -76,16 +72,17 @@ namespace SanguineGenesis.GUI
                 GameData = new GameData();
             }catch(Exception e)
             {
-                MessageBox.Show("Failed to initialize the window: " + e.Message);
+                MessageBox.Show($"Failed to initialize the window: {e.Message}");
                 MainMenuWindow.CanCreateGame = false;
                 Close();
             }
 
-            //wait until the window initializes and then initialize bottom panel and opengl
+            //wait until the window initializes and then initialize gui and opengl
             Shown += (s, e) =>
             {
                 InitializeOpenGL();
                 InitializeUserInterface();
+                Initialized = true;
                 GameUpdateTimer.Enabled = true;
             };
         }
@@ -104,6 +101,10 @@ namespace SanguineGenesis.GUI
         /// Measures the ingame time.
         /// </summary>
         private GameTime GameTime { get; set; }
+        /// <summary>
+        /// Data about the game.
+        /// </summary>
+        public GameData GameData { get; }
 
         public void StartNewGame(MapDescription mapDescription, Biome playersBiome, bool testAnimals)
         {
@@ -281,8 +282,6 @@ namespace SanguineGenesis.GUI
             VictoryPanel.Visible = false;
             GameOptionsMenu.Visible = false;
             GameMenu.Visible = false;
-
-            Initialized = true;
         }
 
         /// <summary>
