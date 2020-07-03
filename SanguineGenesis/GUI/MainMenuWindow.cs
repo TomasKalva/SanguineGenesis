@@ -935,7 +935,7 @@ namespace SanguineGenesis.GUI
                     if (CanBePlacedBuilding(x, y, width, height))
                     {
                         Buildings.Add(new BuildingDescriptor(type, x, y));
-
+                        //choose color of the building
                         Color buildingColor;
                         switch (type)
                         {
@@ -978,14 +978,14 @@ namespace SanguineGenesis.GUI
                 if (NoBuildingColor.SameRGB(BuildingsLocations.GetPixel(x, y)))
                     return;
 
-                BuildingDescriptor? toRemove = null;//BuildingDescriptor is struct but we need null value
+                BuildingDescriptor? toRemove = null;//BuildingDescriptor is struct but we need null value to check if the building exists
                 foreach (var bd in Buildings)
                 {
                     TryGetBuildingExtents(bd.Type, out int width, out int height);
                     if (bd.X <= x && x < bd.X + width && bd.Y <= y && y < bd.Y + height)
                     {
                         toRemove = bd;
-                        FillRectWithColor(BuildingsLocations, Color.White, bd.X, bd.Y, width, height, (_x, _y) => true);
+                        FillRectWithColor(BuildingsLocations, NoBuildingColor, bd.X, bd.Y, width, height, (_x, _y) => true);
                         break;
                     }
                 }
@@ -1039,11 +1039,13 @@ namespace SanguineGenesis.GUI
             /// <summary>
             /// Removes forbiden patterns from TerrainMap the following way:
             /// 
-            /// +_  =>  +_
-            /// _+      ++
+            /// 1)
+            /// x_  =>  x_
+            /// _x      xx
             /// 
-            /// _+  =>  _+
-            /// +_      ++
+            /// 2)
+            /// _x  =>  _x
+            /// x_      xx
             /// 
             /// iterates until all of the forbiden patterns are gone. The operation
             /// is applied with priorities from highest to lowest: DeepWater, ShallowWater, Land.
@@ -1064,56 +1066,48 @@ namespace SanguineGenesis.GUI
                             Color c = TerrainMap.GetPixel(i, j + 1); Color d = TerrainMap.GetPixel(i + 1, j + 1);
 
                             if (a.SameRGB(d) && ! a.SameRGB(c) && ! a.SameRGB(b))
-                            // +_
-                            // _+
+                            // a_
+                            // _a
                             {
                                 if (c.SameRGB(b))
-                                // +-
-                                // -+
+                                // ab
+                                // ba
                                 {
                                     if (TerrainHigherPriority(a, b))
                                     {
+                                        //use rule 1) for x=a
                                         TerrainMap.SetPixel(i, j + 1, a);
                                     }
                                     else
                                     {
+                                        //use rule 2) for x=b
                                         TerrainMap.SetPixel(i + 1, j + 1, b);
                                     }
                                 }
                                 else
-                                // +.
-                                // -+
+                                // ab
+                                // ca
+                                    //use rule 1) for x=a
                                     TerrainMap.SetPixel(i, j + 1, a);
 
-                                    changed = true;
+                                changed = true;
                             }
-                            if (c.SameRGB(b) && !c.SameRGB(a) && !c.SameRGB(d))
-                            // _+
-                            // +_
+                            else if (c.SameRGB(b) && !c.SameRGB(a) && !c.SameRGB(d))
+                            // _b
+                            // b_
                             {
-                                if (a.SameRGB(d))
-                                // -+
-                                // +-
-                                {
-                                    if (TerrainHigherPriority(a, b))
-                                    {
-                                        TerrainMap.SetPixel(i, j + 1, a);
-                                    }
-                                    else
-                                    {
-                                        TerrainMap.SetPixel(i + 1, j + 1, b);
-                                    }
-                                }
-                                else
-                                // .+
-                                // +-
-                                    TerrainMap.SetPixel(i, j + 1, a);
+                                //the case a=c was already covered in the first branch
+                                // ab
+                                // bc
+                                //use rule 2) for x=b
+                                TerrainMap.SetPixel(i, j + 1, a);
 
                                 changed = true;
                             }
                         }
                 }
 
+                //the algorithm might put water under buildings
                 //put land under buildings
                 for (int i = 0; i < Width - 1; i++)
                     for (int j = 0; j < Height - 1; j++)

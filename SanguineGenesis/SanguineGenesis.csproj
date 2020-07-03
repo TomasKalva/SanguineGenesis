@@ -37,7 +37,8 @@
     <StartupObject>SanguineGenesis.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>giraffe.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GlmNet, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -241,9 +242,6 @@
     <None Include="Images\atlas.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="giraffe.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons\Animals\aligator.png">
