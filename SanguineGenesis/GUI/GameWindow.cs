@@ -121,6 +121,7 @@ namespace SanguineGenesis.GUI
             Game = new Game(mapDescription, playersBiome, GameData, GameplayOptions);
             //reset game controls
             GameControls.Reset();
+            GameControls.MapView.SetActualExtents(openGLControl.Width, openGLControl.Height);
             //spawn testing animals
             if (testAnimals)
                 Game.SpawnTestingAnimals();
@@ -128,6 +129,7 @@ namespace SanguineGenesis.GUI
             GameTime = new GameTime(Console.Out);
             GameUpdateTimer.Enabled = true;
             GameEnded = false;
+            initializedPos = false;
         }
 
         public void GameUpdateTimer_MainLoop(object sender, EventArgs e)
@@ -376,6 +378,11 @@ namespace SanguineGenesis.GUI
         #region Event handlers
 
         /// <summary>
+        /// False if the first position of MapView wasn't initialised yet.
+        /// </summary>
+        private bool initializedPos;
+
+        /// <summary>
         /// Draws the game.
         /// </summary>
         private void Draw(object sender, RenderEventArgs args)
@@ -387,6 +394,16 @@ namespace SanguineGenesis.GUI
 
             //set correct extents of the window to game controls
             GameControls.MapView.SetActualExtents(openGLControl.Width, openGLControl.Height);
+            if (!initializedPos)
+            {
+                initializedPos = true;
+                //center view to main building
+                var mainBuilding = Game.CurrentPlayer.GetAll<Building>().First();
+                if (mainBuilding != null)
+                {
+                    GameControls.MapView.CenterTo(Game.Map, mainBuilding.Center);
+                }
+            }
 
             //update data buffers
 
@@ -477,6 +494,11 @@ namespace SanguineGenesis.GUI
                 if(EntityButtonArray.Selected!=null &&
                     GameControls.SelectionInput.State==SelectionInputState.ENTITIES_SELECTED)
                     GameControls.SelectedGroup.KeepSelected(EntityButtonArray.Selected.EntityType);
+            }
+            else if (e.KeyCode == Keys.T)
+            {
+                //switch showing of nutrients
+                GameplayOptions.NutrientsVisible = !GameplayOptions.NutrientsVisible;
             }
             else if ((controlGroupIndex = ControlGroupButtonArray.KeyToGroupIndex(e.KeyCode)) != -1)
             {
@@ -746,6 +768,7 @@ namespace SanguineGenesis.GUI
         private void OpenOptionsMenu()
         {
             GameOptionsMenu.Visible = true;
+            GameOptionsMenu.UpdateCheckboxes(GameplayOptions);
         }
 
         /// <summary>

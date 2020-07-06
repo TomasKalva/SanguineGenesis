@@ -81,9 +81,8 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The animal moves to the target. If the target is on a terrain " +
-                "this animal can't move to, the animal won't do anything." + 
-                (AttackEnemyInstead ? " If animal meets an enemy it attacks it instead." : "");
+            return "The animal moves to the target. " + 
+                (AttackEnemyInstead ? "If animal meets an enemy it attacks it instead." : "");
         }
     }
 

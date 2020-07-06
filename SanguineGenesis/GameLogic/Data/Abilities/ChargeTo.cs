@@ -46,7 +46,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return $"The animal charges to the entity and deals it {AttackDamageMultiplier.ToString("0.0")} times of its attack damage.";
+            return $"The animal charges to the entity and deals it {AttackDamageMultiplier:0.0} times of its attack damage.";
         }
     }
 

@@ -200,7 +200,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             BigPull.SetAbilities(this);
 
             //activate far sight
-            ActivateFarSight = new ApplyStatus(20, gameStaticData.Statuses.FarSightFactory);
+            ActivateFarSight = new ApplyStatus(10, gameStaticData.Statuses.FarSightFactory);
             ActivateFarSight.SetAbilities(this);
 
             //knockback

@@ -510,11 +510,11 @@ namespace SanguineGenesis.GUI
                         continue;
 
                     //active nutrients
-                    int activeNutrients = (int)(current.ActiveNutrients * 10);
+                    int activeNutrients = Math.Min(99,(int)Math.Ceiling(current.ActiveNutrients * 10));
                     Rect atlasActiveNutrients = ImageAtlas.GetImageAtlas.GetNumberedTriangle(activeNutrients);
 
                     //passive nutrients
-                    int passiveNutrients = (int)(current.PassiveNutrients);
+                    int passiveNutrients = Math.Min(99, (int)Math.Ceiling(current.PassiveNutrients));
                     Rect atlasPassiveNutrients = ImageAtlas.GetImageAtlas.GetNumberedTriangle(passiveNutrients);
 
                     //tile position
@@ -726,7 +726,12 @@ namespace SanguineGenesis.GUI
 
                     Rect atlasCoords;
                     //colors
-                    if (!current.Selected)
+                    //fill animals that are state change locked with white color
+                    if (current is Animal a &&
+                        a.StateChangeLock != null)
+                    {
+                        atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleWhite;
+                    }else if (!current.Selected)
                     {
                         //fill the circle with color of the corresponding player
                         switch (current.Faction.FactionID)
@@ -743,12 +748,6 @@ namespace SanguineGenesis.GUI
                             default:
                                 atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleGray;
                                 break;
-                        }
-                        //fill animals that are state change locked with white color
-                        if (current is Animal a &&
-                            a.StateChangeLock != null)
-                        {
-                            atlasCoords = ImageAtlas.GetImageAtlas.UnitCircleWhite;
                         }
                     }
                     else

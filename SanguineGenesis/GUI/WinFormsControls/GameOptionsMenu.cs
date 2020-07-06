@@ -77,5 +77,15 @@ namespace SanguineGenesis.GUI.WinFormsControls
 
             BackColor = Color.Gray;
         }
+
+        /// <summary>
+        /// Updates values of checkboxes.
+        /// </summary>
+        public void UpdateCheckboxes(GameplayOptions gameplayOptions)
+        {
+            optionCheckboxes[0].Checked = gameplayOptions.WholeMapVisible;
+            optionCheckboxes[1].Checked = gameplayOptions.NutrientsVisible;
+            optionCheckboxes[2].Checked = gameplayOptions.ShowFlowfield;
+        }
     }
 }

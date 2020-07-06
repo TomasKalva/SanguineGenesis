@@ -125,7 +125,7 @@ namespace SanguineGenesis.GameLogic
         public void GenerateNutrients()
         {
             //the transaction conserves nutrients
-            float residue = Node.MAX_ACTIVE_NUTRIENTS - ActiveNutrients;
+            float residue = MAX_ACTIVE_NUTRIENTS - ActiveNutrients;
             float extracted = Math.Min(residue,
                 Math.Min(PassiveNutrients, SoilQuality.NutrientsProduction()));
             ActiveNutrients += extracted;

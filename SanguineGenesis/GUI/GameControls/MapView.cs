@@ -69,11 +69,10 @@ namespace SanguineGenesis.GameControls
         /// </summary>
         public float Top => Bottom + Height;
 
-
-        public MapView(float top, float left, float nodeSize,
+        public MapView(float bottom, float left, float nodeSize,
             float minNodeSize = 60, float maxNodeSize = 80, float scrollSpeed = 0.5f, float zoomSpeed = 10)
         {
-            Bottom = top;
+            Bottom = bottom;
             Left = left;
             NodeSize = nodeSize;
             this.scrollSpeed = scrollSpeed;
@@ -223,6 +222,16 @@ namespace SanguineGenesis.GameControls
                 Bottom = map.Height - Height;
             if (Bottom < 0)
                 Bottom = 0;
+        }
+
+        /// <summary>
+        /// Sets center of screen to point.
+        /// </summary>
+        public void CenterTo(Map map, Vector2 point)
+        {
+            Left = point.X - Width / 2;
+            Bottom = point.Y - Height / 2;
+            CorrectPosition(map);
         }
 
         #endregion Position and zoom changing

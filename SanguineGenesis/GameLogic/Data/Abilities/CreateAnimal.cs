@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
+using SanguineGenesis.GUI.WinFormsControls;
 
 namespace SanguineGenesis.GameLogic.Data.Abilities
 {
@@ -36,6 +37,20 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override string Description()
         {
             return $"The entity creates a new {SpawningAnimalFactory.EntityType}. It will move to this entity's rally point.";
+        }
+
+        public override List<Stat> Stats()
+        {
+            List<Stat> stats = new List<Stat>()
+            {
+                new Stat( "Energy cost", EnergyCost.ToString()),
+                new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
+                new Stat( "Air", SpawningAnimalFactory.Air.ToString()),
+                new Stat( "Only one", OnlyOne.ToString()),
+                new Stat( "Target type", TargetName),
+                new Stat( "Interruptable", Interruptable.ToString()),
+            };
+            return stats;
         }
     }
 
@@ -131,7 +146,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         public override void OnRemove()
         {
             //refund the energy after canceling spawn command
-            if (Paid)
+            if (Paid && ElapsedTime < Ability.Duration)
                 CommandedEntity.Energy += Ability.EnergyCost;
         }
     }
