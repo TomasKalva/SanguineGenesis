@@ -1,4 +1,5 @@
 ﻿using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.AI;
 using SanguineGenesis.GameLogic.Data.Entities;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,7 @@ namespace SanguineGenesis.GUI
             DrawOpt = DrawOption.NO_ACTION;
             CanCreateGame = true;
             LoadNamesOfCreatedMaps();
+            LoadAIFactoryNames();
             //load icon
             try { this.Icon = new Icon("Images/Icons/giraffe.ico"); } catch (IOException e)
             {
@@ -186,6 +188,18 @@ namespace SanguineGenesis.GUI
             {
                 ErrorMessage($"List of maps can't be loaded: {e}");
             }
+        }
+
+        /// <summary>
+        /// Loads names of AIFactories.
+        /// </summary>
+        public void LoadAIFactoryNames()
+        {
+            foreach(var name in AIs.GetAINames())
+            {
+                aiCB.Items.Add(name);
+            }
+            aiCB.Text = "Default AI";
         }
 
         /// <summary>
@@ -531,7 +545,7 @@ namespace SanguineGenesis.GUI
                         if (CanCreateGame)
                         {
                             gameWindow.Enabled = true;
-                            gameWindow.StartNewGame(MapDescr, PlayersBiome, testAnimalsCB.Checked);
+                            gameWindow.StartNewGame(MapDescr, PlayersBiome, testAnimalsCB.Checked, AIs.GetAIFactory(aiCB.Text));
                             gameWindow.BringToFront();
                             //hide this window
                             Enabled = false;

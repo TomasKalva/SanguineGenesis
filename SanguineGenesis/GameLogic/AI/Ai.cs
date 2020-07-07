@@ -1,4 +1,5 @@
-﻿using SanguineGenesis.GameLogic.Data.Abilities;
+﻿using SanguineGenesis.GameLogic.Data;
+using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
 using System;
@@ -17,7 +18,7 @@ namespace SanguineGenesis.GameLogic.AI
         /// <summary>
         /// Creates new instance that implements IAI.
         /// </summary>
-        IAI NewInstance(Player controlledPlayer);
+        IAI NewInstance(Player controlledPlayer, GameData gameData);
     }
 
     /// <summary>
@@ -41,7 +42,7 @@ namespace SanguineGenesis.GameLogic.AI
     /// </summary>
     class DefaultAIFactory: IAIFactory
     {
-        public IAI NewInstance(Player controlledPlayer)
+        public IAI NewInstance(Player controlledPlayer, GameData gameData)
         {
             return new DefaultAI(controlledPlayer, 1f);
         }
@@ -222,6 +223,59 @@ namespace SanguineGenesis.GameLogic.AI
                 list.RemoveAt(nextItem);
             }
             return newL;
+        }
+    }
+    /// <summary>
+    /// Creates TutorialAI.
+    /// </summary>
+    class TutorialAIFactory : IAIFactory
+    {
+        public IAI NewInstance(Player controlledPlayer, GameData gameData)
+        {
+            return new TutorialAI(controlledPlayer, gameData);
+        }
+    }
+
+    /// <summary>
+    /// Does nothing except for initializing two Dodos near enemy base.
+    /// </summary>
+    class TutorialAI : IAI
+    {
+        public Player ControlledPlayer { get; }
+        private bool AnimalsInitialized { get; set; }
+        private GameData GameData { get; }
+
+        public TutorialAI(Player controlledPlayer, GameData gameData)
+        {
+            ControlledPlayer = controlledPlayer;
+            AnimalsInitialized = false;
+            GameData = gameData;
+        }
+
+        public void Play(float deltaT, Game game)
+        {
+            if (!AnimalsInitialized)
+            {
+                var mainBuilding = ControlledPlayer.GetAll<Building>().First();
+                if (mainBuilding != null)
+                {
+                    //create two Dodos
+                    var mainBuildingPos = mainBuilding.Center;
+                    var dodoFactory = GameData.AnimalFactories["DODO"];
+                    for (int i = 0; i < 2; i++)
+                    {
+                        var animalPos = new Vector2(mainBuildingPos.X - 3, mainBuildingPos.Y + i - 0.5f);
+                        if (animalPos.X > 0)
+                        {
+                            var animal = dodoFactory.NewInstance(ControlledPlayer, animalPos);
+                            animal.Direction = new Vector2(-1, 0);
+                            animal.Energy = animal.Energy.MaxValue;
+                            ControlledPlayer.AddEntity(animal);
+                        }
+                    }
+                }
+                AnimalsInitialized = true;
+            }
         }
     }
 }

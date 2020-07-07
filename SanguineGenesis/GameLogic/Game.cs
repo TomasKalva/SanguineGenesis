@@ -61,7 +61,7 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         private FactionType nextVisibilityPlayer;
 
-        public Game(MapDescription mapDescription, Biome firstPlayersBiome, GameData gameData, GameplayOptions gameplayOptions)
+        public Game(MapDescription mapDescription, Biome firstPlayersBiome, GameData gameData, GameplayOptions gameplayOptions, IAIFactory aiFactory)
         {
             Winner = null;
             GameData = gameData;
@@ -70,8 +70,8 @@ namespace SanguineGenesis.GameLogic
             //factions
             Players = new Dictionary<FactionType, Player>
             {
-                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null) },
-                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, new DefaultAIFactory()) }
+                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null, gameData) },
+                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, aiFactory, gameData) }
             };
             CurrentPlayer = Players[FactionType.PLAYER0];
             NeutralFaction = new Faction(FactionType.NEUTRAL);

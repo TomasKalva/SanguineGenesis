@@ -26,11 +26,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return new ApplyStatusCommand(user, target, this);
         }
 
-        public override string GetName() => "APPLY_" + StatusFactory.GetName();
+        public override string GetName() => $"APPLY_{StatusFactory.GetName()}";
 
         public override string Description()
         {
-            return $"The unit gain status {StatusFactory.ToString()}.";
+            return $"The unit gain status {StatusFactory}.";
         }
     }
 

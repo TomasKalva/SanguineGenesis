@@ -243,7 +243,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         {
             //remove the staus if the duration is over or animal moves
             timer += deltaT;
-            if (timer > StatusFact.Duration || AffectedObj.WantsToMove)
+            if (timer > StatusFact.Duration || AffectedObj.WantsToMove || AffectedObj.StateChangeLock != null)
                 return true;
             return false;
         }
@@ -399,7 +399,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         public override bool Step(Game game, float deltaT)
         {
             //remove the staus if the animal moves
-            if (AffectedObj.WantsToMove)
+            if (AffectedObj.WantsToMove || AffectedObj.StateChangeLock != null)
                 return true;
             return false;
         }

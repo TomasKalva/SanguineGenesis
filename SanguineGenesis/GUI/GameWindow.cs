@@ -1,5 +1,6 @@
 ﻿using SanguineGenesis.GameControls;
 using SanguineGenesis.GameLogic;
+using SanguineGenesis.GameLogic.AI;
 using SanguineGenesis.GameLogic.Data;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
@@ -106,7 +107,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public GameData GameData { get; }
 
-        public void StartNewGame(MapDescription mapDescription, Biome playersBiome, bool testAnimals)
+        public void StartNewGame(MapDescription mapDescription, Biome playersBiome, bool testAnimals, IAIFactory aiFactory)
         {
             if (Initialized)
             {
@@ -118,7 +119,7 @@ namespace SanguineGenesis.GUI
                 GameUpdateTimer.Enabled = false;
             }
             //initialize game
-            Game = new Game(mapDescription, playersBiome, GameData, GameplayOptions);
+            Game = new Game(mapDescription, playersBiome, GameData, GameplayOptions, aiFactory);
             //reset game controls
             GameControls.Reset();
             GameControls.MapView.SetActualExtents(openGLControl.Width, openGLControl.Height);
