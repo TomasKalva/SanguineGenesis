@@ -70,8 +70,8 @@ namespace SanguineGenesis.GameLogic
             //factions
             Players = new Dictionary<FactionType, Player>
             {
-                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null, gameData) },
-                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, aiFactory, gameData) }
+                { FactionType.PLAYER0, new Player(FactionType.PLAYER0, firstPlayersBiome, null) },
+                { FactionType.PLAYER1, new Player(FactionType.PLAYER1, firstPlayersBiome == Biome.SAVANNA ? Biome.RAINFOREST : Biome.SAVANNA, aiFactory) }
             };
             CurrentPlayer = Players[FactionType.PLAYER0];
             NeutralFaction = new Faction(FactionType.NEUTRAL);

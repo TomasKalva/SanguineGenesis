@@ -114,7 +114,7 @@
             // 
             this.groupBox1.Controls.Add(this.rainforestRB);
             this.groupBox1.Controls.Add(this.savannaRB);
-            this.groupBox1.Location = new System.Drawing.Point(29, 17);
+            this.groupBox1.Location = new System.Drawing.Point(46, 13);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
@@ -246,9 +246,9 @@
             this.eraseNutrientsRB.Location = new System.Drawing.Point(9, 135);
             this.eraseNutrientsRB.Margin = new System.Windows.Forms.Padding(4);
             this.eraseNutrientsRB.Name = "eraseNutrientsRB";
-            this.eraseNutrientsRB.Size = new System.Drawing.Size(127, 21);
+            this.eraseNutrientsRB.Size = new System.Drawing.Size(125, 21);
             this.eraseNutrientsRB.TabIndex = 14;
-            this.eraseNutrientsRB.Text = "Erase Nutrients";
+            this.eraseNutrientsRB.Text = "Erase nutrients";
             this.eraseNutrientsRB.UseVisualStyleBackColor = true;
             this.eraseNutrientsRB.Click += new System.EventHandler(this.DrawOptionsRB_Click);
             // 
@@ -464,10 +464,10 @@
             // 
             this.mapNameL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.mapNameL.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.mapNameL.Location = new System.Drawing.Point(392, 376);
+            this.mapNameL.Location = new System.Drawing.Point(392, 380);
             this.mapNameL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.mapNameL.Name = "mapNameL";
-            this.mapNameL.Size = new System.Drawing.Size(396, 60);
+            this.mapNameL.Size = new System.Drawing.Size(396, 45);
             this.mapNameL.TabIndex = 13;
             this.mapNameL.Text = "<map name>";
             this.mapNameL.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -594,11 +594,11 @@
             this.loadMapGB.Controls.Add(this.saveB);
             this.loadMapGB.Controls.Add(this.editB);
             this.loadMapGB.Controls.Add(this.loadB);
-            this.loadMapGB.Location = new System.Drawing.Point(12, 427);
+            this.loadMapGB.Location = new System.Drawing.Point(12, 422);
             this.loadMapGB.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.loadMapGB.Name = "loadMapGB";
             this.loadMapGB.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.loadMapGB.Size = new System.Drawing.Size(364, 118);
+            this.loadMapGB.Size = new System.Drawing.Size(364, 123);
             this.loadMapGB.TabIndex = 17;
             this.loadMapGB.TabStop = false;
             this.loadMapGB.Text = "Load map";
@@ -611,11 +611,11 @@
             this.playGB.Controls.Add(this.testAnimalsCB);
             this.playGB.Controls.Add(this.playB);
             this.playGB.Controls.Add(this.groupBox1);
-            this.playGB.Location = new System.Drawing.Point(388, 427);
+            this.playGB.Location = new System.Drawing.Point(388, 422);
             this.playGB.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.playGB.Name = "playGB";
             this.playGB.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.playGB.Size = new System.Drawing.Size(400, 118);
+            this.playGB.Size = new System.Drawing.Size(400, 123);
             this.playGB.TabIndex = 18;
             this.playGB.TabStop = false;
             this.playGB.Text = "Play";
@@ -623,7 +623,7 @@
             // aiL
             // 
             this.aiL.AutoSize = true;
-            this.aiL.Location = new System.Drawing.Point(26, 91);
+            this.aiL.Location = new System.Drawing.Point(43, 87);
             this.aiL.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.aiL.Name = "aiL";
             this.aiL.Size = new System.Drawing.Size(24, 17);
@@ -633,7 +633,7 @@
             // aiCB
             // 
             this.aiCB.FormattingEnabled = true;
-            this.aiCB.Location = new System.Drawing.Point(58, 88);
+            this.aiCB.Location = new System.Drawing.Point(75, 84);
             this.aiCB.Margin = new System.Windows.Forms.Padding(4);
             this.aiCB.Name = "aiCB";
             this.aiCB.Size = new System.Drawing.Size(175, 24);

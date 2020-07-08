@@ -129,6 +129,11 @@ namespace SanguineGenesis.GUI
                 ErrorMessage("The name of the map cannot be empty.");
                 return false;
             }
+            if (name.Length > 50)
+            {
+                ErrorMessage("The name of the map is too long.");
+                return false;
+            }
             //check if name contains only alphanumeric characters and '_'
             foreach(char a in name)
                 if (!(char.IsLetterOrDigit(a) || a=='_'))

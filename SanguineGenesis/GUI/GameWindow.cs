@@ -824,7 +824,7 @@ namespace SanguineGenesis.GUI
             VictoryPanel.Visible = true;
             DisableGameControls();
             GameMenu.Visible = false;
-            VictoryPanel.Message.Text = Winner + " won!";
+            VictoryPanel.Message.Text = Winner==FactionType.PLAYER0? "You won!" : "Enemy won!";
             VictoryPanel.AlreadyShown = true;
         }
 

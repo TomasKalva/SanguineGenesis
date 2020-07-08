@@ -18,7 +18,7 @@ namespace SanguineGenesis.GameLogic.AI
         /// <summary>
         /// Creates new instance that implements IAI.
         /// </summary>
-        IAI NewInstance(Player controlledPlayer, GameData gameData);
+        IAI NewInstance(Player controlledPlayer);
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ namespace SanguineGenesis.GameLogic.AI
     /// </summary>
     class DefaultAIFactory: IAIFactory
     {
-        public IAI NewInstance(Player controlledPlayer, GameData gameData)
+        public IAI NewInstance(Player controlledPlayer)
         {
             return new DefaultAI(controlledPlayer, 1f);
         }
@@ -230,26 +230,24 @@ namespace SanguineGenesis.GameLogic.AI
     /// </summary>
     class TutorialAIFactory : IAIFactory
     {
-        public IAI NewInstance(Player controlledPlayer, GameData gameData)
+        public IAI NewInstance(Player controlledPlayer)
         {
-            return new TutorialAI(controlledPlayer, gameData);
+            return new TutorialAI(controlledPlayer);
         }
     }
 
     /// <summary>
-    /// Does nothing except for initializing two Dodos near enemy base.
+    /// Does nothing except for initializing animals near base.
     /// </summary>
     class TutorialAI : IAI
     {
         public Player ControlledPlayer { get; }
         private bool AnimalsInitialized { get; set; }
-        private GameData GameData { get; }
 
-        public TutorialAI(Player controlledPlayer, GameData gameData)
+        public TutorialAI(Player controlledPlayer)
         {
             ControlledPlayer = controlledPlayer;
             AnimalsInitialized = false;
-            GameData = gameData;
         }
 
         public void Play(float deltaT, Game game)
@@ -259,15 +257,23 @@ namespace SanguineGenesis.GameLogic.AI
                 var mainBuilding = ControlledPlayer.GetAll<Building>().First();
                 if (mainBuilding != null)
                 {
-                    //create two Dodos
+                    var gameData = game.GameData;
+                    var map = game.Map;
+                    //create two Chimpanzees
                     var mainBuildingPos = mainBuilding.Center;
-                    var dodoFactory = GameData.AnimalFactories["DODO"];
-                    for (int i = 0; i < 2; i++)
+                    var chimpanzeeFactory = gameData.AnimalFactories["CHIMPANZEE"];
+                    var chimpazeePositions = new List<Vector2>()
                     {
-                        var animalPos = new Vector2(mainBuildingPos.X - 3, mainBuildingPos.Y + i - 0.5f);
-                        if (animalPos.X > 0)
+                        new Vector2(mainBuildingPos.X - 2, mainBuildingPos.Y),
+                        new Vector2(mainBuildingPos.X + 2, mainBuildingPos.Y),
+                        new Vector2(mainBuildingPos.X, mainBuildingPos.Y - 2),
+                        new Vector2(mainBuildingPos.X, mainBuildingPos.Y + 2)
+                    };
+                    foreach (var pos in chimpazeePositions)
+                    {
+                        if (pos.X > 0 && pos.X < map.Width && pos.Y > 0 && pos.Y < map.Height)
                         {
-                            var animal = dodoFactory.NewInstance(ControlledPlayer, animalPos);
+                            var animal = chimpanzeeFactory.NewInstance(ControlledPlayer, pos);
                             animal.Direction = new Vector2(-1, 0);
                             animal.Energy = animal.Energy.MaxValue;
                             ControlledPlayer.AddEntity(animal);

@@ -214,14 +214,14 @@ namespace SanguineGenesis.GameLogic
         /// </summary>
         public IAI AI { get; }
 
-        public Player(FactionType factionID, Biome biome, IAIFactory aiFactory, GameData gameData)
+        public Player(FactionType factionID, Biome biome, IAIFactory aiFactory)
             : base(factionID)
         {
             //SpawnTestingAnimals();
             VisibleBuildings = new List<Building>();
             Biome = biome;
             if(aiFactory!=null)
-                AI = aiFactory.NewInstance(this, gameData);
+                AI = aiFactory.NewInstance(this);
 
         }
 
