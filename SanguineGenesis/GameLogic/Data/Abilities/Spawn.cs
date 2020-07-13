@@ -31,7 +31,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return base.ToString() + " " + SpawningAnimalFactory.EntityType;
         }
 
-        public override string GetName() => "SPAWN_" + SpawningAnimalFactory.EntityType;
+        public override string GetName() => $"SPAWN_{SpawningAnimalFactory.EntityType}";
 
         public override string Description()
         {
@@ -49,21 +49,10 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override bool PerformCommandLogic(Game game, float deltaT)
         {
-            if (ElapsedTime >= Ability.Duration)
-            {
-                var newUnitOwner = CommandedEntity.Faction;
-                Animal newUnit = Ability.SpawningAnimalFactory.NewInstance(newUnitOwner, Target);
-                newUnitOwner.AddEntity(newUnit);
-                return true;
-            }
-            return false;
-        }
-
-        public override void OnRemove()
-        {
-            //refund the energy after canceling spawn command
-            if (Paid)
-                CommandedEntity.Energy += Ability.EnergyCost;
+            var newUnitOwner = CommandedEntity.Faction;
+            Animal newUnit = Ability.SpawningAnimalFactory.NewInstance(newUnitOwner, Target);
+            newUnitOwner.AddEntity(newUnit);
+            return true;
         }
     }
 }

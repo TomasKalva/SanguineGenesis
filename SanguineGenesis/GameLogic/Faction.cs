@@ -176,8 +176,9 @@ namespace SanguineGenesis.GameLogic
             {
                 for (int j = 0; j < 6; j++)
                 {
-                    var animal = a.NewInstance(this, new Vector2(step * ((pos % gridPoints) + 1),
-                                                                 step * ((pos / gridPoints) + 1)));
+                    var newX = (step * ((pos % gridPoints) + 1)) % gridSize;
+                    var newY = (step * ((pos / gridPoints) + 1)) % gridSize;
+                    var animal = a.NewInstance(this, new Vector2(newX, newY));
                     animal.Energy = animal.Energy.MaxValue;
                     AddEntity(animal);
                 }

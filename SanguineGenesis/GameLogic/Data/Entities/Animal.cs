@@ -180,7 +180,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             //make the position delta shorter if it's to long
             if (dPos.Length > MaxDistToMove)
             {
-                Velocity = MaxDistToMove * Velocity.UnitVector();
+                Velocity = MaxDistToMove * Velocity.UnitVector() / deltaT;
             }
 
             // move the animal

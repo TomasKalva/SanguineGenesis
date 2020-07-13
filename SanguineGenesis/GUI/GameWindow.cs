@@ -71,11 +71,13 @@ namespace SanguineGenesis.GUI
             {
                 ImageAtlas.Init();
                 GameData = new GameData();
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
-                MessageBox.Show($"Failed to initialize the window: {e.Message}");
+                MessageBox.Show($"Failed to initialize game data: {e.Message}");
                 MainMenuWindow.CanCreateGame = false;
                 Close();
+                return;
             }
 
             //wait until the window initializes and then initialize gui and opengl
@@ -105,7 +107,7 @@ namespace SanguineGenesis.GUI
         /// <summary>
         /// Data about the game.
         /// </summary>
-        public GameData GameData { get; }
+        public GameData GameData { get; set; }
 
         public void StartNewGame(MapDescription mapDescription, Biome playersBiome, bool testAnimals, IAIFactory aiFactory)
         {
@@ -369,7 +371,7 @@ namespace SanguineGenesis.GUI
                 OpenGLAtlasDrawer.Initialize(gl, openGLControl.Width, openGLControl.Height);
             }catch(Exception e)
             {
-                MessageBox.Show("Failed to initialize window: "+e.Message);
+                MessageBox.Show("Failed to initialize OpenGL context: "+e.Message);
                 MainMenuWindow.CanCreateGame = false;
                 Close();
             }

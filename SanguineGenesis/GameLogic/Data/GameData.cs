@@ -18,6 +18,7 @@ namespace SanguineGenesis.GameLogic.Data
         public Abilities.Abilities Abilities { get; }
         public Statuses.Statuses Statuses { get; }
 
+        /// <exception cref="ArgumentException">Thrown if the data files are not valid.</exception>
         public GameData()
         {
             Statuses = new Statuses.Statuses();

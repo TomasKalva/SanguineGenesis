@@ -2,9 +2,11 @@
 using SanguineGenesis.GameLogic.Maps;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -139,24 +141,37 @@ namespace SanguineGenesis.GUI
         /// </summary>
         public static void Init() 
         {
-            if(GetImageAtlas==null)
-                GetImageAtlas = new ImageAtlas();
+            GetImageAtlas = new ImageAtlas();
         }
 
         private ImageAtlas()
         {
+            string currentAction = "loading atlas.xml";
+            string validationError = "";
             try
             {
                 XDocument doc = XDocument.Load("Images/atlas.xml");
+
+                //check if the schema is valid
+                XmlSchemaSet schemas = new XmlSchemaSet();
+                schemas.Add(null, "Images/XMLAtlasSchema.xsd");
+                doc.Validate(schemas, (o, e) =>
+                {
+                    validationError = e.Message;
+                });
 
                 //returns child element of root with name=elemName
                 XElement elWithName(string elemName) => (from el in doc.Root.Elements()
                                                          where el.Name.LocalName == elemName
                                                          select el).First();
 
+                currentAction = "initializing digits";
                 InitializeDigitImages(elWithName("Digits"));
+                currentAction = "initializing entities animations";
                 InitializeEntitiesAnimations(elWithName("Entities"));
+                currentAction = "numbers array";
                 InitializeNumberedTriangles(elWithName("NumbersArray"));
+                currentAction = "nodes";
                 InitializeNodes(elWithName("Nodes"));
 
                 //finds subelement with attribute name=attrName
@@ -165,27 +180,30 @@ namespace SanguineGenesis.GUI
                                                                   select (XElement)el.FirstNode).First();
 
                 //circles
+                currentAction = "initializing unit cirles";
                 UnitCircleGray = LoadImage(shapesImgElWithName("UnitCircleGray"));
                 UnitCircleRed = LoadImage(shapesImgElWithName("UnitCircleRed"));
                 UnitCircleBlue = LoadImage(shapesImgElWithName("UnitCircleBlue"));
                 UnitCircleYellow = LoadImage(shapesImgElWithName("UnitCircleYellow"));
                 UnitCircleWhite = LoadImage(shapesImgElWithName("UnitCircleWhite"));
 
+                currentAction = "initializing units selector";
                 UnitsSelector = LoadImage(shapesImgElWithName("UnitsSelector"));
 
                 //squares
+                currentAction = "initializing squares";
                 BlackSquare = LoadImage(shapesImgElWithName("BlackSquare"));
                 RedSquare = LoadImage(shapesImgElWithName("RedSquare"));
                 GreenSquare = LoadImage(shapesImgElWithName("GreenSquare"));
                 BlueSquare = LoadImage(shapesImgElWithName("BlueSquare"));
             }
-            catch(IOException ioe)
+            catch(Exception e) when (e is IOException || e is SecurityException || e is FileNotFoundException) 
             {
-                throw new Exception("Failed to load atlas.xml", ioe);
+                throw new Exception("Failed to load the file atlas.xml", e);
             }
             catch (Exception e ) when (e is ArgumentException || e is InvalidOperationException)
             {
-                throw new Exception("Invalid format of atlas.xml", e);
+                throw new Exception($"Error while {currentAction}: {e.Message}.{(validationError!=""?$"\n\natlas.xml doesn't satisfy the schema: {validationError}":"")}", e);
             }
         }
 
@@ -228,53 +246,74 @@ namespace SanguineGenesis.GUI
         /// Loads entities.
         /// </summary>
         /// <param name="animationDescriptionFileName">Element whose subelements are entities.</param>
+        /// <exception cref="ArgumentException">Thrown if the element can't be parsed.</exception>
         private void InitializeEntitiesAnimations(XElement entities)
         {
             //iterate over all entities
             entitiesAnimations = new Dictionary<string, Animation>();
-            foreach (XElement entity in entities.Elements())
+            XElement current = new XElement("VariableNotInitialized");
+            string parsingProgress = "loading entity type";
+            try
             {
-                string entityType = entity.Attribute("EntityType").Value;
-                //iterate over all animations of the entity
-                foreach (XElement animation in entity.Elements())
+                foreach (XElement entity in entities.Elements())
                 {
-                    XElement firstImage = (XElement)animation.FirstNode;
-                    float centerX = float.Parse(animation.Attribute("CenterX").Value, CultureInfo.InvariantCulture);
-                    float centerY = float.Parse(animation.Attribute("CenterY").Value, CultureInfo.InvariantCulture);
-                    float animWidth = float.Parse(firstImage.Attribute("Width").Value, CultureInfo.InvariantCulture);
-                    float animHeight = float.Parse(firstImage.Attribute("Height").Value, CultureInfo.InvariantCulture);
-                    string action = animation.Attribute("Action").Value;
-
-                    //iterate over all images of the animation
-                    var animationImages = new List<Rect>();
-                    var animChangeTime = new List<float>(animationImages.Count);
-                    foreach (XElement image in animation.Elements())
+                    current = entity;
+                    string entityType = entity.Attribute("EntityType").Value;
+                    //iterate over all animations of the entity
+                    foreach (XElement animation in entity.Elements())
                     {
-                        //load extents of the image
-                        animationImages.Add(LoadImage(image));
+                        parsingProgress = "loading action";
+                        string action = animation.Attribute("Action").Value;
+                        XElement firstImage = (XElement)animation.FirstNode;
+                        if (firstImage == null)
+                            parsingProgress = $"loading animation extents, animation {action} contains no images";
 
-                        //load duration of the image
-                        var dur = image.Attribute("Duration");
-                        if (dur != null)
+                        parsingProgress = "loading centerX";
+                        float centerX = float.Parse(animation.Attribute("CenterX").Value, CultureInfo.InvariantCulture);
+                        parsingProgress = "loading centerY";
+                        float centerY = float.Parse(animation.Attribute("CenterY").Value, CultureInfo.InvariantCulture);
+                        parsingProgress = "loading width";
+                        float animWidth = float.Parse(firstImage.Attribute("Width").Value, CultureInfo.InvariantCulture);
+                        parsingProgress = "loading height";
+                        float animHeight = float.Parse(firstImage.Attribute("Height").Value, CultureInfo.InvariantCulture);
+
+                        //iterate over all images of the animation
+                        var animationImages = new List<Rect>();
+                        var animChangeTime = new List<float>(animationImages.Count);
+                        foreach (XElement image in animation.Elements())
                         {
-                            float duration = float.Parse(dur.Value, CultureInfo.InvariantCulture);
-                            animChangeTime.Add(duration);
+                            //load extents of the image
+                            parsingProgress = "loading image extents";
+                            animationImages.Add(LoadImage(image));
+
+                            //load duration of the image
+                            parsingProgress = "loading image duration";
+                            var dur = image.Attribute("Duration");
+                            if (dur != null)
+                            {
+                                float duration = float.Parse(dur.Value, CultureInfo.InvariantCulture);
+                                animChangeTime.Add(duration);
+                            }
+                            else
+                            {
+                                animChangeTime.Add(0.5f);
+                            }
                         }
-                        else
-                        {
-                            animChangeTime.Add(0.5f);
-                        }
+
+                        string animationName = AnimationName(entityType, action);
+
+                        //add new animation to the animation dictionary
+                        parsingProgress = $"adding animation {animationName} to dictionary";
+                        AddEntitiesAnimation(animationName, action, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
                     }
-
-                    string animationName = AnimationName(entityType, action);
-
-                    //add new animation to the animation dictionary
-                    AddEntitiesAnimation(animationName, action, new Vector2(centerX, centerY), animWidth, animHeight, animChangeTime, animationImages);
                 }
+            }catch(Exception e)
+            {
+                throw new ArgumentException($"Invalid entity definition: \n{current}, \n Error while {parsingProgress}: {e.Message}", e);
             }
 
             //load animation of invalid entity
-            AddEntitiesAnimation(AnimationName("NO_ENTITY", "NO_ACTION"), "NO_ACTION", new Vector2(0.5f, 0f), 1, 1, 
+            AddEntitiesAnimation("NO_ENTITY_NO_ACTION", "NO_ACTION", new Vector2(0.5f, 0f), 1, 1, 
                 new List<float>() { 0.5f }, new List<Rect>(){ ToRelative(GridToPixels(28,11,1,1))});
         }
 
@@ -294,7 +333,6 @@ namespace SanguineGenesis.GUI
                 bool visible = bool.Parse(node.Attribute("Visible").Value);
                 XElement image = (XElement)node.FirstNode;
                 nodeTextures.Add(new NodeDescription(biome, terrain, soilQuality, visible), LoadImage(image));
-
             }
         }
 
@@ -304,7 +342,6 @@ namespace SanguineGenesis.GUI
         /// Creates rectangle from imageElement. Extents of the rectangle are relative to the atlas extents.
         /// </summary>
         /// <param name="imageElement">Element that describes the image.</param>
-        /// <returns></returns>
         private Rect LoadImage(XElement imageElement)
         {
             if (imageElement == null || imageElement.Name.LocalName != "Image")
@@ -371,7 +408,7 @@ namespace SanguineGenesis.GUI
             if (entitiesAnimations.TryGetValue(animationName, out Animation anim))
                 return anim;
             else
-                return GetEntityAnimation("NO_ENTITY","NO_ACTION");
+                return entitiesAnimations["NO_ENTITY_NO_ACTION"];
         }
 
         /// <summary>

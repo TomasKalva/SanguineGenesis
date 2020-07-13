@@ -52,11 +52,13 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// <summary>
         /// Adds new ability to this entity's factory, if the ability has correct user type.
         /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the entity is not correct type of owner.</exception>
         public abstract void AddAbility(Ability ability);
 
         /// <summary>
         /// Adds new status to this entity's factory, if the status has correct owner type.
         /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the entity is not correct type of owner.</exception>
         public abstract void AddStatusFactory(StatusFactory status);
     }
 
@@ -136,6 +138,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             {
                 Abilities.Add(ability);
             }
+            else
+            {
+                throw new ArgumentException($"Plant can't use {ability.GetName()}");
+            }
         }
 
         public override void AddStatusFactory(StatusFactory statusFac)
@@ -143,6 +149,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             if (statusFac.OwnerType.IsAssignableFrom(typeof(Plant)))
             {
                 StatusFactories.Add(statusFac);
+            }
+            else
+            {
+                throw new ArgumentException($"Plant can't own {statusFac.GetName()}");
             }
         }
     }
@@ -173,6 +183,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             {
                 Abilities.Add(ability);
             }
+            else
+            {
+                throw new ArgumentException($"Structure can't use {ability.GetName()}");
+            }
         }
 
         public override void AddStatusFactory(StatusFactory statusFac)
@@ -180,6 +194,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             if (statusFac.OwnerType.IsAssignableFrom(typeof(Structure)))
             {
                 StatusFactories.Add(statusFac);
+            }
+            else
+            {
+                throw new ArgumentException($"Structure can't own {statusFac.GetName()}");
             }
         }
     }
@@ -292,6 +310,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             {
                 Abilities.Add(ability);
             }
+            else
+            {
+                throw new ArgumentException($"Animal can't use {ability.GetName()}");
+            }
         }
 
         public override void AddStatusFactory(StatusFactory statusFac)
@@ -299,6 +321,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
             if (statusFac.OwnerType.IsAssignableFrom(typeof(Animal)))
             {
                 StatusFactories.Add(statusFac);
+            }
+            else
+            {
+                throw new ArgumentException($"Animal can't own {statusFac.GetName()}");
             }
         }
     }

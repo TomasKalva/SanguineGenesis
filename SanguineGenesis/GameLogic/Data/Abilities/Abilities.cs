@@ -36,7 +36,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Returns Spawn ability of invalid animal if animal of the type doesn't exist.
         /// </summary>
-        public Spawn UnitSpawn(string type)
+        public Spawn AnimalSpawn(string type)
         {
             if (animalSpawn.TryGetValue(type, out var anim))
             {
@@ -44,8 +44,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             }
             else
             {
-                //invalid animal indicating that the animal doesn't exist
-                return new Spawn(new AnimalFactory($"{anim}_not_exists", 1, 1, 1, 1, 1, 1, 1, 1, false, 1, 1, Movement.LAND, false, Diet.CARNIVORE, 1, false, 1, 1, new List<Statuses.StatusFactory>(), 1));
+                throw new ArgumentException($"The animal with name {type} doesn't exist.");
             }
         }
         /// <summary>
@@ -59,8 +58,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             }
             else
             {
-                //invalid animal indicating that the animal doesn't exist
-                return new CreateAnimal(new AnimalFactory($"{anim}_not_exists", 1, 1, 1, 1, 1, 1, 1, 1, false, 1, 1, Movement.LAND, false, Diet.CARNIVORE, 1, false, 1, 1, new List<Statuses.StatusFactory>(), 1));
+                throw new ArgumentException($"The animal with name {type} doesn't exist.");
             }
         }
         /// <summary>
@@ -74,8 +72,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             }
             else
             {
-                //invalid building indicating that the building doesn't exist
-                return new BuildBuilding(new StructureFactory($"{buil}_not_exists",1,1,1,false,1,Biome.DEFAULT,Terrain.LAND,SoilQuality.BAD,1,1,false,new List<StatusFactory>()));
+                throw new ArgumentException($"The building with name {type} doesn't exist.");
             }
         }
         //=> buildBuilding[type];

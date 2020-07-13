@@ -32,7 +32,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             return base.ToString() + " " + SpawningAnimalFactory.EntityType;
         }
 
-        public override string GetName() => "CREATE_" + SpawningAnimalFactory.EntityType;
+        public override string GetName() => $"CREATE_{SpawningAnimalFactory.EntityType}";
 
         public override string Description()
         {

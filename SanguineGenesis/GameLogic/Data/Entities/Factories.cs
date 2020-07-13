@@ -43,7 +43,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 if (FactoryMap.TryGetValue(entityType, out Factory factory))
                     return factory;
                 else
-                    throw new ArgumentException("There is no "+ typeof(Factory)+" for " + entityType);
+                    throw new ArgumentException($"There is no {typeof(Factory)} for {entityType}");
             }
         }
 
@@ -52,15 +52,25 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="statuses">Statuses that can be given to factories that require them.</param>
+        /// <exception cref="ArgumentException">Thrown if input file has incorrect format.</exception>
         public void InitFactoryMap(string fileName, Statuses.Statuses statuses)
         {
             using (StreamReader fileReader = new StreamReader(fileName))
             {
-                //first line is just a description of the format
-                string line = fileReader.ReadLine();
-                while ((line = fileReader.ReadLine()) != null)
+                //starting at postion 2, postion 1 is header
+                int lineN = 2;
+                try
                 {
-                    AddNewFactory(line, statuses);
+                    //first line is just a description of the format
+                    string line = fileReader.ReadLine();
+                    while ((line = fileReader.ReadLine()) != null)
+                    {
+                        AddNewFactory(line, statuses);
+                        lineN++;
+                    }
+                }catch(ArgumentException e)
+                {
+                    throw new ArgumentException($"Error in file {fileName} at line {lineN}: {e.Message}", e);
                 }
             }
         }
@@ -70,22 +80,29 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// </summary>
         /// <param name="description">String that describes the factory's properties.</param>
         /// <param name="statuses">Statuses that can be given to the factory if it requires them.</param>
+        /// <exception cref="ArgumentException">Thrown when some argument in description has incorrect value.</exception>
         public abstract void AddNewFactory(string description, Statuses.Statuses statuses);
 
         /// <summary>
         /// Returns a list of statuses represented by the string listOfStatuses.
         /// </summary>
+        /// <exception cref="ArgumentException">Thrown if some argument in listOfStatuses has incorrect value.</exception>
         public List<StatusFactory> ParseStatuses(string listOfStatuses, Statuses.Statuses statuses)
         {
             List<StatusFactory> statusFactories = new List<StatusFactory>();
+            if (listOfStatuses == "")
+                return statusFactories;
+
             string[] statusesNames = listOfStatuses.Split(';');
             foreach(string stName in statusesNames)
             {
                 switch (stName)
                 {
-                    case "hole system":
+                    case "holeSystem":
                         statusFactories.Add(statuses.HoleSystem);
                         break;
+                    default:
+                        throw new ArgumentException($"Status {stName} doesn't exist.");
                 }
             }
             return statusFactories;
@@ -95,6 +112,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
         /// Uses abilitiesList to set abilities to the already created FactoryMap. Has to be called after
         /// InitFactoryMap.
         /// </summary>
+        /// <exception cref="ArgumentException">Thrown if some argument in abilities has incorrect value.</exception>
         public void InitAbilities(Abilities.Abilities abilities)
         {
             foreach(var entityAbilities in abilitiesList)
@@ -103,6 +121,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                 string[] abilitiesDesc = entityAbilities.Value.Split(';');
                 foreach(string abilityDesc in abilitiesDesc)
                 {
+                    //skip empty strings
+                    if (abilityDesc == "")
+                        continue;
+
                     //parameters of ability are separated by ':'
                     string[] abPar = abilityDesc.Split(':');
                     string abName = abPar[0];
@@ -134,6 +156,10 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                                         factory.AddAbility(abilities.HerbivoreEat);
                                     else
                                         factory.AddAbility(abilities.CarnivoreEat);
+                                }
+                                else
+                                {
+                                    throw new ArgumentException("Ability eat can be only used by animals.");
                                 }
                                 break;
                             case "poisonousSpit":
@@ -187,6 +213,8 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                             case "kick":
                                 factory.AddAbility(abilities.Kick);
                                 break;
+                            default:
+                                throw new ArgumentException($"Ability {abName} doesn't exist.");
                         }
                     }else if (abPar.Length == 2)
                     {
@@ -197,11 +225,13 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                                 factory.AddAbility(abilities.BuildBuilding(abPar[1]));
                                 break;
                             case "spawn":
-                                factory.AddAbility(abilities.UnitSpawn(abPar[1]));
+                                factory.AddAbility(abilities.AnimalSpawn(abPar[1]));
                                 break;
                             case "create":
                                 factory.AddAbility(abilities.AnimalCreate(abPar[1]));
                                 break;
+                            default:
+                                throw new ArgumentException($"Ability {abName} with 1 parameter doesn't exist.");
                         }
                     }
                 }
@@ -216,29 +246,39 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     {
         public override void AddNewFactory(string description, Statuses.Statuses statuses)
         {
+            //current parsing position
+            int pos = 0;
             string[] fields = description.Split(',');
-            string plantType = fields[0];
-            float maxHealth=float.Parse(fields[1], CultureInfo.InvariantCulture);
-            float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture);
-            float energyRegen = float.Parse(fields[3], CultureInfo.InvariantCulture);
-            bool physical = fields[4] == "yes";
-            int size = int.Parse(fields[5], CultureInfo.InvariantCulture);
-            int rootsDistance = int.Parse(fields[6], CultureInfo.InvariantCulture);
-            float energyCost = float.Parse(fields[7], CultureInfo.InvariantCulture);
-            Biome biome = (Biome)Enum.Parse(typeof(Biome),fields[8]);
-            Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain),fields[9]);
-            SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality),fields[10]);
-            List<StatusFactory> statusFactories = ParseStatuses(fields[12], statuses);
-            bool producer = fields[13] == "yes";
-            int air = int.Parse(fields[14], CultureInfo.InvariantCulture);
-            float buildingDistance = float.Parse(fields[15], CultureInfo.InvariantCulture);
-            float viewRange = float.Parse(fields[16], CultureInfo.InvariantCulture);
-            bool blocksVision = fields[17] == "yes";
+            try
+            {
+                string plantType = fields[0]; pos++;
+                float maxHealth = float.Parse(fields[1], CultureInfo.InvariantCulture); pos++;
+                float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture); pos++;
+                float energyRegen = float.Parse(fields[3], CultureInfo.InvariantCulture); pos++;
+                bool physical = fields[4] == "yes"; pos++;
+                int size = int.Parse(fields[5], CultureInfo.InvariantCulture); pos++;
+                int rootsDistance = int.Parse(fields[6], CultureInfo.InvariantCulture); pos++;
+                float energyCost = float.Parse(fields[7], CultureInfo.InvariantCulture); pos++;
+                Biome biome = (Biome)Enum.Parse(typeof(Biome), fields[8]); pos++;
+                Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[9]); pos++;
+                SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[10]); pos++; pos++;
+                List<StatusFactory> statusFactories = ParseStatuses(fields[12], statuses); pos++;
+                bool producer = fields[13] == "yes"; pos++;
+                int air = int.Parse(fields[14], CultureInfo.InvariantCulture); pos++;
+                float buildingDistance = float.Parse(fields[15], CultureInfo.InvariantCulture); pos++;
+                float viewRange = float.Parse(fields[16], CultureInfo.InvariantCulture); pos++;
+                bool blocksVision = fields[17] == "yes"; pos++;
+                pos=0;
 
-            PlantFactory newFactory = new PlantFactory(plantType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
-                biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, rootsDistance, air, statusFactories);
-            FactoryMap.Add(plantType, newFactory);
-            abilitiesList.Add(plantType, fields[11]);
+                PlantFactory newFactory = new PlantFactory(plantType, maxHealth, maxEnergy, energyRegen, size, physical, energyCost,
+                    biome, terrain, soilQuality, producer, buildingDistance, viewRange, blocksVision, rootsDistance, air, statusFactories);
+                FactoryMap.Add(plantType, newFactory);
+                abilitiesList.Add(plantType, fields[11]);
+            }
+            catch(Exception e) when (e is ArgumentException || e is OverflowException || e is FormatException)
+            {
+                throw new ArgumentException($"Invalid value '{fields[pos]}' at position {pos+1}.");
+            }
         }
     }
 
@@ -249,25 +289,35 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     {
         public override void AddNewFactory(string description, Statuses.Statuses statuses)
         {
+            //current parsing position
+            int pos = 0;
             string[] fields = description.Split(',');
-            string structureType = fields[0];
-            float maxHealth = float.Parse(fields[1], CultureInfo.InvariantCulture);
-            float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture);
-            bool physical = fields[3] == "yes";
-            int size = int.Parse(fields[4], CultureInfo.InvariantCulture);
-            float energyCost = float.Parse(fields[5], CultureInfo.InvariantCulture);
-            Biome biome = (Biome)Enum.Parse(typeof(Biome), fields[6]);
-            Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[7]);
-            SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[8]);
-            List<StatusFactory> statusFactories = ParseStatuses(fields[10], statuses);
-            float buildingDistance = float.Parse(fields[11], CultureInfo.InvariantCulture);
-            float viewRange = float.Parse(fields[12], CultureInfo.InvariantCulture);
-            bool blocksVision = fields[13] == "yes";
+            try
+            {
+                string structureType = fields[0]; pos++;
+                float maxHealth = float.Parse(fields[1], CultureInfo.InvariantCulture); pos++;
+                float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture); pos++;
+                bool physical = fields[3] == "yes"; pos++;
+                int size = int.Parse(fields[4], CultureInfo.InvariantCulture); pos++;
+                float energyCost = float.Parse(fields[5], CultureInfo.InvariantCulture); pos++;
+                Biome biome = (Biome)Enum.Parse(typeof(Biome), fields[6]); pos++;
+                Terrain terrain = (Terrain)Enum.Parse(typeof(Terrain), fields[7]); pos++;
+                SoilQuality soilQuality = (SoilQuality)Enum.Parse(typeof(SoilQuality), fields[8]); pos++; pos++;
+                List<StatusFactory> statusFactories = ParseStatuses(fields[10], statuses); pos++;
+                float buildingDistance = float.Parse(fields[11], CultureInfo.InvariantCulture); pos++;
+                float viewRange = float.Parse(fields[12], CultureInfo.InvariantCulture); pos++;
+                bool blocksVision = fields[13] == "yes"; pos++;
+                pos = 0;
 
-            StructureFactory newFactory = new StructureFactory(structureType, maxHealth, maxEnergy, size, physical, energyCost,
-                biome, terrain, soilQuality, buildingDistance, viewRange, blocksVision, statusFactories);
-            FactoryMap.Add(structureType, newFactory);
-            abilitiesList.Add(structureType, fields[9]);
+                StructureFactory newFactory = new StructureFactory(structureType, maxHealth, maxEnergy, size, physical, energyCost,
+                    biome, terrain, soilQuality, buildingDistance, viewRange, blocksVision, statusFactories);
+                FactoryMap.Add(structureType, newFactory);
+                abilitiesList.Add(structureType, fields[9]);
+            }
+            catch (Exception e) when (e is ArgumentException || e is OverflowException || e is FormatException)
+            {
+                throw new ArgumentException($"Invalid value '{fields[pos]}' at position {pos + 1}.");
+            }
         }
     }
 
@@ -278,53 +328,64 @@ namespace SanguineGenesis.GameLogic.Data.Entities
     {
         public override void AddNewFactory(string description, Statuses.Statuses statuses)
         {
+            //current parsing position
+            int pos = 0;
             string[] fields = description.Split(',');
-            string unitType = fields[0];
-            float maxHealth = float.Parse(fields[1], CultureInfo.InvariantCulture);
-            float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture);
-            float foodEnergyRegen = float.Parse(fields[3], CultureInfo.InvariantCulture);
-            float foodEatingPeriod = float.Parse(fields[4], CultureInfo.InvariantCulture);
-            float radius = float.Parse(fields[5], CultureInfo.InvariantCulture);
-            float energyCost = float.Parse(fields[6], CultureInfo.InvariantCulture);
-            float attackDamage = float.Parse(fields[7], CultureInfo.InvariantCulture);
-            float attackDistance = float.Parse(fields[8], CultureInfo.InvariantCulture);
-            float attackPeriod = float.Parse(fields[9], CultureInfo.InvariantCulture);
-            bool mechanicalDamage = fields[10] == "yes";
-            //field[11] isn't important
-            float maxSpeedLand = float.Parse(fields[12], CultureInfo.InvariantCulture);
-            float maxSpeedWater = float.Parse(fields[13], CultureInfo.InvariantCulture);
-            Movement movement = (Movement)Enum.Parse(typeof(Movement), fields[14]);
-            bool thickSkin = fields[15] == "yes";
-            Diet diet = (Diet)Enum.Parse(typeof(Diet), fields[16]);
-            float spawningTime = float.Parse(fields[17], CultureInfo.InvariantCulture);
-            List<StatusFactory> statusFactories = ParseStatuses(fields[19], statuses);
-            int air = int.Parse(fields[20], CultureInfo.InvariantCulture);
+            try
+            {
+                string unitType = fields[0]; pos++;
+                float maxHealth = float.Parse(fields[1], CultureInfo.InvariantCulture); pos++;
+                float maxEnergy = float.Parse(fields[2], CultureInfo.InvariantCulture); pos++;
+                float foodEnergyRegen = float.Parse(fields[3], CultureInfo.InvariantCulture); pos++;
+                float foodEatingPeriod = float.Parse(fields[4], CultureInfo.InvariantCulture); pos++;
+                float radius = float.Parse(fields[5], CultureInfo.InvariantCulture);
+                if (radius > 0.5f) throw new ArgumentException("The radius of animal can be at most 0.5."); pos++;
+                float energyCost = float.Parse(fields[6], CultureInfo.InvariantCulture); pos++;
+                float attackDamage = float.Parse(fields[7], CultureInfo.InvariantCulture); pos++;
+                float attackDistance = float.Parse(fields[8], CultureInfo.InvariantCulture); pos++;
+                float attackPeriod = float.Parse(fields[9], CultureInfo.InvariantCulture); pos++;
+                bool mechanicalDamage = fields[10] == "yes"; pos++;
+                //field[11] isn't important - it shows damage per second
+                float maxSpeedLand = float.Parse(fields[12], CultureInfo.InvariantCulture); pos++;
+                float maxSpeedWater = float.Parse(fields[13], CultureInfo.InvariantCulture); pos++;
+                Movement movement = (Movement)Enum.Parse(typeof(Movement), fields[14]); pos++;
+                bool thickSkin = fields[15] == "yes"; pos++;
+                Diet diet = (Diet)Enum.Parse(typeof(Diet), fields[16]); pos++;
+                float spawningTime = float.Parse(fields[17], CultureInfo.InvariantCulture); pos++;
+                List<StatusFactory> statusFactories = ParseStatuses(fields[18], statuses); pos++; pos++;
+                int air = int.Parse(fields[20], CultureInfo.InvariantCulture); pos++;
+                pos = 0;
 
-            FactoryMap.Add(unitType, 
-                new AnimalFactory(
-                    unitType: unitType,
-                    maxHealth: maxHealth,
-                    maxEnergy: maxEnergy,
-                    foodEnergyRegen: foodEnergyRegen,
-                    foodEatingPeriod: foodEatingPeriod,
-                    radius: radius,
-                    attackDamage: attackDamage,
-                    attackPeriod: attackPeriod,
-                    attackDistance: attackDistance,
-                    mechanicalDamage: mechanicalDamage,
-                    maxSpeedLand: maxSpeedLand,
-                    maxSpeedWater: maxSpeedWater,
-                    movement: movement,
-                    thickSkin: thickSkin,
-                    diet: diet,
-                    spawningTime: spawningTime,
-                    physical: true,
-                    energyCost: energyCost,
-                    viewRange: 5,
-                    statusFactories: statusFactories,
-                    air:air));
+                FactoryMap.Add(unitType, 
+                    new AnimalFactory(
+                        unitType: unitType,
+                        maxHealth: maxHealth,
+                        maxEnergy: maxEnergy,
+                        foodEnergyRegen: foodEnergyRegen,
+                        foodEatingPeriod: foodEatingPeriod,
+                        radius: radius,
+                        attackDamage: attackDamage,
+                        attackPeriod: attackPeriod,
+                        attackDistance: attackDistance,
+                        mechanicalDamage: mechanicalDamage,
+                        maxSpeedLand: maxSpeedLand,
+                        maxSpeedWater: maxSpeedWater,
+                        movement: movement,
+                        thickSkin: thickSkin,
+                        diet: diet,
+                        spawningTime: spawningTime,
+                        physical: true,
+                        energyCost: energyCost,
+                        viewRange: 5,
+                        statusFactories: statusFactories,
+                        air:air));
 
-            abilitiesList.Add(unitType, fields[19]);
+                abilitiesList.Add(unitType, fields[19]);
+            }
+            catch (Exception e) when (e is ArgumentException || e is OverflowException || e is FormatException)
+            {
+                throw new ArgumentException($"Invalid value '{fields[pos]}' at position {pos + 1}: {e.Message}", e);
+            }
         }
     }
 }
