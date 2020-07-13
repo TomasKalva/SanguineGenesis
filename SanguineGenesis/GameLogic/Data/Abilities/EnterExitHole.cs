@@ -39,7 +39,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The animal enters the hole.";
+            return "The animal enters HOLE.";
         }
     }
 
@@ -88,7 +88,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "All animals exit the hole the hole.";
+            return "All animals exit the hole.";
         }
     }
 

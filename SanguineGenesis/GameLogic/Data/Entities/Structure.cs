@@ -11,7 +11,7 @@ using SanguineGenesis.GUI.WinFormsControls;
 namespace SanguineGenesis.GameLogic.Data.Entities
 {
     /// <summary>
-    /// Represent not living building.
+    /// Represents not living building.
     /// </summary>
     class Structure : Building, IDecayable
     {

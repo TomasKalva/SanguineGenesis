@@ -457,7 +457,7 @@
     <None Include="Images\Icons\Statuses\knock_away.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Statuses\on_tree.png">
+    <None Include="Images\Icons\Statuses\on_plant.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Images\Icons\Statuses\poison.png">
@@ -472,7 +472,7 @@
     <None Include="Images\Icons\Statuses\suffocating.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Images\Icons\Statuses\underground.png">
+    <None Include="Images\Icons\Statuses\hole_system.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -920,6 +920,17 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="SharpGL.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Maps\Tutorial\buildings.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\Tutorial\nutrients.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Maps\Tutorial\terrain.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

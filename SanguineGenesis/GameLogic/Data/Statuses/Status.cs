@@ -98,7 +98,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return $"Increases speed of animal by {StatusFact.SpeedBonus}.";
+            return $"Increases speed of this animal by {StatusFact.SpeedBonus}.";
         }
     }
 
@@ -341,7 +341,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return $"There are {Animals.Count()} animals on this tree.";
+            return $"There are animals on this plant.";
         }
     }
 
@@ -372,7 +372,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         public override string Description()
         {
-            return $"The number of animals in hole system is {AnimalsInHole.Count()}.";
+            return $"Animals can enter the hole system through this building.";
         }
     }
 

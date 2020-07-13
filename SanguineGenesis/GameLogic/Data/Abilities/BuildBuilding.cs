@@ -36,7 +36,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return $"The building is built at the target node. Requires at least {BuildingFactory.SoilQuality} soil qulity in " +
+            return $"The building is built on the target node. Requires at least {BuildingFactory.SoilQuality} soil qulity in " +
                 $"{BuildingFactory.Biome} on {BuildingFactory.Terrain} to be built. The building can't be built on a node blocked by another entity.";
         }
         public override List<Stat> Stats()
@@ -44,11 +44,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
-            new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self useable", SelfUseable.ToString()),
-            new Stat("Only one", OnlyOne.ToString()),
-            new Stat( "Target type", TargetName),
-            new Stat( "Building size", BuildingFactory.Size.ToString()),
+                new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
+                new Stat( "Self useable", SelfUseable.ToString()),
+                new Stat("Only one", OnlyOne.ToString()),
+                new Stat( "Target type", TargetName),
+                new Stat( "Building size", BuildingFactory.Size.ToString()),
             };
             return stats;
         }

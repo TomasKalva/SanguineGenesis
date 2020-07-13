@@ -101,6 +101,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         {
             return GetType().Name;
         }
+
+        /// <summary>
+        /// Returns name of target type visible to the player.
+        /// </summary>
+        public virtual string TargetName { get; }
     }
 
     abstract class Ability<User, Target> : Ability where User:Entity 
@@ -164,7 +169,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
         /// <summary>
         /// Returns name of target type visible to the player.
         /// </summary>
-        public string TargetName
+        public override string TargetName
         {
             get
             {
@@ -298,11 +303,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
-            new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self useable", SelfUseable.ToString()),
-            new Stat("Only one", OnlyOne.ToString()),
-            new Stat( "Target type", TargetName),
-            new Stat( "Interruptable", Interruptable.ToString()),
+                new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
+                new Stat( "Self useable", SelfUseable.ToString()),
+                new Stat( "Only one", OnlyOne.ToString()),
+                new Stat( "Target type", TargetName),
+                new Stat( "Interruptable", Interruptable.ToString()),
             };
             return stats;
         }

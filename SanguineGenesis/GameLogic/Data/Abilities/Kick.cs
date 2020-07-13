@@ -33,18 +33,18 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
-            new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self useable", SelfUseable.ToString()),
-            new Stat("Only one", OnlyOne.ToString()),
-            new Stat( "Target type", TargetName),
-            new Stat( "Energy dmg", EnergyDamage.ToString("0.0")),
+                new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
+                new Stat( "Self useable", SelfUseable.ToString()),
+                new Stat( "Only one", OnlyOne.ToString()),
+                new Stat( "Target type", TargetName),
+                new Stat( "Energy dmg", EnergyDamage.ToString("0.0")),
             };
             return stats;
         }
 
         public override string Description()
         {
-            return "The animal kicks the target animal removing some of its energy.";
+            return $"The animal kicks the target animal and removes {EnergyDamage} of its energy.";
         }
     }
 

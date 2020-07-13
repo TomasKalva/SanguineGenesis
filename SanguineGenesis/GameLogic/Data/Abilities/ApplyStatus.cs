@@ -30,7 +30,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return $"The unit gain status {StatusFactory}.";
+            return $"The animal gains status {StatusFactory}.";
         }
     }
 

@@ -181,7 +181,7 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
         /// <summary>
         /// Animal that will be put on the tree. Should be set right before using this factory to apply status.
         /// </summary>
-        public Animal PutOnTree { get; set; }
+        public Animal PutOnPlant { get; set; }
         public ClimbDownPlant ClimbDownPlant { get; }
 
         public AnimalsOnPlantFactory(ClimbDownPlant climbDownPlant)
@@ -192,35 +192,35 @@ namespace SanguineGenesis.GameLogic.Data.Statuses
 
         protected override Status NewInstance(Plant affected)
         {
-            return new AnimalsOnPlant(affected, this, PutOnTree);
+            return new AnimalsOnPlant(affected, this, PutOnPlant);
         }
 
 
         public override bool ApplyToAffected(Plant affected)
         {
-            if (PutOnTree == null)
+            if (PutOnPlant == null)
                 return false;
 
             AnimalsOnPlant alreadyApplied = (AnimalsOnPlant)affected.Statuses.Where((s) => s.GetType() == typeof(AnimalsOnPlant)).FirstOrDefault();
             if(alreadyApplied!=null)
             {
                 //use existing instance of the status
-                alreadyApplied.Animals.Add(PutOnTree);
-                PutOnTree.Faction.RemoveEntity(PutOnTree);
-                PutOnTree.StateChangeLock = alreadyApplied;
+                alreadyApplied.Animals.Add(PutOnPlant);
+                PutOnPlant.Faction.RemoveEntity(PutOnPlant);
+                PutOnPlant.StateChangeLock = alreadyApplied;
             }
             else
             {
                 //create new instance of the status
                 AnimalsOnPlant newStatus = (AnimalsOnPlant)NewInstance(affected);
                 affected.AddStatus(newStatus);
-                PutOnTree.Faction.RemoveEntity(PutOnTree);
-                PutOnTree.StateChangeLock = newStatus;
+                PutOnPlant.Faction.RemoveEntity(PutOnPlant);
+                PutOnPlant.StateChangeLock = newStatus;
             }
             return true;
         }
 
-        public override string GetName() => "ON_TREE";
+        public override string GetName() => "ON_PLANT";
     }
 
 

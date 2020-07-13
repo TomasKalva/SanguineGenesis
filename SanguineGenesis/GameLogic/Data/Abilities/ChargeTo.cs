@@ -35,11 +35,11 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
             List<Stat> stats = new List<Stat>()
             {
                 new Stat( "Energy cost", EnergyCost.ToString()),
-            new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
-            new Stat( "Self useable", SelfUseable.ToString()),
-            new Stat( "Only one", OnlyOne.ToString()),
-            new Stat( "Target type", TargetName),
-            new Stat( "Dmg mult", AttackDamageMultiplier.ToString("0.0")),
+                new Stat( "Distance", Distance==null?"ATT DIST" : Distance.ToString()),
+                new Stat( "Self useable", SelfUseable.ToString()),
+                new Stat( "Only one", OnlyOne.ToString()),
+                new Stat( "Target type", TargetName),
+                new Stat( "Dmg mult", AttackDamageMultiplier.ToString("0.0")),
             };
             return stats;
         }

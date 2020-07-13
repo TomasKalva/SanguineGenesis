@@ -30,7 +30,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return $"The unit applies poison to the target after short period of time. Poison deals {PoisonFactory.TickDamage} each {PoisonFactory.TickTime}s {PoisonFactory.TotalNumberOfTicks} times.";
+            return $"The animal applies poison to the target after short period of time. Poison deals {PoisonFactory.TickDamage} damage each {PoisonFactory.TickTime}s {PoisonFactory.TotalNumberOfTicks} times.";
         }
     }
 

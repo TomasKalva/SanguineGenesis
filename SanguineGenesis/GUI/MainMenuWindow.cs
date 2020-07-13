@@ -1,5 +1,6 @@
 ﻿using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.AI;
+using SanguineGenesis.GameLogic.Data;
 using SanguineGenesis.GameLogic.Data.Entities;
 using System;
 using System.Collections.Generic;

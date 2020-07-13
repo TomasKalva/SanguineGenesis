@@ -30,7 +30,7 @@ namespace SanguineGenesis.GameLogic.Data.Abilities
 
         public override string Description()
         {
-            return "The animal knocks other animal back.";
+            return "The animal knocks the target animal back.";
         }
     }
 
