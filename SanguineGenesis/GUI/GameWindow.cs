@@ -503,6 +503,12 @@ namespace SanguineGenesis.GUI
                 //switch showing of nutrients
                 GameplayOptions.NutrientsVisible = !GameplayOptions.NutrientsVisible;
             }
+            else if (e.KeyCode == Keys.G)
+            {
+                //center map to the selected entity
+                if (EntityButtonArray.Selected != null)
+                    GameControls.MapView.CenterTo(Game.Map, EntityButtonArray.Selected.Center);
+            }
             else if ((controlGroupIndex = ControlGroupButtonArray.KeyToGroupIndex(e.KeyCode)) != -1)
             {
                 //modify control groups
