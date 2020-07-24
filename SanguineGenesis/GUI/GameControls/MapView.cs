@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Data.Entities;
 using SanguineGenesis.GameLogic.Maps;
@@ -131,7 +132,9 @@ namespace SanguineGenesis.GameControls
                 return new List<Entity>(); ;
 
             return GameQuerying
-                .SelectVisibleEntities(observer, GameQuerying.SelectEntitiesInArea(game, ((IRectangle)this).GetRect()));
+                .SelectVisibleEntities(observer,
+                    //sprite can be seen even if entity is slightly out of the window
+                    GameQuerying.SelectEntitiesInArea(game, new Rect(Left - 2, Bottom - 4, Right + 2, Top + 1)));
         }
 
         #endregion Data retrieval

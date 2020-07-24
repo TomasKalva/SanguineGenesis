@@ -68,7 +68,7 @@ namespace SanguineGenesis.GameLogic.Data.Entities
                         AddNewFactory(line, statuses);
                         lineN++;
                     }
-                }catch(ArgumentException e)
+                }catch(Exception e) when (e is ArgumentException || e is IOException || e is OutOfMemoryException)
                 {
                     throw new ArgumentException($"Error in file {fileName} at line {lineN}: {e.Message}", e);
                 }
