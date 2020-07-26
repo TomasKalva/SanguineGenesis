@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SanguineGenesis;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SanguineGenesis.GameLogic;
 using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GameLogic.Maps.VisibilityGenerating;
