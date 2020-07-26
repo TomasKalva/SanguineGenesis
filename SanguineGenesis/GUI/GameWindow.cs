@@ -4,7 +4,6 @@ using SanguineGenesis.GameLogic.AI;
 using SanguineGenesis.GameLogic.Data;
 using SanguineGenesis.GameLogic.Data.Abilities;
 using SanguineGenesis.GameLogic.Data.Entities;
-using SanguineGenesis.GameLogic.Maps;
 using SanguineGenesis.GameLogic.Maps.MovementGenerating;
 using SanguineGenesis.GUI.WinFormsControls;
 using SharpGL;
@@ -48,12 +47,21 @@ namespace SanguineGenesis.GUI
 
         public GameWindow(MainMenuWindow mainMenuWindow)
         {
-            InitializeComponent();
-            Initialized = false;
-            CloseWindow = false;
-
             //initialize MainMenuWindow
             MainMenuWindow = mainMenuWindow;
+
+            try
+            {
+                InitializeComponent();
+            }catch(Exception e)
+            {
+                MessageBox.Show($"Failed to initialize OpenGL context: {e.Message}");
+                MainMenuWindow.CanCreateGame = false;
+                Close();
+                return;
+            }
+            Initialized = false;
+            CloseWindow = false;
 
             //initialize game controls
             GameControls = new GameControls.GameControls();
@@ -390,7 +398,7 @@ namespace SanguineGenesis.GUI
         /// </summary>
         private void Draw(object sender, RenderEventArgs args)
         {
-            if (!Enabled)
+            if (!Enabled || !Initialized)
                 return;
 
             OpenGL gl = openGLControl.OpenGL;

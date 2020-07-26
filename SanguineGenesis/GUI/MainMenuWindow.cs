@@ -548,7 +548,7 @@ namespace SanguineGenesis.GUI
                         //create new window only if it wasn't created already
                         if (gameWindow == null)
                             gameWindow = new GameWindow(this);
-                        if (CanCreateGame)
+                        if (CanCreateGame && gameWindow!=null)
                         {
                             gameWindow.Enabled = true;
                             gameWindow.StartNewGame(MapDescr, PlayersBiome, testAnimalsCB.Checked, AIs.GetAIFactory(aiCB.Text));
