@@ -22,7 +22,7 @@ A sprawling biome embodying the vitality of expansive grasslands and sporadic, h
 Description of [structures](https://github.com/TomasKalva/SanguineGenesis/files/12803331/prace.3.-137-161.pdf).
 
 ## Animals
-Description of [animals.pdf](https://github.com/TomasKalva/SanguineGenesis/files/12803329/prace.3.-117-134.pdf).
+Description of [animals](https://github.com/TomasKalva/SanguineGenesis/files/12803329/prace.3.-117-134.pdf).
 
 ## Documentation
 
